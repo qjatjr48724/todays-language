@@ -16,19 +16,29 @@ AI 기반 데일리 언어 학습 앱 프로젝트입니다.
 ## 현재 진행 상태
 
 - [x] Flutter 개발 환경 세팅 (Windows)
-- [x] Flutter 프로젝트 생성 및 실행 확인
-- [ ] Firebase 연동 (`flutterfire configure`)
-- [ ] Authentication (Email -> Google -> Apple)
-- [ ] Firestore 최소 스키마 반영
+- [x] Flutter 프로젝트 생성 및 에뮬레이터(Android) 실행 확인
+- [x] Firebase 연동
+  - Firebase CLI 로그인 후 `flutterfire configure` (프로젝트: `todays-language-dev` 등 콘솔에서 만든 ID)
+  - `lib/firebase_options.dart` 생성, `main.dart`에서 `Firebase.initializeApp` 적용
+  - 의존성: `firebase_core`, `firebase_auth`, `cloud_firestore`, `cloud_functions`
+- [x] Android 빌드 안정화: `gradle.properties`의 JVM 메모리 설정 과다 시 Gradle 데몬 크래시 가능 → 상한 완화
+- [ ] Authentication (Email → Google → Apple) — 콘솔에서 제공자 활성화 + 앱 UI
+- [ ] Firestore 생성 및 최소 스키마(`docs/FIRESTORE_MIN_SCHEMA.md`) 반영
 - [ ] Cloud Functions AI 호출 프로토타입
+
+**Android 패키지명(Firebase 콘솔 등록 시):** `com.todayslanguage.mobile`
 
 ## 빠른 시작 (Windows)
 
 ```powershell
 cd "app/mobile"
 flutter pub get
+flutter devices
 flutter run
+# 에뮬레이터만 쓸 때 예: flutter run -d emulator-5554
 ```
+
+Firebase용 CLI를 쓸 때(한 번): `npm install -g firebase-tools` 후 `firebase login`, 앱 폴더에서 `flutterfire configure`.
 
 ## 문서
 
