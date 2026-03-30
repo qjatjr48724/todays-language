@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../services/daily_progress_sync.dart';
 import '../services/user_profile_sync.dart';
+import '../ui/home_feature_card.dart';
 import '../ui/section_card.dart';
 import '../utils/kst_date.dart';
 
@@ -97,11 +98,34 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  int _computedProgressPercent(DailyProgressView p) {
+    final totalGoal = p.wordGoal + p.sentenceGoal + p.quizGoal;
+    if (totalGoal <= 0) return 0;
+    final totalDone = p.wordDone + p.sentenceDone + p.quizDone;
+    return ((totalDone / totalGoal) * 100).round().clamp(0, 100);
+  }
+
+  Color _progressColor(ColorScheme scheme, int percent) {
+    if (percent >= 80) return Colors.green;
+    if (percent >= 40) return Colors.orange;
+    return Colors.red;
+  }
+
+  double _progressValue01(int percent) {
+    // 0%일 때는 채움이 아예 없어 색이 안 보이므로,
+    // UI상 최소 표시값을 주되 텍스트는 0%로 유지합니다.
+    if (percent <= 0) return 0.02;
+    return (percent / 100).clamp(0.0, 1.0);
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
     final scheme = Theme.of(context).colorScheme;
     final p = _todayProgress;
+    final percent = p == null
+        ? null
+        : (p.progressPercent > 0 ? p.progressPercent : _computedProgressPercent(p));
 
     return Scaffold(
       appBar: AppBar(
@@ -119,75 +143,133 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SectionCard(
-              title: '내 계정',
-              subtitle: user?.email ?? '-',
-              trailing: CircleAvatar(
-                radius: 16,
-                backgroundColor: scheme.primaryContainer,
-                foregroundColor: scheme.onPrimaryContainer,
-                child: const Icon(Icons.person, size: 18),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SelectableText('UID: ${user?.uid ?? '-'}'),
-                  if (_profileError != null) ...[
-                    const SizedBox(height: 8),
-                    Text(_profileError!, style: TextStyle(color: scheme.error)),
-                  ],
-                ],
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '홈',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                ),
+                if (user?.email != null)
+                  Text(
+                    user!.email!,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.copyWith(color: scheme.onSurfaceVariant),
+                  ),
+              ],
             ),
+            if (_profileError != null) ...[
+              const SizedBox(height: 8),
+              Text(_profileError!, style: TextStyle(color: scheme.error)),
+            ],
+            const SizedBox(height: 16),
+
+            GridView.count(
+              crossAxisCount: 2,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+              childAspectRatio: 1.05,
+              children: [
+                HomeFeatureCard(
+                  title: '오늘의 단어',
+                  subtitle: '매일 50개',
+                  icon: Icons.translate,
+                  progressText: p == null ? null : '${p.wordDone} / ${p.wordGoal}',
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('TODO: 오늘의 단어 화면')),
+                    );
+                  },
+                ),
+                HomeFeatureCard(
+                  title: '오늘의 문장',
+                  subtitle: '매일 10개',
+                  icon: Icons.format_quote,
+                  progressText: p == null
+                      ? null
+                      : '${p.sentenceDone} / ${p.sentenceGoal}',
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('TODO: 오늘의 문장 화면')),
+                    );
+                  },
+                ),
+                HomeFeatureCard(
+                  title: '단어 퀴즈',
+                  subtitle: '4지선다',
+                  icon: Icons.quiz_outlined,
+                  progressText: p == null ? null : '${p.quizDone} / ${p.quizGoal}',
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('TODO: 단어 퀴즈 화면')),
+                    );
+                  },
+                ),
+                HomeFeatureCard(
+                  title: 'AI 단어 샘플',
+                  subtitle: '프로토타입',
+                  icon: Icons.auto_stories_outlined,
+                  onTap: _fnLoading ? () {} : _fetchSampleWord,
+                  progressText: _fnResult == null ? null : '응답 수신됨',
+                ),
+              ],
+            ),
+
             const SizedBox(height: 16),
             SectionCard(
-              title: '오늘의 진도',
+              title: '오늘의 진행률',
               subtitle: 'KST · ${todayKstYyyyMmDd()}',
               child: _loadingProgress
                   ? const LinearProgressIndicator()
-                  : (p == null)
+                  : (percent == null)
                       ? Text('데이터가 없습니다.', style: TextStyle(color: scheme.error))
                       : Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              '단어: ${p.wordDone} / ${p.wordGoal} · 문장: ${p.sentenceDone} / ${p.sentenceGoal} · 퀴즈: ${p.quizDone} / ${p.quizGoal}',
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(999),
+                                    child: LinearProgressIndicator(
+                                      value: _progressValue01(percent),
+                                      minHeight: 12,
+                                      backgroundColor:
+                                          scheme.surfaceContainerHighest,
+                                      valueColor: AlwaysStoppedAnimation(
+                                        _progressColor(scheme, percent),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Text('$percent%'),
+                              ],
                             ),
-                            const SizedBox(height: 6),
-                            Text('진행률(저장값): ${p.progressPercent}%'),
+                            const SizedBox(height: 10),
+                            if (p != null)
+                              Text(
+                                '단어 ${p.wordDone}/${p.wordGoal} · 문장 ${p.sentenceDone}/${p.sentenceGoal} · 퀴즈 ${p.quizDone}/${p.quizGoal}',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(color: scheme.onSurfaceVariant),
+                              ),
+                            if (_fnError != null) ...[
+                              const SizedBox(height: 10),
+                              Text(_fnError!, style: TextStyle(color: scheme.error)),
+                            ],
+                            if (_fnResult != null) ...[
+                              const SizedBox(height: 10),
+                              SelectableText(_fnResult!),
+                            ],
                           ],
                         ),
-            ),
-            const SizedBox(height: 16),
-            SectionCard(
-              title: 'AI 프로토타입',
-              subtitle: 'Cloud Functions · generateWord',
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  FilledButton.icon(
-                    onPressed: _fnLoading ? null : _fetchSampleWord,
-                    icon: _fnLoading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Icon(Icons.auto_stories_outlined),
-                    label: Text(
-                      _fnLoading ? '불러오는 중…' : '샘플 단어 받기',
-                    ),
-                  ),
-                  if (_fnError != null) ...[
-                    const SizedBox(height: 12),
-                    Text(_fnError!, style: TextStyle(color: scheme.error)),
-                  ],
-                  if (_fnResult != null) ...[
-                    const SizedBox(height: 12),
-                    SelectableText(_fnResult!),
-                  ],
-                ],
-              ),
             ),
           ],
         ),

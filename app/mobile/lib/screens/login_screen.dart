@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -14,6 +15,9 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _loading = false;
   String? _errorMessage;
+
+  static const _testEmail = 'test@test.com';
+  static const _testPassword = 'test1234';
 
   @override
   void dispose() {
@@ -54,6 +58,37 @@ class _LoginScreenState extends State<LoginScreen> {
         password: _passwordController.text,
       );
     } on FirebaseAuthException catch (e) {
+      setState(() => _errorMessage = _messageForAuthException(e));
+    } catch (_) {
+      setState(() => _errorMessage = '알 수 없는 오류가 발생했습니다.');
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _signInTestAccount() async {
+    setState(() {
+      _loading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _testEmail,
+        password: _testPassword,
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: _testEmail,
+          password: _testPassword,
+        );
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: _testEmail,
+          password: _testPassword,
+        );
+        return;
+      }
       setState(() => _errorMessage = _messageForAuthException(e));
     } catch (_) {
       setState(() => _errorMessage = '알 수 없는 오류가 발생했습니다.');
@@ -141,6 +176,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: _loading ? null : _register,
                   child: const Text('회원가입'),
                 ),
+                if (kDebugMode) ...[
+                  const SizedBox(height: 12),
+                  OutlinedButton.icon(
+                    onPressed: _loading ? null : _signInTestAccount,
+                    icon: const Icon(Icons.bolt),
+                    label: const Text('테스트 계정으로 자동 로그인'),
+                  ),
+                ],
                 const SizedBox(height: 16),
                 Text(
                   'Google/Apple 로그인은 이후 단계에서 추가됩니다.',
