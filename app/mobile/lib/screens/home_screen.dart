@@ -6,6 +6,9 @@ import '../services/daily_progress_sync.dart';
 import '../services/user_profile_sync.dart';
 import '../ui/home_feature_card.dart';
 import '../ui/section_card.dart';
+import 'today_sentences_screen.dart';
+import 'today_words_screen.dart';
+import 'word_quiz_screen.dart';
 import '../utils/kst_date.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -51,6 +54,18 @@ class _HomeScreenState extends State<HomeScreen> {
         _profileError = '프로필 또는 진도 동기화 실패: $e';
         _loadingProgress = false;
       });
+    }
+  }
+
+  Future<void> _refreshTodayProgress() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+    try {
+      final p = await ensureTodayDailyProgress(user);
+      if (!mounted) return;
+      setState(() => _todayProgress = p);
+    } catch (_) {
+      // 홈 새로고침 실패는 UI 흐름을 막지 않음
     }
   }
 
@@ -181,9 +196,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: Icons.translate,
                   progressText: p == null ? null : '${p.wordDone} / ${p.wordGoal}',
                   onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('TODO: 오늘의 단어 화면')),
-                    );
+                    Navigator.of(context)
+                        .push(
+                      MaterialPageRoute(
+                        builder: (_) => const TodayWordsScreen(),
+                      ),
+                    )
+                        .then((_) => _refreshTodayProgress());
                   },
                 ),
                 HomeFeatureCard(
@@ -194,9 +213,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       ? null
                       : '${p.sentenceDone} / ${p.sentenceGoal}',
                   onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('TODO: 오늘의 문장 화면')),
-                    );
+                    Navigator.of(context)
+                        .push(
+                      MaterialPageRoute(
+                        builder: (_) => const TodaySentencesScreen(),
+                      ),
+                    )
+                        .then((_) => _refreshTodayProgress());
                   },
                 ),
                 HomeFeatureCard(
@@ -205,9 +228,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: Icons.quiz_outlined,
                   progressText: p == null ? null : '${p.quizDone} / ${p.quizGoal}',
                   onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('TODO: 단어 퀴즈 화면')),
-                    );
+                    Navigator.of(context)
+                        .push(
+                      MaterialPageRoute(
+                        builder: (_) => const WordQuizScreen(),
+                      ),
+                    )
+                        .then((_) => _refreshTodayProgress());
                   },
                 ),
                 HomeFeatureCard(

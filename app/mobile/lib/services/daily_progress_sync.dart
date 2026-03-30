@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../utils/kst_date.dart';
 
+enum DailyProgressKind { word, sentence, quiz }
+
 /// [docs/FIRESTORE_MIN_SCHEMA.md] — `users/{uid}/daily_progress/{dateKst}`
 class DailyProgressView {
   const DailyProgressView({
@@ -78,4 +80,82 @@ Future<DailyProgressView> ensureTodayDailyProgress(User user) async {
   final after = await ref.get();
   final data = after.data() ?? {};
   return DailyProgressView.fromMap(dateKst, data);
+}
+
+/// 오늘(KST) 진도를 1회 증가시키고 progressPercent까지 갱신합니다.
+///
+/// - 트랜잭션으로 동시 업데이트를 안전하게 처리합니다.
+/// - goal을 초과하지 않도록 clamp 합니다.
+Future<DailyProgressView> incrementTodayDailyProgress(
+  User user, {
+  required DailyProgressKind kind,
+}) async {
+  final dateKst = todayKstYyyyMmDd();
+  final ref = FirebaseFirestore.instance
+      .collection('users')
+      .doc(user.uid)
+      .collection('daily_progress')
+      .doc(dateKst);
+
+  return FirebaseFirestore.instance.runTransaction((tx) async {
+    final snap = await tx.get(ref);
+    final data = snap.data() ?? <String, dynamic>{};
+
+    int iv(String k, int def) {
+      final v = data[k];
+      if (v is int) return v;
+      if (v is num) return v.toInt();
+      return def;
+    }
+
+    final wordGoal = iv('wordGoal', 50);
+    final sentenceGoal = iv('sentenceGoal', 10);
+    final quizGoal = iv('quizGoal', 20);
+
+    var wordDone = iv('wordDone', 0);
+    var sentenceDone = iv('sentenceDone', 0);
+    var quizDone = iv('quizDone', 0);
+
+    switch (kind) {
+      case DailyProgressKind.word:
+        wordDone = (wordDone + 1).clamp(0, wordGoal);
+      case DailyProgressKind.sentence:
+        sentenceDone = (sentenceDone + 1).clamp(0, sentenceGoal);
+      case DailyProgressKind.quiz:
+        quizDone = (quizDone + 1).clamp(0, quizGoal);
+    }
+
+    final totalGoal = wordGoal + sentenceGoal + quizGoal;
+    final totalDone = wordDone + sentenceDone + quizDone;
+    final percent = totalGoal <= 0
+        ? 0
+        : ((totalDone / totalGoal) * 100).round().clamp(0, 100);
+
+    tx.set(
+      ref,
+      {
+        'dateKst': dateKst,
+        'wordGoal': wordGoal,
+        'wordDone': wordDone,
+        'sentenceGoal': sentenceGoal,
+        'sentenceDone': sentenceDone,
+        'quizGoal': quizGoal,
+        'quizDone': quizDone,
+        'progressPercent': percent,
+        'updatedAt': FieldValue.serverTimestamp(),
+      },
+      SetOptions(merge: true),
+    );
+
+    return DailyProgressView(
+      dateKst: dateKst,
+      wordGoal: wordGoal,
+      wordDone: wordDone,
+      sentenceGoal: sentenceGoal,
+      sentenceDone: sentenceDone,
+      quizGoal: quizGoal,
+      quizDone: quizDone,
+      progressPercent: percent,
+    );
+  });
 }
