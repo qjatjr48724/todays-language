@@ -1,5 +1,6 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../services/daily_progress_sync.dart';
@@ -22,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _profileError;
   DailyProgressView? _todayProgress;
   bool _loadingProgress = true;
+  bool _resettingProgress = false;
 
   bool _fnLoading = false;
   String? _fnResult;
@@ -66,6 +68,27 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() => _todayProgress = p);
     } catch (_) {
       // 홈 새로고침 실패는 UI 흐름을 막지 않음
+    }
+  }
+
+  Future<void> _resetTodayProgress() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+    setState(() => _resettingProgress = true);
+    try {
+      final p = await resetTodayDailyProgress(user);
+      if (!mounted) return;
+      setState(() => _todayProgress = p);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('오늘 진행률을 초기화했어요.')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('초기화 실패: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _resettingProgress = false);
     }
   }
 
@@ -294,6 +317,20 @@ class _HomeScreenState extends State<HomeScreen> {
                             if (_fnResult != null) ...[
                               const SizedBox(height: 10),
                               SelectableText(_fnResult!),
+                            ],
+                            if (kDebugMode) ...[
+                              const SizedBox(height: 12),
+                              OutlinedButton.icon(
+                                onPressed: _resettingProgress ? null : _resetTodayProgress,
+                                icon: _resettingProgress
+                                    ? const SizedBox(
+                                        width: 18,
+                                        height: 18,
+                                        child: CircularProgressIndicator(strokeWidth: 2),
+                                      )
+                                    : const Icon(Icons.restart_alt),
+                                label: const Text('진행률 초기화(디버그)'),
+                              ),
                             ],
                           ],
                         ),

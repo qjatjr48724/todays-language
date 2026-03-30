@@ -12,7 +12,6 @@ class WordQuizScreen extends StatefulWidget {
 }
 
 class _WordQuizScreenState extends State<WordQuizScreen> {
-  bool _loading = false;
   String? _error;
 
   bool _aiLoading = true;
@@ -22,6 +21,7 @@ class _WordQuizScreenState extends State<WordQuizScreen> {
   int? _answerIndex;
   bool _showAnswer = false;
   int? _selectedIndex;
+  bool _progressSaving = false;
 
   @override
   void initState() {
@@ -38,6 +38,7 @@ class _WordQuizScreenState extends State<WordQuizScreen> {
       _answerIndex = null;
       _showAnswer = false;
       _selectedIndex = null;
+      _error = null;
     });
 
     try {
@@ -86,7 +87,9 @@ class _WordQuizScreenState extends State<WordQuizScreen> {
     final isSelected = index == selected;
 
     if (isAnswer) return Colors.green.withValues(alpha: 0.18);
-    if (isSelected && selected != answer) return Colors.red.withValues(alpha: 0.18);
+    if (isSelected && selected != answer) {
+      return Colors.red.withValues(alpha: 0.18);
+    }
     return scheme.surfaceContainerHighest;
   }
 
@@ -103,20 +106,34 @@ class _WordQuizScreenState extends State<WordQuizScreen> {
     return scheme.onSurfaceVariant;
   }
 
-  Future<void> _markDone() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
+  Future<void> _onChoiceTap(int i) async {
+    if (_showAnswer) return;
+
     setState(() {
-      _loading = true;
+      _selectedIndex = i;
+      _showAnswer = true;
       _error = null;
     });
+
+    final answer = _answerIndex;
+    if (answer == null || i != answer) {
+      return;
+    }
+
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    setState(() => _progressSaving = true);
     try {
       await incrementTodayDailyProgress(user, kind: DailyProgressKind.quiz);
-      await _fetchQuizSample();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('정답! 오늘 퀴즈 진도 +1')),
+      );
     } catch (e) {
-      setState(() => _error = '저장 실패: $e');
+      if (mounted) setState(() => _error = '진도 저장 실패: $e');
     } finally {
-      if (mounted) setState(() => _loading = false);
+      if (mounted) setState(() => _progressSaving = false);
     }
   }
 
@@ -131,7 +148,7 @@ class _WordQuizScreenState extends State<WordQuizScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'MVP: 퀴즈 샘플 + 완료 처리(+1)',
+              '보기를 고르면 정답/오답이 표시됩니다. 정답일 때만 진도가 +1 됩니다.',
               style: Theme.of(context)
                   .textTheme
                   .bodyMedium
@@ -141,14 +158,16 @@ class _WordQuizScreenState extends State<WordQuizScreen> {
             if (_aiLoading) ...[
               const LinearProgressIndicator(),
               const SizedBox(height: 12),
-              Text('샘플을 불러오는 중…',
-                  style: TextStyle(color: scheme.onSurfaceVariant)),
+              Text(
+                '문제를 불러오는 중…',
+                style: TextStyle(color: scheme.onSurfaceVariant),
+              ),
             ] else if (_aiError != null) ...[
               Text(_aiError!, style: TextStyle(color: scheme.error)),
               const SizedBox(height: 12),
               FilledButton(
                 onPressed: _fetchQuizSample,
-                child: const Text('샘플 다시 불러오기'),
+                child: const Text('다시 불러오기'),
               ),
             ] else ...[
               Text(
@@ -160,19 +179,11 @@ class _WordQuizScreenState extends State<WordQuizScreen> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: OutlinedButton(
-                    onPressed: () {
-                      if (_showAnswer) return;
-                      setState(() {
-                        _selectedIndex = i;
-                        _showAnswer = true;
-                      });
-                    },
+                    onPressed: _showAnswer ? null : () => _onChoiceTap(i),
                     style: OutlinedButton.styleFrom(
                       backgroundColor: _choiceBgColor(scheme, i),
                       foregroundColor: _choiceFgColor(scheme, i),
-                      side: BorderSide(
-                        color: scheme.outlineVariant,
-                      ),
+                      side: BorderSide(color: scheme.outlineVariant),
                     ),
                     child: Align(
                       alignment: Alignment.centerLeft,
@@ -191,18 +202,27 @@ class _WordQuizScreenState extends State<WordQuizScreen> {
                 ),
               ],
             ],
-            const SizedBox(height: 16),
-            FilledButton.icon(
-              onPressed: _loading ? null : _markDone,
-              icon: _loading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
+            const Spacer(),
+            if (!_aiLoading && _aiError == null && _promptKo != null) ...[
+              if (_progressSaving)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(bottom: 12),
+                    child: SizedBox(
+                      width: 24,
+                      height: 24,
                       child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.check),
-              label: Text(_loading ? '저장 중…' : '퀴즈 1개 완료(+1)'),
-            ),
+                    ),
+                  ),
+                ),
+              FilledButton.icon(
+                onPressed: (_aiLoading || !_showAnswer || _progressSaving)
+                    ? null
+                    : _fetchQuizSample,
+                icon: const Icon(Icons.refresh),
+                label: const Text('다음 문제'),
+              ),
+            ],
             if (_error != null) ...[
               const SizedBox(height: 12),
               Text(_error!, style: TextStyle(color: scheme.error)),
@@ -213,4 +233,3 @@ class _WordQuizScreenState extends State<WordQuizScreen> {
     );
   }
 }
-

@@ -159,3 +159,59 @@ Future<DailyProgressView> incrementTodayDailyProgress(
     );
   });
 }
+
+/// 오늘(KST) 진도를 0으로 초기화하고 progressPercent까지 갱신합니다.
+///
+/// - goal 값은 유지합니다.
+/// - 문서가 없어도 생성/병합되도록 처리합니다.
+Future<DailyProgressView> resetTodayDailyProgress(User user) async {
+  final dateKst = todayKstYyyyMmDd();
+  final ref = FirebaseFirestore.instance
+      .collection('users')
+      .doc(user.uid)
+      .collection('daily_progress')
+      .doc(dateKst);
+
+  return FirebaseFirestore.instance.runTransaction((tx) async {
+    final snap = await tx.get(ref);
+    final data = snap.data() ?? <String, dynamic>{};
+
+    int iv(String k, int def) {
+      final v = data[k];
+      if (v is int) return v;
+      if (v is num) return v.toInt();
+      return def;
+    }
+
+    final wordGoal = iv('wordGoal', 50);
+    final sentenceGoal = iv('sentenceGoal', 10);
+    final quizGoal = iv('quizGoal', 20);
+
+    tx.set(
+      ref,
+      {
+        'dateKst': dateKst,
+        'wordGoal': wordGoal,
+        'wordDone': 0,
+        'sentenceGoal': sentenceGoal,
+        'sentenceDone': 0,
+        'quizGoal': quizGoal,
+        'quizDone': 0,
+        'progressPercent': 0,
+        'updatedAt': FieldValue.serverTimestamp(),
+      },
+      SetOptions(merge: true),
+    );
+
+    return DailyProgressView(
+      dateKst: dateKst,
+      wordGoal: wordGoal,
+      wordDone: 0,
+      sentenceGoal: sentenceGoal,
+      sentenceDone: 0,
+      quizGoal: quizGoal,
+      quizDone: 0,
+      progressPercent: 0,
+    );
+  });
+}
