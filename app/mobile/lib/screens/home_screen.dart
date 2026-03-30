@@ -1,3 +1,4 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -15,6 +16,10 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _profileError;
   DailyProgressView? _todayProgress;
   bool _loadingProgress = true;
+
+  bool _fnLoading = false;
+  String? _fnResult;
+  String? _fnError;
 
   @override
   void initState() {
@@ -46,6 +51,42 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> _fetchSampleWord() async {
+    setState(() {
+      _fnLoading = true;
+      _fnError = null;
+      _fnResult = null;
+    });
+    try {
+      final callable = FirebaseFunctions.instanceFor(
+        region: 'asia-northeast3',
+      ).httpsCallable('generateWord');
+      final result = await callable.call<Map<String, dynamic>>({
+        'targetLanguage': 'ja',
+        'level': 'beginner',
+      });
+      final data = Map<String, dynamic>.from(result.data as Map);
+      final word = data['word']?.toString() ?? '';
+      final meaning = data['meaningKo']?.toString() ?? '';
+      final example = data['example']?.toString();
+      final buf = StringBuffer('$word — $meaning');
+      if (example != null && example.isNotEmpty) {
+        buf.write('\n예문: $example');
+      }
+      if (!mounted) return;
+      setState(() {
+        _fnResult = buf.toString();
+        _fnLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _fnError = '함수 호출 실패: $e';
+        _fnLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
@@ -63,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,7 +143,32 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
             const SizedBox(height: 24),
             Text(
-              'Firestore: users/{uid} 및 users/{uid}/daily_progress/{yyyy-MM-dd}',
+              'Cloud Functions (프로토타입)',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            FilledButton.icon(
+              onPressed: _fnLoading ? null : _fetchSampleWord,
+              icon: _fnLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.auto_stories_outlined),
+              label: Text(_fnLoading ? '불러오는 중…' : '샘플 단어 받기 (generateWord)'),
+            ),
+            if (_fnError != null) ...[
+              const SizedBox(height: 12),
+              Text(_fnError!, style: TextStyle(color: scheme.error)),
+            ],
+            if (_fnResult != null) ...[
+              const SizedBox(height: 12),
+              SelectableText(_fnResult!),
+            ],
+            const SizedBox(height: 24),
+            Text(
+              'Firestore: users/{uid} 및 daily_progress',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: scheme.onSurfaceVariant,
                   ),
