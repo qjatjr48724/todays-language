@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 
 import '../services/daily_progress_sync.dart';
 import '../services/user_profile_sync.dart';
+import '../ui/section_card.dart';
+import '../utils/kst_date.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -58,6 +60,14 @@ class _HomeScreenState extends State<HomeScreen> {
       _fnResult = null;
     });
     try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        throw Exception('로그인 상태가 아닙니다.');
+      }
+      // 로그인 직후 토큰이 아직 전파되지 않아 callable에서 unauthenticated가 뜨는 케이스가 있어
+      // 호출 전에 토큰을 강제로 갱신합니다.
+      await user.getIdToken(true);
+
       final callable = FirebaseFunctions.instanceFor(
         region: 'asia-northeast3',
       ).httpsCallable('generateWord');
@@ -109,69 +119,75 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              '로그인됨',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 12),
-            SelectableText('UID: ${user?.uid ?? '-'}'),
-            const SizedBox(height: 8),
-            SelectableText('이메일: ${user?.email ?? '-'}'),
-            if (_profileError != null) ...[
-              const SizedBox(height: 16),
-              Text(
-                _profileError!,
-                style: TextStyle(color: scheme.error),
+            SectionCard(
+              title: '내 계정',
+              subtitle: user?.email ?? '-',
+              trailing: CircleAvatar(
+                radius: 16,
+                backgroundColor: scheme.primaryContainer,
+                foregroundColor: scheme.onPrimaryContainer,
+                child: const Icon(Icons.person, size: 18),
               ),
-            ],
-            const SizedBox(height: 24),
-            Text(
-              '오늘의 진도 (KST)',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8),
-            if (_loadingProgress)
-              const LinearProgressIndicator()
-            else if (p != null) ...[
-              SelectableText('날짜 키: ${p.dateKst}'),
-              const SizedBox(height: 8),
-              Text(
-                '단어: ${p.wordDone} / ${p.wordGoal} · 문장: ${p.sentenceDone} / ${p.sentenceGoal} · 퀴즈: ${p.quizDone} / ${p.quizGoal}',
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SelectableText('UID: ${user?.uid ?? '-'}'),
+                  if (_profileError != null) ...[
+                    const SizedBox(height: 8),
+                    Text(_profileError!, style: TextStyle(color: scheme.error)),
+                  ],
+                ],
               ),
-              const SizedBox(height: 4),
-              Text('진행률(저장값): ${p.progressPercent}%'),
-            ],
-            const SizedBox(height: 24),
-            Text(
-              'Cloud Functions (프로토타입)',
-              style: Theme.of(context).textTheme.titleMedium,
             ),
-            const SizedBox(height: 8),
-            FilledButton.icon(
-              onPressed: _fnLoading ? null : _fetchSampleWord,
-              icon: _fnLoading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.auto_stories_outlined),
-              label: Text(_fnLoading ? '불러오는 중…' : '샘플 단어 받기 (generateWord)'),
+            const SizedBox(height: 16),
+            SectionCard(
+              title: '오늘의 진도',
+              subtitle: 'KST · ${todayKstYyyyMmDd()}',
+              child: _loadingProgress
+                  ? const LinearProgressIndicator()
+                  : (p == null)
+                      ? Text('데이터가 없습니다.', style: TextStyle(color: scheme.error))
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '단어: ${p.wordDone} / ${p.wordGoal} · 문장: ${p.sentenceDone} / ${p.sentenceGoal} · 퀴즈: ${p.quizDone} / ${p.quizGoal}',
+                            ),
+                            const SizedBox(height: 6),
+                            Text('진행률(저장값): ${p.progressPercent}%'),
+                          ],
+                        ),
             ),
-            if (_fnError != null) ...[
-              const SizedBox(height: 12),
-              Text(_fnError!, style: TextStyle(color: scheme.error)),
-            ],
-            if (_fnResult != null) ...[
-              const SizedBox(height: 12),
-              SelectableText(_fnResult!),
-            ],
-            const SizedBox(height: 24),
-            Text(
-              'Firestore: users/{uid} 및 daily_progress',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: scheme.onSurfaceVariant,
+            const SizedBox(height: 16),
+            SectionCard(
+              title: 'AI 프로토타입',
+              subtitle: 'Cloud Functions · generateWord',
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  FilledButton.icon(
+                    onPressed: _fnLoading ? null : _fetchSampleWord,
+                    icon: _fnLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.auto_stories_outlined),
+                    label: Text(
+                      _fnLoading ? '불러오는 중…' : '샘플 단어 받기',
+                    ),
                   ),
+                  if (_fnError != null) ...[
+                    const SizedBox(height: 12),
+                    Text(_fnError!, style: TextStyle(color: scheme.error)),
+                  ],
+                  if (_fnResult != null) ...[
+                    const SizedBox(height: 12),
+                    SelectableText(_fnResult!),
+                  ],
+                ],
+              ),
             ),
           ],
         ),

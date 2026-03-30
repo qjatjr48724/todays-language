@@ -64,6 +64,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final t = Theme.of(context).textTheme;
+
     return Scaffold(
       appBar: AppBar(title: const Text("Today's Language")),
       body: SafeArea(
@@ -74,15 +77,18 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                Text('시작하기', style: t.headlineSmall),
+                const SizedBox(height: 6),
                 Text(
-                  '이메일로 로그인',
-                  style: Theme.of(context).textTheme.titleLarge,
+                  '이메일로 로그인/회원가입을 진행합니다.',
+                  style: t.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
                 ),
                 const SizedBox(height: 24),
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   autocorrect: false,
+                  textInputAction: TextInputAction.next,
                   decoration: const InputDecoration(
                     labelText: '이메일',
                     border: OutlineInputBorder(),
@@ -98,6 +104,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 TextFormField(
                   controller: _passwordController,
                   obscureText: true,
+                  textInputAction: TextInputAction.done,
                   decoration: const InputDecoration(
                     labelText: '비밀번호',
                     border: OutlineInputBorder(),
@@ -114,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Text(
                     _errorMessage!,
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.error,
+                      color: scheme.error,
                     ),
                   ),
                 ],
@@ -133,6 +140,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 OutlinedButton(
                   onPressed: _loading ? null : _register,
                   child: const Text('회원가입'),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Google/Apple 로그인은 이후 단계에서 추가됩니다.',
+                  style: t.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
                 ),
               ],
             ),
