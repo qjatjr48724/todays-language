@@ -12,13 +12,14 @@ class TodaySentencesScreen extends StatefulWidget {
 }
 
 class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
-  bool _loading = false;
+  bool _savingProgress = false;
   String? _error;
 
   bool _aiLoading = true;
   String? _aiError;
   String? _sentence;
   String? _meaning;
+  bool _completedCurrent = false;
 
   @override
   void initState() {
@@ -32,6 +33,8 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
       _aiError = null;
       _sentence = null;
       _meaning = null;
+      _completedCurrent = false;
+      _error = null;
     });
 
     try {
@@ -68,19 +71,24 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
   }
 
   Future<void> _markDone() async {
+    if (_completedCurrent) return;
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
     setState(() {
-      _loading = true;
+      _savingProgress = true;
       _error = null;
     });
     try {
       await incrementTodayDailyProgress(user, kind: DailyProgressKind.sentence);
-      await _fetchSentenceSample();
+      if (!mounted) return;
+      setState(() => _completedCurrent = true);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('문장 학습 완료! 오늘 진도 +1')),
+      );
     } catch (e) {
       setState(() => _error = '저장 실패: $e');
     } finally {
-      if (mounted) setState(() => _loading = false);
+      if (mounted) setState(() => _savingProgress = false);
     }
   }
 
@@ -95,7 +103,7 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'MVP: 샘플 문장 + 완료 처리(+1)',
+              '완료 버튼은 현재 문장에서 1회만 +1 됩니다. 이후 다음 문장으로 넘어가세요.',
               style: Theme.of(context)
                   .textTheme
                   .bodyMedium
@@ -127,17 +135,29 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
                     ),
               ),
             ],
-            const SizedBox(height: 16),
+            const Spacer(),
             FilledButton.icon(
-              onPressed: _loading ? null : _markDone,
-              icon: _loading
+              onPressed: (_aiLoading || _aiError != null || _completedCurrent || _savingProgress)
+                  ? null
+                  : _markDone,
+              icon: _savingProgress
                   ? const SizedBox(
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   : const Icon(Icons.check),
-              label: Text(_loading ? '저장 중…' : '문장 1개 완료(+1)'),
+              label: Text(
+                _savingProgress
+                    ? '저장 중…'
+                    : (_completedCurrent ? '완료 반영됨 (+1)' : '이 문장 완료(+1)'),
+              ),
+            ),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              onPressed: (_aiLoading || _savingProgress) ? null : _fetchSentenceSample,
+              icon: const Icon(Icons.refresh),
+              label: const Text('다음 문장'),
             ),
             if (_error != null) ...[
               const SizedBox(height: 12),

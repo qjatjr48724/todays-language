@@ -97,6 +97,59 @@
 2. “완료 처리” 액션을 붙여 `daily_progress`를 증가시키고 진행률 계산/저장
 3. 진행률 색상 구간/표시 규칙을 Notion 최신 기획값으로 최종 확정
 
+
+## 최근 기록 — 퀴즈 정답만 +1 · 디버그 진행률 초기화 버튼
+
+## [단계 n] 퀴즈 정답일 때만 진행률 +1 + 디버그 진행률 초기화
+
+### 1) 오늘 한 일
+
+- 단어 퀴즈(`WordQuizScreen`): **정답을 고른 경우에만** `daily_progress`의 `quizDone` 증가(프로그레스 +1)
+  - 오답은 보기·정답 색상 피드백만, Firestore 진도 저장 없음
+  - 답 선택 후 재선택 불가
+  - 저장(진도 반영) 중에는 **다음 문제** 버튼 비활성화
+  - 상단 설명 문구로 정책 안내, 정답 시 스낵바(`정답! 오늘 퀴즈 진도 +1`)
+  - 기존 `퀴즈 1개 완료(+1)` 단일 버튼은 제거 → 보기 선택 후 **다음 문제**로만 새 샘플 로드(+1 없음)
+- 홈: **디버그 전용** `진행률 초기화(디버그)` 버튼 추가
+  - 오늘(KST) `users/{uid}/daily_progress/{yyyy-MM-dd}`에서 `wordDone` / `sentenceDone` / `quizDone`을 0으로, `progressPercent` 0으로 리셋
+  - `wordGoal` / `sentenceGoal` / `quizGoal`은 유지
+  - `kDebugMode`에서만 노출(릴리즈 미포함), **추후 삭제 예정**
+- 서비스: `resetTodayDailyProgress(User)` 추가(트랜잭션으로 안전하게 리셋)
+
+### 2) 완료 기준 체크
+
+- [x] 로컬 실행/동작 확인 (퀴즈 정답만 +1, 오답 시 진도 변화 없음, 초기화 후 홈 수치·바 반영)
+- [x] 핵심 설정값 문서화 (정답 시에만 `incrementTodayDailyProgress(..., quiz)` 호출 / 초기화는 디버그 한정)
+- [x] 다음 단계 선행조건 충족 (퀴즈 완료 정책이 정답 기준으로 코드에 반영됨)
+
+### 3) 추가/변경한 코드 포인트
+
+- 파일:
+  - `app/mobile/lib/screens/word_quiz_screen.dart`
+  - `app/mobile/lib/services/daily_progress_sync.dart`
+  - `app/mobile/lib/screens/home_screen.dart`
+- 핵심 포인트:
+  - 퀴즈 진도는 **선택 인덱스 == `answerIndex`**일 때만 `incrementTodayDailyProgress` 호출
+  - 초기화는 `resetTodayDailyProgress`로 분리해 홈에서만 디버그 조건부 호출
+  - 임시 도구이므로 나중에 버튼·함수 제거 또는 관리자 전용 경로로 옮길 수 있음
+
+### 4) 이슈/막힌 점
+
+- 증상: (해당 없음)
+- 원인 추정: -
+- 해결/우회: -
+
+### 5) 다음 액션 (내일 바로 할 것)
+
+1. (선택) 오늘의 단어·문장도 “확인/완료 후에만 +1” 등으로 퀴즈와 정책 통일
+2. (선택) 초기화 버튼에 확인 다이얼로그 추가 후, MVP 확정 시 디버그 UI 제거
+3. Notion 기획과 맞춰 다음 화면/기능 우선순위 진행
+
+
+
+
+
+
 ## 단계별 Notion에 꼭 남길 내용 가이드
 
 ### 1. Flutter 환경
