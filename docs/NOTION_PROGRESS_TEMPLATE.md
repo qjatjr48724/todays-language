@@ -150,6 +150,62 @@
 
 
 
+## 최근 기록 — AI 퀴즈 캐시/공통 출제 전환 + 오늘의 마무리 추가 (진행 중)
+
+## [단계 n] AI 퀴즈 비용/속도 최적화 작업 (공통 세트 + 복습 혼합)
+
+### 1) 오늘 한 일
+
+- `generateQuiz`를 실시간 1문제 생성에서 **일일 세트 캐시 방식**으로 확장
+  - 하루 첫 생성 후, 같은 날에는 저장된 세트를 순차 제공(`cursor`)
+  - AI 실패 시 fallback 응답 유지
+- 출제 정책을 **사용자별 → 공통 세트(`users/__global__/daily_quiz_sets/{dateKst}`)** 방향으로 전환
+- 최근 7일 문제와의 중복을 줄이기 위해 문제 문구 정규화 후 중복 회피 로직 추가
+- 복습 문제 혼합 로직 추가
+  - 전날 성과 기반 복습 비율 가변(저성과 50%, 보통 30%, 고성과 20%)
+- 앱 기능 확장
+  - 오늘의 단어 목표값 기본 50 → **30**으로 조정
+  - 홈에 **오늘의 마무리** 메뉴 추가
+  - 단어/문장 목표 달성 시에만 오늘의 마무리 메뉴 활성화
+  - 오늘의 마무리 화면(문제+정답 점검형) 신규 생성
+- `users/__global__` 부모 문서가 콘솔에서 보이도록 명시적 생성 로직 추가
+
+### 2) 완료 기준 체크
+
+- [x] 로컬 빌드/분석 통과 (`functions: npm run build`, `flutter analyze`)
+- [x] 퀴즈 유형 다양화 동작 확인
+- [x] 단어 목표 30 반영 및 오늘의 마무리 메뉴/화면 연결
+- [ ] Firestore 콘솔에서 `users/__global__/daily_quiz_sets` 생성 확인 (미해결)
+
+### 3) 추가/변경한 코드 포인트
+
+- 파일:
+  - `functions/src/index.ts`
+  - `app/mobile/lib/services/daily_progress_sync.dart`
+  - `app/mobile/lib/screens/home_screen.dart`
+  - `app/mobile/lib/screens/today_wrap_up_screen.dart` (신규)
+- 핵심 포인트:
+  - 퀴즈 세트 생성/재사용/복습 혼합/정리(보관기간) 로직을 Functions에 추가
+  - 글로벌 세트 owner(`__global__`)를 사용하도록 변경
+  - 단어/문장 완료 기반으로 오늘의 마무리 진입 게이트 적용
+
+### 4) 이슈/막힌 점
+
+- 증상: 단어퀴즈 호출은 되지만 Firestore에서 `users/__global__/daily_quiz_sets`가 확인되지 않음
+- 원인 추정:
+  - 런타임 경로에서 세트 생성 이전 예외 발생 후 fallback만 반환
+  - 콘솔 프로젝트/문서 경로 확인 오차 가능성
+  - 배포 버전 불일치 또는 반영 지연 가능성
+- 해결/우회:
+  - 인덱스 의존 쿼리 완화, 부모 문서 명시 생성 로직 추가까지 반영 완료
+  - 다음 작업은 Functions 로그로 생성 경로를 직접 추적해 원인 확정
+
+### 5) 다음 액션 (내일 바로 할 것)
+
+1. `generateQuiz` 런타임 로그 확인으로 `getOrCreateTodaySet` 진입/실패 지점 파악
+2. `users/__global__` 및 `daily_quiz_sets/{todayKst}` 강제 생성용 디버그 callable로 경로 자체 검증
+3. 글로벌 세트 저장 확인 후, 자정 기준 세트 교체/정리 동작 테스트
+
 ## 단계별 Notion에 꼭 남길 내용 가이드
 
 ### 1. Flutter 환경

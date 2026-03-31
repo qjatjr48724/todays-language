@@ -37,7 +37,7 @@ class DailyProgressView {
 
     return DailyProgressView(
       dateKst: m['dateKst'] as String? ?? dateKst,
-      wordGoal: iv('wordGoal', 50),
+      wordGoal: iv('wordGoal', 30),
       wordDone: iv('wordDone', 0),
       sentenceGoal: iv('sentenceGoal', 10),
       sentenceDone: iv('sentenceDone', 0),
@@ -61,7 +61,7 @@ Future<DailyProgressView> ensureTodayDailyProgress(User user) async {
   if (!snap.exists) {
     await ref.set({
       'dateKst': dateKst,
-      'wordGoal': 50,
+      'wordGoal': 30,
       'wordDone': 0,
       'sentenceGoal': 10,
       'sentenceDone': 0,
@@ -108,7 +108,7 @@ Future<DailyProgressView> incrementTodayDailyProgress(
       return def;
     }
 
-    final wordGoal = iv('wordGoal', 50);
+    final wordGoal = iv('wordGoal', 30);
     final sentenceGoal = iv('sentenceGoal', 10);
     final quizGoal = iv('quizGoal', 20);
 
@@ -183,7 +183,7 @@ Future<DailyProgressView> resetTodayDailyProgress(User user) async {
       return def;
     }
 
-    final wordGoal = iv('wordGoal', 50);
+    final wordGoal = iv('wordGoal', 30);
     final sentenceGoal = iv('sentenceGoal', 10);
     final quizGoal = iv('quizGoal', 20);
 

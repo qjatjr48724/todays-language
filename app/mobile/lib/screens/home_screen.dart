@@ -9,6 +9,7 @@ import '../ui/home_feature_card.dart';
 import '../ui/section_card.dart';
 import 'today_sentences_screen.dart';
 import 'today_words_screen.dart';
+import 'today_wrap_up_screen.dart';
 import 'word_quiz_screen.dart';
 import '../utils/kst_date.dart';
 
@@ -92,6 +93,36 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> _confirmAndResetTodayProgress() async {
+    if (_resettingProgress) return;
+    final shouldReset = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('진행률 초기화'),
+          content: const Text(
+            '오늘 진행률(단어/문장/퀴즈)을 0으로 초기화할까요?\n'
+            '이 작업은 디버그용이며 되돌릴 수 없습니다.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('취소'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('초기화'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldReset == true) {
+      await _resetTodayProgress();
+    }
+  }
+
   Future<void> _fetchSampleWord() async {
     setState(() {
       _fnLoading = true;
@@ -161,6 +192,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final user = FirebaseAuth.instance.currentUser;
     final scheme = Theme.of(context).colorScheme;
     final p = _todayProgress;
+    final canOpenWrapUp = p != null &&
+        p.wordDone >= p.wordGoal &&
+        p.sentenceDone >= p.sentenceGoal;
     final percent = p == null
         ? null
         : (p.progressPercent > 0 ? p.progressPercent : _computedProgressPercent(p));
@@ -215,7 +249,7 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 HomeFeatureCard(
                   title: '오늘의 단어',
-                  subtitle: '매일 50개',
+                  subtitle: '매일 30개',
                   icon: Icons.translate,
                   progressText: p == null ? null : '${p.wordDone} / ${p.wordGoal}',
                   onTap: () {
@@ -266,6 +300,24 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: Icons.auto_stories_outlined,
                   onTap: _fnLoading ? () {} : _fetchSampleWord,
                   progressText: _fnResult == null ? null : '응답 수신됨',
+                ),
+                HomeFeatureCard(
+                  title: '오늘의 마무리',
+                  subtitle: canOpenWrapUp
+                      ? '모의 점검'
+                      : '단어/문장 학습 완료 후 열림',
+                  icon: Icons.fact_check_outlined,
+                  onTap: canOpenWrapUp
+                      ? () {
+                          Navigator.of(context)
+                              .push(
+                            MaterialPageRoute(
+                              builder: (_) => const TodayWrapUpScreen(),
+                            ),
+                          )
+                              .then((_) => _refreshTodayProgress());
+                        }
+                      : () {},
                 ),
               ],
             ),
@@ -321,7 +373,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             if (kDebugMode) ...[
                               const SizedBox(height: 12),
                               OutlinedButton.icon(
-                                onPressed: _resettingProgress ? null : _resetTodayProgress,
+                                onPressed: _resettingProgress
+                                    ? null
+                                    : _confirmAndResetTodayProgress,
                                 icon: _resettingProgress
                                     ? const SizedBox(
                                         width: 18,
