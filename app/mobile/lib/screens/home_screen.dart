@@ -1,4 +1,3 @@
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,10 +6,10 @@ import '../services/daily_progress_sync.dart';
 import '../services/user_profile_sync.dart';
 import '../ui/home_feature_card.dart';
 import '../ui/section_card.dart';
+import 'my_info_screen.dart';
 import 'today_sentences_screen.dart';
 import 'today_words_screen.dart';
 import 'today_wrap_up_screen.dart';
-import 'word_quiz_screen.dart';
 import '../utils/kst_date.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -25,10 +24,6 @@ class _HomeScreenState extends State<HomeScreen> {
   DailyProgressView? _todayProgress;
   bool _loadingProgress = true;
   bool _resettingProgress = false;
-
-  bool _fnLoading = false;
-  String? _fnResult;
-  String? _fnError;
 
   @override
   void initState() {
@@ -101,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
         return AlertDialog(
           title: const Text('진행률 초기화'),
           content: const Text(
-            '오늘 진행률(단어/문장/퀴즈)을 0으로 초기화할까요?\n'
+            '오늘 진행률(단어/문장/마무리)을 0으로 초기화할까요?\n'
             '이 작업은 디버그용이며 되돌릴 수 없습니다.',
           ),
           actions: [
@@ -120,50 +115,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (shouldReset == true) {
       await _resetTodayProgress();
-    }
-  }
-
-  Future<void> _fetchSampleWord() async {
-    setState(() {
-      _fnLoading = true;
-      _fnError = null;
-      _fnResult = null;
-    });
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        throw Exception('로그인 상태가 아닙니다.');
-      }
-      // 로그인 직후 토큰이 아직 전파되지 않아 callable에서 unauthenticated가 뜨는 케이스가 있어
-      // 호출 전에 토큰을 강제로 갱신합니다.
-      await user.getIdToken(true);
-
-      final callable = FirebaseFunctions.instanceFor(
-        region: 'asia-northeast3',
-      ).httpsCallable('generateWord');
-      final result = await callable.call<Map<String, dynamic>>({
-        'targetLanguage': 'ja',
-        'level': 'beginner',
-      });
-      final data = Map<String, dynamic>.from(result.data as Map);
-      final word = data['word']?.toString() ?? '';
-      final meaning = data['meaningKo']?.toString() ?? '';
-      final example = data['example']?.toString();
-      final buf = StringBuffer('$word — $meaning');
-      if (example != null && example.isNotEmpty) {
-        buf.write('\n예문: $example');
-      }
-      if (!mounted) return;
-      setState(() {
-        _fnResult = buf.toString();
-        _fnLoading = false;
-      });
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _fnError = '함수 호출 실패: $e';
-        _fnLoading = false;
-      });
     }
   }
 
@@ -203,6 +154,17 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text("Today's Language"),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.person_outline),
+            tooltip: '내 정보',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const MyInfoScreen(),
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: '로그아웃',
@@ -280,33 +242,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 ),
                 HomeFeatureCard(
-                  title: '단어 퀴즈',
-                  subtitle: '4지선다',
-                  icon: Icons.quiz_outlined,
-                  progressText: p == null ? null : '${p.quizDone} / ${p.quizGoal}',
-                  onTap: () {
-                    Navigator.of(context)
-                        .push(
-                      MaterialPageRoute(
-                        builder: (_) => const WordQuizScreen(),
-                      ),
-                    )
-                        .then((_) => _refreshTodayProgress());
-                  },
-                ),
-                HomeFeatureCard(
-                  title: 'AI 단어 샘플',
-                  subtitle: '프로토타입',
-                  icon: Icons.auto_stories_outlined,
-                  onTap: _fnLoading ? () {} : _fetchSampleWord,
-                  progressText: _fnResult == null ? null : '응답 수신됨',
-                ),
-                HomeFeatureCard(
                   title: '오늘의 마무리',
                   subtitle: canOpenWrapUp
-                      ? '모의 점검'
+                      ? '단어 20 + 문장 5'
                       : '단어/문장 학습 완료 후 열림',
                   icon: Icons.fact_check_outlined,
+                  progressText: p == null ? null : '${p.quizDone} / ${p.quizGoal}',
                   onTap: canOpenWrapUp
                       ? () {
                           Navigator.of(context)
@@ -356,20 +297,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             const SizedBox(height: 10),
                             if (p != null)
                               Text(
-                                '단어 ${p.wordDone}/${p.wordGoal} · 문장 ${p.sentenceDone}/${p.sentenceGoal} · 퀴즈 ${p.quizDone}/${p.quizGoal}',
+                                '단어 ${p.wordDone}/${p.wordGoal} · 문장 ${p.sentenceDone}/${p.sentenceGoal} · 마무리 ${p.quizDone}/${p.quizGoal}',
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyMedium
                                     ?.copyWith(color: scheme.onSurfaceVariant),
                               ),
-                            if (_fnError != null) ...[
-                              const SizedBox(height: 10),
-                              Text(_fnError!, style: TextStyle(color: scheme.error)),
-                            ],
-                            if (_fnResult != null) ...[
-                              const SizedBox(height: 10),
-                              SelectableText(_fnResult!),
-                            ],
                             if (kDebugMode) ...[
                               const SizedBox(height: 12),
                               OutlinedButton.icon(

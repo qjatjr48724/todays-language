@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../utils/kst_date.dart';
 
+// `quiz`는 현재 "오늘의 마무리" 점검 진행도를 의미합니다.
 enum DailyProgressKind { word, sentence, quiz }
 
 /// [docs/FIRESTORE_MIN_SCHEMA.md] — `users/{uid}/daily_progress/{dateKst}`
@@ -41,7 +42,7 @@ class DailyProgressView {
       wordDone: iv('wordDone', 0),
       sentenceGoal: iv('sentenceGoal', 10),
       sentenceDone: iv('sentenceDone', 0),
-      quizGoal: iv('quizGoal', 20),
+      quizGoal: iv('quizGoal', 25),
       quizDone: iv('quizDone', 0),
       progressPercent: iv('progressPercent', 0).clamp(0, 100),
     );
@@ -65,7 +66,7 @@ Future<DailyProgressView> ensureTodayDailyProgress(User user) async {
       'wordDone': 0,
       'sentenceGoal': 10,
       'sentenceDone': 0,
-      'quizGoal': 20,
+      'quizGoal': 25,
       'quizDone': 0,
       'progressPercent': 0,
       'updatedAt': FieldValue.serverTimestamp(),
@@ -110,7 +111,7 @@ Future<DailyProgressView> incrementTodayDailyProgress(
 
     final wordGoal = iv('wordGoal', 30);
     final sentenceGoal = iv('sentenceGoal', 10);
-    final quizGoal = iv('quizGoal', 20);
+    final quizGoal = iv('quizGoal', 25);
 
     var wordDone = iv('wordDone', 0);
     var sentenceDone = iv('sentenceDone', 0);
@@ -185,7 +186,7 @@ Future<DailyProgressView> resetTodayDailyProgress(User user) async {
 
     final wordGoal = iv('wordGoal', 30);
     final sentenceGoal = iv('sentenceGoal', 10);
-    final quizGoal = iv('quizGoal', 20);
+    final quizGoal = iv('quizGoal', 25);
 
     tx.set(
       ref,
