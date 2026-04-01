@@ -45,7 +45,7 @@ const OPENAI_API_URL = "https://api.openai.com/v1/responses";
 const OPENAI_MODEL = process.env.OPENAI_MODEL ?? "gpt-4.1-mini";
 const DAILY_QUIZ_COUNT = 10;
 const DEFAULT_RETENTION_DAYS = 7;
-const GLOBAL_QUIZ_SET_OWNER = "__global__";
+const GLOBAL_QUIZ_SET_OWNER = "global_quiz_owner";
 const QUIZ_MODES = [
   "ko_to_target_word",
   "target_to_ko_meaning",
@@ -95,6 +95,19 @@ function normalizePromptKey(text: string): string {
     .toLowerCase()
     .replace(/\s+/g, "")
     .replace(/[^\p{L}\p{N}]/gu, "");
+}
+
+function normalizeChoiceKey(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/\s+/g, "")
+    .replace(/[^\p{L}\p{N}]/gu, "");
+}
+
+function quizUniqueKey(quiz: GenerateQuizResponse): string {
+  const prompt = normalizePromptKey(quiz.promptKo);
+  const choices = quiz.choices.map((c) => normalizeChoiceKey(c)).join("|");
+  return `${prompt}::${choices}`;
 }
 
 function pickReviewRatioByYesterday(quizDone: number, quizGoal: number): number {
@@ -181,16 +194,17 @@ async function buildDailyQuizItems(
   );
 
   const reviewPool = await getRecentReviewPool(uid, todayKst, targetLanguage, level);
-  const reviewItems = shuffle(reviewPool).slice(0, reviewTargetCount).map((q) => ({
-    ...q,
-    source: "review" as const,
-  }));
-
-  const blockedPromptKeys = new Set(
-    reviewPool.map((q) => normalizePromptKey(q.promptKo))
-  );
-  for (const r of reviewItems) {
-    blockedPromptKeys.add(normalizePromptKey(r.promptKo));
+  const reviewItems: StoredQuizItem[] = [];
+  const usedKeys = new Set<string>();
+  for (const q of shuffle(reviewPool)) {
+    const key = quizUniqueKey(q);
+    if (!key || usedKeys.has(key)) continue;
+    usedKeys.add(key);
+    reviewItems.push({
+      ...q,
+      source: "review" as const,
+    });
+    if (reviewItems.length >= reviewTargetCount) break;
   }
 
   const needNew = DAILY_QUIZ_COUNT - reviewItems.length;
@@ -200,11 +214,11 @@ async function buildDailyQuizItems(
     attempts += 1;
     try {
       const generated = await generateQuizWithOpenAI(targetLanguage, level);
-      const key = normalizePromptKey(generated.promptKo);
-      if (!key || blockedPromptKeys.has(key)) {
+      const key = quizUniqueKey(generated);
+      if (!key || usedKeys.has(key)) {
         continue;
       }
-      blockedPromptKeys.add(key);
+      usedKeys.add(key);
       newItems.push({
         ...generated,
         source: "new",
@@ -212,8 +226,14 @@ async function buildDailyQuizItems(
       });
     } catch (e) {
       console.error("[daily-quiz] AI generation failed, using fallback item.", e);
+      const fallback = fallbackQuiz(targetLanguage, level);
+      const key = quizUniqueKey(fallback);
+      if (!key || usedKeys.has(key)) {
+        continue;
+      }
+      usedKeys.add(key);
       newItems.push({
-        ...fallbackQuiz(targetLanguage, level),
+        ...fallback,
         source: "new",
         createdAtMs: Date.now(),
       });
@@ -222,9 +242,9 @@ async function buildDailyQuizItems(
 
   while (newItems.length < needNew) {
     const f = fallbackQuiz(targetLanguage, level);
-    const key = normalizePromptKey(f.promptKo);
-    if (!key || blockedPromptKeys.has(key)) break;
-    blockedPromptKeys.add(key);
+    const key = quizUniqueKey(f);
+    if (!key || usedKeys.has(key)) break;
+    usedKeys.add(key);
     newItems.push({
       ...f,
       source: "new",
@@ -278,22 +298,46 @@ async function popQuizFromTodaySet(
   targetLanguage: string,
   level: string
 ): Promise<GenerateQuizResponse> {
-  const ref = await getOrCreateTodaySet(uid, targetLanguage, level);
+  const todayKst = todayKstYyyyMmDd();
+  const setRef = await getOrCreateTodaySet(
+    GLOBAL_QUIZ_SET_OWNER,
+    targetLanguage,
+    level
+  );
+  const cursorRef = db
+    .collection("users")
+    .doc(uid)
+    .collection("daily_quiz_cursor")
+    .doc(`${todayKst}_${targetLanguage}_${level}`);
+
   return db.runTransaction(async (tx) => {
-    const snap = await tx.get(ref);
-    const data = (snap.data() ?? {}) as Partial<DailyQuizSet>;
+    const setSnap = await tx.get(setRef);
+    const cursorSnap = await tx.get(cursorRef);
+    const data = (setSnap.data() ?? {}) as Partial<DailyQuizSet>;
+    const cursorData = cursorSnap.data() ?? {};
     const items = (Array.isArray(data.items) ? data.items : []) as StoredQuizItem[];
     if (items.length === 0) {
       return fallbackQuiz(targetLanguage, level);
     }
-    const cursor = Number(data.cursor ?? 0);
+    const cursor = Number(cursorData.cursor ?? 0);
     const index = ((cursor % items.length) + items.length) % items.length;
     const picked = items[index];
-    tx.set(
-      ref,
-      { cursor: cursor + 1, updatedAtMs: Date.now() },
-      { merge: true }
-    );
+    console.log("[generateQuiz] cursor resolved", {
+      uid,
+      dateKst: todayKst,
+      targetLanguage,
+      level,
+      cursorBefore: cursor,
+      index,
+      cursorDocId: `${todayKst}_${targetLanguage}_${level}`,
+    });
+    tx.set(cursorRef, {
+      dateKst: todayKst,
+      targetLanguage,
+      level,
+      cursor: cursor + 1,
+      updatedAtMs: Date.now(),
+    }, { merge: true });
     return {
       promptKo: picked.promptKo,
       choices: picked.choices,
@@ -302,62 +346,45 @@ async function popQuizFromTodaySet(
   });
 }
 
-function fallbackQuiz(targetLanguage: string, level: string): GenerateQuizResponse {
+function fallbackTemplates(targetLanguage: string, level: string): GenerateQuizResponse[] {
   if (targetLanguage === "ja" && level === "beginner") {
-    const templates: GenerateQuizResponse[] = [
-      {
-        promptKo: "다음 중 '고마워요'에 해당하는 일본어는?",
-        choices: ["こんにちは", "ありがとう", "さようなら", "すみません"],
-        answerIndex: 1,
-      },
-      {
-        promptKo: "다음 중 일본어 'おはよう'의 뜻은?",
-        choices: ["안녕하세요(낮)", "안녕히 가세요", "좋은 아침", "고마워요"],
-        answerIndex: 2,
-      },
-      {
-        promptKo: "빈칸에 들어갈 가장 자연스러운 표현은? '_____、たすかりました。'",
-        choices: ["ありがとう", "こんばんは", "いただきます", "おやすみ"],
-        answerIndex: 0,
-      },
-      {
-        promptKo: "상황: 실수로 부딪힌 뒤 먼저 할 말로 가장 적절한 일본어는?",
-        choices: ["すみません", "じゃあね", "おめでとう", "ただいま"],
-        answerIndex: 0,
-      },
+    return [
+      { promptKo: "다음 중 '고마워요'에 해당하는 일본어는?", choices: ["こんにちは", "ありがとう", "さようなら", "すみません"], answerIndex: 1 },
+      { promptKo: "다음 중 일본어 'おはよう'의 뜻은?", choices: ["안녕하세요(낮)", "안녕히 가세요", "좋은 아침", "고마워요"], answerIndex: 2 },
+      { promptKo: "빈칸에 들어갈 가장 자연스러운 표현은? '_____、たすかりました。'", choices: ["ありがとう", "こんばんは", "いただきます", "おやすみ"], answerIndex: 0 },
+      { promptKo: "상황: 실수로 부딪힌 뒤 먼저 할 말로 가장 적절한 일본어는?", choices: ["すみません", "じゃあね", "おめでとう", "ただいま"], answerIndex: 0 },
+      { promptKo: "다음 중 '안녕하세요(낮 인사)'에 해당하는 일본어는?", choices: ["こんにちは", "おやすみ", "ありがとう", "ごめん"], answerIndex: 0 },
+      { promptKo: "다음 중 일본어 'さようなら'의 뜻은?", choices: ["잘 자요", "안녕히 가세요", "축하해요", "미안합니다"], answerIndex: 1 },
+      { promptKo: "빈칸에 들어갈 표현은? 'あさは _____ を いいます。'", choices: ["おはよう", "こんにちは", "ありがとう", "すみません"], answerIndex: 0 },
+      { promptKo: "다음 중 '미안합니다/실례합니다' 의미로 가장 적절한 일본어는?", choices: ["すみません", "ただいま", "おめでとう", "いただきます"], answerIndex: 0 },
+      { promptKo: "일본어 'こんばんは'의 뜻으로 맞는 것은?", choices: ["좋은 아침", "안녕하세요(밤)", "안녕히 주무세요", "다녀왔습니다"], answerIndex: 1 },
+      { promptKo: "빈칸에 알맞은 말은? 'ねるまえに _____ と いいます。'", choices: ["おはよう", "こんばんは", "おやすみ", "ありがとう"], answerIndex: 2 },
+      { promptKo: "다음 중 축하할 때 쓰는 일본어는?", choices: ["おめでとう", "すみません", "さようなら", "こんにちは"], answerIndex: 0 },
+      { promptKo: "일본어 'ただいま'의 의미로 가장 알맞은 것은?", choices: ["다녀왔습니다", "잘 부탁합니다", "잘 자요", "괜찮아요"], answerIndex: 0 },
     ];
-    return templates[Math.floor(Math.random() * templates.length)];
   }
 
   if (targetLanguage === "es" && level === "beginner") {
-    const templates: GenerateQuizResponse[] = [
-      {
-        promptKo: "다음 중 '안녕'에 해당하는 스페인어는?",
-        choices: ["adiós", "gracias", "hola", "por favor"],
-        answerIndex: 2,
-      },
-      {
-        promptKo: "스페인어 'gracias'의 뜻은?",
-        choices: ["고마워요", "미안해요", "안녕", "좋은 밤"],
-        answerIndex: 0,
-      },
+    return [
+      { promptKo: "다음 중 '안녕'에 해당하는 스페인어는?", choices: ["adiós", "gracias", "hola", "por favor"], answerIndex: 2 },
+      { promptKo: "스페인어 'gracias'의 뜻은?", choices: ["고마워요", "미안해요", "안녕", "좋은 밤"], answerIndex: 0 },
+      { promptKo: "다음 중 '부탁합니다'에 해당하는 스페인어는?", choices: ["hola", "por favor", "adiós", "gracias"], answerIndex: 1 },
+      { promptKo: "스페인어 'adiós'의 뜻은?", choices: ["안녕(만날 때)", "고마워", "안녕히 가세요", "천만에요"], answerIndex: 2 },
+      { promptKo: "빈칸 채우기: '_____ , ¿cómo estás?'", choices: ["hola", "adiós", "gracias", "perdón"], answerIndex: 0 },
+      { promptKo: "다음 중 '미안합니다'에 가까운 스페인어는?", choices: ["perdón", "hola", "gracias", "mañana"], answerIndex: 0 },
     ];
-    return templates[Math.floor(Math.random() * templates.length)];
   }
 
-  const genericTemplates: GenerateQuizResponse[] = [
-    {
-      promptKo: "다음 중 '안녕'에 해당하는 표현은?",
-      choices: ["goodbye", "hello", "thanks", "sorry"],
-      answerIndex: 1,
-    },
-    {
-      promptKo: "다음 중 '고마워요'에 해당하는 표현은?",
-      choices: ["thanks", "bye", "please", "hello"],
-      answerIndex: 0,
-    },
+  return [
+    { promptKo: "다음 중 '안녕'에 해당하는 표현은?", choices: ["goodbye", "hello", "thanks", "sorry"], answerIndex: 1 },
+    { promptKo: "다음 중 '고마워요'에 해당하는 표현은?", choices: ["thanks", "bye", "please", "hello"], answerIndex: 0 },
+    { promptKo: "다음 중 '미안해요'에 해당하는 표현은?", choices: ["sorry", "hello", "thanks", "bye"], answerIndex: 0 },
   ];
-  return genericTemplates[Math.floor(Math.random() * genericTemplates.length)];
+}
+
+function fallbackQuiz(targetLanguage: string, level: string): GenerateQuizResponse {
+  const templates = fallbackTemplates(targetLanguage, level);
+  return templates[Math.floor(Math.random() * templates.length)];
 }
 
 function isValidQuizPayload(value: unknown): value is OpenAiQuizResponse {
@@ -519,10 +546,11 @@ export const generateQuiz = onCall(
       throw new HttpsError("unauthenticated", "로그인이 필요합니다.");
     }
 
+    const uid = request.auth.uid;
     const targetLanguage = (request.data?.targetLanguage ?? "ja") as string;
     const level = (request.data?.level ?? "beginner") as string;
     try {
-      return await popQuizFromTodaySet(GLOBAL_QUIZ_SET_OWNER, targetLanguage, level);
+      return await popQuizFromTodaySet(uid, targetLanguage, level);
     } catch (e) {
       console.error("[generateQuiz] Daily set flow failed. Fallback is used.", e);
       return fallbackQuiz(targetLanguage, level);

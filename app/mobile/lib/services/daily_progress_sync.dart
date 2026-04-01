@@ -172,7 +172,7 @@ Future<DailyProgressView> resetTodayDailyProgress(User user) async {
       .collection('daily_progress')
       .doc(dateKst);
 
-  return FirebaseFirestore.instance.runTransaction((tx) async {
+  final resetView = await FirebaseFirestore.instance.runTransaction((tx) async {
     final snap = await tx.get(ref);
     final data = snap.data() ?? <String, dynamic>{};
 
@@ -214,4 +214,19 @@ Future<DailyProgressView> resetTodayDailyProgress(User user) async {
       progressPercent: 0,
     );
   });
+
+  // 진행률 초기화 시, 오늘 퀴즈 개인 커서도 함께 초기화합니다.
+  final cursorCol = FirebaseFirestore.instance
+      .collection('users')
+      .doc(user.uid)
+      .collection('daily_quiz_cursor');
+
+  final batch = FirebaseFirestore.instance.batch();
+  final cursorSnap = await cursorCol.where('dateKst', isEqualTo: dateKst).get();
+  for (final doc in cursorSnap.docs) {
+    batch.delete(doc.reference);
+  }
+  await batch.commit();
+
+  return resetView;
 }
