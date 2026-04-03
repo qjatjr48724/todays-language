@@ -39,46 +39,38 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
       if (user == null) throw Exception('로그인 상태가 아닙니다.');
       await user.getIdToken(true);
 
-      final wordCallable = FirebaseFunctions.instanceFor(
+      final callable = FirebaseFunctions.instanceFor(
         region: 'asia-northeast3',
-      ).httpsCallable('generateWord');
-      final sentenceCallable = FirebaseFunctions.instanceFor(
-        region: 'asia-northeast3',
-      ).httpsCallable('generateSentence');
+      ).httpsCallable('getWrapUpDeck');
 
-      for (var i = 0; i < 20; i++) {
-        final result = await wordCallable.call<Map<String, dynamic>>({
-          'targetLanguage': 'ja',
-          'level': 'beginner',
-        });
-        final data = Map<String, dynamic>.from(result.data as Map);
-        final word = data['word']?.toString() ?? '';
-        final meaning = data['meaningKo']?.toString() ?? '';
-        if (word.isEmpty || meaning.isEmpty) continue;
-        _items.add(_WrapUpItem(
-          kind: '단어',
-          question: '뜻: $meaning\n해당하는 단어를 확인해보세요.',
-          answer: word,
-        ));
+      final result = await callable.call<Map<String, dynamic>>({
+        'targetLanguage': 'ja',
+        'level': 'beginner',
+      });
+
+      final data = Map<String, dynamic>.from(result.data as Map);
+      final rawItems = (data['items'] as List?) ?? const [];
+      for (final e in rawItems) {
+        if (e is! Map) continue;
+        final m = Map<String, dynamic>.from(e);
+        final kind = m['kind']?.toString() ?? '';
+        final meaning = m['meaningKo']?.toString() ?? '';
+        final answer = m['answer']?.toString() ?? '';
+        if (meaning.isEmpty || answer.isEmpty) continue;
+        if (kind == 'word') {
+          _items.add(_WrapUpItem(
+            kind: '단어',
+            question: '뜻: $meaning\n해당하는 단어를 확인해보세요.',
+            answer: answer,
+          ));
+        } else if (kind == 'sentence') {
+          _items.add(_WrapUpItem(
+            kind: '문장',
+            question: '뜻: $meaning\n해당하는 문장을 확인해보세요.',
+            answer: answer,
+          ));
+        }
       }
-
-      for (var i = 0; i < 5; i++) {
-        final result = await sentenceCallable.call<Map<String, dynamic>>({
-          'targetLanguage': 'ja',
-          'level': 'beginner',
-        });
-        final data = Map<String, dynamic>.from(result.data as Map);
-        final sentence = data['sentence']?.toString() ?? '';
-        final meaning = data['meaningKo']?.toString() ?? '';
-        if (sentence.isEmpty || meaning.isEmpty) continue;
-        _items.add(_WrapUpItem(
-          kind: '문장',
-          question: '뜻: $meaning\n해당하는 문장을 확인해보세요.',
-          answer: sentence,
-        ));
-      }
-
-      _items.shuffle();
       if (!mounted) return;
       setState(() => _loading = false);
     } catch (e) {

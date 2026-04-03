@@ -216,15 +216,31 @@ Future<DailyProgressView> resetTodayDailyProgress(User user) async {
     );
   });
 
-  // 진행률 초기화 시, 오늘 퀴즈 개인 커서도 함께 초기화합니다.
+  // 진행률 초기화 시, 퀴즈·단어·문장 개인 커서 문서를 제거합니다 (글로벌 세트는 Functions 소유).
   final cursorCol = FirebaseFirestore.instance
       .collection('users')
       .doc(user.uid)
       .collection('daily_quiz_cursor');
+  final wordCursorCol = FirebaseFirestore.instance
+      .collection('users')
+      .doc(user.uid)
+      .collection('daily_word_cursor');
+  final sentenceCursorCol = FirebaseFirestore.instance
+      .collection('users')
+      .doc(user.uid)
+      .collection('daily_sentence_cursor');
 
   final batch = FirebaseFirestore.instance.batch();
   final cursorSnap = await cursorCol.where('dateKst', isEqualTo: dateKst).get();
   for (final doc in cursorSnap.docs) {
+    batch.delete(doc.reference);
+  }
+  final wordCursorSnap = await wordCursorCol.where('dateKst', isEqualTo: dateKst).get();
+  for (final doc in wordCursorSnap.docs) {
+    batch.delete(doc.reference);
+  }
+  final sentenceCursorSnap = await sentenceCursorCol.where('dateKst', isEqualTo: dateKst).get();
+  for (final doc in sentenceCursorSnap.docs) {
     batch.delete(doc.reference);
   }
   await batch.commit();

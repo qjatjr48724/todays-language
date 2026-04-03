@@ -207,7 +207,8 @@ class _HomeScreenState extends State<HomeScreen> {
               physics: const NeverScrollableScrollPhysics(),
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
-              childAspectRatio: 1.05,
+              // 카드 안 Column(아이콘행+제목+부제+진행)이 세로로 넉넉히 들어가도록 셀을 약간 높임
+              childAspectRatio: 0.9,
               children: [
                 HomeFeatureCard(
                   title: '오늘의 단어',

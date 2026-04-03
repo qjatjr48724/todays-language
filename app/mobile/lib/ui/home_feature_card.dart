@@ -26,37 +26,55 @@ class HomeFeatureCard extends StatelessWidget {
       onTap: onTap,
       child: Card(
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Row(
                 children: [
                   Container(
-                    width: 36,
-                    height: 36,
+                    width: 32,
+                    height: 32,
                     decoration: BoxDecoration(
                       color: scheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Icon(icon, color: scheme.onPrimaryContainer),
+                    child: Icon(
+                      icon,
+                      size: 18,
+                      color: scheme.onPrimaryContainer,
+                    ),
                   ),
                   const Spacer(),
-                  Icon(Icons.chevron_right, color: scheme.onSurfaceVariant),
+                  Icon(
+                    Icons.chevron_right,
+                    size: 20,
+                    color: scheme.onSurfaceVariant,
+                  ),
                 ],
               ),
-              const SizedBox(height: 12),
-              Text(title, style: t.titleMedium),
-              const SizedBox(height: 4),
+              const SizedBox(height: 8),
+              Text(
+                title,
+                style: t.titleSmall,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 2),
               Text(
                 subtitle,
-                style: t.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+                style: t.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
               if (progressText != null) ...[
-                const SizedBox(height: 10),
+                const SizedBox(height: 6),
                 Text(
                   progressText!,
-                  style: t.labelMedium?.copyWith(color: scheme.onSurfaceVariant),
+                  style: t.labelSmall?.copyWith(color: scheme.onSurfaceVariant),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ],

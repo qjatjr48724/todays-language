@@ -98,3 +98,68 @@ export function buildSentenceUserPromptJson(
     diversitySeed,
   });
 }
+
+/** 일일 단어 세트: 한 번에 N개 (보통 10개씩 끊어 30개 구성) */
+export function buildDailyWordBatchSystemPrompt(
+  targetLanguage: string,
+  level: string,
+  count: number
+): string {
+  const lang = languageLabel(targetLanguage);
+  return [
+    `You create exactly ${count} distinct practical vocabulary items in ${lang} for a Korean native speaker learning that language.`,
+    `Learner level: ${level}.`,
+    "Every item must use a different headword (no duplicates, no near-duplicates).",
+    "Return ONLY a raw JSON object (no markdown, no extra text).",
+    "Shape: {\"words\":[{\"word\":string,\"meaningKo\":string,\"example\":string?}, ...]}",
+    `The \"words\" array MUST have length exactly ${count}.`,
+    "If targetLanguage is ja and level is beginner, prefer hiragana for word and example; avoid kanji unless necessary.",
+  ].join(" ");
+}
+
+export function buildDailyWordBatchUserPromptJson(
+  targetLanguage: string,
+  level: string,
+  count: number,
+  diversitySeed: string
+): string {
+  return JSON.stringify({
+    targetLanguage,
+    level,
+    learnerNativeLanguage: "ko",
+    batchSize: count,
+    diversitySeed,
+  });
+}
+
+/** 일일 문장 세트: 하루 목표 개수(예: 10) 한 번에 생성 */
+export function buildDailySentenceBatchSystemPrompt(
+  targetLanguage: string,
+  level: string,
+  count: number
+): string {
+  const lang = languageLabel(targetLanguage);
+  return [
+    `You create exactly ${count} distinct short sentences in ${lang} for a Korean native speaker at level ${level}.`,
+    "Each sentence must be unique and useful for daily study.",
+    "Return ONLY a raw JSON object (no markdown, no extra text).",
+    "Shape: {\"sentences\":[{\"sentence\":string,\"meaningKo\":string}, ...]}",
+    `The \"sentences\" array MUST have length exactly ${count}.`,
+    "If targetLanguage is ja and level is beginner, use hiragana only where possible; avoid kanji and katakana except proper nouns if unavoidable.",
+  ].join(" ");
+}
+
+export function buildDailySentenceBatchUserPromptJson(
+  targetLanguage: string,
+  level: string,
+  count: number,
+  diversitySeed: string
+): string {
+  return JSON.stringify({
+    targetLanguage,
+    level,
+    learnerNativeLanguage: "ko",
+    batchSize: count,
+    diversitySeed,
+  });
+}

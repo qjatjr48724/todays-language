@@ -1,7 +1,12 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as admin from "firebase-admin";
 
 import {
+  buildDailySentenceBatchSystemPrompt,
+  buildDailySentenceBatchUserPromptJson,
+  buildDailyWordBatchSystemPrompt,
+  buildDailyWordBatchUserPromptJson,
   buildQuizSystemPrompt,
   buildQuizUserPromptJson,
   buildSentenceSystemPrompt,
@@ -14,13 +19,13 @@ type GenerateWordResponse = {
   word: string;
   meaningKo: string;
   example?: string;
-  debugSource?: "openai" | "fallback";
+  debugSource?: "openai" | "fallback" | "daily_set";
 };
 
 type GenerateSentenceResponse = {
   sentence: string;
   meaningKo: string;
-  debugSource?: "openai" | "fallback";
+  debugSource?: "openai" | "fallback" | "daily_set";
 };
 
 type GenerateQuizResponse = {
@@ -45,6 +50,41 @@ type DailyQuizSet = {
   updatedAtMs: number;
 };
 
+type StoredWordItem = {
+  word: string;
+  meaningKo: string;
+  example?: string;
+};
+
+type DailyWordSet = {
+  dateKst: string;
+  targetLanguage: string;
+  level: string;
+  words: StoredWordItem[];
+  cursor: number;
+  updatedAtMs: number;
+};
+
+type StoredSentenceItem = {
+  sentence: string;
+  meaningKo: string;
+};
+
+type DailySentenceSet = {
+  dateKst: string;
+  targetLanguage: string;
+  level: string;
+  sentences: StoredSentenceItem[];
+  cursor: number;
+  updatedAtMs: number;
+};
+
+type WrapUpDeckItem = {
+  kind: "word" | "sentence";
+  meaningKo: string;
+  answer: string;
+};
+
 type OpenAiQuizResponse = {
   quizType: QuizMode;
   promptKo: string;
@@ -55,8 +95,22 @@ type OpenAiQuizResponse = {
 const OPENAI_API_URL = "https://api.openai.com/v1/responses";
 const OPENAI_MODEL = process.env.OPENAI_MODEL ?? "gpt-4.1-mini";
 const DAILY_QUIZ_COUNT = 10;
+/** 오늘의 단어 화면 일일 목표와 동일하게 유지 */
+const DAILY_WORD_COUNT = 30;
+/** 오늘의 문장 화면 일일 목표와 동일하게 유지 */
+const DAILY_SENTENCE_COUNT = 10;
+/** 단어 배치 한 번에 요청할 개수 (두 배치 병렬 호출 → 문장 1회와 비슷한 체감에 가깝게) */
+const DAILY_WORD_BATCH_SIZE = 15;
 const DEFAULT_RETENTION_DAYS = 7;
 const GLOBAL_QUIZ_SET_OWNER = "global_quiz_owner";
+/** 일일 단어·문장 세트 공유 소유자 (모든 유저가 동일 30/10 풀 사용, 커서만 사용자별). */
+const GLOBAL_LEARNING_SET_OWNER = "global_learning_set_owner";
+
+/** 스케줄러가 자정 전후에 미리 생성할 (targetLanguage, level) 목록 */
+const PREGEN_LANGUAGE_LEVEL_PAIRS: { targetLanguage: string; level: string }[] = [
+  { targetLanguage: "ja", level: "beginner" },
+  { targetLanguage: "es", level: "beginner" },
+];
 const QUIZ_MODES = [
   "ko_to_target_word",
   "target_to_ko_meaning",
@@ -80,6 +134,10 @@ function todayKstYyyyMmDd(now = new Date()): string {
   const m = (kst.getUTCMonth() + 1).toString().padStart(2, "0");
   const d = kst.getUTCDate().toString().padStart(2, "0");
   return `${y}-${m}-${d}`;
+}
+
+function learningSetDocId(todayKst: string, targetLanguage: string, level: string): string {
+  return `${todayKst}_${targetLanguage}_${level}`;
 }
 
 function addDaysYyyyMmDd(baseYmd: string, days: number): string {
@@ -139,6 +197,20 @@ async function cleanupExpiredDailySets(uid: string, todayKst: string): Promise<v
     batch.delete(doc.ref);
   }
   await batch.commit();
+}
+
+async function cleanupExpiredLearningSets(uid: string, todayKst: string): Promise<void> {
+  const deleteBefore = addDaysYyyyMmDd(todayKst, -(DEFAULT_RETENTION_DAYS + 1));
+  for (const sub of ["daily_word_sets", "daily_sentence_sets"] as const) {
+    const col = db.collection("users").doc(uid).collection(sub);
+    const snap = await col.where("dateKst", "<=", deleteBefore).limit(20).get();
+    if (snap.empty) continue;
+    const batch = db.batch();
+    for (const doc of snap.docs) {
+      batch.delete(doc.ref);
+    }
+    await batch.commit();
+  }
 }
 
 async function getYesterdayReviewRatio(uid: string, todayKst: string): Promise<number> {
@@ -708,54 +780,558 @@ async function generateSentenceWithOpenAI(
   }
 }
 
-/** 앱에서만 호출 (인증 필수). OpenAI 실패 시 고정 폴백. */
-export const generateWord = onCall(
-  { region: "asia-northeast3", secrets: ["OPENAI_API_KEY"] },
-  async (request): Promise<GenerateWordResponse> => {
-    if (!request.auth) {
-      throw new HttpsError("unauthenticated", "로그인이 필요합니다.");
+function parseWordItem(value: unknown): StoredWordItem | null {
+  if (typeof value !== "object" || value === null) return null;
+  const word = readOptionalString(value, ["word"]);
+  const meaningKo =
+    readOptionalString(value, ["meaningKo"]) ??
+    readOptionalString(value, ["meaning", "koMeaning", "koreanMeaning"]);
+  if (!word || !meaningKo) return null;
+  const example = readOptionalString(value, ["example", "exampleSentence"]);
+  return example ? { word, meaningKo, example } : { word, meaningKo };
+}
+
+function parseSentenceItem(value: unknown): StoredSentenceItem | null {
+  if (typeof value !== "object" || value === null) return null;
+  const sentence = readOptionalString(value, ["sentence"]);
+  const meaningKo =
+    readOptionalString(value, ["meaningKo"]) ??
+    readOptionalString(value, ["meaning", "koMeaning", "koreanMeaning"]);
+  if (!sentence || !meaningKo) return null;
+  return { sentence, meaningKo };
+}
+
+function wordDedupKey(word: string): string {
+  return normalizePromptKey(word);
+}
+
+function sentenceDedupKey(sentence: string): string {
+  return normalizePromptKey(sentence);
+}
+
+async function generateDailyWordChunkWithOpenAI(
+  targetLanguage: string,
+  level: string,
+  count: number,
+  diversitySeed: string
+): Promise<StoredWordItem[]> {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error("OPENAI_API_KEY is missing");
+  }
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 25000);
+
+  try {
+    const systemPrompt = buildDailyWordBatchSystemPrompt(targetLanguage, level, count);
+    const userPrompt = buildDailyWordBatchUserPromptJson(
+      targetLanguage,
+      level,
+      count,
+      diversitySeed
+    );
+
+    const response = await fetch(OPENAI_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: OPENAI_MODEL,
+        temperature: 1.05,
+        input: [
+          { role: "system", content: [{ type: "input_text", text: systemPrompt }] },
+          { role: "user", content: [{ type: "input_text", text: userPrompt }] },
+        ],
+      }),
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`OpenAI HTTP ${response.status}: ${text}`);
     }
 
-    const targetLanguage = (request.data?.targetLanguage ?? "ja") as string;
-    const level = (request.data?.level ?? "beginner") as string;
+    const data: unknown = await response.json();
+    const outputText = extractOutputTextFromOpenAIResponses(data);
+    if (!outputText) {
+      throw new Error("OpenAI response had no assistant text (output_text/output)");
+    }
 
-    console.error(`[generateWord] invoked targetLanguage=${targetLanguage}, level=${level}`);
+    const parsed = safeJsonParse(outputText);
+    if (typeof parsed !== "object" || parsed === null) {
+      throw new Error("word batch JSON root invalid");
+    }
+    const rawWords = (parsed as Record<string, unknown>).words;
+    if (!Array.isArray(rawWords)) {
+      throw new Error("word batch missing words[]");
+    }
+    const out: StoredWordItem[] = [];
+    for (const item of rawWords) {
+      const w = parseWordItem(item);
+      if (w) {
+        out.push(w);
+      }
+    }
+    if (out.length < count) {
+      throw new Error(`word batch too short: ${out.length}/${count}`);
+    }
+    return out.slice(0, count);
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function generateDailySentenceBatchWithOpenAI(
+  targetLanguage: string,
+  level: string,
+  count: number,
+  diversitySeed: string
+): Promise<StoredSentenceItem[]> {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error("OPENAI_API_KEY is missing");
+  }
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 25000);
+
+  try {
+    const systemPrompt = buildDailySentenceBatchSystemPrompt(targetLanguage, level, count);
+    const userPrompt = buildDailySentenceBatchUserPromptJson(
+      targetLanguage,
+      level,
+      count,
+      diversitySeed
+    );
+
+    const response = await fetch(OPENAI_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: OPENAI_MODEL,
+        temperature: 1.05,
+        input: [
+          { role: "system", content: [{ type: "input_text", text: systemPrompt }] },
+          { role: "user", content: [{ type: "input_text", text: userPrompt }] },
+        ],
+      }),
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`OpenAI HTTP ${response.status}: ${text}`);
+    }
+
+    const data: unknown = await response.json();
+    const outputText = extractOutputTextFromOpenAIResponses(data);
+    if (!outputText) {
+      throw new Error("OpenAI response had no assistant text (output_text/output)");
+    }
+
+    const parsed = safeJsonParse(outputText);
+    if (typeof parsed !== "object" || parsed === null) {
+      throw new Error("sentence batch JSON root invalid");
+    }
+    const raw = (parsed as Record<string, unknown>).sentences;
+    if (!Array.isArray(raw)) {
+      throw new Error("sentence batch missing sentences[]");
+    }
+    const out: StoredSentenceItem[] = [];
+    for (const item of raw) {
+      const s = parseSentenceItem(item);
+      if (s) {
+        out.push(s);
+      }
+    }
+    if (out.length < count) {
+      throw new Error(`sentence batch too short: ${out.length}/${count}`);
+    }
+    return out.slice(0, count);
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+function mergeWordBatchInto(
+  batch: StoredWordItem[],
+  out: StoredWordItem[],
+  used: Set<string>
+): void {
+  for (const item of batch) {
+    const key = wordDedupKey(item.word);
+    if (!key || used.has(key)) {
+      continue;
+    }
+    used.add(key);
+    out.push(item);
+  }
+}
+
+async function buildDailyWordItems(targetLanguage: string, level: string): Promise<StoredWordItem[]> {
+  const out: StoredWordItem[] = [];
+  const used = new Set<string>();
+  const t0 = Date.now();
+
+  // 15 + 15 를 동시에 호출해 순차 3회(10개) 대비 대기 시간을 크게 줄임.
+  const parallelSeeds = [
+    `words-p0-${t0}-${Math.random().toString(36).slice(2)}`,
+    `words-p1-${t0}-${Math.random().toString(36).slice(2)}`,
+  ];
+  const parallelResults = await Promise.allSettled([
+    generateDailyWordChunkWithOpenAI(targetLanguage, level, DAILY_WORD_BATCH_SIZE, parallelSeeds[0]),
+    generateDailyWordChunkWithOpenAI(targetLanguage, level, DAILY_WORD_BATCH_SIZE, parallelSeeds[1]),
+  ]);
+
+  for (let i = 0; i < parallelResults.length; i++) {
+    const r = parallelResults[i];
+    if (r.status === "fulfilled") {
+      mergeWordBatchInto(r.value, out, used);
+    } else {
+      console.error(`[daily-words] parallel chunk ${i} failed`, r.reason);
+    }
+  }
+
+  // 중복·실패로 30개 미만이면 한 번 더 (순차)
+  if (out.length < DAILY_WORD_COUNT) {
+    const need = Math.min(DAILY_WORD_BATCH_SIZE, DAILY_WORD_COUNT - out.length);
     try {
-      const res = await generateWordWithOpenAI(targetLanguage, level);
-      console.log(`[generateWord] source=openai targetLanguage=${targetLanguage}, level=${level}`);
-      return { ...res, debugSource: "openai" };
+      const batch = await generateDailyWordChunkWithOpenAI(
+        targetLanguage,
+        level,
+        need,
+        `words-topup-${Date.now()}-${Math.random().toString(36).slice(2)}`
+      );
+      mergeWordBatchInto(batch, out, used);
     } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      console.error(`[generateWord] OpenAI failed, using fallback. message=${msg}`);
-      console.warn(`[generateWord] source=fallback targetLanguage=${targetLanguage}, level=${level}`);
+      console.error("[daily-words] top-up chunk AI failed", e);
+    }
+  }
+
+  let fillAttempts = 0;
+  while (out.length < DAILY_WORD_COUNT && fillAttempts < 75) {
+    fillAttempts += 1;
+    try {
+      const one = await generateWordWithOpenAI(targetLanguage, level);
+      const key = wordDedupKey(one.word);
+      if (key && !used.has(key)) {
+        used.add(key);
+        out.push({
+          word: one.word,
+          meaningKo: one.meaningKo,
+          ...(one.example ? { example: one.example } : {}),
+        });
+      }
+    } catch {
+      const fb = fallbackWord(targetLanguage, level);
+      const fk = `${wordDedupKey(fb.word)}#${out.length}`;
+      if (!used.has(fk)) {
+        used.add(fk);
+        out.push({
+          word: fb.word,
+          meaningKo: fb.meaningKo,
+          ...(fb.example ? { example: fb.example } : {}),
+        });
+      }
+    }
+  }
+  return out.slice(0, DAILY_WORD_COUNT);
+}
+
+async function buildDailySentenceItems(
+  targetLanguage: string,
+  level: string
+): Promise<StoredSentenceItem[]> {
+  try {
+    const batch = await generateDailySentenceBatchWithOpenAI(
+      targetLanguage,
+      level,
+      DAILY_SENTENCE_COUNT,
+      `s-${Date.now()}-${Math.random().toString(36).slice(2)}`
+    );
+    const out: StoredSentenceItem[] = [];
+    const used = new Set<string>();
+    for (const item of batch) {
+      const key = sentenceDedupKey(item.sentence);
+      if (!key || used.has(key)) {
+        continue;
+      }
+      used.add(key);
+      out.push(item);
+    }
+    if (out.length >= DAILY_SENTENCE_COUNT) {
+      return out.slice(0, DAILY_SENTENCE_COUNT);
+    }
+  } catch (e) {
+    console.error("[daily-sentences] batch AI failed", e);
+  }
+
+  const out: StoredSentenceItem[] = [];
+  const used = new Set<string>();
+  let attempts = 0;
+  while (out.length < DAILY_SENTENCE_COUNT && attempts < 40) {
+    attempts += 1;
+    try {
+      const one = await generateSentenceWithOpenAI(targetLanguage, level);
+      const key = sentenceDedupKey(one.sentence);
+      if (key && !used.has(key)) {
+        used.add(key);
+        out.push({ sentence: one.sentence, meaningKo: one.meaningKo });
+      }
+    } catch {
+      const fb = fallbackSentence(targetLanguage, level);
+      const fk = `${sentenceDedupKey(fb.sentence)}#${out.length}`;
+      if (!used.has(fk)) {
+        used.add(fk);
+        out.push({ sentence: fb.sentence, meaningKo: fb.meaningKo });
+      }
+    }
+  }
+  return out.slice(0, DAILY_SENTENCE_COUNT);
+}
+
+function globalTodayWordSetRef(
+  targetLanguage: string,
+  level: string
+): FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData> {
+  const todayKst = todayKstYyyyMmDd();
+  const docId = learningSetDocId(todayKst, targetLanguage, level);
+  return db
+    .collection("users")
+    .doc(GLOBAL_LEARNING_SET_OWNER)
+    .collection("daily_word_sets")
+    .doc(docId);
+}
+
+function globalTodaySentenceSetRef(
+  targetLanguage: string,
+  level: string
+): FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData> {
+  const todayKst = todayKstYyyyMmDd();
+  const docId = learningSetDocId(todayKst, targetLanguage, level);
+  return db
+    .collection("users")
+    .doc(GLOBAL_LEARNING_SET_OWNER)
+    .collection("daily_sentence_sets")
+    .doc(docId);
+}
+
+/** 스케줄러에서만 호출: 없거나 비어 있으면 AI로 채움. Callable에서는 사용하지 않음. */
+async function materializeGlobalTodayWordSetIfAbsent(
+  targetLanguage: string,
+  level: string
+): Promise<FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>> {
+  const ref = globalTodayWordSetRef(targetLanguage, level);
+  const snap = await ref.get();
+  if (snap.exists) {
+    const data = snap.data() as Partial<DailyWordSet>;
+    if (
+      data.targetLanguage === targetLanguage &&
+      data.level === level &&
+      Array.isArray(data.words) &&
+      data.words.length > 0
+    ) {
+      return ref;
+    }
+  }
+
+  const todayKst = todayKstYyyyMmDd();
+  await cleanupExpiredLearningSets(GLOBAL_LEARNING_SET_OWNER, todayKst);
+  const words = await buildDailyWordItems(targetLanguage, level);
+  const payload: DailyWordSet = {
+    dateKst: todayKst,
+    targetLanguage,
+    level,
+    words,
+    cursor: 0,
+    updatedAtMs: Date.now(),
+  };
+  await ref.set(payload);
+  return ref;
+}
+
+/** 스케줄러에서만 호출: 없거나 비어 있으면 AI로 채움. Callable에서는 사용하지 않음. */
+async function materializeGlobalTodaySentenceSetIfAbsent(
+  targetLanguage: string,
+  level: string
+): Promise<FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>> {
+  const ref = globalTodaySentenceSetRef(targetLanguage, level);
+  const snap = await ref.get();
+  if (snap.exists) {
+    const data = snap.data() as Partial<DailySentenceSet>;
+    if (
+      data.targetLanguage === targetLanguage &&
+      data.level === level &&
+      Array.isArray(data.sentences) &&
+      data.sentences.length > 0
+    ) {
+      return ref;
+    }
+  }
+
+  const todayKst = todayKstYyyyMmDd();
+  await cleanupExpiredLearningSets(GLOBAL_LEARNING_SET_OWNER, todayKst);
+  const sentences = await buildDailySentenceItems(targetLanguage, level);
+  const payload: DailySentenceSet = {
+    dateKst: todayKst,
+    targetLanguage,
+    level,
+    sentences,
+    cursor: 0,
+    updatedAtMs: Date.now(),
+  };
+  await ref.set(payload);
+  return ref;
+}
+
+async function popWordFromTodaySet(
+  uid: string,
+  targetLanguage: string,
+  level: string
+): Promise<GenerateWordResponse> {
+  const todayKst = todayKstYyyyMmDd();
+  const setRef = globalTodayWordSetRef(targetLanguage, level);
+  const cursorRef = db
+    .collection("users")
+    .doc(uid)
+    .collection("daily_word_cursor")
+    .doc(learningSetDocId(todayKst, targetLanguage, level));
+
+  return db.runTransaction(async (tx) => {
+    const setSnap = await tx.get(setRef);
+    const data = (setSnap.data() ?? {}) as Partial<DailyWordSet>;
+    const words = Array.isArray(data.words) ? data.words : [];
+    if (words.length === 0) {
       return { ...fallbackWord(targetLanguage, level), debugSource: "fallback" };
     }
-  }
-);
-
-export const generateSentence = onCall(
-  { region: "asia-northeast3", secrets: ["OPENAI_API_KEY"] },
-  async (request): Promise<GenerateSentenceResponse> => {
-    if (!request.auth) {
-      throw new HttpsError("unauthenticated", "로그인이 필요합니다.");
+    const cursorSnap = await tx.get(cursorRef);
+    const cursorData = cursorSnap.data() ?? {};
+    const cursor = Number(cursorData.cursor ?? 0);
+    const index = ((cursor % words.length) + words.length) % words.length;
+    const picked = words[index];
+    if (!picked?.word || !picked?.meaningKo) {
+      return { ...fallbackWord(targetLanguage, level), debugSource: "fallback" };
     }
+    tx.set(
+      cursorRef,
+      {
+        dateKst: todayKst,
+        targetLanguage,
+        level,
+        cursor: cursor + 1,
+        updatedAtMs: Date.now(),
+      },
+      { merge: true }
+    );
+    return {
+      word: picked.word,
+      meaningKo: picked.meaningKo,
+      ...(picked.example ? { example: picked.example } : {}),
+      debugSource: "daily_set",
+    };
+  });
+}
 
-    const targetLanguage = (request.data?.targetLanguage ?? "ja") as string;
-    const level = (request.data?.level ?? "beginner") as string;
+async function popSentenceFromTodaySet(
+  uid: string,
+  targetLanguage: string,
+  level: string
+): Promise<GenerateSentenceResponse> {
+  const todayKst = todayKstYyyyMmDd();
+  const setRef = globalTodaySentenceSetRef(targetLanguage, level);
+  const cursorRef = db
+    .collection("users")
+    .doc(uid)
+    .collection("daily_sentence_cursor")
+    .doc(learningSetDocId(todayKst, targetLanguage, level));
 
-    console.error(`[generateSentence] invoked targetLanguage=${targetLanguage}, level=${level}`);
-    try {
-      const res = await generateSentenceWithOpenAI(targetLanguage, level);
-      console.log(`[generateSentence] source=openai targetLanguage=${targetLanguage}, level=${level}`);
-      return { ...res, debugSource: "openai" };
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      console.error(`[generateSentence] OpenAI failed, using fallback. message=${msg}`);
-      console.warn(`[generateSentence] source=fallback targetLanguage=${targetLanguage}, level=${level}`);
+  return db.runTransaction(async (tx) => {
+    const setSnap = await tx.get(setRef);
+    const data = (setSnap.data() ?? {}) as Partial<DailySentenceSet>;
+    const sentences = Array.isArray(data.sentences) ? data.sentences : [];
+    if (sentences.length === 0) {
       return { ...fallbackSentence(targetLanguage, level), debugSource: "fallback" };
     }
+    const cursorSnap = await tx.get(cursorRef);
+    const cursorData = cursorSnap.data() ?? {};
+    const cursor = Number(cursorData.cursor ?? 0);
+    const index = ((cursor % sentences.length) + sentences.length) % sentences.length;
+    const picked = sentences[index];
+    if (!picked?.sentence || !picked?.meaningKo) {
+      return { ...fallbackSentence(targetLanguage, level), debugSource: "fallback" };
+    }
+    tx.set(
+      cursorRef,
+      {
+        dateKst: todayKst,
+        targetLanguage,
+        level,
+        cursor: cursor + 1,
+        updatedAtMs: Date.now(),
+      },
+      { merge: true }
+    );
+    return {
+      sentence: picked.sentence,
+      meaningKo: picked.meaningKo,
+      debugSource: "daily_set",
+    };
+  });
+}
+
+/** 앱에서만 호출. 자정 배치로 만든 Firestore 세트에서만 꺼냄(AI 생성 없음). 없으면 정적 폴백. */
+export const generateWord = onCall({ region: "asia-northeast3" }, async (request): Promise<GenerateWordResponse> => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "로그인이 필요합니다.");
   }
-);
+
+  const uid = request.auth.uid;
+  const targetLanguage = (request.data?.targetLanguage ?? "ja") as string;
+  const level = (request.data?.level ?? "beginner") as string;
+
+  console.error(`[generateWord] invoked targetLanguage=${targetLanguage}, level=${level}`);
+  try {
+    const res = await popWordFromTodaySet(uid, targetLanguage, level);
+    console.log(
+      `[generateWord] source=${res.debugSource} targetLanguage=${targetLanguage}, level=${level}`
+    );
+    return res;
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error(`[generateWord] read/pop failed. message=${msg}`);
+    return { ...fallbackWord(targetLanguage, level), debugSource: "fallback" };
+  }
+});
+
+/** 문장도 동일: 세트는 스케줄러만 생성, 앱은 읽기만. */
+export const generateSentence = onCall({ region: "asia-northeast3" }, async (request): Promise<GenerateSentenceResponse> => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "로그인이 필요합니다.");
+  }
+
+  const uid = request.auth.uid;
+  const targetLanguage = (request.data?.targetLanguage ?? "ja") as string;
+  const level = (request.data?.level ?? "beginner") as string;
+
+  console.error(`[generateSentence] invoked targetLanguage=${targetLanguage}, level=${level}`);
+  try {
+    const res = await popSentenceFromTodaySet(uid, targetLanguage, level);
+    console.log(
+      `[generateSentence] source=${res.debugSource} targetLanguage=${targetLanguage}, level=${level}`
+    );
+    return res;
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error(`[generateSentence] read/pop failed. message=${msg}`);
+    return { ...fallbackSentence(targetLanguage, level), debugSource: "fallback" };
+  }
+});
 
 export const generateQuiz = onCall(
   { region: "asia-northeast3", secrets: ["OPENAI_API_KEY"] },
@@ -773,5 +1349,69 @@ export const generateQuiz = onCall(
       console.error("[generateQuiz] Daily set flow failed. Fallback is used.", e);
       return fallbackQuiz(targetLanguage, level);
     }
+  }
+);
+
+/** 마무리용 카드만 Firestore에서 읽음(AI·세트 생성 없음). */
+export const getWrapUpDeck = onCall({ region: "asia-northeast3" }, async (request): Promise<{ items: WrapUpDeckItem[] }> => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "로그인이 필요합니다.");
+  }
+
+  const targetLanguage = (request.data?.targetLanguage ?? "ja") as string;
+  const level = (request.data?.level ?? "beginner") as string;
+
+  const wordSnap = await globalTodayWordSetRef(targetLanguage, level).get();
+  const sentenceSnap = await globalTodaySentenceSetRef(targetLanguage, level).get();
+
+  const wdata = wordSnap.data() as Partial<DailyWordSet> | undefined;
+  const sdata = sentenceSnap.data() as Partial<DailySentenceSet> | undefined;
+  const words = Array.isArray(wdata?.words) ? wdata!.words : [];
+  const sentences = Array.isArray(sdata?.sentences) ? sdata!.sentences : [];
+
+  const pickW = shuffle([...words]).slice(0, Math.min(20, words.length));
+  const pickS = shuffle([...sentences]).slice(0, Math.min(5, sentences.length));
+
+  const items: WrapUpDeckItem[] = [
+    ...pickW.map((w) => ({
+      kind: "word" as const,
+      meaningKo: w.meaningKo,
+      answer: w.word,
+    })),
+    ...pickS.map((s) => ({
+      kind: "sentence" as const,
+      meaningKo: s.meaningKo,
+      answer: s.sentence,
+    })),
+  ];
+  return { items: shuffle(items) };
+});
+
+/**
+ * 매일 KST 자정 — (언어, 레벨)별 글로벌 단어 30·문장 10 세트를 AI로 생성·저장.
+ * Blaze + Cloud Scheduler 필요. 앱 callable은 이 문서만 읽음.
+ */
+export const pregenerateDailyLearningSets = onSchedule(
+  {
+    schedule: "0 0 * * *",
+    timeZone: "Asia/Seoul",
+    region: "asia-northeast3",
+    secrets: ["OPENAI_API_KEY"],
+    timeoutSeconds: 540,
+    memory: "512MiB",
+  },
+  async () => {
+    const todayKst = todayKstYyyyMmDd();
+    console.log("[pregenerateDailyLearningSets] start", { todayKst });
+    for (const { targetLanguage, level } of PREGEN_LANGUAGE_LEVEL_PAIRS) {
+      try {
+        await materializeGlobalTodayWordSetIfAbsent(targetLanguage, level);
+        await materializeGlobalTodaySentenceSetIfAbsent(targetLanguage, level);
+        console.log("[pregenerateDailyLearningSets] ok", { targetLanguage, level });
+      } catch (e) {
+        console.error("[pregenerateDailyLearningSets] failed", { targetLanguage, level, e });
+      }
+    }
+    console.log("[pregenerateDailyLearningSets] done", { todayKst });
   }
 );
