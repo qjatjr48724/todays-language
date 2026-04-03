@@ -1,6 +1,7 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 import '../services/daily_progress_sync.dart';
 
@@ -19,6 +20,7 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
   String? _aiError;
   String? _sentence;
   String? _meaning;
+  String? _debugSource;
   bool _completedCurrent = false;
 
   @override
@@ -33,6 +35,7 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
       _aiError = null;
       _sentence = null;
       _meaning = null;
+      _debugSource = null;
       _completedCurrent = false;
       _error = null;
     });
@@ -54,11 +57,13 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
       final data = Map<String, dynamic>.from(result.data as Map);
       final sentence = data['sentence']?.toString() ?? '';
       final meaning = data['meaningKo']?.toString() ?? '';
+      final debugSource = data['debugSource']?.toString();
 
       if (!mounted) return;
       setState(() {
         _sentence = sentence;
         _meaning = meaning;
+        _debugSource = debugSource;
         _aiLoading = false;
       });
     } catch (e) {
@@ -134,6 +139,15 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
                       color: scheme.onSurfaceVariant,
                     ),
               ),
+              if (kDebugMode && _debugSource != null) ...[
+                const SizedBox(height: 10),
+                Text(
+                  'debugSource: $_debugSource',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                ),
+              ],
             ],
             const Spacer(),
             FilledButton.icon(

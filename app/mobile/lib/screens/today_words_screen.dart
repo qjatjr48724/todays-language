@@ -1,6 +1,7 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 import '../services/daily_progress_sync.dart';
 
@@ -19,6 +20,7 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
   String? _word;
   String? _meaning;
   String? _example;
+  String? _debugSource;
   bool _completedCurrent = false;
 
   String? _error;
@@ -36,6 +38,7 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
       _word = null;
       _meaning = null;
       _example = null;
+      _debugSource = null;
       _completedCurrent = false;
       _error = null;
     });
@@ -61,12 +64,14 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
       final word = data['word']?.toString() ?? '';
       final meaning = data['meaningKo']?.toString() ?? '';
       final example = data['example']?.toString();
+      final debugSource = data['debugSource']?.toString();
 
       if (!mounted) return;
       setState(() {
         _word = word;
         _meaning = meaning;
         _example = example;
+        _debugSource = debugSource;
         _aiLoading = false;
       });
     } catch (e) {
@@ -142,6 +147,15 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
                       color: scheme.onSurfaceVariant,
                     ),
               ),
+              if (kDebugMode && _debugSource != null) ...[
+                const SizedBox(height: 10),
+                Text(
+                  'debugSource: $_debugSource',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                ),
+              ],
               if (_example != null && _example!.isNotEmpty) ...[
                 const SizedBox(height: 12),
                 Text(
