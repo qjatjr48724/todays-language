@@ -206,6 +206,106 @@
 2. `users/__global__` 및 `daily_quiz_sets/{todayKst}` 강제 생성용 디버그 callable로 경로 자체 검증
 3. 글로벌 세트 저장 확인 후, 자정 기준 세트 교체/정리 동작 테스트
 
+## 최근 기록 — 인증 진입 플로우 개편 + 내 정보/하단 탭 + 마무리 모의고사 전환
+
+## [단계 n] 로그인 구조 재정비 및 마무리 학습 흐름 고도화
+
+### 1) 오늘 한 일
+
+- 앱 실행 시 최초로 보이는 터치 시작 화면을 추가(아이콘 제거, 텍스트 중심)
+- 로그인 화면을 "시작 방식 선택 허브"로 개편
+  - 이메일로 시작하기 → 이메일 로그인 화면으로 이동
+  - 이메일 로그인 화면 하단의 `회원가입` 텍스트 버튼으로 회원가입 화면 이동
+  - 구글/애플 시작 버튼은 다음 단계 연결 대상으로 유지
+  - 디버그 테스트 계정 자동 로그인 버튼 유지
+- 이메일 회원가입 화면을 명세에 맞게 확장
+  - 입력: 이메일/비밀번호/이름/생년월일/전화번호(인증)
+  - 약관/개인정보 동의 체크 후 가입 가능
+  - 가입 성공 시 `users/{uid}` 문서에 추가 정보 저장
+- 하단 내비게이션 탭(내 정보/홈/진행률) 추가
+- 내 정보 화면 시안 1차 구현 + 임베드 모드에서 상단 SafeArea 적용
+- 홈 기능 구조 조정
+  - `단어 퀴즈` 카드 제거
+  - `오늘의 마무리`를 최종 점검 카드로 전환
+  - 안내 문구를 `단어 20 + 문장 5` 기준으로 변경
+- 오늘의 마무리 화면을 모의고사 점검 형태로 개편
+  - 당일 단어 20 + 문장 5 로드
+  - 정답 보기 기반 점검 + `마무리 완료` 반영 버튼 추가
+- 진행률 목표/표현 정리
+  - 마무리 목표(`quizGoal`) 기본값 25로 조정
+  - 진행률/초기화 문구에서 `퀴즈` 표현을 `마무리` 의미로 정리
+
+### 2) 완료 기준 체크
+
+- [x] 최초 실행 화면 추가 및 시작 터치 진입 동작 확인
+- [x] 이메일 로그인/회원가입 분리 플로우 확인
+- [x] 하단 탭 3구조(내 정보/홈/진행률) 적용
+- [x] 단어 퀴즈 제거 및 오늘의 마무리 카드 전환
+- [x] 오늘의 마무리(단어 20 + 문장 5) 화면 동작 확인
+- [x] 정적 검증 통과 (`flutter analyze`, `npm run build`)
+
+### 3) 추가/변경한 코드 포인트
+
+- 파일:
+  - `app/mobile/lib/main.dart`
+  - `app/mobile/lib/screens/launch_screen.dart` (신규)
+  - `app/mobile/lib/auth_gate.dart`
+  - `app/mobile/lib/screens/login_screen.dart`
+  - `app/mobile/lib/screens/email_login_screen.dart` (신규)
+  - `app/mobile/lib/screens/email_register_screen.dart` (신규)
+  - `app/mobile/lib/screens/main_nav_screen.dart` (신규)
+  - `app/mobile/lib/screens/progress_screen.dart` (신규)
+  - `app/mobile/lib/screens/my_info_screen.dart`
+  - `app/mobile/lib/screens/home_screen.dart`
+  - `app/mobile/lib/screens/today_wrap_up_screen.dart`
+  - `app/mobile/lib/services/daily_progress_sync.dart`
+  - `functions/src/index.ts`
+  - `Base-Rule.mdc`
+- 핵심 포인트:
+  - 인증 진입 구조를 "시작 화면 → 로그인 허브 → 이메일 로그인/회원가입 분리"로 재구성
+  - 공통 문제세트 + 사용자별 커서 구조 유지, 중복 문제 방지 로직 강화
+  - 진행률 초기화 시 개인 커서 동시 초기화
+  - 사용자 요청 누락 방지/파일 반영 우선 규칙을 `Base-Rule.mdc`에 명시
+
+### 4) 이슈/막힌 점
+
+- 증상: `users/__global__` 문서가 생성되지 않음
+- 원인 추정: Firestore 예약 ID(`__...__`) 사용으로 문서 생성 실패
+- 해결/우회:
+  - 글로벌 owner ID를 `global_quiz_owner`로 변경하여 해결
+  - 이후 `users/global_quiz_owner/daily_quiz_sets/{todayKst}` 생성 확인
+
+### 5) 다음 액션 (내일 바로 할 것)
+
+1. 오늘의 단어/오늘의 문장을 AI 생성 중심으로 정리하고 고정 응답 의존 제거
+2. 단어 30개/문장 10개 학습 완료 시 `다음` 버튼 비활성 + `재학습 시작` 버튼으로 전환
+3. 재학습 시작 시 같은 날 사이클 재개 동작과 진행률 반영 정책 일치 검증
+
+---
+
+## 최근 기록 — 오늘의 단어/문장 Callable OpenAI 연동
+
+### 1) 오늘 한 일
+
+- Cloud Functions `generateWord`, `generateSentence`에 OpenAI Responses API 연동 (`OPENAI_API_KEY` 시크릿, `generateQuiz`와 동일 패턴)
+- 응답 JSON 스키마 검증(`word`/`meaningKo`/`example?`, `sentence`/`meaningKo`) 후 반환; 실패·타임아웃·429 등은 로그 후 기존 고정 폴백 응답으로 안전 처리
+- 일본어 초급은 프롬프트에서 히라가나 위주 지침 유지(기존 제품 방향과 정합)
+
+### 2) 완료 기준 체크
+
+- [x] `functions`: `npm run build` 통과
+- [ ] 배포 후 실기기/에뮬에서 단어·문장 화면에서 매 요청 다양한 응답 확인(폴백이 자주 뜨면 로그/OpenAI 쿼터 확인)
+
+### 3) 추가/변경한 코드 포인트
+
+- 파일: `functions/src/index.ts`
+- 핵심: 앱은 변경 없음(callable 이름·응답 필드 동일). 배포 시 `generateWord`/`generateSentence`에도 시크릿 바인딩 필요.
+
+### 4) 다음 액션
+
+1. 30단어/10문장 달성 후 `재학습 시작` UX 및 진행률 정책
+2. (선택) 당일 중복 단어/문장 완화를 위해 클라이언트가 이미 본 항목 힌트를 서버에 전달하는 방안 검토
+
 ## 단계별 Notion에 꼭 남길 내용 가이드
 
 ### 1. Flutter 환경
