@@ -1,15 +1,26 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 
+import {
+  buildQuizSystemPrompt,
+  buildQuizUserPromptJson,
+  buildSentenceSystemPrompt,
+  buildSentenceUserPromptJson,
+  buildWordSystemPrompt,
+  buildWordUserPromptJson,
+} from "./prompts";
+
 type GenerateWordResponse = {
   word: string;
   meaningKo: string;
   example?: string;
+  debugSource?: "openai" | "fallback";
 };
 
 type GenerateSentenceResponse = {
   sentence: string;
   meaningKo: string;
+  debugSource?: "openai" | "fallback";
 };
 
 type GenerateQuizResponse = {
@@ -387,6 +398,107 @@ function fallbackQuiz(targetLanguage: string, level: string): GenerateQuizRespon
   return templates[Math.floor(Math.random() * templates.length)];
 }
 
+function fallbackWord(targetLanguage: string, level: string): GenerateWordResponse {
+  if (targetLanguage === "ja" && level === "beginner") {
+    return {
+      word: "ありがとう",
+      meaningKo: "고마워요",
+      example: "ありがとう、助かりました。",
+    };
+  }
+  return {
+    word: "hola",
+    meaningKo: "안녕",
+    example: "Hola, ¿cómo estás?",
+  };
+}
+
+function fallbackSentence(targetLanguage: string, level: string): GenerateSentenceResponse {
+  if (targetLanguage === "ja" && level === "beginner") {
+    return {
+      sentence: "きょうはいいてんきですね。",
+      meaningKo: "오늘은 날씨가 좋네요.",
+    };
+  }
+  return {
+    sentence: "Hoy hace buen tiempo.",
+    meaningKo: "오늘 날씨가 좋아요.",
+  };
+}
+
+function safeJsonParse(value: string): unknown | null {
+  try {
+    return JSON.parse(value);
+  } catch {
+    // ignore
+  }
+
+  // 모델이 앞뒤 설명을 섞어 보내는 경우를 대비해서
+  // 첫 '{' ~ 마지막 '}' 범위만 다시 파싱해본다.
+  const firstBrace = value.indexOf("{");
+  const lastBrace = value.lastIndexOf("}");
+  if (firstBrace >= 0 && lastBrace > firstBrace) {
+    const candidate = value.slice(firstBrace, lastBrace + 1);
+    try {
+      return JSON.parse(candidate);
+    } catch {
+      return null;
+    }
+  }
+
+  return null;
+}
+
+function readOptionalString(obj: unknown, keys: string[]): string | undefined {
+  if (typeof obj !== "object" || obj === null) return undefined;
+  const o = obj as Record<string, unknown>;
+  for (const k of keys) {
+    const v = o[k];
+    if (typeof v === "string") {
+      const t = v.trim();
+      if (t.length > 0) return t;
+    }
+  }
+  return undefined;
+}
+
+/**
+ * OpenAI Responses API (`POST /v1/responses`) 응답에서 모델 텍스트를 꺼낸다.
+ * - 일부 SDK/문서는 top-level `output_text`를 가정하지만, 실제 JSON은 `output[].content[].text`만 주는 경우가 많다.
+ */
+function extractOutputTextFromOpenAIResponses(data: unknown): string {
+  if (typeof data !== "object" || data === null) return "";
+  const root = data as Record<string, unknown>;
+
+  const top = root.output_text;
+  if (typeof top === "string" && top.trim().length > 0) {
+    return top.trim();
+  }
+
+  const output = root.output;
+  if (!Array.isArray(output)) return "";
+
+  const parts: string[] = [];
+  for (const item of output) {
+    if (typeof item !== "object" || item === null) continue;
+    const o = item as Record<string, unknown>;
+    const content = o.content;
+    if (!Array.isArray(content)) continue;
+    for (const block of content) {
+      if (typeof block !== "object" || block === null) continue;
+      const b = block as Record<string, unknown>;
+      const textVal = b.text;
+      if (typeof textVal !== "string" || textVal.trim().length === 0) continue;
+      const typ = b.type;
+      if (typ === "output_text" || typ === "text") {
+        parts.push(textVal.trim());
+      }
+    }
+  }
+
+  return parts.join("\n").trim();
+}
+
 function isValidQuizPayload(value: unknown): value is OpenAiQuizResponse {
   if (typeof value !== "object" || value === null) return false;
   const v = value as Partial<OpenAiQuizResponse>;
@@ -413,30 +525,8 @@ async function generateQuizWithOpenAI(
 
   try {
     const quizMode = pickQuizMode();
-    const systemPrompt = [
-      "You generate beginner language quiz questions for a Korean learner.",
-      `Use quiz mode: ${quizMode}.`,
-      "Mode meaning:",
-      "- ko_to_target_word: Korean meaning is given, choose target-language word.",
-      "- target_to_ko_meaning: target-language word/sentence is given, choose Korean meaning.",
-      "- simple_context_choice: simple short context and choose fitting expression.",
-      "- fill_in_blank_word: very short sentence with one blank, choose best word.",
-      "Return ONLY a compact JSON object with fields:",
-      "quizType (must exactly equal requested mode), promptKo (string), choices (array of exactly 4 strings), answerIndex (0..3 integer).",
-      "No markdown. No extra keys.",
-      "For Japanese beginner content, prefer easy expressions.",
-    ].join(" ");
-
-    const userPrompt = JSON.stringify({
-      targetLanguage,
-      level,
-      quizType: quizMode,
-      learnerNativeLanguage: "ko",
-      constraints: {
-        choicesCount: 4,
-        singleCorrectAnswer: true,
-      },
-    });
+    const systemPrompt = buildQuizSystemPrompt(quizMode);
+    const userPrompt = buildQuizUserPromptJson(targetLanguage, level, quizMode);
 
     const response = await fetch(OPENAI_API_URL, {
       method: "POST",
@@ -460,10 +550,10 @@ async function generateQuizWithOpenAI(
       throw new Error(`OpenAI HTTP ${response.status}: ${text}`);
     }
 
-    const data = (await response.json()) as { output_text?: string };
-    const outputText = (data.output_text ?? "").trim();
+    const data: unknown = await response.json();
+    const outputText = extractOutputTextFromOpenAIResponses(data);
     if (!outputText) {
-      throw new Error("OpenAI response had no output_text");
+      throw new Error("OpenAI response had no assistant text (output_text/output)");
     }
 
     const parsed = JSON.parse(outputText) as unknown;
@@ -484,12 +574,143 @@ async function generateQuizWithOpenAI(
   }
 }
 
-/**
- * 앱에서만 호출 (인증 필수). 초기에는 고정 응답으로 플로우 검증.
- * 실제 AI 연동 시 이 함수 내부에서만 외부 API 호출.
- */
+async function generateWordWithOpenAI(
+  targetLanguage: string,
+  level: string
+): Promise<GenerateWordResponse> {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error("OPENAI_API_KEY is missing");
+  }
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 12000);
+
+  try {
+    const systemPrompt = buildWordSystemPrompt(targetLanguage, level);
+    const userPrompt = buildWordUserPromptJson(
+      targetLanguage,
+      level,
+      `${Date.now()}-${Math.random().toString(36).slice(2)}`
+    );
+
+    const response = await fetch(OPENAI_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: OPENAI_MODEL,
+        temperature: 1.1,
+        input: [
+          { role: "system", content: [{ type: "input_text", text: systemPrompt }] },
+          { role: "user", content: [{ type: "input_text", text: userPrompt }] },
+        ],
+      }),
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`OpenAI HTTP ${response.status}: ${text}`);
+    }
+
+    const data: unknown = await response.json();
+    const outputText = extractOutputTextFromOpenAIResponses(data);
+    if (!outputText) {
+      throw new Error("OpenAI response had no assistant text (output_text/output)");
+    }
+
+    const parsed = safeJsonParse(outputText);
+    const word = readOptionalString(parsed, ["word"]);
+    const meaningKo =
+      readOptionalString(parsed, ["meaningKo"]) ??
+      readOptionalString(parsed, ["meaning", "koMeaning", "koreanMeaning"]);
+    const ex = readOptionalString(parsed, ["example", "exampleSentence"]);
+
+    if (!word || !meaningKo) {
+      throw new Error("OpenAI response JSON schema mismatch (word)");
+    }
+    return {
+      word,
+      meaningKo,
+      example: ex && ex.length > 0 ? ex : undefined,
+    };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function generateSentenceWithOpenAI(
+  targetLanguage: string,
+  level: string
+): Promise<GenerateSentenceResponse> {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error("OPENAI_API_KEY is missing");
+  }
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 12000);
+
+  try {
+    const systemPrompt = buildSentenceSystemPrompt(targetLanguage, level);
+    const userPrompt = buildSentenceUserPromptJson(
+      targetLanguage,
+      level,
+      `${Date.now()}-${Math.random().toString(36).slice(2)}`
+    );
+
+    const response = await fetch(OPENAI_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: OPENAI_MODEL,
+        temperature: 1.1,
+        input: [
+          { role: "system", content: [{ type: "input_text", text: systemPrompt }] },
+          { role: "user", content: [{ type: "input_text", text: userPrompt }] },
+        ],
+      }),
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`OpenAI HTTP ${response.status}: ${text}`);
+    }
+
+    const data: unknown = await response.json();
+    const outputText = extractOutputTextFromOpenAIResponses(data);
+    if (!outputText) {
+      throw new Error("OpenAI response had no assistant text (output_text/output)");
+    }
+
+    const parsed = safeJsonParse(outputText);
+    const sentence = readOptionalString(parsed, ["sentence"]);
+    const meaningKo =
+      readOptionalString(parsed, ["meaningKo"]) ??
+      readOptionalString(parsed, ["meaning", "koMeaning", "koreanMeaning"]);
+
+    if (!sentence || !meaningKo) {
+      throw new Error("OpenAI response JSON schema mismatch (sentence)");
+    }
+    return {
+      sentence,
+      meaningKo,
+    };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+/** 앱에서만 호출 (인증 필수). OpenAI 실패 시 고정 폴백. */
 export const generateWord = onCall(
-  { region: "asia-northeast3" },
+  { region: "asia-northeast3", secrets: ["OPENAI_API_KEY"] },
   async (request): Promise<GenerateWordResponse> => {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "로그인이 필요합니다.");
@@ -498,24 +719,22 @@ export const generateWord = onCall(
     const targetLanguage = (request.data?.targetLanguage ?? "ja") as string;
     const level = (request.data?.level ?? "beginner") as string;
 
-    if (targetLanguage === "ja" && level === "beginner") {
-      return {
-        word: "ありがとう",
-        meaningKo: "고마워요",
-        example: "ありがとう、助かりました。",
-      };
+    console.error(`[generateWord] invoked targetLanguage=${targetLanguage}, level=${level}`);
+    try {
+      const res = await generateWordWithOpenAI(targetLanguage, level);
+      console.log(`[generateWord] source=openai targetLanguage=${targetLanguage}, level=${level}`);
+      return { ...res, debugSource: "openai" };
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error(`[generateWord] OpenAI failed, using fallback. message=${msg}`);
+      console.warn(`[generateWord] source=fallback targetLanguage=${targetLanguage}, level=${level}`);
+      return { ...fallbackWord(targetLanguage, level), debugSource: "fallback" };
     }
-
-    return {
-      word: "hola",
-      meaningKo: "안녕",
-      example: "Hola, ¿cómo estás?",
-    };
   }
 );
 
 export const generateSentence = onCall(
-  { region: "asia-northeast3" },
+  { region: "asia-northeast3", secrets: ["OPENAI_API_KEY"] },
   async (request): Promise<GenerateSentenceResponse> => {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "로그인이 필요합니다.");
@@ -524,18 +743,17 @@ export const generateSentence = onCall(
     const targetLanguage = (request.data?.targetLanguage ?? "ja") as string;
     const level = (request.data?.level ?? "beginner") as string;
 
-    if (targetLanguage === "ja" && level === "beginner") {
-      return {
-        // 초기 버전: 일본어는 히라가나만 노출(한자/가타카나 지양)
-        sentence: "きょうはいいてんきですね。",
-        meaningKo: "오늘은 날씨가 좋네요.",
-      };
+    console.error(`[generateSentence] invoked targetLanguage=${targetLanguage}, level=${level}`);
+    try {
+      const res = await generateSentenceWithOpenAI(targetLanguage, level);
+      console.log(`[generateSentence] source=openai targetLanguage=${targetLanguage}, level=${level}`);
+      return { ...res, debugSource: "openai" };
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error(`[generateSentence] OpenAI failed, using fallback. message=${msg}`);
+      console.warn(`[generateSentence] source=fallback targetLanguage=${targetLanguage}, level=${level}`);
+      return { ...fallbackSentence(targetLanguage, level), debugSource: "fallback" };
     }
-
-    return {
-      sentence: "Hoy hace buen tiempo.",
-      meaningKo: "오늘 날씨가 좋아요.",
-    };
   }
 );
 
