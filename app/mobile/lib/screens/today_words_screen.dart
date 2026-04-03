@@ -25,10 +25,58 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
 
   String? _error;
 
+  DailyProgressView? _todayProgress;
+  /// 오늘 단어 목표(30) 달성 후 「다음 단어」를 다시 쓰려면 true.
+  bool _relearnActive = false;
+
+  bool get _wordCapReached =>
+      _todayProgress != null &&
+      _todayProgress!.wordDone >= _todayProgress!.wordGoal;
+
+  bool get _showRelearnButton => _wordCapReached && !_relearnActive;
+
+  bool get _canUseNextButton =>
+      !_aiLoading &&
+      !_savingProgress &&
+      (!_wordCapReached || _relearnActive);
+
+  bool get _canMarkComplete =>
+      !_wordCapReached &&
+      !(_aiLoading || _aiError != null || _completedCurrent || _savingProgress);
+
   @override
   void initState() {
     super.initState();
+    _loadTodayProgress();
     _fetchWordSample();
+  }
+
+  Future<void> _loadTodayProgress() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+    try {
+      final p = await ensureTodayDailyProgress(user);
+      if (!mounted) return;
+      setState(() {
+        _todayProgress = p;
+        if (p.wordDone < p.wordGoal) {
+          _relearnActive = false;
+        }
+      });
+    } catch (_) {
+      // 진도 로드 실패는 학습 화면을 막지 않음
+    }
+  }
+
+  void _startRelearn() {
+    setState(() => _relearnActive = true);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          '연습 모드입니다. 「다음 단어」로 복습할 수 있어요. (오늘 진도는 이미 목표에 도달했습니다.)',
+        ),
+      ),
+    );
   }
 
   Future<void> _fetchWordSample() async {
@@ -92,9 +140,15 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
       _error = null;
     });
     try {
-      await incrementTodayDailyProgress(user, kind: DailyProgressKind.word);
+      final p = await incrementTodayDailyProgress(user, kind: DailyProgressKind.word);
       if (!mounted) return;
-      setState(() => _completedCurrent = true);
+      setState(() {
+        _completedCurrent = true;
+        _todayProgress = p;
+        if (p.wordDone < p.wordGoal) {
+          _relearnActive = false;
+        }
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('단어 학습 완료! 오늘 진도 +1')),
       );
@@ -116,7 +170,11 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '완료 버튼은 현재 단어에서 1회만 +1 됩니다. 이후 다음 단어로 넘어가세요.',
+              _wordCapReached && !_relearnActive
+                  ? '오늘 단어 목표(${_todayProgress?.wordGoal ?? 30}개)를 달성했습니다. 「재학습 시작」 후 「다음 단어」로 복습할 수 있어요.'
+                  : _wordCapReached && _relearnActive
+                      ? '연습 모드: 새 단어를 불러오며 복습할 수 있습니다. (진도는 더 올라가지 않습니다.)'
+                      : '완료 버튼은 현재 단어에서 1회만 +1 됩니다. 이후 다음 단어로 넘어가세요.',
               style: Theme.of(context)
                   .textTheme
                   .bodyMedium
@@ -169,9 +227,7 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
 
             const Spacer(),
             FilledButton.icon(
-              onPressed: (_aiLoading || _aiError != null || _completedCurrent || _savingProgress)
-                  ? null
-                  : _markDone,
+              onPressed: _canMarkComplete ? _markDone : null,
               icon: _savingProgress
                   ? const SizedBox(
                       width: 20,
@@ -180,14 +236,24 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
                     )
                   : const Icon(Icons.check),
               label: Text(
-                _savingProgress
-                    ? '저장 중…'
-                    : (_completedCurrent ? '완료 반영됨 (+1)' : '이 단어 완료(+1)'),
+                _wordCapReached
+                    ? '오늘 목표 달성 (진도 +0)'
+                    : _savingProgress
+                        ? '저장 중…'
+                        : (_completedCurrent ? '완료 반영됨 (+1)' : '이 단어 완료(+1)'),
               ),
             ),
             const SizedBox(height: 8),
+            if (_showRelearnButton) ...[
+              FilledButton.tonalIcon(
+                onPressed: (_aiLoading || _savingProgress) ? null : _startRelearn,
+                icon: const Icon(Icons.school_outlined),
+                label: const Text('재학습 시작'),
+              ),
+              const SizedBox(height: 8),
+            ],
             OutlinedButton.icon(
-              onPressed: (_aiLoading || _savingProgress) ? null : _fetchWordSample,
+              onPressed: _canUseNextButton ? _fetchWordSample : null,
               icon: const Icon(Icons.refresh),
               label: const Text('다음 단어'),
             ),

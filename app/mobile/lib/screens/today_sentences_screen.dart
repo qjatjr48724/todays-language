@@ -23,10 +23,55 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
   String? _debugSource;
   bool _completedCurrent = false;
 
+  DailyProgressView? _todayProgress;
+  bool _relearnActive = false;
+
+  bool get _sentenceCapReached =>
+      _todayProgress != null &&
+      _todayProgress!.sentenceDone >= _todayProgress!.sentenceGoal;
+
+  bool get _showRelearnButton => _sentenceCapReached && !_relearnActive;
+
+  bool get _canUseNextButton =>
+      !_aiLoading &&
+      !_savingProgress &&
+      (!_sentenceCapReached || _relearnActive);
+
+  bool get _canMarkComplete =>
+      !_sentenceCapReached &&
+      !(_aiLoading || _aiError != null || _completedCurrent || _savingProgress);
+
   @override
   void initState() {
     super.initState();
+    _loadTodayProgress();
     _fetchSentenceSample();
+  }
+
+  Future<void> _loadTodayProgress() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+    try {
+      final p = await ensureTodayDailyProgress(user);
+      if (!mounted) return;
+      setState(() {
+        _todayProgress = p;
+        if (p.sentenceDone < p.sentenceGoal) {
+          _relearnActive = false;
+        }
+      });
+    } catch (_) {}
+  }
+
+  void _startRelearn() {
+    setState(() => _relearnActive = true);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          '연습 모드입니다. 「다음 문장」으로 복습할 수 있어요. (오늘 진도는 이미 목표에 도달했습니다.)',
+        ),
+      ),
+    );
   }
 
   Future<void> _fetchSentenceSample() async {
@@ -84,9 +129,16 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
       _error = null;
     });
     try {
-      await incrementTodayDailyProgress(user, kind: DailyProgressKind.sentence);
+      final p =
+          await incrementTodayDailyProgress(user, kind: DailyProgressKind.sentence);
       if (!mounted) return;
-      setState(() => _completedCurrent = true);
+      setState(() {
+        _completedCurrent = true;
+        _todayProgress = p;
+        if (p.sentenceDone < p.sentenceGoal) {
+          _relearnActive = false;
+        }
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('문장 학습 완료! 오늘 진도 +1')),
       );
@@ -108,7 +160,11 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '완료 버튼은 현재 문장에서 1회만 +1 됩니다. 이후 다음 문장으로 넘어가세요.',
+              _sentenceCapReached && !_relearnActive
+                  ? '오늘 문장 목표(${_todayProgress?.sentenceGoal ?? 10}개)를 달성했습니다. 「재학습 시작」 후 「다음 문장」으로 복습할 수 있어요.'
+                  : _sentenceCapReached && _relearnActive
+                      ? '연습 모드: 새 문장을 불러오며 복습할 수 있습니다. (진도는 더 올라가지 않습니다.)'
+                      : '완료 버튼은 현재 문장에서 1회만 +1 됩니다. 이후 다음 문장으로 넘어가세요.',
               style: Theme.of(context)
                   .textTheme
                   .bodyMedium
@@ -151,9 +207,7 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
             ],
             const Spacer(),
             FilledButton.icon(
-              onPressed: (_aiLoading || _aiError != null || _completedCurrent || _savingProgress)
-                  ? null
-                  : _markDone,
+              onPressed: _canMarkComplete ? _markDone : null,
               icon: _savingProgress
                   ? const SizedBox(
                       width: 20,
@@ -162,14 +216,24 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
                     )
                   : const Icon(Icons.check),
               label: Text(
-                _savingProgress
-                    ? '저장 중…'
-                    : (_completedCurrent ? '완료 반영됨 (+1)' : '이 문장 완료(+1)'),
+                _sentenceCapReached
+                    ? '오늘 목표 달성 (진도 +0)'
+                    : _savingProgress
+                        ? '저장 중…'
+                        : (_completedCurrent ? '완료 반영됨 (+1)' : '이 문장 완료(+1)'),
               ),
             ),
             const SizedBox(height: 8),
+            if (_showRelearnButton) ...[
+              FilledButton.tonalIcon(
+                onPressed: (_aiLoading || _savingProgress) ? null : _startRelearn,
+                icon: const Icon(Icons.school_outlined),
+                label: const Text('재학습 시작'),
+              ),
+              const SizedBox(height: 8),
+            ],
             OutlinedButton.icon(
-              onPressed: (_aiLoading || _savingProgress) ? null : _fetchSentenceSample,
+              onPressed: _canUseNextButton ? _fetchSentenceSample : null,
               icon: const Icon(Icons.refresh),
               label: const Text('다음 문장'),
             ),
