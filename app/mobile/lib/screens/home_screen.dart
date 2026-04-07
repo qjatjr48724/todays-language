@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -40,6 +41,22 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       await ensureUserProfileDocument(user);
       final progress = await ensureTodayDailyProgress(user);
+      // 개발 단계: 앱 실행 시 오늘 세트가 없으면 서버에서 즉시 생성(자정 전후/초기 배포 대비)
+      if (kDebugMode) {
+        try {
+          await user.getIdToken(true);
+          final callable = FirebaseFunctions.instanceFor(
+            region: 'asia-northeast3',
+          ).httpsCallable('ensureTodayLearningSets');
+          await callable.call<Map<String, dynamic>>({
+            'dev': true,
+            'targetLanguage': 'ja',
+            'level': 'beginner',
+          });
+        } catch (_) {
+          // 개발 워밍업 실패는 앱 흐름을 막지 않음
+        }
+      }
       if (!mounted) return;
       setState(() {
         _todayProgress = progress;

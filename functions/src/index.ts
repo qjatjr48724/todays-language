@@ -1098,10 +1098,11 @@ async function buildDailySentenceItems(
 
 function globalTodayWordSetRef(
   targetLanguage: string,
-  level: string
+  level: string,
+  dateKst?: string
 ): FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData> {
-  const todayKst = todayKstYyyyMmDd();
-  const docId = learningSetDocId(todayKst, targetLanguage, level);
+  const ymd = dateKst ?? todayKstYyyyMmDd();
+  const docId = learningSetDocId(ymd, targetLanguage, level);
   return db
     .collection("users")
     .doc(GLOBAL_LEARNING_SET_OWNER)
@@ -1111,10 +1112,11 @@ function globalTodayWordSetRef(
 
 function globalTodaySentenceSetRef(
   targetLanguage: string,
-  level: string
+  level: string,
+  dateKst?: string
 ): FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData> {
-  const todayKst = todayKstYyyyMmDd();
-  const docId = learningSetDocId(todayKst, targetLanguage, level);
+  const ymd = dateKst ?? todayKstYyyyMmDd();
+  const docId = learningSetDocId(ymd, targetLanguage, level);
   return db
     .collection("users")
     .doc(GLOBAL_LEARNING_SET_OWNER)
@@ -1125,9 +1127,10 @@ function globalTodaySentenceSetRef(
 /** 스케줄러에서만 호출: 없거나 비어 있으면 AI로 채움. Callable에서는 사용하지 않음. */
 async function materializeGlobalTodayWordSetIfAbsent(
   targetLanguage: string,
-  level: string
+  level: string,
+  dateKst?: string
 ): Promise<FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>> {
-  const ref = globalTodayWordSetRef(targetLanguage, level);
+  const ref = globalTodayWordSetRef(targetLanguage, level, dateKst);
   const snap = await ref.get();
   if (snap.exists) {
     const data = snap.data() as Partial<DailyWordSet>;
@@ -1141,11 +1144,11 @@ async function materializeGlobalTodayWordSetIfAbsent(
     }
   }
 
-  const todayKst = todayKstYyyyMmDd();
-  await cleanupExpiredLearningSets(GLOBAL_LEARNING_SET_OWNER, todayKst);
+  const ymd = dateKst ?? todayKstYyyyMmDd();
+  await cleanupExpiredLearningSets(GLOBAL_LEARNING_SET_OWNER, ymd);
   const words = await buildDailyWordItems(targetLanguage, level);
   const payload: DailyWordSet = {
-    dateKst: todayKst,
+    dateKst: ymd,
     targetLanguage,
     level,
     words,
@@ -1159,9 +1162,10 @@ async function materializeGlobalTodayWordSetIfAbsent(
 /** 스케줄러에서만 호출: 없거나 비어 있으면 AI로 채움. Callable에서는 사용하지 않음. */
 async function materializeGlobalTodaySentenceSetIfAbsent(
   targetLanguage: string,
-  level: string
+  level: string,
+  dateKst?: string
 ): Promise<FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>> {
-  const ref = globalTodaySentenceSetRef(targetLanguage, level);
+  const ref = globalTodaySentenceSetRef(targetLanguage, level, dateKst);
   const snap = await ref.get();
   if (snap.exists) {
     const data = snap.data() as Partial<DailySentenceSet>;
@@ -1175,11 +1179,11 @@ async function materializeGlobalTodaySentenceSetIfAbsent(
     }
   }
 
-  const todayKst = todayKstYyyyMmDd();
-  await cleanupExpiredLearningSets(GLOBAL_LEARNING_SET_OWNER, todayKst);
+  const ymd = dateKst ?? todayKstYyyyMmDd();
+  await cleanupExpiredLearningSets(GLOBAL_LEARNING_SET_OWNER, ymd);
   const sentences = await buildDailySentenceItems(targetLanguage, level);
   const payload: DailySentenceSet = {
-    dateKst: todayKst,
+    dateKst: ymd,
     targetLanguage,
     level,
     sentences,
@@ -1333,6 +1337,34 @@ export const generateSentence = onCall({ region: "asia-northeast3" }, async (req
   }
 });
 
+/**
+ * 개발 단계 전용: 앱 실행 시 오늘(KST) 단어/문장 세트가 없으면 서버에서 즉시 생성합니다.
+ * - 배포 환경에서 무분별한 비용 발생을 막기 위해, 클라이언트에서 kDebugMode일 때만 호출하세요.
+ * - 호출 자체는 인증 필수이며, 실패해도 앱 동작을 막지 않는 용도로 설계합니다.
+ */
+export const ensureTodayLearningSets = onCall(
+  { region: "asia-northeast3", secrets: ["OPENAI_API_KEY"] },
+  async (request): Promise<{ ok: true; dateKst: string }> => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "로그인이 필요합니다.");
+    }
+    // 개발 앱에서만 보내도록 클라이언트가 강제 (서버는 추가적으로 플래그를 확인)
+    const dev = Boolean(request.data?.dev);
+    if (!dev) {
+      throw new HttpsError("failed-precondition", "dev flag is required");
+    }
+
+    const targetLanguage = (request.data?.targetLanguage ?? "ja") as string;
+    const level = (request.data?.level ?? "beginner") as string;
+    const todayKst = todayKstYyyyMmDd();
+
+    await materializeGlobalTodayWordSetIfAbsent(targetLanguage, level, todayKst);
+    await materializeGlobalTodaySentenceSetIfAbsent(targetLanguage, level, todayKst);
+
+    return { ok: true, dateKst: todayKst };
+  }
+);
+
 export const generateQuiz = onCall(
   { region: "asia-northeast3", secrets: ["OPENAI_API_KEY"] },
   async (request): Promise<GenerateQuizResponse> => {
@@ -1393,7 +1425,8 @@ export const getWrapUpDeck = onCall({ region: "asia-northeast3" }, async (reques
  */
 export const pregenerateDailyLearningSets = onSchedule(
   {
-    schedule: "0 0 * * *",
+    // KST 23:55에 "내일 자정부터 사용할" 세트를 미리 생성
+    schedule: "55 23 * * *",
     timeZone: "Asia/Seoul",
     region: "asia-northeast3",
     secrets: ["OPENAI_API_KEY"],
@@ -1402,16 +1435,17 @@ export const pregenerateDailyLearningSets = onSchedule(
   },
   async () => {
     const todayKst = todayKstYyyyMmDd();
-    console.log("[pregenerateDailyLearningSets] start", { todayKst });
+    const tomorrowKst = addDaysYyyyMmDd(todayKst, 1);
+    console.log("[pregenerateDailyLearningSets] start", { todayKst, tomorrowKst });
     for (const { targetLanguage, level } of PREGEN_LANGUAGE_LEVEL_PAIRS) {
       try {
-        await materializeGlobalTodayWordSetIfAbsent(targetLanguage, level);
-        await materializeGlobalTodaySentenceSetIfAbsent(targetLanguage, level);
-        console.log("[pregenerateDailyLearningSets] ok", { targetLanguage, level });
+        await materializeGlobalTodayWordSetIfAbsent(targetLanguage, level, tomorrowKst);
+        await materializeGlobalTodaySentenceSetIfAbsent(targetLanguage, level, tomorrowKst);
+        console.log("[pregenerateDailyLearningSets] ok", { targetLanguage, level, tomorrowKst });
       } catch (e) {
         console.error("[pregenerateDailyLearningSets] failed", { targetLanguage, level, e });
       }
     }
-    console.log("[pregenerateDailyLearningSets] done", { todayKst });
+    console.log("[pregenerateDailyLearningSets] done", { todayKst, tomorrowKst });
   }
 );
