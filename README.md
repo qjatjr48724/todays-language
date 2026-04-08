@@ -1,5 +1,6 @@
-# Today's Language
-
+# Today's Language 📖
+---
+- 
 AI 기반 데일리 언어 학습 앱 프로젝트입니다.
 
 - 앱/브랜드 표기: `Today's Language`

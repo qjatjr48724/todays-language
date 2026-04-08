@@ -4,6 +4,64 @@
 
 ---
 
+## [단계 n] 일일 단어/문장 문제 세트 사전 생성(23:55) + 앱은 읽기만
+
+### 1) 오늘 한 일
+
+- Cloud Functions에 **일일 단어 30개 / 문장 10개 문제 세트**를 Firestore에 저장하는 구조를 추가
+  - 저장 위치(글로벌 공유 풀): `users/global_learning_set_owner/daily_word_sets/{yyyy-MM-dd}_{lang}_{level}`
+  - 저장 위치(글로벌 공유 풀): `users/global_learning_set_owner/daily_sentence_sets/{yyyy-MM-dd}_{lang}_{level}`
+  - 사용자별 소비 커서: `users/{uid}/daily_word_cursor/{yyyy-MM-dd}_{lang}_{level}`, `users/{uid}/daily_sentence_cursor/{yyyy-MM-dd}_{lang}_{level}`
+- **스케줄러**로 세트를 미리 생성하도록 변경
+  - KST **23:55**에 실행되어 **내일자(yyyy-MM-dd)** 세트를 사전 생성 → 자정 이후 이용 시 “세트 없음” 오류 가능성 최소화
+- 앱의 `generateWord`/`generateSentence`는 **AI 생성 없이 Firestore 세트에서만 읽기**(없으면 fallback)
+- 개발 단계 편의 기능 추가
+  - 디버그 홈 진입 시 `ensureTodayLearningSets(dev: true)`를 백그라운드로 호출해 **당일 세트가 없으면 즉시 생성**
+- (부가) 홈 카드 그리드에서 발생하던 `RenderFlex overflow` UI 문제를 수정
+
+### 2) 완료 기준 체크
+
+- [x] `functions`: `npm run build` 통과
+- [x] `mobile`: `flutter analyze` 통과
+- [x] Firestore에 `users/global_learning_set_owner` 및 하위 세트 문서 생성 확인
+- [x] 앱에서 `debugSource = daily_set` 표시 확인
+- [x] 사용자별 커서 문서 생성/증가 확인
+- [ ] 23:55 스케줄이 실제로 매일 실행되어 “내일자” 세트가 자동 생성되는지 운영 환경에서 추가 확인(Blaze/스케줄러 전제)
+
+### 3) 추가/변경한 코드 포인트
+
+- 파일:
+  - `functions/src/index.ts`
+  - `functions/src/prompts.ts`
+  - `app/mobile/lib/screens/home_screen.dart`
+  - `app/mobile/lib/screens/today_wrap_up_screen.dart`
+  - `app/mobile/lib/services/daily_progress_sync.dart`
+  - `app/mobile/lib/ui/home_feature_card.dart`
+  - `app/mobile/lib/screens/home_screen.dart`
+- 핵심 포인트:
+  - **자정 직후 생성이 아니라 23:55 사전 생성**으로 UX 안정화(00:00부터 바로 조회 가능)
+  - 앱은 “생성” 책임을 갖지 않고 **세트 조회/커서 증가**만 수행
+  - 개발 단계에서만 워밍업 callable을 호출하도록 `kDebugMode`로 제한(운영에서 비용 폭증 방지)
+  - 글로벌 owner 문서를 명시적으로 생성해 콘솔 탐색/디버깅 용이성 확보
+
+### 4) 이슈/막힌 점
+
+- 증상: 디버그 홈 진입 시 세트가 자동 생성되지 않는 것처럼 보임
+- 원인 추정:
+  - callable 미배포/타임아웃/예외를 앱에서 `catch`로 삼켜서 겉으로 드러나지 않음
+  - Firestore 콘솔에서 “부모 문서가 없어서” 경로가 없는 것처럼 보이는 케이스
+- 해결/우회:
+  - `ensureTodayLearningSets` 배포 및 타임아웃/메모리 상향, 서버 로그 추가
+  - `users/global_learning_set_owner` 부모 문서 명시 생성 로직 추가
+
+### 5) 다음 액션 (내일 바로 할 것)
+
+1. 23:55 스케줄이 실제로 내일자 세트를 생성하는지(콘솔/로그) 확인
+2. (정책) `PREGEN_LANGUAGE_LEVEL_PAIRS`를 “고정 1개”로 갈지, “사용량 상위 언어/레벨”로 확장할지 결정
+3. (보안) 개발용 `ensureTodayLearningSets`를 운영 전에 제거하거나 UID allowlist/App Check 등으로 추가 보호
+
+---
+
 ## [단계 n] 제목 (예: Flutter 환경 세팅)
 
 ### 1) 오늘 한 일

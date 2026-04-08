@@ -140,6 +140,17 @@ function learningSetDocId(todayKst: string, targetLanguage: string, level: strin
   return `${todayKst}_${targetLanguage}_${level}`;
 }
 
+async function ensureGlobalLearningOwnerDoc(nowMs = Date.now()): Promise<void> {
+  const ownerRef = db.collection("users").doc(GLOBAL_LEARNING_SET_OWNER);
+  await ownerRef.set(
+    {
+      kind: "global_learning_set_owner",
+      updatedAtMs: nowMs,
+    },
+    { merge: true }
+  );
+}
+
 function addDaysYyyyMmDd(baseYmd: string, days: number): string {
   const [y, m, d] = baseYmd.split("-").map((v) => Number(v));
   const base = new Date(Date.UTC(y, m - 1, d));
@@ -1130,6 +1141,7 @@ async function materializeGlobalTodayWordSetIfAbsent(
   level: string,
   dateKst?: string
 ): Promise<FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>> {
+  await ensureGlobalLearningOwnerDoc();
   const ref = globalTodayWordSetRef(targetLanguage, level, dateKst);
   const snap = await ref.get();
   if (snap.exists) {
@@ -1165,6 +1177,7 @@ async function materializeGlobalTodaySentenceSetIfAbsent(
   level: string,
   dateKst?: string
 ): Promise<FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>> {
+  await ensureGlobalLearningOwnerDoc();
   const ref = globalTodaySentenceSetRef(targetLanguage, level, dateKst);
   const snap = await ref.get();
   if (snap.exists) {
@@ -1343,7 +1356,7 @@ export const generateSentence = onCall({ region: "asia-northeast3" }, async (req
  * - 호출 자체는 인증 필수이며, 실패해도 앱 동작을 막지 않는 용도로 설계합니다.
  */
 export const ensureTodayLearningSets = onCall(
-  { region: "asia-northeast3", secrets: ["OPENAI_API_KEY"] },
+  { region: "asia-northeast3", secrets: ["OPENAI_API_KEY"], timeoutSeconds: 300, memory: "512MiB" },
   async (request): Promise<{ ok: true; dateKst: string }> => {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "로그인이 필요합니다.");
@@ -1358,8 +1371,21 @@ export const ensureTodayLearningSets = onCall(
     const level = (request.data?.level ?? "beginner") as string;
     const todayKst = todayKstYyyyMmDd();
 
+    console.log("[ensureTodayLearningSets] start", {
+      uid: request.auth.uid,
+      todayKst,
+      targetLanguage,
+      level,
+    });
+    const t0 = Date.now();
     await materializeGlobalTodayWordSetIfAbsent(targetLanguage, level, todayKst);
     await materializeGlobalTodaySentenceSetIfAbsent(targetLanguage, level, todayKst);
+    console.log("[ensureTodayLearningSets] done", {
+      todayKst,
+      targetLanguage,
+      level,
+      elapsedMs: Date.now() - t0,
+    });
 
     return { ok: true, dateKst: todayKst };
   }
