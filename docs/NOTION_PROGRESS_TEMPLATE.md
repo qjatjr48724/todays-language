@@ -62,6 +62,56 @@
 
 ---
 
+## [단계 n] 언어 코드 표준화(ISO-3166-1 alpha-3) + 언어 선택 시 즉시 세트 생성
+
+### 1) 오늘 한 일
+
+- Firestore/앱/Functions에서 언어 코드 표기를 `ja/es` 대신 **ISO-3166-1 alpha-3**로 전환
+  - 예: `JPN`, `ESP`
+  - 레거시 클라이언트 호환을 위해 Functions에서 `ja/es` 입력도 수용 후 내부 매핑
+- 스케줄 사전 생성은 당분간 **`JPN/beginner`만** 생성하도록 단순화
+- `내 정보`에서 언어 선택 UI 추가
+  - 선택 후 **저장 버튼을 눌러야** Firestore에 적용
+  - 저장 시 `ensureLearningSetForToday` callable로 **오늘(KST) 세트가 없으면 즉시 생성**
+- 홈/학습 화면에서 callable 파라미터 하드코딩 제거
+  - `users/{uid}` 프로필의 `targetLanguage` / `level`을 읽어 전달
+  - 홈은 유저 문서 변경을 구독해 언어 변경이 즉시 반영되도록 갱신
+
+### 2) 완료 기준 체크
+
+- [x] `functions`: `npm run build` 통과
+- [x] `mobile`: `flutter analyze` 통과
+- [ ] `ESP` 선택 후 Firestore에 `{오늘KST}_ESP_beginner` 세트 생성 확인(실기기/에뮬)
+- [ ] 언어 변경 후 단어/문장 화면 `debugSource = daily_set` 확인
+
+### 3) 추가/변경한 코드 포인트
+
+- 파일:
+  - `functions/src/index.ts`
+  - `app/mobile/lib/screens/my_info_screen.dart`
+  - `app/mobile/lib/screens/home_screen.dart`
+  - `app/mobile/lib/screens/today_words_screen.dart`
+  - `app/mobile/lib/screens/today_sentences_screen.dart`
+  - `app/mobile/lib/screens/today_wrap_up_screen.dart`
+  - `app/mobile/lib/services/user_profile_sync.dart`
+  - `app/mobile/lib/services/user_prefs.dart` (신규)
+- 핵심 포인트:
+  - 앱/서버/DB의 언어 코드 표기를 **alpha-3로 통일**해 확장 시 꼬임 방지
+  - 스케줄은 최소 범위로(일단 JPN만) → 기타 언어는 **사용자 선택 시 즉시 생성**으로 UX/비용 균형
+
+### 4) 이슈/막힌 점
+
+- 증상: Flutter 라디오 위젯 API 변경(deprecated)으로 분석 경고/오류 발생
+- 해결: 간단한 리스트 선택 UI로 대체하고, async gap에서 `context.mounted` 체크 추가
+
+### 5) 다음 액션 (내일 바로 할 것)
+
+1. `ESP` 선택 플로우에서 세트 생성/로딩/커서 증가까지 E2E로 확인
+2. (정책) “최근 로그인 유저 기반 생성 대상 확장”은 트래픽/비용 기준 정한 뒤 2차로 설계
+3. (보안) 운영 전 개발용 워밍업 callable 정리(allowlist 유지/삭제/대체 결정)
+
+---
+
 ## [단계 n] 제목 (예: Flutter 환경 세팅)
 
 ### 1) 오늘 한 일
