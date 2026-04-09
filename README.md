@@ -23,9 +23,11 @@
 - iOS - 
 
 ## ⚙ 기술 스택
-<img src="https://img.shields.io/badge/#02569B?style=for-the-badge&logo=flutter&logoColor=white">
-<img src="https://img.shields.io/badge/표시할이름-색상?style=for-the-badge&logo=기술스택아이콘&logoColor=white">
-<img src="https://img.shields.io/badge/표시할이름-색상?style=for-the-badge&logo=기술스택아이콘&logoColor=white">
+- 모바일 앱 - <img src="https://img.shields.io/badge/flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white"> <img src="https://img.shields.io/badge/dart-#0175C2?style=for-the-badge&logo=dart&logoColor=white">
+- 백엔드 - <img src="https://img.shields.io/badge/firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=white"> <img src="https://img.shields.io/badge/nodedotjs-#5FA04E?style=for-the-badge&logo=nodedotjs&logoColor=white">
+- AI - OpenAI Responses API
+
+
 
 - 앱/브랜드 표기: `Today's Language`
 - GitHub 리포지토리 이름: `todays-language`
