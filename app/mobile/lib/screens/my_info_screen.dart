@@ -126,17 +126,33 @@ class MyInfoScreen extends StatelessWidget {
                       child: const Text('전체 데이터 백업'),
                     ),
                   ),
-                  const SizedBox(height: 280),
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: OutlinedButton(
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('리뷰 작성 연결은 다음 단계에서 구현합니다.')),
-                        );
-                      },
-                      child: const Text('리뷰 작성하기'),
-                    ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          minimumSize: const Size(0, 40),
+                        ),
+                        icon: const Icon(Icons.logout, size: 18),
+                        label: const Text('로그아웃'),
+                        onPressed: () => FirebaseAuth.instance.signOut(),
+                      ),
+                      const SizedBox(width: 8),
+                      OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          minimumSize: const Size(0, 40),
+                        ),
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('리뷰 작성 연결은 다음 단계에서 구현합니다.')),
+                          );
+                        },
+                        child: const Text('리뷰 작성'),
+                      ),
+                    ],
                   ),
                 ],
               ),
