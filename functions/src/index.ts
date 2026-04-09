@@ -7,8 +7,6 @@ import {
   buildDailySentenceBatchUserPromptJson,
   buildDailyWordBatchSystemPrompt,
   buildDailyWordBatchUserPromptJson,
-  buildQuizSystemPrompt,
-  buildQuizUserPromptJson,
   buildSentenceSystemPrompt,
   buildSentenceUserPromptJson,
   buildWordSystemPrompt,
@@ -26,28 +24,6 @@ type GenerateSentenceResponse = {
   sentence: string;
   meaningKo: string;
   debugSource?: "openai" | "fallback" | "daily_set";
-};
-
-type GenerateQuizResponse = {
-  promptKo: string;
-  choices: string[];
-  answerIndex: number;
-};
-
-type StoredQuizItem = GenerateQuizResponse & {
-  source: "new" | "review";
-  createdAtMs: number;
-};
-
-type DailyQuizSet = {
-  dateKst: string;
-  targetLanguage: string;
-  level: string;
-  items: StoredQuizItem[];
-  cursor: number;
-  retentionDays: number;
-  reviewRatio: number;
-  updatedAtMs: number;
 };
 
 type StoredWordItem = {
@@ -85,16 +61,8 @@ type WrapUpDeckItem = {
   answer: string;
 };
 
-type OpenAiQuizResponse = {
-  quizType: QuizMode;
-  promptKo: string;
-  choices: string[];
-  answerIndex: number;
-};
-
 const OPENAI_API_URL = "https://api.openai.com/v1/responses";
 const OPENAI_MODEL = process.env.OPENAI_MODEL ?? "gpt-4.1-mini";
-const DAILY_QUIZ_COUNT = 10;
 /** 오늘의 단어 화면 일일 목표와 동일하게 유지 */
 const DAILY_WORD_COUNT = 30;
 /** 오늘의 문장 화면 일일 목표와 동일하게 유지 */
@@ -111,22 +79,8 @@ const PREGEN_LANGUAGE_LEVEL_PAIRS: { targetLanguage: string; level: string }[] =
   // ISO-3166-1 alpha-3 표기(외부/Firestore/API 입력 기준)
   { targetLanguage: "JPN", level: "beginner" },
 ];
-const QUIZ_MODES = [
-  "ko_to_target_word",
-  "target_to_ko_meaning",
-  "simple_context_choice",
-  "fill_in_blank_word",
-] as const;
-
-type QuizMode = (typeof QUIZ_MODES)[number];
-
 admin.initializeApp();
 const db = admin.firestore();
-
-function pickQuizMode(): QuizMode {
-  const i = Math.floor(Math.random() * QUIZ_MODES.length);
-  return QUIZ_MODES[i];
-}
 
 function todayKstYyyyMmDd(now = new Date()): string {
   const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
@@ -192,39 +146,6 @@ function normalizePromptKey(text: string): string {
     .replace(/[^\p{L}\p{N}]/gu, "");
 }
 
-function normalizeChoiceKey(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/\s+/g, "")
-    .replace(/[^\p{L}\p{N}]/gu, "");
-}
-
-function quizUniqueKey(quiz: GenerateQuizResponse): string {
-  const prompt = normalizePromptKey(quiz.promptKo);
-  const choices = quiz.choices.map((c) => normalizeChoiceKey(c)).join("|");
-  return `${prompt}::${choices}`;
-}
-
-function pickReviewRatioByYesterday(quizDone: number, quizGoal: number): number {
-  if (quizGoal <= 0) return 0.3;
-  const completionRate = (quizDone / quizGoal) * 100;
-  if (completionRate < 30) return 0.5;
-  if (completionRate < 70) return 0.3;
-  return 0.2;
-}
-
-async function cleanupExpiredDailySets(uid: string, todayKst: string): Promise<void> {
-  const deleteBefore = addDaysYyyyMmDd(todayKst, -(DEFAULT_RETENTION_DAYS + 1));
-  const col = db.collection("users").doc(uid).collection("daily_quiz_sets");
-  const snap = await col.where("dateKst", "<=", deleteBefore).limit(20).get();
-  if (snap.empty) return;
-  const batch = db.batch();
-  for (const doc of snap.docs) {
-    batch.delete(doc.ref);
-  }
-  await batch.commit();
-}
-
 async function cleanupExpiredLearningSets(uid: string, todayKst: string): Promise<void> {
   const deleteBefore = addDaysYyyyMmDd(todayKst, -(DEFAULT_RETENTION_DAYS + 1));
   for (const sub of ["daily_word_sets", "daily_sentence_sets"] as const) {
@@ -237,263 +158,6 @@ async function cleanupExpiredLearningSets(uid: string, todayKst: string): Promis
     }
     await batch.commit();
   }
-}
-
-async function getYesterdayReviewRatio(uid: string, todayKst: string): Promise<number> {
-  if (uid === GLOBAL_QUIZ_SET_OWNER) {
-    return 0.3;
-  }
-  const yesterday = addDaysYyyyMmDd(todayKst, -1);
-  const ref = db.collection("users").doc(uid).collection("daily_progress").doc(yesterday);
-  const snap = await ref.get();
-  const data = snap.data() ?? {};
-  const quizDone = Number(data.quizDone ?? 0);
-  const quizGoal = Number(data.quizGoal ?? 20);
-  return pickReviewRatioByYesterday(quizDone, quizGoal);
-}
-
-async function getRecentReviewPool(
-  uid: string,
-  todayKst: string,
-  targetLanguage: string,
-  level: string
-): Promise<StoredQuizItem[]> {
-  const fromDate = addDaysYyyyMmDd(todayKst, -DEFAULT_RETENTION_DAYS);
-  const col = db.collection("users").doc(uid).collection("daily_quiz_sets");
-  const snap = await col
-    .where("dateKst", ">=", fromDate)
-    .where("dateKst", "<", todayKst)
-    .limit(50)
-    .get();
-
-  const pooled: StoredQuizItem[] = [];
-  for (const doc of snap.docs) {
-    const data = doc.data() as Partial<DailyQuizSet>;
-    if (data.targetLanguage !== targetLanguage || data.level !== level) {
-      continue;
-    }
-    const items = Array.isArray(data.items) ? data.items : [];
-    for (const raw of items) {
-      if (!raw) continue;
-      pooled.push({
-        promptKo: String((raw as Partial<StoredQuizItem>).promptKo ?? ""),
-        choices: Array.isArray((raw as Partial<StoredQuizItem>).choices)
-          ? (raw as Partial<StoredQuizItem>).choices!.map((v) => String(v))
-          : [],
-        answerIndex: Number((raw as Partial<StoredQuizItem>).answerIndex ?? 0),
-        source: "review",
-        createdAtMs: Number((raw as Partial<StoredQuizItem>).createdAtMs ?? Date.now()),
-      });
-    }
-  }
-
-  return pooled.filter((q) => q.promptKo && q.choices.length === 4 && q.answerIndex >= 0 && q.answerIndex <= 3);
-}
-
-async function buildDailyQuizItems(
-  uid: string,
-  todayKst: string,
-  targetLanguage: string,
-  level: string
-): Promise<{ items: StoredQuizItem[]; reviewRatio: number }> {
-  const reviewRatio = await getYesterdayReviewRatio(uid, todayKst);
-  const reviewTargetCount = Math.min(
-    DAILY_QUIZ_COUNT - 1,
-    Math.floor(DAILY_QUIZ_COUNT * reviewRatio)
-  );
-
-  const reviewPool = await getRecentReviewPool(uid, todayKst, targetLanguage, level);
-  const reviewItems: StoredQuizItem[] = [];
-  const usedKeys = new Set<string>();
-  for (const q of shuffle(reviewPool)) {
-    const key = quizUniqueKey(q);
-    if (!key || usedKeys.has(key)) continue;
-    usedKeys.add(key);
-    reviewItems.push({
-      ...q,
-      source: "review" as const,
-    });
-    if (reviewItems.length >= reviewTargetCount) break;
-  }
-
-  const needNew = DAILY_QUIZ_COUNT - reviewItems.length;
-  const newItems: StoredQuizItem[] = [];
-  let attempts = 0;
-  while (newItems.length < needNew && attempts < needNew * 5) {
-    attempts += 1;
-    try {
-      const generated = await generateQuizWithOpenAI(targetLanguage, level);
-      const key = quizUniqueKey(generated);
-      if (!key || usedKeys.has(key)) {
-        continue;
-      }
-      usedKeys.add(key);
-      newItems.push({
-        ...generated,
-        source: "new",
-        createdAtMs: Date.now(),
-      });
-    } catch (e) {
-      console.error("[daily-quiz] AI generation failed, using fallback item.", e);
-      const fallback = fallbackQuiz(targetLanguage, level);
-      const key = quizUniqueKey(fallback);
-      if (!key || usedKeys.has(key)) {
-        continue;
-      }
-      usedKeys.add(key);
-      newItems.push({
-        ...fallback,
-        source: "new",
-        createdAtMs: Date.now(),
-      });
-    }
-  }
-
-  while (newItems.length < needNew) {
-    const f = fallbackQuiz(targetLanguage, level);
-    const key = quizUniqueKey(f);
-    if (!key || usedKeys.has(key)) break;
-    usedKeys.add(key);
-    newItems.push({
-      ...f,
-      source: "new",
-      createdAtMs: Date.now(),
-    });
-  }
-
-  return {
-    items: shuffle([...reviewItems, ...newItems]),
-    reviewRatio,
-  };
-}
-
-async function getOrCreateTodaySet(
-  uid: string,
-  targetLanguage: string,
-  level: string
-): Promise<FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>> {
-  const todayKst = todayKstYyyyMmDd();
-  const ownerRef = db.collection("users").doc(uid);
-  await ownerRef.set(
-    {
-      kind: "global_quiz_owner",
-      updatedAtMs: Date.now(),
-    },
-    { merge: true }
-  );
-  const ref = db.collection("users").doc(uid).collection("daily_quiz_sets").doc(todayKst);
-  const snap = await ref.get();
-  if (snap.exists) return ref;
-
-  await cleanupExpiredDailySets(uid, todayKst);
-  const { items, reviewRatio } = await buildDailyQuizItems(uid, todayKst, targetLanguage, level);
-
-  const payload: DailyQuizSet = {
-    dateKst: todayKst,
-    targetLanguage,
-    level,
-    items,
-    cursor: 0,
-    retentionDays: DEFAULT_RETENTION_DAYS,
-    reviewRatio,
-    updatedAtMs: Date.now(),
-  };
-  await ref.set(payload, { merge: true });
-  return ref;
-}
-
-async function popQuizFromTodaySet(
-  uid: string,
-  targetLanguage: string,
-  level: string
-): Promise<GenerateQuizResponse> {
-  const todayKst = todayKstYyyyMmDd();
-  const setRef = await getOrCreateTodaySet(
-    GLOBAL_QUIZ_SET_OWNER,
-    targetLanguage,
-    level
-  );
-  const cursorRef = db
-    .collection("users")
-    .doc(uid)
-    .collection("daily_quiz_cursor")
-    .doc(`${todayKst}_${targetLanguage}_${level}`);
-
-  return db.runTransaction(async (tx) => {
-    const setSnap = await tx.get(setRef);
-    const cursorSnap = await tx.get(cursorRef);
-    const data = (setSnap.data() ?? {}) as Partial<DailyQuizSet>;
-    const cursorData = cursorSnap.data() ?? {};
-    const items = (Array.isArray(data.items) ? data.items : []) as StoredQuizItem[];
-    if (items.length === 0) {
-      return fallbackQuiz(targetLanguage, level);
-    }
-    const cursor = Number(cursorData.cursor ?? 0);
-    const index = ((cursor % items.length) + items.length) % items.length;
-    const picked = items[index];
-    console.log("[generateQuiz] cursor resolved", {
-      uid,
-      dateKst: todayKst,
-      targetLanguage,
-      level,
-      cursorBefore: cursor,
-      index,
-      cursorDocId: `${todayKst}_${targetLanguage}_${level}`,
-    });
-    tx.set(cursorRef, {
-      dateKst: todayKst,
-      targetLanguage,
-      level,
-      cursor: cursor + 1,
-      updatedAtMs: Date.now(),
-    }, { merge: true });
-    return {
-      promptKo: picked.promptKo,
-      choices: picked.choices,
-      answerIndex: picked.answerIndex,
-    };
-  });
-}
-
-function fallbackTemplates(targetLanguage: string, level: string): GenerateQuizResponse[] {
-  if (targetLanguage === "ja" && level === "beginner") {
-    return [
-      { promptKo: "다음 중 '고마워요'에 해당하는 일본어는?", choices: ["こんにちは", "ありがとう", "さようなら", "すみません"], answerIndex: 1 },
-      { promptKo: "다음 중 일본어 'おはよう'의 뜻은?", choices: ["안녕하세요(낮)", "안녕히 가세요", "좋은 아침", "고마워요"], answerIndex: 2 },
-      { promptKo: "빈칸에 들어갈 가장 자연스러운 표현은? '_____、たすかりました。'", choices: ["ありがとう", "こんばんは", "いただきます", "おやすみ"], answerIndex: 0 },
-      { promptKo: "상황: 실수로 부딪힌 뒤 먼저 할 말로 가장 적절한 일본어는?", choices: ["すみません", "じゃあね", "おめでとう", "ただいま"], answerIndex: 0 },
-      { promptKo: "다음 중 '안녕하세요(낮 인사)'에 해당하는 일본어는?", choices: ["こんにちは", "おやすみ", "ありがとう", "ごめん"], answerIndex: 0 },
-      { promptKo: "다음 중 일본어 'さようなら'의 뜻은?", choices: ["잘 자요", "안녕히 가세요", "축하해요", "미안합니다"], answerIndex: 1 },
-      { promptKo: "빈칸에 들어갈 표현은? 'あさは _____ を いいます。'", choices: ["おはよう", "こんにちは", "ありがとう", "すみません"], answerIndex: 0 },
-      { promptKo: "다음 중 '미안합니다/실례합니다' 의미로 가장 적절한 일본어는?", choices: ["すみません", "ただいま", "おめでとう", "いただきます"], answerIndex: 0 },
-      { promptKo: "일본어 'こんばんは'의 뜻으로 맞는 것은?", choices: ["좋은 아침", "안녕하세요(밤)", "안녕히 주무세요", "다녀왔습니다"], answerIndex: 1 },
-      { promptKo: "빈칸에 알맞은 말은? 'ねるまえに _____ と いいます。'", choices: ["おはよう", "こんばんは", "おやすみ", "ありがとう"], answerIndex: 2 },
-      { promptKo: "다음 중 축하할 때 쓰는 일본어는?", choices: ["おめでとう", "すみません", "さようなら", "こんにちは"], answerIndex: 0 },
-      { promptKo: "일본어 'ただいま'의 의미로 가장 알맞은 것은?", choices: ["다녀왔습니다", "잘 부탁합니다", "잘 자요", "괜찮아요"], answerIndex: 0 },
-    ];
-  }
-
-  if (targetLanguage === "es" && level === "beginner") {
-    return [
-      { promptKo: "다음 중 '안녕'에 해당하는 스페인어는?", choices: ["adiós", "gracias", "hola", "por favor"], answerIndex: 2 },
-      { promptKo: "스페인어 'gracias'의 뜻은?", choices: ["고마워요", "미안해요", "안녕", "좋은 밤"], answerIndex: 0 },
-      { promptKo: "다음 중 '부탁합니다'에 해당하는 스페인어는?", choices: ["hola", "por favor", "adiós", "gracias"], answerIndex: 1 },
-      { promptKo: "스페인어 'adiós'의 뜻은?", choices: ["안녕(만날 때)", "고마워", "안녕히 가세요", "천만에요"], answerIndex: 2 },
-      { promptKo: "빈칸 채우기: '_____ , ¿cómo estás?'", choices: ["hola", "adiós", "gracias", "perdón"], answerIndex: 0 },
-      { promptKo: "다음 중 '미안합니다'에 가까운 스페인어는?", choices: ["perdón", "hola", "gracias", "mañana"], answerIndex: 0 },
-    ];
-  }
-
-  return [
-    { promptKo: "다음 중 '안녕'에 해당하는 표현은?", choices: ["goodbye", "hello", "thanks", "sorry"], answerIndex: 1 },
-    { promptKo: "다음 중 '고마워요'에 해당하는 표현은?", choices: ["thanks", "bye", "please", "hello"], answerIndex: 0 },
-    { promptKo: "다음 중 '미안해요'에 해당하는 표현은?", choices: ["sorry", "hello", "thanks", "bye"], answerIndex: 0 },
-  ];
-}
-
-function fallbackQuiz(targetLanguage: string, level: string): GenerateQuizResponse {
-  const templates = fallbackTemplates(targetLanguage, level);
-  return templates[Math.floor(Math.random() * templates.length)];
 }
 
 function fallbackWord(targetLanguage: string, level: string): GenerateWordResponse {
@@ -597,81 +261,6 @@ function extractOutputTextFromOpenAIResponses(data: unknown): string {
   }
 
   return parts.join("\n").trim();
-}
-
-function isValidQuizPayload(value: unknown): value is OpenAiQuizResponse {
-  if (typeof value !== "object" || value === null) return false;
-  const v = value as Partial<OpenAiQuizResponse>;
-  if (!v.quizType || !QUIZ_MODES.includes(v.quizType)) return false;
-  if (typeof v.promptKo !== "string" || v.promptKo.trim().length === 0) return false;
-  if (!Array.isArray(v.choices) || v.choices.length !== 4) return false;
-  if (v.choices.some((c) => typeof c !== "string" || c.trim().length === 0)) return false;
-  if (typeof v.answerIndex !== "number") return false;
-  if (!Number.isInteger(v.answerIndex) || v.answerIndex < 0 || v.answerIndex > 3) return false;
-  return true;
-}
-
-async function generateQuizWithOpenAI(
-  targetLanguage: string,
-  level: string
-): Promise<GenerateQuizResponse> {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    throw new Error("OPENAI_API_KEY is missing");
-  }
-
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 12000);
-
-  try {
-    const quizMode = pickQuizMode();
-    const systemPrompt = buildQuizSystemPrompt(quizMode);
-    const userPrompt = buildQuizUserPromptJson(targetLanguage, level, quizMode);
-
-    const response = await fetch(OPENAI_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: OPENAI_MODEL,
-        temperature: 1.1,
-        input: [
-          { role: "system", content: [{ type: "input_text", text: systemPrompt }] },
-          { role: "user", content: [{ type: "input_text", text: userPrompt }] },
-        ],
-      }),
-      signal: controller.signal,
-    });
-
-    if (!response.ok) {
-      const text = await response.text();
-      throw new Error(`OpenAI HTTP ${response.status}: ${text}`);
-    }
-
-    const data: unknown = await response.json();
-    const outputText = extractOutputTextFromOpenAIResponses(data);
-    if (!outputText) {
-      throw new Error("OpenAI response had no assistant text (output_text/output)");
-    }
-
-    const parsed = JSON.parse(outputText) as unknown;
-    if (!isValidQuizPayload(parsed)) {
-      throw new Error("OpenAI response JSON schema mismatch");
-    }
-    if (parsed.quizType !== quizMode) {
-      throw new Error(`OpenAI response quizType mismatch. expected=${quizMode}, got=${parsed.quizType}`);
-    }
-
-    return {
-      promptKo: parsed.promptKo.trim(),
-      choices: parsed.choices.map((c) => c.trim()),
-      answerIndex: parsed.answerIndex,
-    };
-  } finally {
-    clearTimeout(timeout);
-  }
 }
 
 async function generateWordWithOpenAI(
@@ -1473,7 +1062,7 @@ export const ensureTodayLearningSets = onCall(
       }
     }
 
-    const targetLanguage = (request.data?.targetLanguage ?? "ja") as string;
+    const targetLanguage = (request.data?.targetLanguage ?? "JPN") as string;
     const level = (request.data?.level ?? "beginner") as string;
     const todayKst = todayKstYyyyMmDd();
 
@@ -1507,7 +1096,7 @@ export const ensureLearningSetForToday = onCall(
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "로그인이 필요합니다.");
     }
-    const targetLanguage = (request.data?.targetLanguage ?? "ja") as string;
+    const targetLanguage = (request.data?.targetLanguage ?? "JPN") as string;
     const level = (request.data?.level ?? "beginner") as string;
     const todayKst = todayKstYyyyMmDd();
     console.log("[ensureLearningSetForToday] start", { uid: request.auth.uid, todayKst, targetLanguage, level });
@@ -1519,24 +1108,7 @@ export const ensureLearningSetForToday = onCall(
   }
 );
 
-export const generateQuiz = onCall(
-  { region: "asia-northeast3", secrets: ["OPENAI_API_KEY"] },
-  async (request): Promise<GenerateQuizResponse> => {
-    if (!request.auth) {
-      throw new HttpsError("unauthenticated", "로그인이 필요합니다.");
-    }
-
-    const uid = request.auth.uid;
-    const targetLanguage = (request.data?.targetLanguage ?? "ja") as string;
-    const level = (request.data?.level ?? "beginner") as string;
-    try {
-      return await popQuizFromTodaySet(uid, targetLanguage, level);
-    } catch (e) {
-      console.error("[generateQuiz] Daily set flow failed. Fallback is used.", e);
-      return fallbackQuiz(targetLanguage, level);
-    }
-  }
-);
+// NOTE: 단어 퀴즈(generateQuiz)는 현재 앱 기능에서 제거되어, Functions에서도 노출하지 않습니다.
 
 /** 마무리용 카드만 Firestore에서 읽음(AI·세트 생성 없음). */
 export const getWrapUpDeck = onCall({ region: "asia-northeast3" }, async (request): Promise<{ items: WrapUpDeckItem[] }> => {
@@ -1544,7 +1116,7 @@ export const getWrapUpDeck = onCall({ region: "asia-northeast3" }, async (reques
     throw new HttpsError("unauthenticated", "로그인이 필요합니다.");
   }
 
-  const targetLanguage = (request.data?.targetLanguage ?? "ja") as string;
+  const targetLanguage = (request.data?.targetLanguage ?? "JPN") as string;
   const level = (request.data?.level ?? "beginner") as string;
 
   const wordSnap = await globalTodayWordSetRef(targetLanguage, level).get();
@@ -1601,5 +1173,85 @@ export const pregenerateDailyLearningSets = onSchedule(
       }
     }
     console.log("[pregenerateDailyLearningSets] done", { todayKst, tomorrowKst });
+  }
+);
+
+/**
+ * 레거시/미사용 문서 정리(스케줄).
+ * - alpha-2 기반 글로벌 학습 세트 문서(예: 2026-04-09_ja_beginner) 삭제
+ * - 퀴즈 기능 제거로 더 이상 쓰지 않는 global_quiz_owner 및 글로벌 퀴즈 세트 삭제
+ *
+ * 주의: 앱/Functions에서 더 이상 참조하지 않는 문서만 대상으로 합니다.
+ */
+export const cleanupLegacyFirestoreDocs = onSchedule(
+  {
+    // 매일 KST 03:10에 정리 (트래픽 적은 시간대)
+    schedule: "10 3 * * *",
+    timeZone: "Asia/Seoul",
+    region: "asia-northeast3",
+    timeoutSeconds: 540,
+    memory: "512MiB",
+  },
+  async () => {
+    const todayKst = todayKstYyyyMmDd();
+    console.log("[cleanupLegacyFirestoreDocs] start", { todayKst });
+
+    // 1) 글로벌 퀴즈 오너 + 세트 정리 (현재 앱에서 퀴즈 제거)
+    try {
+      const ownerRef = db.collection("users").doc(GLOBAL_QUIZ_SET_OWNER);
+      const ownerSnap = await ownerRef.get();
+      if (ownerSnap.exists) {
+        const col = ownerRef.collection("daily_quiz_sets");
+        for (;;) {
+          const snap = await col.limit(200).get();
+          if (snap.empty) break;
+          const batch = db.batch();
+          for (const d of snap.docs) batch.delete(d.ref);
+          await batch.commit();
+        }
+        await ownerRef.delete();
+        console.log("[cleanupLegacyFirestoreDocs] deleted global_quiz_owner");
+      }
+    } catch (e) {
+      console.error("[cleanupLegacyFirestoreDocs] global_quiz_owner cleanup failed", e);
+    }
+
+    // 2) alpha-2 기반 글로벌 학습 세트 문서 정리
+    // - Functions는 canonical alpha-3 docId만 사용하므로 alpha-2 문서는 미사용.
+    const alpha2 = ["ja", "es", "en", "ko"];
+    for (const sub of ["daily_word_sets", "daily_sentence_sets"] as const) {
+      try {
+        const col = db
+          .collection("users")
+          .doc(GLOBAL_LEARNING_SET_OWNER)
+          .collection(sub);
+
+        for (;;) {
+          const snap = await col.limit(400).get();
+          if (snap.empty) break;
+
+          const batch = db.batch();
+          let delCount = 0;
+
+          for (const d of snap.docs) {
+            const id = d.id;
+            // id 형식: YYYY-MM-DD_LANG_LEVEL
+            const lower = id.toLowerCase();
+            if (alpha2.some((a2) => lower.includes(`_${a2}_`))) {
+              batch.delete(d.ref);
+              delCount++;
+            }
+          }
+
+          if (delCount === 0) break;
+          await batch.commit();
+          console.log("[cleanupLegacyFirestoreDocs] deleted alpha-2 docs", { sub, delCount });
+        }
+      } catch (e) {
+        console.error("[cleanupLegacyFirestoreDocs] alpha-2 cleanup failed", { sub, e });
+      }
+    }
+
+    console.log("[cleanupLegacyFirestoreDocs] done", { todayKst });
   }
 );
