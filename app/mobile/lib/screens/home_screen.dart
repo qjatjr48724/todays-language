@@ -208,11 +208,6 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: '로그아웃',
-            onPressed: () => FirebaseAuth.instance.signOut(),
-          ),
         ],
       ),
       body: SingleChildScrollView(
