@@ -108,8 +108,8 @@ const GLOBAL_LEARNING_SET_OWNER = "global_learning_set_owner";
 
 /** 스케줄러가 자정 전후에 미리 생성할 (targetLanguage, level) 목록 */
 const PREGEN_LANGUAGE_LEVEL_PAIRS: { targetLanguage: string; level: string }[] = [
-  { targetLanguage: "ja", level: "beginner" },
-  { targetLanguage: "es", level: "beginner" },
+  // ISO-3166-1 alpha-3 표기(외부/Firestore/API 입력 기준)
+  { targetLanguage: "JPN", level: "beginner" },
 ];
 const QUIZ_MODES = [
   "ko_to_target_word",
@@ -138,6 +138,21 @@ function todayKstYyyyMmDd(now = new Date()): string {
 
 function learningSetDocId(todayKst: string, targetLanguage: string, level: string): string {
   return `${todayKst}_${targetLanguage}_${level}`;
+}
+
+function normalizeTargetLanguage(code: string): { external: string; internal: string } {
+  const raw = (code ?? "").trim();
+  const upper = raw.toUpperCase();
+  // external (ISO-3166-1 alpha-3)
+  if (upper === "JPN") return { external: "JPN", internal: "ja" };
+  if (upper === "ESP") return { external: "ESP", internal: "es" };
+  // accept legacy language codes from old clients
+  const lower = raw.toLowerCase();
+  if (lower === "ja") return { external: "JPN", internal: "ja" };
+  if (lower === "es") return { external: "ESP", internal: "es" };
+  if (lower === "en") return { external: "USA", internal: "en" };
+  // default passthrough
+  return { external: upper.length === 3 ? upper : raw, internal: lower };
 }
 
 async function ensureGlobalLearningOwnerDoc(nowMs = Date.now()): Promise<void> {
@@ -482,7 +497,8 @@ function fallbackQuiz(targetLanguage: string, level: string): GenerateQuizRespon
 }
 
 function fallbackWord(targetLanguage: string, level: string): GenerateWordResponse {
-  if (targetLanguage === "ja" && level === "beginner") {
+  const lang = normalizeTargetLanguage(targetLanguage).internal;
+  if (lang === "ja" && level === "beginner") {
     return {
       word: "ありがとう",
       meaningKo: "고마워요",
@@ -497,7 +513,8 @@ function fallbackWord(targetLanguage: string, level: string): GenerateWordRespon
 }
 
 function fallbackSentence(targetLanguage: string, level: string): GenerateSentenceResponse {
-  if (targetLanguage === "ja" && level === "beginner") {
+  const lang = normalizeTargetLanguage(targetLanguage).internal;
+  if (lang === "ja" && level === "beginner") {
     return {
       sentence: "きょうはいいてんきですね。",
       meaningKo: "오늘은 날씨가 좋네요.",
@@ -986,6 +1003,7 @@ function mergeWordBatchInto(
 }
 
 async function buildDailyWordItems(targetLanguage: string, level: string): Promise<StoredWordItem[]> {
+  const internalLang = normalizeTargetLanguage(targetLanguage).internal;
   const out: StoredWordItem[] = [];
   const used = new Set<string>();
   const t0 = Date.now();
@@ -996,8 +1014,8 @@ async function buildDailyWordItems(targetLanguage: string, level: string): Promi
     `words-p1-${t0}-${Math.random().toString(36).slice(2)}`,
   ];
   const parallelResults = await Promise.allSettled([
-    generateDailyWordChunkWithOpenAI(targetLanguage, level, DAILY_WORD_BATCH_SIZE, parallelSeeds[0]),
-    generateDailyWordChunkWithOpenAI(targetLanguage, level, DAILY_WORD_BATCH_SIZE, parallelSeeds[1]),
+    generateDailyWordChunkWithOpenAI(internalLang, level, DAILY_WORD_BATCH_SIZE, parallelSeeds[0]),
+    generateDailyWordChunkWithOpenAI(internalLang, level, DAILY_WORD_BATCH_SIZE, parallelSeeds[1]),
   ]);
 
   for (let i = 0; i < parallelResults.length; i++) {
@@ -1014,7 +1032,7 @@ async function buildDailyWordItems(targetLanguage: string, level: string): Promi
     const need = Math.min(DAILY_WORD_BATCH_SIZE, DAILY_WORD_COUNT - out.length);
     try {
       const batch = await generateDailyWordChunkWithOpenAI(
-        targetLanguage,
+        internalLang,
         level,
         need,
         `words-topup-${Date.now()}-${Math.random().toString(36).slice(2)}`
@@ -1029,7 +1047,7 @@ async function buildDailyWordItems(targetLanguage: string, level: string): Promi
   while (out.length < DAILY_WORD_COUNT && fillAttempts < 75) {
     fillAttempts += 1;
     try {
-      const one = await generateWordWithOpenAI(targetLanguage, level);
+      const one = await generateWordWithOpenAI(internalLang, level);
       const key = wordDedupKey(one.word);
       if (key && !used.has(key)) {
         used.add(key);
@@ -1040,7 +1058,7 @@ async function buildDailyWordItems(targetLanguage: string, level: string): Promi
         });
       }
     } catch {
-      const fb = fallbackWord(targetLanguage, level);
+      const fb = fallbackWord(internalLang, level);
       const fk = `${wordDedupKey(fb.word)}#${out.length}`;
       if (!used.has(fk)) {
         used.add(fk);
@@ -1059,9 +1077,10 @@ async function buildDailySentenceItems(
   targetLanguage: string,
   level: string
 ): Promise<StoredSentenceItem[]> {
+  const internalLang = normalizeTargetLanguage(targetLanguage).internal;
   try {
     const batch = await generateDailySentenceBatchWithOpenAI(
-      targetLanguage,
+      internalLang,
       level,
       DAILY_SENTENCE_COUNT,
       `s-${Date.now()}-${Math.random().toString(36).slice(2)}`
@@ -1089,14 +1108,14 @@ async function buildDailySentenceItems(
   while (out.length < DAILY_SENTENCE_COUNT && attempts < 40) {
     attempts += 1;
     try {
-      const one = await generateSentenceWithOpenAI(targetLanguage, level);
+      const one = await generateSentenceWithOpenAI(internalLang, level);
       const key = sentenceDedupKey(one.sentence);
       if (key && !used.has(key)) {
         used.add(key);
         out.push({ sentence: one.sentence, meaningKo: one.meaningKo });
       }
     } catch {
-      const fb = fallbackSentence(targetLanguage, level);
+      const fb = fallbackSentence(internalLang, level);
       const fk = `${sentenceDedupKey(fb.sentence)}#${out.length}`;
       if (!used.has(fk)) {
         used.add(fk);
@@ -1309,7 +1328,8 @@ export const generateWord = onCall({ region: "asia-northeast3" }, async (request
   }
 
   const uid = request.auth.uid;
-  const targetLanguage = (request.data?.targetLanguage ?? "ja") as string;
+  const tl = normalizeTargetLanguage((request.data?.targetLanguage ?? "JPN") as string);
+  const targetLanguage = tl.external;
   const level = (request.data?.level ?? "beginner") as string;
 
   console.error(`[generateWord] invoked targetLanguage=${targetLanguage}, level=${level}`);
@@ -1333,7 +1353,8 @@ export const generateSentence = onCall({ region: "asia-northeast3" }, async (req
   }
 
   const uid = request.auth.uid;
-  const targetLanguage = (request.data?.targetLanguage ?? "ja") as string;
+  const tl = normalizeTargetLanguage((request.data?.targetLanguage ?? "JPN") as string);
+  const targetLanguage = tl.external;
   const level = (request.data?.level ?? "beginner") as string;
 
   console.error(`[generateSentence] invoked targetLanguage=${targetLanguage}, level=${level}`);
@@ -1356,7 +1377,12 @@ export const generateSentence = onCall({ region: "asia-northeast3" }, async (req
  * - 호출 자체는 인증 필수이며, 실패해도 앱 동작을 막지 않는 용도로 설계합니다.
  */
 export const ensureTodayLearningSets = onCall(
-  { region: "asia-northeast3", secrets: ["OPENAI_API_KEY"], timeoutSeconds: 300, memory: "512MiB" },
+  {
+    region: "asia-northeast3",
+    secrets: ["OPENAI_API_KEY", "DEV_WARMUP_UID_ALLOWLIST"],
+    timeoutSeconds: 300,
+    memory: "512MiB",
+  },
   async (request): Promise<{ ok: true; dateKst: string }> => {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "로그인이 필요합니다.");
@@ -1365,6 +1391,27 @@ export const ensureTodayLearningSets = onCall(
     const dev = Boolean(request.data?.dev);
     if (!dev) {
       throw new HttpsError("failed-precondition", "dev flag is required");
+    }
+
+    // 운영에서 비용 폭증 방지: allowlist에 포함된 UID만 실행 (에뮬레이터는 예외)
+    const isEmulator = process.env.FUNCTIONS_EMULATOR === "true";
+    if (!isEmulator) {
+      const allowRaw = (process.env.DEV_WARMUP_UID_ALLOWLIST ?? "").trim();
+      const allowed = new Set(
+        allowRaw
+          .split(",")
+          .map((s) => s.trim())
+          .filter((s) => s.length > 0)
+      );
+      if (allowed.size === 0) {
+        throw new HttpsError(
+          "failed-precondition",
+          "DEV_WARMUP_UID_ALLOWLIST is missing"
+        );
+      }
+      if (!allowed.has(request.auth.uid)) {
+        throw new HttpsError("permission-denied", "not allowed");
+      }
     }
 
     const targetLanguage = (request.data?.targetLanguage ?? "ja") as string;
@@ -1388,6 +1435,28 @@ export const ensureTodayLearningSets = onCall(
     });
 
     return { ok: true, dateKst: todayKst };
+  }
+);
+
+/**
+ * 언어/레벨 선택 시 즉시 세트 생성(당일 KST).
+ * - 스케줄은 ja/beginner만 미리 생성하므로, 기타 조합은 사용자가 선택하는 순간 생성한다.
+ */
+export const ensureLearningSetForToday = onCall(
+  { region: "asia-northeast3", secrets: ["OPENAI_API_KEY"], timeoutSeconds: 300, memory: "512MiB" },
+  async (request): Promise<{ ok: true; dateKst: string; targetLanguage: string; level: string }> => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "로그인이 필요합니다.");
+    }
+    const targetLanguage = (request.data?.targetLanguage ?? "ja") as string;
+    const level = (request.data?.level ?? "beginner") as string;
+    const todayKst = todayKstYyyyMmDd();
+    console.log("[ensureLearningSetForToday] start", { uid: request.auth.uid, todayKst, targetLanguage, level });
+    const t0 = Date.now();
+    await materializeGlobalTodayWordSetIfAbsent(targetLanguage, level, todayKst);
+    await materializeGlobalTodaySentenceSetIfAbsent(targetLanguage, level, todayKst);
+    console.log("[ensureLearningSetForToday] done", { todayKst, targetLanguage, level, elapsedMs: Date.now() - t0 });
+    return { ok: true, dateKst: todayKst, targetLanguage, level };
   }
 );
 
