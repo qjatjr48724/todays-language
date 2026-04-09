@@ -916,7 +916,8 @@ async function generateDailySentenceBatchWithOpenAI(
   targetLanguage: string,
   level: string,
   count: number,
-  diversitySeed: string
+  diversitySeed: string,
+  requiredVocabulary?: string[]
 ): Promise<StoredSentenceItem[]> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
@@ -927,12 +928,19 @@ async function generateDailySentenceBatchWithOpenAI(
   const timeout = setTimeout(() => controller.abort(), 25000);
 
   try {
-    const systemPrompt = buildDailySentenceBatchSystemPrompt(targetLanguage, level, count);
+    const systemPrompt = buildDailySentenceBatchSystemPrompt(
+      targetLanguage,
+      level,
+      count,
+      requiredVocabulary
+    );
     const userPrompt = buildDailySentenceBatchUserPromptJson(
       targetLanguage,
       level,
       count,
       diversitySeed
+      ,
+      requiredVocabulary
     );
 
     const response = await fetch(OPENAI_API_URL, {
@@ -1075,7 +1083,8 @@ async function buildDailyWordItems(targetLanguage: string, level: string): Promi
 
 async function buildDailySentenceItems(
   targetLanguage: string,
-  level: string
+  level: string,
+  requiredVocabulary?: string[]
 ): Promise<StoredSentenceItem[]> {
   const internalLang = normalizeTargetLanguage(targetLanguage).internal;
   try {
@@ -1083,7 +1092,8 @@ async function buildDailySentenceItems(
       internalLang,
       level,
       DAILY_SENTENCE_COUNT,
-      `s-${Date.now()}-${Math.random().toString(36).slice(2)}`
+      `s-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      requiredVocabulary
     );
     const out: StoredSentenceItem[] = [];
     const used = new Set<string>();
@@ -1132,7 +1142,8 @@ function globalTodayWordSetRef(
   dateKst?: string
 ): FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData> {
   const ymd = dateKst ?? todayKstYyyyMmDd();
-  const docId = learningSetDocId(ymd, targetLanguage, level);
+  const tl = normalizeTargetLanguage(targetLanguage);
+  const docId = learningSetDocId(ymd, tl.external, level);
   return db
     .collection("users")
     .doc(GLOBAL_LEARNING_SET_OWNER)
@@ -1146,7 +1157,8 @@ function globalTodaySentenceSetRef(
   dateKst?: string
 ): FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData> {
   const ymd = dateKst ?? todayKstYyyyMmDd();
-  const docId = learningSetDocId(ymd, targetLanguage, level);
+  const tl = normalizeTargetLanguage(targetLanguage);
+  const docId = learningSetDocId(ymd, tl.external, level);
   return db
     .collection("users")
     .doc(GLOBAL_LEARNING_SET_OWNER)
@@ -1161,12 +1173,14 @@ async function materializeGlobalTodayWordSetIfAbsent(
   dateKst?: string
 ): Promise<FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>> {
   await ensureGlobalLearningOwnerDoc();
-  const ref = globalTodayWordSetRef(targetLanguage, level, dateKst);
+  const tl = normalizeTargetLanguage(targetLanguage);
+  const canonicalLang = tl.external;
+  const ref = globalTodayWordSetRef(canonicalLang, level, dateKst);
   const snap = await ref.get();
   if (snap.exists) {
     const data = snap.data() as Partial<DailyWordSet>;
     if (
-      data.targetLanguage === targetLanguage &&
+      data.targetLanguage === canonicalLang &&
       data.level === level &&
       Array.isArray(data.words) &&
       data.words.length > 0
@@ -1177,16 +1191,32 @@ async function materializeGlobalTodayWordSetIfAbsent(
 
   const ymd = dateKst ?? todayKstYyyyMmDd();
   await cleanupExpiredLearningSets(GLOBAL_LEARNING_SET_OWNER, ymd);
-  const words = await buildDailyWordItems(targetLanguage, level);
+  const words = await buildDailyWordItems(canonicalLang, level);
   const payload: DailyWordSet = {
     dateKst: ymd,
-    targetLanguage,
+    targetLanguage: canonicalLang,
     level,
     words,
     cursor: 0,
     updatedAtMs: Date.now(),
   };
   await ref.set(payload);
+
+  // 레거시 alpha-2 문서가 같은 날 생성된 경우 정리(글로벌 세트만)
+  // ex) 2026-04-09_ja_beginner → 2026-04-09_JPN_beginner
+  const legacy = (targetLanguage ?? "").trim();
+  if (legacy.length > 0 && legacy.toUpperCase() !== canonicalLang) {
+    const legacyId = learningSetDocId(ymd, legacy, level);
+    const legacyRef = db
+      .collection("users")
+      .doc(GLOBAL_LEARNING_SET_OWNER)
+      .collection("daily_word_sets")
+      .doc(legacyId);
+    const legacySnap = await legacyRef.get();
+    if (legacySnap.exists) {
+      await legacyRef.delete();
+    }
+  }
   return ref;
 }
 
@@ -1197,12 +1227,14 @@ async function materializeGlobalTodaySentenceSetIfAbsent(
   dateKst?: string
 ): Promise<FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>> {
   await ensureGlobalLearningOwnerDoc();
-  const ref = globalTodaySentenceSetRef(targetLanguage, level, dateKst);
+  const tl = normalizeTargetLanguage(targetLanguage);
+  const canonicalLang = tl.external;
+  const ref = globalTodaySentenceSetRef(canonicalLang, level, dateKst);
   const snap = await ref.get();
   if (snap.exists) {
     const data = snap.data() as Partial<DailySentenceSet>;
     if (
-      data.targetLanguage === targetLanguage &&
+      data.targetLanguage === canonicalLang &&
       data.level === level &&
       Array.isArray(data.sentences) &&
       data.sentences.length > 0
@@ -1213,16 +1245,43 @@ async function materializeGlobalTodaySentenceSetIfAbsent(
 
   const ymd = dateKst ?? todayKstYyyyMmDd();
   await cleanupExpiredLearningSets(GLOBAL_LEARNING_SET_OWNER, ymd);
-  const sentences = await buildDailySentenceItems(targetLanguage, level);
+
+  // 오늘의 문장은 "오늘의 단어"를 이용한 문장으로 생성한다.
+  // - 단어 세트를 먼저 materialize 하고, 그 중 일부(최대 10개)를 뽑아 문장 생성에 강제 사용.
+  await materializeGlobalTodayWordSetIfAbsent(canonicalLang, level, ymd);
+  const wordSnap = await globalTodayWordSetRef(canonicalLang, level, ymd).get();
+  const wdata = wordSnap.data() as Partial<DailyWordSet> | undefined;
+  const words = Array.isArray(wdata?.words) ? wdata!.words : [];
+  const vocab = shuffle(words)
+    .map((w) => (w?.word ? String(w.word) : ""))
+    .filter((w) => w.trim().length > 0)
+    .slice(0, Math.min(DAILY_SENTENCE_COUNT, words.length));
+
+  const sentences = await buildDailySentenceItems(canonicalLang, level, vocab.length > 0 ? vocab : undefined);
   const payload: DailySentenceSet = {
     dateKst: ymd,
-    targetLanguage,
+    targetLanguage: canonicalLang,
     level,
     sentences,
     cursor: 0,
     updatedAtMs: Date.now(),
   };
   await ref.set(payload);
+
+  // 레거시 alpha-2 문서가 같은 날 생성된 경우 정리(글로벌 세트만)
+  const legacy = (targetLanguage ?? "").trim();
+  if (legacy.length > 0 && legacy.toUpperCase() !== canonicalLang) {
+    const legacyId = learningSetDocId(ymd, legacy, level);
+    const legacyRef = db
+      .collection("users")
+      .doc(GLOBAL_LEARNING_SET_OWNER)
+      .collection("daily_sentence_sets")
+      .doc(legacyId);
+    const legacySnap = await legacyRef.get();
+    if (legacySnap.exists) {
+      await legacyRef.delete();
+    }
+  }
   return ref;
 }
 
