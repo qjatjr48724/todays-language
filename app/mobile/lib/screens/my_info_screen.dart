@@ -38,8 +38,8 @@ class MyInfoScreen extends StatelessWidget {
         final data = snapshot.data?.data() ?? <String, dynamic>{};
         final displayName = (data['displayName'] as String?)?.trim();
         final provider = (data['provider'] as String?) ?? 'unknown';
-        final nativeLanguage = (data['nativeLanguage'] as String?) ?? 'ko';
-        final targetLanguage = (data['targetLanguage'] as String?) ?? 'ja';
+        final nativeLanguage = (data['nativeLanguage'] as String?) ?? 'KOR';
+        final targetLanguage = (data['targetLanguage'] as String?) ?? 'JPN';
         final createdAt = data['createdAt'];
 
         String createdText = '-';
@@ -199,7 +199,8 @@ Future<void> _openLanguagePicker(BuildContext context) async {
   final snap = await docRef.get();
   if (!context.mounted) return;
   final data = snap.data() ?? <String, dynamic>{};
-  final current = (data['targetLanguage'] as String?) ?? 'JPN';
+  final currentRaw = (data['targetLanguage'] as String?) ?? 'JPN';
+  final current = _normalizeTargetLanguageAlpha3(currentRaw);
 
   String selected = current;
 
@@ -283,6 +284,19 @@ Future<void> _openLanguagePicker(BuildContext context) async {
   }
 }
 
+String _normalizeTargetLanguageAlpha3(String raw) {
+  final v = raw.trim();
+  if (v.isEmpty) return 'JPN';
+  switch (v.toLowerCase()) {
+    case 'ja':
+      return 'JPN';
+    case 'es':
+      return 'ESP';
+    default:
+      return v.toUpperCase();
+  }
+}
+
 class _ProviderBadge extends StatelessWidget {
   const _ProviderBadge({required this.provider});
 
@@ -337,12 +351,15 @@ String _providerLabel(String provider) {
 
 String _languageLabel(String code) {
   switch (code) {
-    case 'ko':
-      return '한국어';
-    case 'ja':
-      return '일본어(히라가나)';
-    case 'en':
-      return '영어';
+    // ISO-3166-1 alpha-3 (프로젝트 내부 표준)
+    case 'KOR':
+      return '한국어 (KOR)';
+    case 'JPN':
+      return '일본어 (JPN)';
+    case 'ESP':
+      return '스페인어 (ESP)';
+    case 'USA':
+      return '영어 (USA)';
     default:
       return code;
   }
