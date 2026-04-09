@@ -150,6 +150,60 @@
 
 ---
 
+## [단계 4] Cloud Functions 프로토타입 배포 (generateWord)
+
+### 1) 오늘 한 일
+- functions/ TypeScript 기반 Cloud Functions 코드베이스 추가
+- Callable 함수 generateWord 구현 (인증 필수, 초기 고정 응답으로 플로우 검증)
+- 루트 firebase.json / .firebaserc 구성
+- firebase deploy --only functions로 generateWord(callable, v2, nodejs24, asia-northeast3) 배포 완료
+- 배포 과정에서 빌드 서비스 계정 권한 이슈를 IAM에서 해결
+- 앱 홈에서 샘플 단어 받기(generateWord) 버튼으로 호출 테스트
+- 호출 중 unauthenticated 발생 원인 분석:
+	- Cloud Run(2nd Gen)에서 401로 호출이 막히던 상태
+- Cloud Run 서비스 권한을 “공개 호출 가능(allUsers invoker)”로 변경 후 재테스트
+- 로그인 상태에서 예문 포함 응답 정상 확인(미로그인 시 unauthenticated 유지)
+
+### 2) 완료 기준 체크
+
+[o] 로컬 실행/동작 확인 (배포 성공)
+[o] 핵심 설정값 문서화 (함수명/리전/입출력/인증 요구사항)
+[o] 다음 단계 선행조건 충족 (앱에서 callable 호출 테스트 준비 완료)
+
+### 3) 추가/변경한 코드 포인트
+- 파일:
+`functions/src/index.ts`
+`functions/package.json`
+`firebase.json`
+`.firebaserc`
+`app/mobile/lib/screens/home_screen.dart`
+- 핵심 포인트:
+인증 필수: 미로그인 호출 시 unauthenticated로 차단
+리전 고정: asia-northeast3 (앱과 동일해야 함)
+초기 고정 응답: “배포/호출/응답 파이프라인”부터 안정화 후 실제 AI 호출로 교체
+배포 의존성: 2nd Gen 배포는 Cloud Build/Artifact Registry/Run 등 권한이 맞아야 함
+
+### 4) 이슈/막힌 점
+
+| **증상** | `Build failed ... missing permission on the build service account`로 Functions 배포 실패
+							Cloud Build 링크는 “유효한 식별자 아님/로드 오류”처럼 보일 수 있었음 |
+| **원인** | Cloud Functions(2nd Gen) 빌드에 사용하는 빌드 서비스 계정 IAM 권한 부족
+							(환경에 따라) 조직 정책/기본 권한 미부여로 발생 가능 |
+| **해결** | IAM에서 빌드 서비스 계정(예: 269278317829-compute@developer.gserviceaccount.com)에 필요한 권한 부여 재배포 후 deploy complete 확인 |
+
+### 5) 테스트 방법 (배포 검증)
+- 앱에서:
+로그인된 상태로 홈 화면 진입
+샘플 단어 받기 (generateWord) 버튼 클릭
+ありがとう — 고마워요 같은 결과가 표시되면 성공
+
+- 실패 시 빠른 체크:
+unauthenticated: 로그인 상태 확인
+`not-found/region` 관련: 함수 리전(asia-northeast3)과 앱 리전 일치 확인
+기타: Firebase 콘솔 Functions/Cloud Run 로그 확인
+
+---
+
 ## 최근 기록 (예시) — 홈 UI 개편 + 디버그 테스트 로그인 추가
 
 ## [단계 5] 홈 UI 개편 + 디버그 테스트 로그인 추가
