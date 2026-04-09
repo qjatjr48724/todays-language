@@ -6,7 +6,14 @@ import 'package:flutter/foundation.dart';
 import '../services/daily_progress_sync.dart';
 
 class TodaySentencesScreen extends StatefulWidget {
-  const TodaySentencesScreen({super.key});
+  const TodaySentencesScreen({
+    super.key,
+    required this.targetLanguage,
+    required this.level,
+  });
+
+  final String targetLanguage;
+  final String level;
 
   @override
   State<TodaySentencesScreen> createState() => _TodaySentencesScreenState();
@@ -95,8 +102,8 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
       ).httpsCallable('generateSentence');
 
       final result = await callable.call<Map<String, dynamic>>({
-        'targetLanguage': 'ja',
-        'level': 'beginner',
+        'targetLanguage': widget.targetLanguage,
+        'level': widget.level,
       });
 
       final data = Map<String, dynamic>.from(result.data as Map);

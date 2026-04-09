@@ -5,7 +5,14 @@ import 'package:flutter/material.dart';
 import '../services/daily_progress_sync.dart';
 
 class TodayWrapUpScreen extends StatefulWidget {
-  const TodayWrapUpScreen({super.key});
+  const TodayWrapUpScreen({
+    super.key,
+    required this.targetLanguage,
+    required this.level,
+  });
+
+  final String targetLanguage;
+  final String level;
 
   @override
   State<TodayWrapUpScreen> createState() => _TodayWrapUpScreenState();
@@ -44,8 +51,8 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
       ).httpsCallable('getWrapUpDeck');
 
       final result = await callable.call<Map<String, dynamic>>({
-        'targetLanguage': 'ja',
-        'level': 'beginner',
+        'targetLanguage': widget.targetLanguage,
+        'level': widget.level,
       });
 
       final data = Map<String, dynamic>.from(result.data as Map);
