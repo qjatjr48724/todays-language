@@ -136,12 +136,18 @@ export function buildDailyWordBatchUserPromptJson(
 export function buildDailySentenceBatchSystemPrompt(
   targetLanguage: string,
   level: string,
-  count: number
+  count: number,
+  requiredVocabulary?: string[]
 ): string {
   const lang = languageLabel(targetLanguage);
+  const vocabLine =
+    requiredVocabulary && requiredVocabulary.length > 0
+        ? `You MUST use the provided vocabulary list. Each sentence must include exactly one of the provided words/expressions, and do not reuse the same vocabulary across sentences.`
+        : "";
   return [
     `You create exactly ${count} distinct short sentences in ${lang} for a Korean native speaker at level ${level}.`,
     "Each sentence must be unique and useful for daily study.",
+    vocabLine,
     "Return ONLY a raw JSON object (no markdown, no extra text).",
     "Shape: {\"sentences\":[{\"sentence\":string,\"meaningKo\":string}, ...]}",
     `The \"sentences\" array MUST have length exactly ${count}.`,
@@ -153,7 +159,8 @@ export function buildDailySentenceBatchUserPromptJson(
   targetLanguage: string,
   level: string,
   count: number,
-  diversitySeed: string
+  diversitySeed: string,
+  requiredVocabulary?: string[]
 ): string {
   return JSON.stringify({
     targetLanguage,
@@ -161,5 +168,8 @@ export function buildDailySentenceBatchUserPromptJson(
     learnerNativeLanguage: "ko",
     batchSize: count,
     diversitySeed,
+    ...(requiredVocabulary && requiredVocabulary.length > 0
+        ? { requiredVocabulary }
+        : {}),
   });
 }
