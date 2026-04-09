@@ -11,7 +11,8 @@ Future<void> ensureUserProfileDocument(User user) async {
     'displayName': user.displayName ?? '',
     'provider': _providerLabel(user),
     'nativeLanguage': 'ko',
-    'targetLanguage': 'ja',
+    // ISO-3166-1 alpha-3 (국가 코드) 표기 사용: JPN/ESP/...
+    'targetLanguage': 'JPN',
     'timezone': 'Asia/Seoul',
     'lastLoginAt': FieldValue.serverTimestamp(),
   };
