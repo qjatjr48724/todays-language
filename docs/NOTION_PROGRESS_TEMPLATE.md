@@ -554,3 +554,63 @@ unauthenticated: 로그인 상태 확인
 
 ---
 
+## [단계 11] 퀴즈 제거 + alpha-3 정합성 마무리 + Google/Apple 로그인 연결 + 레거시 문서 정리(스케줄)
+
+### 1) 오늘 한 일
+
+- **단어 퀴즈 기능 제거**
+  - 앱에서 `WordQuizScreen` 삭제
+  - Functions에서 `generateQuiz` callable 노출 제거(재도입 전까지 API 표면 축소)
+- **언어 코드 ISO-3166-1 alpha-3 정합성 마무리**
+  - 앱 기본값/표기에서 `ja/es/ko`(alpha-2) 전제를 제거하고 `JPN/ESP/KOR` 기준으로 통일
+  - 내정보 화면 표시 및 선택 로직에서 alpha-2가 남아있어도 alpha-3로 정규화해서 표시/저장
+- **Google / Apple 로그인(코드) 연동**
+  - 로그인 허브 화면에서 “구글/애플로 시작하기” 버튼을 실제 로그인 로직으로 연결
+  - Apple 로그인은 iOS에서만 동작하도록 가드(Windows/Android에서는 안내 메시지)
+- **레거시 Firestore 문서 정리(스케줄)**
+  - 더 이상 사용하지 않는 레거시 문서(예: `users/global_quiz_owner`, alpha-2 기반 글로벌 학습 세트 문서 `*_ja_*`)를 제거하는 스케줄 함수 추가
+- **이메일 회원가입 동의 포맷 확정**
+  - 동의 저장 포맷을 `terms/version+agreedAt`, `privacy/version+agreedAt` 형태로 확정
+  - 약관/개인정보 전문 “보기” 다이얼로그 추가
+
+### 2) 완료 기준 체크
+
+- [ ] Android 빌드/실행 성공(현재 Gradle daemon JVM 메모리 부족 이슈로 빌드 크래시 발생)
+- [ ] Android에서 Google 로그인 성공(sha-1 등록 후 검증)
+- [x] TypeScript 빌드/정적 진단(Functions) 오류 없음
+- [x] Flutter/Dart 정적 진단(코드 레벨) 오류 없음
+
+### 3) 추가/변경한 코드 포인트
+
+- 파일(Flutter):
+  - `app/mobile/lib/screens/login_screen.dart` — Google/Apple 로그인 실제 연동(프로필 동기화 포함)
+  - `app/mobile/lib/screens/email_register_screen.dart` — 동의 포맷 확정 + “보기” 다이얼로그 + 레거시 필드 저장 제거
+  - `app/mobile/lib/screens/my_info_screen.dart` — alpha-3 기본값/표기 통일 + legacy alpha-2 값 정규화
+  - `app/mobile/lib/services/user_prefs.dart` — fallback `JPN`으로 통일
+  - `app/mobile/lib/services/user_profile_sync.dart` — alpha-2 → alpha-3 정규화 + 레거시 사용자 필드 삭제(merge)
+  - `app/mobile/lib/screens/word_quiz_screen.dart` — 삭제
+  - `app/mobile/pubspec.yaml`, `app/mobile/pubspec.lock` — `google_sign_in`, `sign_in_with_apple`, `crypto` 추가
+  - `app/mobile/macos/Flutter/GeneratedPluginRegistrant.swift` — 플러그인 레지스트리 갱신(자동)
+- 파일(Functions):
+  - `functions/src/index.ts`
+    - `generateQuiz` callable 제거(미사용 API 표면 축소)
+    - 레거시 문서 정리 스케줄 `cleanupLegacyFirestoreDocs` 추가
+
+### 4) 이슈/막힌 점
+
+- **증상:** `flutter run` 중 `Gradle build daemon disappeared unexpectedly`
+- **원인:** 시스템 페이지 파일(가상 메모리) 부족으로 JVM 네이티브 mmap 실패
+- **로그 근거:** `hs_err_pid*.log`에 `There is insufficient memory...` / `AvailPageFile size ...` 표시
+- **해결/우회(다음 작업):**
+  - Windows 가상 메모리(페이지 파일) 증설 후 재부팅
+  - `gradlew --stop`, `flutter clean`, `flutter run --no-daemon`으로 임시 우회
+  - 필요 시 `android/gradle.properties`에서 Gradle JVM args/workers 조정
+
+### 5) 다음 액션 (내일 바로 할 것)
+
+1. Windows 페이지 파일 증설/재부팅 후 Android 빌드 정상화
+2. Firebase Console에서 Google Sign-in Enable + SHA-1 등록 → Android에서 Google 로그인 E2E 확인
+3. Functions 배포(legacy cleanup 스케줄 포함) 후 Firestore에서 `global_quiz_owner` 및 `*_ja_*` 레거시 문서가 정리되는지 확인
+
+---
+
