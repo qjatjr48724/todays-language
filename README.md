@@ -13,7 +13,7 @@
 > 근로소득보다 물가가 더 빠르게 치솟고 있는 현대 사회에서
 > 책을 구매하고 언어 강의를 구독하여 나가는 지출이 많이 부담스러울 수 있다.
 > 언제 어디서나 외국어를 접할 수 있는 글로벌시대에 간단하게라도 다양한 언어를 학습하도록 하고  
-> 최소한의 비용으로 오랜기간 학습할 수 있도록 기회를 제공함으로써 지출에 대한 부담을 완화하고자 개발하였습니다.
+> 최소한의 비용으로 오랜기간 학습할 수 있도록 기회를 제공함으로써 지출에 대한 부담을 완화하고자 개발을 계획하게 되었습니다.
 
 ## 📆 개발 기간
 > 2026-03-22 ~ ing
@@ -24,11 +24,28 @@
 
 ## ⚙ 기술 스택
 - 모바일 앱 - <img src="https://img.shields.io/badge/flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white"> <img src="https://img.shields.io/badge/dart-#0175C2?style=for-the-badge&logo=dart&logoColor=white">
-- 백엔드 - <img src="https://img.shields.io/badge/firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=white"> <img src="https://img.shields.io/badge/nodedotjs-#5FA04E?style=for-the-badge&logo=nodedotjs&logoColor=white">
+- 백엔드 - <img src="https://img.shields.io/badge/firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=white"> <img src="https://img.shields.io/badge/node.js-339933?style=for-the-badge&logo=Node.js&logoColor=white">
 - AI - OpenAI Responses API
 
+## 핵심 기능
 
 
+## 아키텍쳐
+
+## 데이터/스키마 구조
+
+## 화면 구성 및 상세 구현
+|  |
+|---|
+|  |
+
+## 향후 개발 계획
+
+
+
+
+
+----------------
 - 앱/브랜드 표기: `Today's Language`
 - GitHub 리포지토리 이름: `todays-language`
 - 목표 플랫폼: Android, iOS (Flutter)
