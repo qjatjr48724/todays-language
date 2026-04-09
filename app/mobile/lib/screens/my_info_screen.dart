@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -165,15 +166,103 @@ class MyInfoScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.language),
             tooltip: '언어 설정',
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('언어 변경 기능은 다음 단계에서 연결합니다.')),
-              );
-            },
+            onPressed: () => _openLanguagePicker(context),
           ),
         ],
       ),
       body: content,
+    );
+  }
+}
+
+Future<void> _openLanguagePicker(BuildContext context) async {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user == null) return;
+
+  final docRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+  final snap = await docRef.get();
+  if (!context.mounted) return;
+  final data = snap.data() ?? <String, dynamic>{};
+  final current = (data['targetLanguage'] as String?) ?? 'JPN';
+
+  String selected = current;
+
+  final confirmed = await showModalBottomSheet<bool>(
+    context: context,
+    showDragHandle: true,
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('대상 언어 선택', style: Theme.of(context).textTheme.titleLarge),
+                const SizedBox(height: 12),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('일본어 (JPN)'),
+                  trailing: selected == 'JPN' ? const Icon(Icons.check) : null,
+                  onTap: () => setState(() => selected = 'JPN'),
+                ),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('스페인어 (ESP)'),
+                  trailing: selected == 'ESP' ? const Icon(Icons.check) : null,
+                  onTap: () => setState(() => selected = 'ESP'),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: const Text('취소'),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: FilledButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        child: const Text('저장'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  );
+  if (!context.mounted) return;
+
+  if (confirmed != true) return;
+
+  // 1) 유저 프로필 업데이트
+  await docRef.set({'targetLanguage': selected}, SetOptions(merge: true));
+  if (!context.mounted) return;
+
+  // 2) 선택된 언어의 "오늘 세트"가 없으면 즉시 생성(사용자 액션 기반)
+  try {
+    await user.getIdToken(true);
+    final callable = FirebaseFunctions.instanceFor(region: 'asia-northeast3')
+        .httpsCallable('ensureLearningSetForToday');
+    await callable.call<Map<String, dynamic>>({
+      'targetLanguage': selected,
+      'level': 'beginner',
+    });
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('언어가 저장되었고, 오늘 문제 세트를 준비했어요.')),
+    );
+  } catch (e) {
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('언어 저장은 됐지만 세트 준비에 실패했어요: $e')),
     );
   }
 }
