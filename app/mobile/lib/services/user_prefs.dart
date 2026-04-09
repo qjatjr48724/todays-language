@@ -10,7 +10,8 @@ class UserPrefs {
   final String targetLanguage;
   final String level;
 
-  static UserPrefs fallback() => const UserPrefs(targetLanguage: 'ja', level: 'beginner');
+  // ISO-3166-1 alpha-3 표기: 기본값 JPN
+  static UserPrefs fallback() => const UserPrefs(targetLanguage: 'JPN', level: 'beginner');
 }
 
 Future<UserPrefs> fetchUserPrefs(User user) async {
