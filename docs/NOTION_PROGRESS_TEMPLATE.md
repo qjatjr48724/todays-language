@@ -3,115 +3,6 @@
 아래 템플릿을 단계마다 복붙해 기록하면, 개발/회고/재개가 쉬워진다.
 
 ---
-
-## [단계 n] 일일 단어/문장 문제 세트 사전 생성(23:55) + 앱은 읽기만
-
-### 1) 오늘 한 일
-
-- Cloud Functions에 **일일 단어 30개 / 문장 10개 문제 세트**를 Firestore에 저장하는 구조를 추가
-  - 저장 위치(글로벌 공유 풀): `users/global_learning_set_owner/daily_word_sets/{yyyy-MM-dd}_{lang}_{level}`
-  - 저장 위치(글로벌 공유 풀): `users/global_learning_set_owner/daily_sentence_sets/{yyyy-MM-dd}_{lang}_{level}`
-  - 사용자별 소비 커서: `users/{uid}/daily_word_cursor/{yyyy-MM-dd}_{lang}_{level}`, `users/{uid}/daily_sentence_cursor/{yyyy-MM-dd}_{lang}_{level}`
-- **스케줄러**로 세트를 미리 생성하도록 변경
-  - KST **23:55**에 실행되어 **내일자(yyyy-MM-dd)** 세트를 사전 생성 → 자정 이후 이용 시 “세트 없음” 오류 가능성 최소화
-- 앱의 `generateWord`/`generateSentence`는 **AI 생성 없이 Firestore 세트에서만 읽기**(없으면 fallback)
-- 개발 단계 편의 기능 추가
-  - 디버그 홈 진입 시 `ensureTodayLearningSets(dev: true)`를 백그라운드로 호출해 **당일 세트가 없으면 즉시 생성**
-- (부가) 홈 카드 그리드에서 발생하던 `RenderFlex overflow` UI 문제를 수정
-
-### 2) 완료 기준 체크
-
-- [x] `functions`: `npm run build` 통과
-- [x] `mobile`: `flutter analyze` 통과
-- [x] Firestore에 `users/global_learning_set_owner` 및 하위 세트 문서 생성 확인
-- [x] 앱에서 `debugSource = daily_set` 표시 확인
-- [x] 사용자별 커서 문서 생성/증가 확인
-- [ ] 23:55 스케줄이 실제로 매일 실행되어 “내일자” 세트가 자동 생성되는지 운영 환경에서 추가 확인(Blaze/스케줄러 전제)
-
-### 3) 추가/변경한 코드 포인트
-
-- 파일:
-  - `functions/src/index.ts`
-  - `functions/src/prompts.ts`
-  - `app/mobile/lib/screens/home_screen.dart`
-  - `app/mobile/lib/screens/today_wrap_up_screen.dart`
-  - `app/mobile/lib/services/daily_progress_sync.dart`
-  - `app/mobile/lib/ui/home_feature_card.dart`
-  - `app/mobile/lib/screens/home_screen.dart`
-- 핵심 포인트:
-  - **자정 직후 생성이 아니라 23:55 사전 생성**으로 UX 안정화(00:00부터 바로 조회 가능)
-  - 앱은 “생성” 책임을 갖지 않고 **세트 조회/커서 증가**만 수행
-  - 개발 단계에서만 워밍업 callable을 호출하도록 `kDebugMode`로 제한(운영에서 비용 폭증 방지)
-  - 글로벌 owner 문서를 명시적으로 생성해 콘솔 탐색/디버깅 용이성 확보
-
-### 4) 이슈/막힌 점
-
-- 증상: 디버그 홈 진입 시 세트가 자동 생성되지 않는 것처럼 보임
-- 원인 추정:
-  - callable 미배포/타임아웃/예외를 앱에서 `catch`로 삼켜서 겉으로 드러나지 않음
-  - Firestore 콘솔에서 “부모 문서가 없어서” 경로가 없는 것처럼 보이는 케이스
-- 해결/우회:
-  - `ensureTodayLearningSets` 배포 및 타임아웃/메모리 상향, 서버 로그 추가
-  - `users/global_learning_set_owner` 부모 문서 명시 생성 로직 추가
-
-### 5) 다음 액션 (내일 바로 할 것)
-
-1. 23:55 스케줄이 실제로 내일자 세트를 생성하는지(콘솔/로그) 확인
-2. (정책) `PREGEN_LANGUAGE_LEVEL_PAIRS`를 “고정 1개”로 갈지, “사용량 상위 언어/레벨”로 확장할지 결정
-3. (보안) 개발용 `ensureTodayLearningSets`를 운영 전에 제거하거나 UID allowlist/App Check 등으로 추가 보호
-
----
-
-## [단계 n] 언어 코드 표준화(ISO-3166-1 alpha-3) + 언어 선택 시 즉시 세트 생성
-
-### 1) 오늘 한 일
-
-- Firestore/앱/Functions에서 언어 코드 표기를 `ja/es` 대신 **ISO-3166-1 alpha-3**로 전환
-  - 예: `JPN`, `ESP`
-  - 레거시 클라이언트 호환을 위해 Functions에서 `ja/es` 입력도 수용 후 내부 매핑
-- 스케줄 사전 생성은 당분간 **`JPN/beginner`만** 생성하도록 단순화
-- `내 정보`에서 언어 선택 UI 추가
-  - 선택 후 **저장 버튼을 눌러야** Firestore에 적용
-  - 저장 시 `ensureLearningSetForToday` callable로 **오늘(KST) 세트가 없으면 즉시 생성**
-- 홈/학습 화면에서 callable 파라미터 하드코딩 제거
-  - `users/{uid}` 프로필의 `targetLanguage` / `level`을 읽어 전달
-  - 홈은 유저 문서 변경을 구독해 언어 변경이 즉시 반영되도록 갱신
-
-### 2) 완료 기준 체크
-
-- [x] `functions`: `npm run build` 통과
-- [x] `mobile`: `flutter analyze` 통과
-- [ ] `ESP` 선택 후 Firestore에 `{오늘KST}_ESP_beginner` 세트 생성 확인(실기기/에뮬)
-- [ ] 언어 변경 후 단어/문장 화면 `debugSource = daily_set` 확인
-
-### 3) 추가/변경한 코드 포인트
-
-- 파일:
-  - `functions/src/index.ts`
-  - `app/mobile/lib/screens/my_info_screen.dart`
-  - `app/mobile/lib/screens/home_screen.dart`
-  - `app/mobile/lib/screens/today_words_screen.dart`
-  - `app/mobile/lib/screens/today_sentences_screen.dart`
-  - `app/mobile/lib/screens/today_wrap_up_screen.dart`
-  - `app/mobile/lib/services/user_profile_sync.dart`
-  - `app/mobile/lib/services/user_prefs.dart` (신규)
-- 핵심 포인트:
-  - 앱/서버/DB의 언어 코드 표기를 **alpha-3로 통일**해 확장 시 꼬임 방지
-  - 스케줄은 최소 범위로(일단 JPN만) → 기타 언어는 **사용자 선택 시 즉시 생성**으로 UX/비용 균형
-
-### 4) 이슈/막힌 점
-
-- 증상: Flutter 라디오 위젯 API 변경(deprecated)으로 분석 경고/오류 발생
-- 해결: 간단한 리스트 선택 UI로 대체하고, async gap에서 `context.mounted` 체크 추가
-
-### 5) 다음 액션 (내일 바로 할 것)
-
-1. `ESP` 선택 플로우에서 세트 생성/로딩/커서 증가까지 E2E로 확인
-2. (정책) “최근 로그인 유저 기반 생성 대상 확장”은 트래픽/비용 기준 정한 뒤 2차로 설계
-3. (보안) 운영 전 개발용 워밍업 callable 정리(allowlist 유지/삭제/대체 결정)
-
----
-
 ## [단계 n] 제목 (예: Flutter 환경 세팅)
 
 ### 1) 오늘 한 일
@@ -146,12 +37,122 @@
 1. 
 2. 
 3. 
+---
+
+## [단계 통합] Flutter · Firebase · 이메일 인증 · Firestore 사용자·일일 진도(시드)
+
+### 1) 오늘 한 일
+
+- Windows에 Flutter SDK 설치·PATH 정리 후 `flutter doctor` 통과, Android 에뮬레이터에서 앱 실행 확인.
+- GitHub `todays-language` 원격과 로컬 병합·푸시, 루트/`app/mobile` README 역할 정리.
+- Firebase 프로젝트(`todays-language-dev` 등) 연동: Firebase CLI 설치·로그인, `app/mobile`에서 `flutterfire configure`, `firebase_core` / Auth / Firestore / Functions 패키지, `main.dart`에서 `Firebase.initializeApp`.
+- Android Gradle 데몬 JVM 메모리 과다로 크래시(`gradle.properties`의 `-Xmx8G`, `MaxMetaspaceSize=4G`) → 상한 완화로 해결.
+- 이메일·비밀번호 회원가입·로그인 UI(`AuthGate`, `LoginScreen`, `HomeScreen`), 로그아웃은 AppBar `IconButton`으로 가시성 확보.
+- Firestore 프로덕션 모드 생성, `users/{uid}` 최소 필드 동기화(`ensureUserProfileDocument`), 보안 규칙으로 본인 문서만 읽기·쓰기.
+- KST 기준 `yyyy-MM-dd` 날짜 키로 `users/{uid}/daily_progress/{dateKst}` 문서 **시드**(최초 생성 시 기본 필드 채움) 및 재방문 시 `updatedAt`만 갱신, 홈 화면에 오늘 진도 요약 표시.
+- 용어 정리: **시드(seed)** = 해당 날짜 문서가 없을 때 한 번 넣는 **초기 기본값 묶음**; 이미 있으면 목표·완료 수치는 덮어쓰지 않음.
+
+### 2) 완료 기준 체크
+
+- [x] 로컬 실행/동작 확인 (에뮬레이터, 로그인·Firestore 쓰기·홈 진도 표시)
+- [x] 핵심 설정값 문서화 (README, `docs/IMPLEMENTATION_GUIDE.md`, `FIRESTORE_MIN_SCHEMA.md` 등)
+- [x] 다음 단계 선행조건 충족 (인증된 사용자 + Firestore 규칙 + Callable 붙일 준비는 코드 레벨에서 가능)
+
+### 3) 추가/변경한 코드 포인트
+
+- 파일:
+  - `app/mobile/lib/main.dart` — `AuthGate` 홈, Firebase 초기화.
+  - `app/mobile/lib/auth_gate.dart` — `authStateChanges()` 분기.
+  - `app/mobile/lib/screens/login_screen.dart`, `home_screen.dart` — 인증·진도·UI.
+  - `app/mobile/lib/services/user_profile_sync.dart` — `users/{uid}` merge upsert.
+  - `app/mobile/lib/utils/kst_date.dart` — KST 달력 날짜 `yyyy-MM-dd`.
+  - `app/mobile/lib/services/daily_progress_sync.dart` — `daily_progress` 시드·`DailyProgressView`.
+  - `app/mobile/android/gradle.properties` — JVM 힙/메타스페이스 완화.
+  - `README.md`, `app/mobile/README.md` — 프로젝트 진행 상태 반영(작성 시점 기준).
+- 핵심 포인트:
+  - **AuthGate:** 로그인 여부에 따라 화면 전환, 별도 라우터 없이 MVP에 적합.
+  - **Firestore merge:** `users`는 `createdAt`은 최초에만, `lastLoginAt`은 매번 갱신.
+  - **daily_progress 문서 ID = KST 날짜:** 일일 리셋 정책(Asia/Seoul)과 정합.
+  - **시드:** 문서 미존재 시에만 목표·0 완료 등으로 생성; 존재 시 `updatedAt`만 merge.
+- 나중에 바꿀 임시값(TODO):
+  - `wordGoal` / `sentenceGoal` / `quizGoal` 하드코딩(50/10/20) → 원격 설정 또는 Firestore/Functions로 이전 가능.
+- 보안/비용/성능:
+  - 프로덕션 규칙 필수; `users`와 `users/{uid}/daily_progress/{docId}` 둘 다 본인 `uid`만 허용하도록 중첩 `match` 추가.
+  - 홈 진입마다 `daily_progress`에 `updatedAt` write — 트래픽 늘면 배치/쓰기 빈도 조정 검토.
+
+### 4) 이슈/막힌 점
+
+| 구분 | 내용 |
+|------|------|
+| **증상** | `flutterfire` 명령 인식 실패 |
+| **원인** | Pub 전역 실행 경로(`Pub\Cache\bin`) 미등록 |
+| **해결** | PATH 추가 또는 `dart pub global run flutterfire_cli:flutterfire configure` |
+
+| 구분 | 내용 |
+|------|------|
+| **증상** | `flutterfire configure` 시 Firebase CLI 없음 |
+| **원인** | FlutterFire가 `firebase` CLI에 의존 |
+| **해결** | `npm i -g firebase-tools`, `firebase login` |
+
+| 구분 | 내용 |
+|------|------|
+| **증상** | Gradle daemon disappeared / JVM crash |
+| **원인** | `org.gradle.jvmargs` 과다(`-Xmx8G`, `MaxMetaspaceSize=4G`)로 네이티브 mmap 실패 |
+| **해결** | `-Xmx2048m`, `MaxMetaspaceSize=512m` 등으로 완화 |
+
+| 구분 | 내용 |
+|------|------|
+| **증상** | 로그아웃 글자가 AppBar와 색이 겹쳐 안 보임 |
+| **원인** | `TextButton`에 `onPrimary` 등 잘못된 색 대비 |
+| **해결** | `IconButton` + 툴팁으로 전환 |
+
+| 구분 | 내용 |
+|------|------|
+| **증상** | `daily_progress` 쓰기 permission-denied |
+| **원인** | 프로덕션 규칙에 서브컬렉션 경로 미추가 |
+| **해결** | `match /users/{userId}/daily_progress/{docId}` 허용 규칙 추가 후 게시 |
+
+### 5) 다음 액션 (내일 바로 할 것)
+
+1. Cloud Functions `generateWord` 배포(`firebase deploy --only functions`) — Blaze 요금제·콘솔에서 리전 확인.
+2. 앱에서 Callable 호출 성공 여부 확인(로그인 필수·리전 `asia-northeast3` 일치).
+3. (선택) 실제 AI API는 Functions 환경 변수만 사용해 연동; App Check·호출 제한 설계 초안.
+
+---
+
+## (참고) 단계별 Notion 메모 — 이번 범위에서 채운 항목
+
+### Flutter 환경
+
+- Flutter stable(대화 시점 예: 3.41.x), Android SDK·에뮬레이터, `flutter doctor` 이슈 없음(해결 후).
+- 에뮬레이터 예: `sdk gphone64 x86 64`, Android 14(API 34).
+
+### Firebase 생성/연동
+
+- 프로젝트 ID: `todays-language-dev`(로컬 `.firebaserc`/콘솔과 일치 확인).
+- Android 패키지명: `com.todayslanguage.mobile` (`android/app/build.gradle.kts`의 `applicationId`).
+- `flutterfire configure` 성공, `lib/firebase_options.dart` 존재.
+
+### Authentication
+
+- 이메일/비밀번호 사용 설정 및 앱에서 가입·로그인·로그아웃 검증 완료.
+- Google / Apple: 미구현(로드맵상 다음).
+
+### Firestore 스키마
+
+- `users/{uid}` + `users/{uid}/daily_progress/{yyyy-MM-dd}`.
+- 시드 필드: `dateKst`, 목표·완료 카운트, `progressPercent`, `updatedAt` 등(`docs/FIRESTORE_MIN_SCHEMA.md` 참고).
+- 보안 규칙: 본인 `uid` 경로만 read/write(사용자 문서 + `daily_progress` 중첩).
+
+### Cloud Functions AI
+
+- **이번 기록 범위에서는 미진행.** 내일: 함수명·region·입출력 스펙 Notion에 추가 예정.
 
 ---
 
 ## 최근 기록 (예시) — 홈 UI 개편 + 디버그 테스트 로그인 추가
 
-## [단계 n] 홈 UI 개편 + 디버그 테스트 로그인 추가
+## [단계 5] 홈 UI 개편 + 디버그 테스트 로그인 추가
 
 ### 1) 오늘 한 일
 
@@ -205,10 +206,11 @@
 2. “완료 처리” 액션을 붙여 `daily_progress`를 증가시키고 진행률 계산/저장
 3. 진행률 색상 구간/표시 규칙을 Notion 최신 기획값으로 최종 확정
 
+---
 
 ## 최근 기록 — 퀴즈 정답만 +1 · 디버그 진행률 초기화 버튼
 
-## [단계 n] 퀴즈 정답일 때만 진행률 +1 + 디버그 진행률 초기화
+## [단계 6] 퀴즈 정답일 때만 진행률 +1 + 디버그 진행률 초기화
 
 ### 1) 오늘 한 일
 
@@ -253,14 +255,11 @@
 2. (선택) 초기화 버튼에 확인 다이얼로그 추가 후, MVP 확정 시 디버그 UI 제거
 3. Notion 기획과 맞춰 다음 화면/기능 우선순위 진행
 
-
-
-
-
+---
 
 ## 최근 기록 — AI 퀴즈 캐시/공통 출제 전환 + 오늘의 마무리 추가 (진행 중)
 
-## [단계 n] AI 퀴즈 비용/속도 최적화 작업 (공통 세트 + 복습 혼합)
+## [단계 7] AI 퀴즈 비용/속도 최적화 작업 (공통 세트 + 복습 혼합)
 
 ### 1) 오늘 한 일
 
@@ -314,9 +313,11 @@
 2. `users/__global__` 및 `daily_quiz_sets/{todayKst}` 강제 생성용 디버그 callable로 경로 자체 검증
 3. 글로벌 세트 저장 확인 후, 자정 기준 세트 교체/정리 동작 테스트
 
+---
+
 ## 최근 기록 — 인증 진입 플로우 개편 + 내 정보/하단 탭 + 마무리 모의고사 전환
 
-## [단계 n] 로그인 구조 재정비 및 마무리 학습 흐름 고도화
+## [단계 8] 로그인 구조 재정비 및 마무리 학습 흐름 고도화
 
 ### 1) 오늘 한 일
 
@@ -391,57 +392,111 @@
 
 ---
 
-## 최근 기록 — 오늘의 단어/문장 Callable OpenAI 연동
+## [단계 9] 일일 단어/문장 문제 세트 사전 생성(23:55) + 앱은 읽기만
 
 ### 1) 오늘 한 일
 
-- Cloud Functions `generateWord`, `generateSentence`에 OpenAI Responses API 연동 (`OPENAI_API_KEY` 시크릿, `generateQuiz`와 동일 패턴)
-- 응답 JSON 스키마 검증(`word`/`meaningKo`/`example?`, `sentence`/`meaningKo`) 후 반환; 실패·타임아웃·429 등은 로그 후 기존 고정 폴백 응답으로 안전 처리
-- 일본어 초급은 프롬프트에서 히라가나 위주 지침 유지(기존 제품 방향과 정합)
+- Cloud Functions에 **일일 단어 30개 / 문장 10개 문제 세트**를 Firestore에 저장하는 구조를 추가
+  - 저장 위치(글로벌 공유 풀): `users/global_learning_set_owner/daily_word_sets/{yyyy-MM-dd}_{lang}_{level}`
+  - 저장 위치(글로벌 공유 풀): `users/global_learning_set_owner/daily_sentence_sets/{yyyy-MM-dd}_{lang}_{level}`
+  - 사용자별 소비 커서: `users/{uid}/daily_word_cursor/{yyyy-MM-dd}_{lang}_{level}`, `users/{uid}/daily_sentence_cursor/{yyyy-MM-dd}_{lang}_{level}`
+- **스케줄러**로 세트를 미리 생성하도록 변경
+  - KST **23:55**에 실행되어 **내일자(yyyy-MM-dd)** 세트를 사전 생성 → 자정 이후 이용 시 “세트 없음” 오류 가능성 최소화
+- 앱의 `generateWord`/`generateSentence`는 **AI 생성 없이 Firestore 세트에서만 읽기**(없으면 fallback)
+- 개발 단계 편의 기능 추가
+  - 디버그 홈 진입 시 `ensureTodayLearningSets(dev: true)`를 백그라운드로 호출해 **당일 세트가 없으면 즉시 생성**
+- (부가) 홈 카드 그리드에서 발생하던 `RenderFlex overflow` UI 문제를 수정
 
 ### 2) 완료 기준 체크
 
 - [x] `functions`: `npm run build` 통과
-- [ ] 배포 후 실기기/에뮬에서 단어·문장 화면에서 매 요청 다양한 응답 확인(폴백이 자주 뜨면 로그/OpenAI 쿼터 확인)
+- [x] `mobile`: `flutter analyze` 통과
+- [x] Firestore에 `users/global_learning_set_owner` 및 하위 세트 문서 생성 확인
+- [x] 앱에서 `debugSource = daily_set` 표시 확인
+- [x] 사용자별 커서 문서 생성/증가 확인
+- [ ] 23:55 스케줄이 실제로 매일 실행되어 “내일자” 세트가 자동 생성되는지 운영 환경에서 추가 확인(Blaze/스케줄러 전제)
 
 ### 3) 추가/변경한 코드 포인트
 
-- 파일: `functions/src/index.ts`
-- 핵심: 앱은 변경 없음(callable 이름·응답 필드 동일). 배포 시 `generateWord`/`generateSentence`에도 시크릿 바인딩 필요.
+- 파일:
+  - `functions/src/index.ts`
+  - `functions/src/prompts.ts`
+  - `app/mobile/lib/screens/home_screen.dart`
+  - `app/mobile/lib/screens/today_wrap_up_screen.dart`
+  - `app/mobile/lib/services/daily_progress_sync.dart`
+  - `app/mobile/lib/ui/home_feature_card.dart`
+  - `app/mobile/lib/screens/home_screen.dart`
+- 핵심 포인트:
+  - **자정 직후 생성이 아니라 23:55 사전 생성**으로 UX 안정화(00:00부터 바로 조회 가능)
+  - 앱은 “생성” 책임을 갖지 않고 **세트 조회/커서 증가**만 수행
+  - 개발 단계에서만 워밍업 callable을 호출하도록 `kDebugMode`로 제한(운영에서 비용 폭증 방지)
+  - 글로벌 owner 문서를 명시적으로 생성해 콘솔 탐색/디버깅 용이성 확보
 
-### 4) 다음 액션
+### 4) 이슈/막힌 점
 
-1. 30단어/10문장 달성 후 `재학습 시작` UX 및 진행률 정책
-2. (선택) 당일 중복 단어/문장 완화를 위해 클라이언트가 이미 본 항목 힌트를 서버에 전달하는 방안 검토
+- 증상: 디버그 홈 진입 시 세트가 자동 생성되지 않는 것처럼 보임
+- 원인 추정:
+  - callable 미배포/타임아웃/예외를 앱에서 `catch`로 삼켜서 겉으로 드러나지 않음
+  - Firestore 콘솔에서 “부모 문서가 없어서” 경로가 없는 것처럼 보이는 케이스
+- 해결/우회:
+  - `ensureTodayLearningSets` 배포 및 타임아웃/메모리 상향, 서버 로그 추가
+  - `users/global_learning_set_owner` 부모 문서 명시 생성 로직 추가
 
-## 단계별 Notion에 꼭 남길 내용 가이드
+### 5) 다음 액션 (내일 바로 할 것)
 
-### 1. Flutter 환경
+1. 23:55 스케줄이 실제로 내일자 세트를 생성하는지(콘솔/로그) 확인
+2. (정책) `PREGEN_LANGUAGE_LEVEL_PAIRS`를 “고정 1개”로 갈지, “사용량 상위 언어/레벨”로 확장할지 결정
+3. (보안) 개발용 `ensureTodayLearningSets`를 운영 전에 제거하거나 UID allowlist/App Check 등으로 추가 보호
 
-- Flutter/Android Studio/SDK 버전
-- `flutter doctor` 경고와 해결 여부
-- 에뮬레이터 기종/OS 버전
+---
 
-### 2. Firebase 생성/연동
+## [단계 10] 언어 코드 표준화(ISO-3166-1 alpha-3) + 언어 선택 시 즉시 세트 생성
 
-- 프로젝트 ID
-- 등록한 앱 ID(패키지명/번들 ID)
-- `flutterfire configure` 성공 여부
+### 1) 오늘 한 일
 
-### 3. Authentication
+- Firestore/앱/Functions에서 언어 코드 표기를 `ja/es` 대신 **ISO-3166-1 alpha-3**로 전환
+  - 예: `JPN`, `ESP`
+  - 레거시 클라이언트 호환을 위해 Functions에서 `ja/es` 입력도 수용 후 내부 매핑
+- 스케줄 사전 생성은 당분간 **`JPN/beginner`만** 생성하도록 단순화
+- `내 정보`에서 언어 선택 UI 추가
+  - 선택 후 **저장 버튼을 눌러야** Firestore에 적용
+  - 저장 시 `ensureLearningSetForToday` callable로 **오늘(KST) 세트가 없으면 즉시 생성**
+- 홈/학습 화면에서 callable 파라미터 하드코딩 제거
+  - `users/{uid}` 프로필의 `targetLanguage` / `level`을 읽어 전달
+  - 홈은 유저 문서 변경을 구독해 언어 변경이 즉시 반영되도록 갱신
 
-- 활성화 provider 목록(Email, Google, Apple)
-- 각 provider별 테스트 계정/성공 스크린샷
-- 미완료 항목(예: Apple은 Mac에서 진행 예정)
+### 2) 완료 기준 체크
 
-### 4. Firestore 스키마
+- [x] `functions`: `npm run build` 통과
+- [x] `mobile`: `flutter analyze` 통과
+- [ ] `ESP` 선택 후 Firestore에 `{오늘KST}_ESP_beginner` 세트 생성 확인(실기기/에뮬)
+- [ ] 언어 변경 후 단어/문장 화면 `debugSource = daily_set` 확인
 
-- 컬렉션 구조 확정본
-- 문서 예시 JSON
-- 보안 규칙 초안 링크
+### 3) 추가/변경한 코드 포인트
 
-### 5. Cloud Functions AI
+- 파일:
+  - `functions/src/index.ts`
+  - `app/mobile/lib/screens/my_info_screen.dart`
+  - `app/mobile/lib/screens/home_screen.dart`
+  - `app/mobile/lib/screens/today_words_screen.dart`
+  - `app/mobile/lib/screens/today_sentences_screen.dart`
+  - `app/mobile/lib/screens/today_wrap_up_screen.dart`
+  - `app/mobile/lib/services/user_profile_sync.dart`
+  - `app/mobile/lib/services/user_prefs.dart` (신규)
+- 핵심 포인트:
+  - 앱/서버/DB의 언어 코드 표기를 **alpha-3로 통일**해 확장 시 꼬임 방지
+  - 스케줄은 최소 범위로(일단 JPN만) → 기타 언어는 **사용자 선택 시 즉시 생성**으로 UX/비용 균형
 
-- 함수 이름/region
-- 입력/출력 JSON 스펙
-- 에러 코드 정책(unauthenticated, invalid-argument 등)
+### 4) 이슈/막힌 점
+
+- 증상: Flutter 라디오 위젯 API 변경(deprecated)으로 분석 경고/오류 발생
+- 해결: 간단한 리스트 선택 UI로 대체하고, async gap에서 `context.mounted` 체크 추가
+
+### 5) 다음 액션 (내일 바로 할 것)
+
+1. `ESP` 선택 플로우에서 세트 생성/로딩/커서 증가까지 E2E로 확인
+2. (정책) “최근 로그인 유저 기반 생성 대상 확장”은 트래픽/비용 기준 정한 뒤 2차로 설계
+3. (보안) 운영 전 개발용 워밍업 callable 정리(allowlist 유지/삭제/대체 결정)
+
+---
+
