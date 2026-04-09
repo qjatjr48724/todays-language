@@ -1,10 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../services/daily_progress_sync.dart';
 import '../services/user_profile_sync.dart';
+import '../services/user_prefs.dart';
 import '../ui/home_feature_card.dart';
 import '../ui/section_card.dart';
 import 'my_info_screen.dart';
@@ -23,6 +25,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String? _profileError;
   DailyProgressView? _todayProgress;
+  UserPrefs _prefs = UserPrefs.fallback();
   bool _loadingProgress = true;
   bool _resettingProgress = false;
 
@@ -40,12 +43,32 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _bootstrap(User user) async {
     try {
       await ensureUserProfileDocument(user);
+      final prefs = await fetchUserPrefs(user);
       final progress = await ensureTodayDailyProgress(user);
       if (!mounted) return;
       setState(() {
+        _prefs = prefs;
         _todayProgress = progress;
         _profileError = null;
         _loadingProgress = false;
+      });
+
+      // 유저 프로필(targetLanguage/level)이 변경되면 홈에서 즉시 반영
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .snapshots()
+          .listen((snap) {
+        final data = snap.data() ?? <String, dynamic>{};
+        final tl = (data['targetLanguage'] as String?)?.trim();
+        final lv = (data['level'] as String?)?.trim();
+        if (!mounted) return;
+        setState(() {
+          _prefs = UserPrefs(
+            targetLanguage: (tl == null || tl.isEmpty) ? _prefs.targetLanguage : tl,
+            level: (lv == null || lv.isEmpty) ? _prefs.level : lv,
+          );
+        });
       });
 
       // 개발 단계: 홈 진입을 막지 않고 백그라운드로 세트 생성 워밍업을 시도합니다.
@@ -58,8 +81,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ).httpsCallable('ensureTodayLearningSets');
             await callable.call<Map<String, dynamic>>({
               'dev': true,
-              'targetLanguage': 'ja',
-              'level': 'beginner',
+              'targetLanguage': _prefs.targetLanguage,
+              'level': _prefs.level,
             });
           } catch (_) {
             // 개발 워밍업 실패는 앱 흐름을 막지 않음
@@ -239,7 +262,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     Navigator.of(context)
                         .push(
                       MaterialPageRoute(
-                        builder: (_) => const TodayWordsScreen(),
+                        builder: (_) => TodayWordsScreen(
+                          targetLanguage: _prefs.targetLanguage,
+                          level: _prefs.level,
+                        ),
                       ),
                     )
                         .then((_) => _refreshTodayProgress());
@@ -256,7 +282,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     Navigator.of(context)
                         .push(
                       MaterialPageRoute(
-                        builder: (_) => const TodaySentencesScreen(),
+                        builder: (_) => TodaySentencesScreen(
+                          targetLanguage: _prefs.targetLanguage,
+                          level: _prefs.level,
+                        ),
                       ),
                     )
                         .then((_) => _refreshTodayProgress());
@@ -274,7 +303,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           Navigator.of(context)
                               .push(
                             MaterialPageRoute(
-                              builder: (_) => const TodayWrapUpScreen(),
+                              builder: (_) => TodayWrapUpScreen(
+                                targetLanguage: _prefs.targetLanguage,
+                                level: _prefs.level,
+                              ),
                             ),
                           )
                               .then((_) => _refreshTodayProgress());
