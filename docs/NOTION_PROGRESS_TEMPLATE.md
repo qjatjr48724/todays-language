@@ -423,12 +423,12 @@ unauthenticated: 로그인 상태 확인
   - `app/mobile/lib/screens/today_wrap_up_screen.dart`
   - `app/mobile/lib/services/daily_progress_sync.dart`
   - `functions/src/index.ts`
-  - `Base-Rule.mdc`
+  - `docs/Base-Rule.mdc`
 - 핵심 포인트:
   - 인증 진입 구조를 "시작 화면 → 로그인 허브 → 이메일 로그인/회원가입 분리"로 재구성
   - 공통 문제세트 + 사용자별 커서 구조 유지, 중복 문제 방지 로직 강화
   - 진행률 초기화 시 개인 커서 동시 초기화
-  - 사용자 요청 누락 방지/파일 반영 우선 규칙을 `Base-Rule.mdc`에 명시
+  - 사용자 요청 누락 방지/파일 반영 우선 규칙을 `docs/Base-Rule.mdc`에 명시
 
 ### 4) 이슈/막힌 점
 

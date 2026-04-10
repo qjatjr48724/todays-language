@@ -1,6 +1,17 @@
 # Today's Language — 프로젝트 컨텍스트 (전체 정리)
 
-> 새 에이전트/새 대화에서 이 파일(`docs/PROJECT_CONTEXT.md`) 또는 루트 `AGENTS.md`를 참조하면 된다.
+> 새 에이전트/새 대화에서 이 파일(`docs/PROJECT_CONTEXT.md`) 또는 `docs/AGENTS.md`를 참조하면 된다.
+
+---
+
+## 0. 필수 문서(작업 시작 루트)
+
+- **개발 규칙(최우선)**: `docs/Base-Rule.mdc` (동일 내용: `.cursor/rules/base-rule.mdc`)
+- **실행/셋업(Windows 우선)**: `docs/IMPLEMENTATION_GUIDE.md`
+- **작업 유형별 참고/체크리스트(인덱스)**: `docs/WORKFLOW_REFERENCE.md`
+- **Firestore 최소 스키마(MVP)**: `docs/FIRESTORE_MIN_SCHEMA.md`
+- **Cloud Functions AI 호출 프로토타입**: `docs/CLOUD_FUNCTIONS_PROTOTYPE.md`
+- **Notion 기록 템플릿**: `docs/NOTION_PROGRESS_TEMPLATE.md`
 
 ---
 
@@ -50,6 +61,7 @@
 
 - **인터넷 연결 필수** — 오프라인 동작 범위는 초기에 정하지 않음.
 - **일일 리셋:** **한국 자정**, 타임존 **Asia/Seoul (KST)** 명시.
+- **보안 원칙:** 앱(Flutter)에 API 키/비밀값을 두지 않으며, 외부 AI 호출은 Cloud Functions(서버)에서만 수행.
 
 ---
 
@@ -120,7 +132,8 @@
 ## 11. 대화 이어가기
 
 - Cursor에서 **폴더를 바꾸거나 새 채팅**을 열면 이전 대화가 자동 이어지지 않을 수 있음.
-- **이 파일과 `AGENTS.md`를 커밋**해 두고, 새 대화에서 `@docs/PROJECT_CONTEXT.md` 로 참조하면 맥락 유지에 유리함.
+- **이 파일과 `docs/AGENTS.md`를 커밋**해 두고, 새 대화에서 `@docs/PROJECT_CONTEXT.md` 로 참조하면 맥락 유지에 유리함.
+- 새 작업을 시작할 때는 `docs/WORKFLOW_REFERENCE.md`의 체크리스트를 따라가면 누락(KST/보안/스키마/인증)을 줄일 수 있음.
 
 ---
 
@@ -135,4 +148,4 @@
 
 ---
 
-*마지막 정리일: 대화 기준 2026-03-21. Notion 수치·문구는 사용자가 수정할 수 있으니 상세는 항상 Notion 최신본을 본다.*
+*마지막 정리일: 2026-04-10. Notion 수치·문구는 사용자가 수정할 수 있으니 상세는 항상 Notion 최신본을 본다.*

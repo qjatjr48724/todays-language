@@ -2,6 +2,15 @@
 
 이 파일은 새 채팅·새 에이전트가 맥락을 빠르게 잡도록 정리한 프로젝트 메모다. 상세는 `docs/PROJECT_CONTEXT.md`를 본다.
 
+## 작업 시작 가이드(필수 문서)
+
+- **개발 규칙(최우선)**: `docs/Base-Rule.mdc` (동일 내용: `.cursor/rules/base-rule.mdc`)
+- **프로젝트 컨텍스트(기획/정책)**: `docs/PROJECT_CONTEXT.md`
+- **실행/셋업 가이드(Windows 우선)**: `docs/IMPLEMENTATION_GUIDE.md`
+- **작업 유형별 참고/체크리스트(인덱스)**: `docs/WORKFLOW_REFERENCE.md`
+- **Firestore 최소 스키마(MVP)**: `docs/FIRESTORE_MIN_SCHEMA.md`
+- **Functions AI 호출 프로토타입**: `docs/CLOUD_FUNCTIONS_PROTOTYPE.md`
+
 ## 정체성
 
 - **표기(브랜드·스토어·README):** Today's Language
@@ -29,6 +38,7 @@
 
 - **온라인 필수** (오프라인 범위는 초기에 두지 않음).
 - **일일 리셋:** 한국 자정 기준 **Asia/Seoul (KST)**.
+- **보안:** 앱(Flutter)에 API 키/비밀값 하드코딩 금지, 외부 AI 호출은 Functions에서만 수행
 
 ## 다음 우선순위 (구현 순)
 
@@ -40,3 +50,12 @@
 ## 외부 기획 문서
 
 - Notion(공개): 사용자가 기획을 지속 갱신함. 링크는 `docs/PROJECT_CONTEXT.md`에 둔다.
+
+---
+
+## Git/테스트 운용(요약)
+
+- **Push 전 최소 검증**: 앱은 `flutter analyze`, Functions는 `npm run build` 통과
+- **브랜치**: `type/topic` 권장(예: `feature/...`, `fix/...`, `functions/...`, `docs/...`) — 세부 규칙은 `docs/Base-Rule.mdc`의 `7) 테스트 규칙`, `8) Git 접근 규칙` 참고
+- **규칙 문서 위치**: `docs/Base-Rule.mdc`
+

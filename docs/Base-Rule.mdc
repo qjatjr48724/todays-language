@@ -1,9 +1,4 @@
 ---
-description: 
-alwaysApply: true
----
-
----
 description: Today's Language 기본 개발 규칙 (Flutter + Firebase + Functions)
 alwaysApply: true
 ---
@@ -81,10 +76,9 @@ alwaysApply: true
   - AI 응답은 스키마 검증 후 사용되는지 확인하고, 실패 시 안전한 fallback이 동작하는지 확인한다.
   - Functions region이 기본 `asia-northeast3`로 유지되는지 확인한다.
 
-
 ## 8) Git 접근 규칙
 - Push는 반드시 `7) 테스트 규칙`을 참고하여 검증과 테스트를 진행하고, 문제없이 통과한 이후에 진행한다. 
-- 사용자가 커밋을 요청하면, 현재 작업 상황을 토대로 파일별로 커밋메시지를 정리하여 커밋한다.
+- 사용자가 커밋을 요청하면, 현재 작업 상황을 토대로 각 브랜치에 커밋메시지를 정리하여 커밋한다.
 
 ### 브랜치 운용 원칙
 - `main`은 항상 **빌드/배포 가능한 상태**를 유지한다.
@@ -115,3 +109,13 @@ alwaysApply: true
 - `functions/callable-auth-guard`
 - `docs/workflow-reference`
 - `chore/update-flutter-deps`
+
+## 9) 작업 시작/종료 최소 체크(워크플로우 요약)
+
+- 작업을 시작할 때는 “작업 유형”을 먼저 분류하고(Flutter / Firestore / Functions / 문서), 아래 영향 범위를 체크한다.
+  - **KST 날짜 키/리셋** 영향 여부
+  - **Auth/보안/secret** 영향 여부
+  - **스키마 호환성** 영향 여부 (`users/{uid}/daily_progress/{yyyy-MM-dd}`)
+- 구현 중에는 변경 단위를 작게 유지하고, 앱에 외부 AI 호출/비밀값이 들어가지 않게 유지한다.
+- 종료(머지/푸시) 전에는 `7) 테스트 규칙`의 품질 게이트를 통과하고, KST/진도/스키마/인증 변경이면 핵심 플로우를 1회 이상 수동 검증한다.
+
