@@ -8,3 +8,15 @@ String todayKstYyyyMmDd() {
   final d = kstInstant.day.toString().padLeft(2, '0');
   return '$y-$m-$d';
 }
+
+DateTime kstNowDate() {
+  final kstInstant = DateTime.now().toUtc().add(const Duration(hours: 9));
+  return DateTime(kstInstant.year, kstInstant.month, kstInstant.day);
+}
+
+String formatYyyyMmDd(DateTime dt) {
+  final y = dt.year.toString().padLeft(4, '0');
+  final m = dt.month.toString().padLeft(2, '0');
+  final d = dt.day.toString().padLeft(2, '0');
+  return '$y-$m-$d';
+}
