@@ -3,6 +3,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 import '../services/daily_progress_sync.dart';
 import '../services/user_profile_sync.dart';
@@ -28,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   UserPrefs _prefs = UserPrefs.fallback();
   bool _loadingProgress = true;
   bool _resettingProgress = false;
+  StreamSubscription? _profileSub;
 
   @override
   void initState() {
@@ -54,7 +56,8 @@ class _HomeScreenState extends State<HomeScreen> {
       });
 
       // 유저 프로필(targetLanguage/level)이 변경되면 홈에서 즉시 반영
-      FirebaseFirestore.instance
+      _profileSub?.cancel();
+      _profileSub = FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
           .snapshots()
@@ -69,6 +72,8 @@ class _HomeScreenState extends State<HomeScreen> {
             level: (lv == null || lv.isEmpty) ? _prefs.level : lv,
           );
         });
+      }, onError: (_) {
+        // Firestore 규칙/네트워크 이슈 등으로 스트림이 실패해도 홈 흐름을 깨지지 않게 함
       });
 
       // 개발 단계: 홈 진입을 막지 않고 백그라운드로 세트 생성 워밍업을 시도합니다.
@@ -96,6 +101,12 @@ class _HomeScreenState extends State<HomeScreen> {
         _loadingProgress = false;
       });
     }
+  }
+
+  @override
+  void dispose() {
+    _profileSub?.cancel();
+    super.dispose();
   }
 
   Future<void> _refreshTodayProgress() async {
