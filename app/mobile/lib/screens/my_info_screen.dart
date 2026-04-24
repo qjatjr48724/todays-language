@@ -3,6 +3,8 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../auth_gate.dart';
+
 class MyInfoScreen extends StatelessWidget {
   const MyInfoScreen({super.key, this.embedded = false});
 
@@ -35,6 +37,15 @@ class MyInfoScreen extends StatelessWidget {
     final content = StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
       stream: docStream,
       builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(
+            child: Text(
+              '내 정보 불러오기 실패: ${snapshot.error}',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: scheme.error),
+            ),
+          );
+        }
         final data = snapshot.data?.data() ?? <String, dynamic>{};
         final displayName = (data['displayName'] as String?)?.trim();
         final provider = (data['provider'] as String?) ?? 'unknown';
@@ -137,7 +148,51 @@ class MyInfoScreen extends StatelessWidget {
                         ),
                         icon: const Icon(Icons.logout, size: 18),
                         label: const Text('로그아웃'),
-                        onPressed: () => FirebaseAuth.instance.signOut(),
+                        onPressed: () async {
+                          // 로그아웃 시 StreamBuilder가 permission error를 뿜기 전에
+                          // 2초 로딩을 보여주고 로그인/회원가입(AuthGate)로 이동합니다.
+                          showDialog<void>(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (context) {
+                              final scheme = Theme.of(context).colorScheme;
+                              return PopScope(
+                                canPop: false,
+                                child: AlertDialog(
+                                  content: Row(
+                                    children: [
+                                      const SizedBox(
+                                        width: 18,
+                                        height: 18,
+                                        child: CircularProgressIndicator(strokeWidth: 2),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Text(
+                                          '로그아웃 중…',
+                                          style: TextStyle(color: scheme.onSurface),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+
+                          await FirebaseAuth.instance.signOut();
+                          await Future<void>.delayed(const Duration(seconds: 2));
+                          if (!context.mounted) return;
+
+                          // 다이얼로그 닫기
+                          Navigator.of(context, rootNavigator: true).pop();
+
+                          // 내 정보(탭/스택) 상태를 끊고 AuthGate로 복귀
+                          Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                            MaterialPageRoute(builder: (_) => const AuthGate()),
+                            (route) => false,
+                          );
+                        },
                       ),
                       const SizedBox(width: 8),
                       OutlinedButton(
