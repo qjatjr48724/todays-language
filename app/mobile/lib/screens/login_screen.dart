@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:crypto/crypto.dart';
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
 import 'email_login_screen.dart';
 import '../services/user_profile_sync.dart';
+import 'main_nav_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -21,9 +23,29 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   bool _loading = false;
   String? _errorMessage;
+  StreamSubscription<User?>? _authSub;
 
   static const _testEmail = 'test@test.com';
   static const _testPassword = 'test1234';
+
+  @override
+  void initState() {
+    super.initState();
+    // AuthGate 바깥에서 LoginScreen이 열리는 경우에도, 로그인 성공 시 홈으로 전환되게 합니다.
+    _authSub = FirebaseAuth.instance.authStateChanges().listen((user) {
+      if (user == null) return;
+      if (!mounted) return;
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const MainNavScreen()),
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _authSub?.cancel();
+    super.dispose();
+  }
 
   String _randomNonce([int length = 32]) {
     const charset = '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';

@@ -8,7 +8,7 @@ Future<void> ensureUserProfileDocument(User user) async {
   final exists = snap.exists;
   final current = snap.data() ?? <String, dynamic>{};
 
-  String _normalizeAlpha3OrDefault(String? raw, {required String fallback}) {
+  String normalizeAlpha3OrDefault(String? raw, {required String fallback}) {
     final v = (raw ?? '').trim();
     if (v.isEmpty) return fallback;
     // alpha-2 → alpha-3 정규화 (레거시 데이터 정리)
@@ -24,11 +24,11 @@ Future<void> ensureUserProfileDocument(User user) async {
     }
   }
 
-  final nativeLanguage = _normalizeAlpha3OrDefault(
+  final nativeLanguage = normalizeAlpha3OrDefault(
     current['nativeLanguage'] as String?,
     fallback: 'KOR',
   );
-  final targetLanguage = _normalizeAlpha3OrDefault(
+  final targetLanguage = normalizeAlpha3OrDefault(
     current['targetLanguage'] as String?,
     fallback: 'JPN',
   );
