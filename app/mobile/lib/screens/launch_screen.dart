@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../auth_gate.dart';
-import 'main_nav_screen.dart';
 
 class LaunchScreen extends StatefulWidget {
   const LaunchScreen({super.key});
@@ -81,9 +80,9 @@ class _LaunchScreenState extends State<LaunchScreen> {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       if (!mounted) return;
-      Navigator.of(context).pushReplacement(
-        _fadeRoute(const MainNavScreen()),
-      );
+      // 로그인 상태라도 AuthGate를 거쳐서 들어가야,
+      // 이후 세션 변경(로그아웃/토큰 무효화)에도 일관되게 화면 전환이 됩니다.
+      Navigator.of(context).pushReplacement(_fadeRoute(const AuthGate()));
       return;
     }
 
