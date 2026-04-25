@@ -82,6 +82,40 @@ flutter run -d ios
 
 ---
 
+## 4-1) (선택) Mac에서 Android도 테스트하기 (Android Studio + Emulator)
+
+Mac에서도 Android 테스트가 필요하면(예: Google 로그인 Android 동작 확인), 아래를 추가로 설치합니다.
+
+### A) Android Studio 설치
+
+```bash
+brew install --cask android-studio
+open -a "Android Studio"
+```
+
+Android Studio 첫 실행 후:
+- **SDK Manager**에서 Android SDK 설치
+- **Android Emulator** 설치
+- (Apple Silicon) 시스템 이미지가 ARM64용으로 설치되는지 확인
+
+### B) 에뮬레이터 생성/실행
+
+- Android Studio → **Device Manager** → **Create device**
+- 생성 후 실행(Play Store 포함 이미지 권장)
+
+### C) Flutter에서 Android로 실행
+
+```bash
+cd app/mobile
+flutter doctor -v
+flutter devices
+flutter run -d <android-device-id>
+```
+
+> 팁: iOS/Android 모두를 자주 쓸 예정이면, `flutter run` 전에 에뮬레이터/시뮬레이터를 미리 켜두는 게 가장 빠릅니다.
+
+---
+
 ## 5) iOS CocoaPods 문제 발생 시(자주 쓰는 복구 절차)
 
 ```bash
@@ -150,4 +184,9 @@ firebase deploy --only functions
 - iOS에서 Apple/Google 로그인까지 테스트할 경우:
   - Xcode Signing/Capabilities 설정
   - Firebase iOS 설정(번들 ID, plist 등) 정합성 확인
+
+- Android도 Mac에서 테스트할 경우:
+  - Android Studio의 SDK/Emulator 설치 여부
+  - `flutter doctor -v`에서 Android toolchain 정상 여부
+  - (Google 로그인) Firebase 콘솔의 Android 앱 설정(패키지명/sha-1) 정합성 확인
 
