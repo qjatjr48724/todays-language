@@ -614,3 +614,81 @@ unauthenticated: 로그인 상태 확인
 
 ---
 
+## [단계 12] 스플래시/세션 안정화 + Firestore 권한 수정 + 진행률 캘린더/상세 바텀시트 개선
+
+### 1) 오늘 한 일
+
+- **앱 진입(스플래시) UX 구현**
+  - 설치 후 첫 실행: 로고 + “시작하려면 터치해주세요” → 터치 시 로그인/회원가입으로 이동
+  - 이후 실행: 로고 1초 유지 후 자동 전환(인터넷 연결 확인 + 로그인 상태에 따라 홈/로그인)
+  - 터치 시 레이아웃이 흔들리던 현상(로고가 위로 움직임) 수정: 하단 영역 높이 고정
+- **로그인 성공 후 화면 전환이 안 되던 문제 해결**
+  - `AuthGate`를 경유하도록 진입 경로 정리
+  - 로그인 화면에서 auth state 변화를 감지해 홈으로 전환되는 안전장치 추가
+- **로그아웃 UX/전환 문제 해결**
+  - 로그아웃 시 내 정보 StreamBuilder permission error가 노출되던 문제 개선
+  - “로그아웃 중…” 다이얼로그 표시 → 2초 대기 → 로그인/회원가입 화면(`AuthGate`)로 네비게이션 스택 리셋
+- **Firestore 권한(PERMISSION_DENIED) 해결**
+  - 로그인 직후 `users/{uid}` listen/read에서 권한 거부가 발생해 앱 흐름이 깨지던 문제 수정
+  - 본인 `users/{uid}` 및 하위 컬렉션은 본인만 read/write 가능하게 규칙 추가
+  - 글로벌 세트(`users/global_learning_set_owner/**`, `users/global_quiz_owner/**`)는 로그인한 사용자 read-only 허용
+- **진행률 페이지(1순위) 캘린더/스티커 구현**
+  - 월 단위 캘린더 그리드 + 월 이동
+  - 스티커 규칙: 0~39 빨강 네모 / 40~79 주황 세모 / 80~100 초록 동그라미
+  - 과거 날짜인데 `daily_progress` 문서가 없으면 “기록 없음”으로 회색 네모 표시(미래는 빈칸 유지)
+  - 요일 시작을 “일월화수목금토”로 변경
+  - `Bottom overflowed by ...` 오버플로우 해결(셀 비율/패딩/간격 조정)
+  - “오늘의 진행률” vs “캘린더” 섹션을 카드로 분리(시각적 구분)
+- **캘린더 날짜 탭 시 상세 바텀시트 추가(UX 확장)**
+  - 해당 날짜의 `daily_progress/{yyyy-MM-dd}`를 읽어 %/단어/문장/마무리(done/goal) 표시
+  - 기록이 없으면 0/30, 0/10, 0/25, 0%로 표시 + “해당 날짜의 학습 기록이 없습니다.” 문구
+  - 바텀시트 텍스트를 전체적으로 20% 축소(가독성 조정)
+- **세션 만료/오류 대비 전역 리다이렉트 추가**
+  - 앱 최상단에서 `authStateChanges()` 감시 → (첫 실행 이후) user가 null로 바뀌면 `AuthGate`로 스택 리셋
+
+### 2) 완료 기준 체크
+
+- [x] 로컬 실행/동작 확인 (스플래시 → 로그인 → 홈, 로그아웃 → 로그인 화면 복귀)
+- [x] Firestore permission-denied 재현 로그 제거 확인
+- [x] 진행률 캘린더/스티커 표시 및 월 이동 동작 확인
+- [x] 날짜 탭 바텀시트 정상 표시(기록 있음/없음 케이스)
+- [x] 정적 검증 통과 (`flutter analyze`)
+- [x] 테스트 통과 (`flutter test` — 템플릿 카운터 테스트를 스플래시 스모크 테스트로 교체)
+
+### 3) 추가/변경한 코드 포인트
+
+- 파일(Flutter):
+  - `app/mobile/lib/screens/launch_screen.dart` — 첫 실행 터치 시작 + 재실행 자동 전환(인터넷/로그인) + 레이아웃 흔들림 방지
+  - `app/mobile/lib/auth_gate.dart` — auth state 기반 라우팅(기존)
+  - `app/mobile/lib/auth_session_watcher.dart` — 전역 세션 워처(세션 풀림 시 AuthGate로 복귀)
+  - `app/mobile/lib/screens/login_screen.dart` — 로그인 성공 후 홈 전환 안전장치(기존 작업)
+  - `app/mobile/lib/screens/my_info_screen.dart` — 로그아웃 UX(2초 대기 후 AuthGate로 리셋, permission error 노출 방지)
+  - `app/mobile/lib/screens/progress_screen.dart` — 캘린더/스티커/상세 바텀시트/오버플로우 해결/섹션 카드 분리
+  - `app/mobile/lib/ui/section_card.dart` — 진행률 탭에서도 재사용
+  - `app/mobile/lib/utils/kst_date.dart` — 캘린더/조회용 날짜 유틸 보강
+  - `app/mobile/test/widget_test.dart` — 스플래시 렌더링 스모크 테스트로 교체
+- 파일(Firebase):
+  - `firestore.rules`, `firebase.json` — 규칙 파일 연결 및 권한 정책 반영
+
+### 4) 이슈/막힌 점
+
+- **증상:** 로그인은 되는데 홈으로 넘어가지 않음(“반응 없음”)
+  - **원인:** 스플래시/로그인 진입 경로가 `AuthGate`를 우회하고, 로그인 성공 시 홈 전환 코드가 없었음
+  - **해결:** AuthGate 경유 + 로그인 화면 auth state 감지 안전장치 추가
+
+- **증상:** 로그인 직후 Firestore `PERMISSION_DENIED`로 크래시/흐름 깨짐
+  - **원인:** `users/{uid}` 및 하위 컬렉션에 대한 프로덕션 규칙 미정의
+  - **해결:** 본인 경로 허용 + 글로벌 세트 read-only 규칙 추가 후 배포
+
+- **증상:** 진행률 캘린더에서 `Bottom overflowed by ...`
+  - **원인:** 셀 내부(숫자+스티커) 대비 셀 높이가 빡빡함
+  - **해결:** aspectRatio/spacing/padding 조정으로 여유 확보
+
+### 5) 다음 액션 (다음 작업 후보)
+
+1. 내 정보(1순위) 난이도(초/중/고) 선택 UI + `level` 저장/반영
+2. (명세 정합) “오늘의 마무리” 문구/목표/구성(30/10 기준) 불일치 정리
+3. (선택) 캘린더 상세 바텀시트에서 “그날 스티커/색상” 또는 “그날 상세 화면 이동” UX 확장
+
+---
+
