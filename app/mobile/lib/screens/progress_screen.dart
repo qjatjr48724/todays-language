@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../services/daily_progress_sync.dart';
+import '../ui/section_card.dart';
 import '../utils/kst_date.dart';
 
 class ProgressScreen extends StatefulWidget {
@@ -19,6 +20,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
   bool _calendarLoading = true;
   String? _calendarError;
   Map<String, int> _monthPercentByDate = <String, int>{};
+  bool _openingDetail = false;
 
   @override
   void initState() {
@@ -97,6 +99,195 @@ class _ProgressScreenState extends State<ProgressScreen> {
     return _monthPercentByDate[id];
   }
 
+  Future<DocumentSnapshot<Map<String, dynamic>>?> _fetchDailyProgressById(
+    String dateId,
+  ) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return null;
+    final ref = FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .collection('daily_progress')
+        .doc(dateId);
+    return ref.get();
+  }
+
+  Future<void> _openDayDetail(DateTime day) async {
+    if (_openingDetail) return;
+    setState(() => _openingDetail = true);
+    try {
+      final dateId = formatYyyyMmDd(day);
+      await showModalBottomSheet<void>(
+        context: context,
+        showDragHandle: true,
+        isScrollControlled: true,
+        builder: (context) {
+          final scheme = Theme.of(context).colorScheme;
+          return MediaQuery(
+            // 바텀시트 텍스트만 20% 축소(다른 화면 영향 없음)
+            data: MediaQuery.of(context).copyWith(
+              textScaler: const TextScaler.linear(0.8),
+            ),
+            child: SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+                child: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>?>(
+                  future: _fetchDailyProgressById(dateId),
+                  builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return SizedBox(
+                      height: 220,
+                      child: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const SizedBox(
+                              width: 22,
+                              height: 22,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              '상세 기록을 불러오는 중…',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(color: scheme.onSurfaceVariant),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+
+                  if (snapshot.hasError) {
+                    return SizedBox(
+                      height: 220,
+                      child: Center(
+                        child: Text(
+                          '상세 기록을 불러오지 못했습니다.\n${snapshot.error}',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: scheme.error),
+                        ),
+                      ),
+                    );
+                  }
+
+                  final snap = snapshot.data;
+                  if (snap == null) {
+                    return SizedBox(
+                      height: 220,
+                      child: Center(
+                        child: Text(
+                          '로그인이 필요합니다.',
+                          style: TextStyle(color: scheme.onSurfaceVariant),
+                        ),
+                      ),
+                    );
+                  }
+
+                  // 문서가 없으면 "기록 없음"으로 0/x 를 보여줍니다.
+                  final data = snap.data() ?? <String, dynamic>{};
+
+                  int iv(String k, int def) {
+                    final v = data[k];
+                    if (v is int) return v;
+                    if (v is num) return v.toInt();
+                    return def;
+                  }
+
+                  final percent = iv('progressPercent', 0).clamp(0, 100);
+                  final wordGoal = iv('wordGoal', 30);
+                  final wordDone = iv('wordDone', 0);
+                  final sentenceGoal = iv('sentenceGoal', 10);
+                  final sentenceDone = iv('sentenceDone', 0);
+                  final quizGoal = iv('quizGoal', 25);
+                  final quizDone = iv('quizDone', 0);
+
+                  final hasAny =
+                      (wordDone + sentenceDone + quizDone) > 0 || percent > 0;
+
+                  Color barColor() {
+                    if (percent >= 80) return Colors.green;
+                    if (percent >= 40) return Colors.orange;
+                    return Colors.red;
+                  }
+
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '$dateId 상세 기록',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: 10),
+                      if (!hasAny) ...[
+                        Text(
+                          '해당 날짜의 학습 기록이 없습니다.',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.copyWith(color: scheme.onSurfaceVariant),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(999),
+                              child: LinearProgressIndicator(
+                                value: (percent / 100).clamp(0.0, 1.0),
+                                minHeight: 12,
+                                backgroundColor: scheme.surfaceContainerHighest,
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(barColor()),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text('$percent%'),
+                        ],
+                      ),
+                      const SizedBox(height: 14),
+                      _DetailRow(
+                        title: '오늘의 단어',
+                        value: '$wordDone / $wordGoal',
+                      ),
+                      const SizedBox(height: 8),
+                      _DetailRow(
+                        title: '오늘의 문장',
+                        value: '$sentenceDone / $sentenceGoal',
+                      ),
+                      const SizedBox(height: 8),
+                      _DetailRow(
+                        title: '오늘의 마무리',
+                        value: '$quizDone / $quizGoal',
+                      ),
+                      const SizedBox(height: 14),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: const Text('닫기'),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    } finally {
+      if (mounted) setState(() => _openingDetail = false);
+    }
+  }
+
   Widget _buildCalendar(ColorScheme scheme) {
     final year = _focusedMonth.year;
     final month = _focusedMonth.month;
@@ -155,6 +346,11 @@ class _ProgressScreenState extends State<ProgressScreen> {
               label: '80~100%',
               child: _Sticker(shape: _StickerShape.circle, color: Colors.green),
             ),
+            const SizedBox(width: 10),
+            _LegendItem(
+              label: '기록 없음',
+              child: _Sticker(shape: _StickerShape.square, color: Colors.grey),
+            ),
           ],
         ),
         const SizedBox(height: 10),
@@ -190,11 +386,11 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 7,
-                  mainAxisSpacing: 6,
-                  crossAxisSpacing: 6,
+                  mainAxisSpacing: 5,
+                  crossAxisSpacing: 5,
                   // 달력 셀 내부(숫자 + 스티커)가 아래로 overflow 되는 문제를 방지하기 위해
                   // 정사각형보다 살짝 "세로로" 여유를 둡니다.
-                  childAspectRatio: 0.92,
+                  childAspectRatio: 0.85,
                 ),
                 itemBuilder: (context, index) {
                   final dayNumber = index - leadingBlankCount + 1;
@@ -218,36 +414,52 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       shape = _StickerShape.square;
                       stickerColor = Colors.red;
                     }
+                  } else {
+                    // 과거 날짜인데 daily_progress 문서가 없다면 "미접속/기록 없음"으로 회색 표시
+                    final isPastDay = day.isBefore(today);
+                    if (isPastDay) {
+                      shape = _StickerShape.square;
+                      stickerColor = Colors.grey;
+                    }
                   }
 
                   final isToday = isCurrentMonth && dayNumber == today.day;
                   final borderColor =
                       isToday ? scheme.primary : scheme.outlineVariant;
 
-                  return Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: borderColor),
+                  return Material(
+                    color: Colors.transparent,
+                    child: InkWell(
                       borderRadius: BorderRadius.circular(10),
-                      color: isToday ? scheme.primary.withValues(alpha: 0.08) : null,
-                    ),
-                    padding: const EdgeInsets.all(5),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '$dayNumber',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
+                      onTap: () => _openDayDetail(day),
+                      child: Ink(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: borderColor),
+                          borderRadius: BorderRadius.circular(10),
+                          color: isToday
+                              ? scheme.primary.withValues(alpha: 0.08)
+                              : null,
                         ),
-                        const Spacer(),
-                        Align(
-                          alignment: Alignment.bottomRight,
-                          child: shape == null
-                              ? const SizedBox.shrink()
-                              : _Sticker(shape: shape, color: stickerColor!),
+                        padding: const EdgeInsets.all(4),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '$dayNumber',
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                            ),
+                            const Spacer(),
+                            Align(
+                              alignment: Alignment.bottomRight,
+                              child: shape == null
+                                  ? const SizedBox.shrink()
+                                  : _Sticker(shape: shape, color: stickerColor!),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   );
                 },
@@ -270,7 +482,8 @@ class _ProgressScreenState extends State<ProgressScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('진행률')),
       body: Padding(
-        padding: const EdgeInsets.all(24),
+        // 카드가 화면에 더 꽉 차 보이도록 좌우 여백을 줄입니다.
+        padding: const EdgeInsets.all(16),
         child: _loading
             ? const Center(child: CircularProgressIndicator())
             : (p == null)
@@ -285,44 +498,43 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            '오늘의 진행률 · ${todayKstYyyyMmDd()}',
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                          const SizedBox(height: 12),
-                          LinearProgressIndicator(
-                            value: (p.progressPercent / 100).clamp(0.0, 1.0),
-                            minHeight: 14,
-                            color: p.progressPercent >= 80
-                                ? Colors.green
-                                : p.progressPercent >= 40
-                                    ? Colors.orange
-                                    : Colors.red,
-                          ),
-                          const SizedBox(height: 8),
-                          Text('${p.progressPercent}%'),
-                          const SizedBox(height: 16),
-                          Text('단어 ${p.wordDone}/${p.wordGoal}'),
-                          Text('문장 ${p.sentenceDone}/${p.sentenceGoal}'),
-                          Text('퀴즈 ${p.quizDone}/${p.quizGoal}'),
-                          const SizedBox(height: 22),
-                          Row(
-                            children: [
-                              Text(
-                                '캘린더',
-                                style: Theme.of(context).textTheme.titleLarge,
-                              ),
-                              const SizedBox(width: 10),
-                              if (_calendarLoading)
-                                const SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
+                          SectionCard(
+                            title: '오늘의 진행률',
+                            subtitle: 'KST · ${todayKstYyyyMmDd()}',
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                LinearProgressIndicator(
+                                  value: (p.progressPercent / 100).clamp(0.0, 1.0),
+                                  minHeight: 14,
+                                  color: p.progressPercent >= 80
+                                      ? Colors.green
+                                      : p.progressPercent >= 40
+                                          ? Colors.orange
+                                          : Colors.red,
                                 ),
-                            ],
+                                const SizedBox(height: 8),
+                                Text('${p.progressPercent}%'),
+                                const SizedBox(height: 12),
+                                Text('단어 ${p.wordDone}/${p.wordGoal}'),
+                                Text('문장 ${p.sentenceDone}/${p.sentenceGoal}'),
+                                Text('마무리 ${p.quizDone}/${p.quizGoal}'),
+                              ],
+                            ),
                           ),
-                          const SizedBox(height: 10),
-                          _buildCalendar(scheme),
+                          const SizedBox(height: 16),
+                          SectionCard(
+                            title: '캘린더',
+                            subtitle: '날짜별 진행률 스티커',
+                            trailing: _calendarLoading
+                                ? const SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                  )
+                                : null,
+                            child: _buildCalendar(scheme),
+                          ),
                           const SizedBox(height: 24),
                         ],
                       ),
@@ -352,6 +564,35 @@ class _LegendItem extends StatelessWidget {
           style: Theme.of(context)
               .textTheme
               .bodySmall
+              ?.copyWith(color: scheme.onSurfaceVariant),
+        ),
+      ],
+    );
+  }
+}
+
+class _DetailRow extends StatelessWidget {
+  const _DetailRow({required this.title, required this.value});
+
+  final String title;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            title,
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+        ),
+        Text(
+          value,
+          style: Theme.of(context)
+              .textTheme
+              .bodyLarge
               ?.copyWith(color: scheme.onSurfaceVariant),
         ),
       ],
