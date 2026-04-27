@@ -97,7 +97,7 @@
 - 정책:
   - 본인 `users/{uid}` 및 하위 컬렉션은 본인만 read/write
   - 글로벌 세트:
-    - `users/global_learning_set_owner/**`, `users/global_quiz_owner/**`는 로그인 사용자 read-only
+    - `users/global_learning_set_owner/**`는 로그인 사용자 read-only
 
 > 배포 필요 시: `firebase deploy --only firestore:rules`
 

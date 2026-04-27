@@ -15,6 +15,8 @@ import {
 
 type GenerateWordResponse = {
   word: string;
+  /** 일본어용: 히라가나만(확인용) */
+  readingHira?: string;
   meaningKo: string;
   example?: string;
   debugSource?: "openai" | "fallback" | "daily_set";
@@ -22,12 +24,15 @@ type GenerateWordResponse = {
 
 type GenerateSentenceResponse = {
   sentence: string;
+  /** 일본어용: 히라가나만(확인용) */
+  sentenceHira?: string;
   meaningKo: string;
   debugSource?: "openai" | "fallback" | "daily_set";
 };
 
 type StoredWordItem = {
   word: string;
+  readingHira?: string;
   meaningKo: string;
   example?: string;
 };
@@ -43,6 +48,7 @@ type DailyWordSet = {
 
 type StoredSentenceItem = {
   sentence: string;
+  sentenceHira?: string;
   meaningKo: string;
 };
 
@@ -70,7 +76,6 @@ const DAILY_SENTENCE_COUNT = 10;
 /** 단어 배치 한 번에 요청할 개수 (두 배치 병렬 호출 → 문장 1회와 비슷한 체감에 가깝게) */
 const DAILY_WORD_BATCH_SIZE = 15;
 const DEFAULT_RETENTION_DAYS = 7;
-const GLOBAL_QUIZ_SET_OWNER = "global_quiz_owner";
 /** 일일 단어·문장 세트 공유 소유자 (모든 유저가 동일 30/10 풀 사용, 커서만 사용자별). */
 const GLOBAL_LEARNING_SET_OWNER = "global_learning_set_owner";
 
@@ -313,6 +318,9 @@ async function generateWordWithOpenAI(
 
     const parsed = safeJsonParse(outputText);
     const word = readOptionalString(parsed, ["word"]);
+    const readingHira =
+      readOptionalString(parsed, ["readingHira"]) ??
+      readOptionalString(parsed, ["wordHira", "wordKana", "readingKana", "reading"]);
     const meaningKo =
       readOptionalString(parsed, ["meaningKo"]) ??
       readOptionalString(parsed, ["meaning", "koMeaning", "koreanMeaning"]);
@@ -323,6 +331,7 @@ async function generateWordWithOpenAI(
     }
     return {
       word,
+      ...(readingHira && readingHira.length > 0 ? { readingHira } : {}),
       meaningKo,
       example: ex && ex.length > 0 ? ex : undefined,
     };
@@ -381,6 +390,9 @@ async function generateSentenceWithOpenAI(
 
     const parsed = safeJsonParse(outputText);
     const sentence = readOptionalString(parsed, ["sentence"]);
+    const sentenceHira =
+      readOptionalString(parsed, ["sentenceHira"]) ??
+      readOptionalString(parsed, ["readingHira", "sentenceKana", "readingKana", "reading"]);
     const meaningKo =
       readOptionalString(parsed, ["meaningKo"]) ??
       readOptionalString(parsed, ["meaning", "koMeaning", "koreanMeaning"]);
@@ -390,6 +402,7 @@ async function generateSentenceWithOpenAI(
     }
     return {
       sentence,
+      ...(sentenceHira && sentenceHira.length > 0 ? { sentenceHira } : {}),
       meaningKo,
     };
   } finally {
@@ -400,22 +413,37 @@ async function generateSentenceWithOpenAI(
 function parseWordItem(value: unknown): StoredWordItem | null {
   if (typeof value !== "object" || value === null) return null;
   const word = readOptionalString(value, ["word"]);
+  const readingHira =
+    readOptionalString(value, ["readingHira"]) ??
+    readOptionalString(value, ["wordHira", "wordKana", "readingKana", "reading"]);
   const meaningKo =
     readOptionalString(value, ["meaningKo"]) ??
     readOptionalString(value, ["meaning", "koMeaning", "koreanMeaning"]);
   if (!word || !meaningKo) return null;
   const example = readOptionalString(value, ["example", "exampleSentence"]);
-  return example ? { word, meaningKo, example } : { word, meaningKo };
+  return {
+    word,
+    ...(readingHira && readingHira.length > 0 ? { readingHira } : {}),
+    meaningKo,
+    ...(example ? { example } : {}),
+  };
 }
 
 function parseSentenceItem(value: unknown): StoredSentenceItem | null {
   if (typeof value !== "object" || value === null) return null;
   const sentence = readOptionalString(value, ["sentence"]);
+  const sentenceHira =
+    readOptionalString(value, ["sentenceHira"]) ??
+    readOptionalString(value, ["readingHira", "sentenceKana", "readingKana", "reading"]);
   const meaningKo =
     readOptionalString(value, ["meaningKo"]) ??
     readOptionalString(value, ["meaning", "koMeaning", "koreanMeaning"]);
   if (!sentence || !meaningKo) return null;
-  return { sentence, meaningKo };
+  return {
+    sentence,
+    ...(sentenceHira && sentenceHira.length > 0 ? { sentenceHira } : {}),
+    meaningKo,
+  };
 }
 
 function wordDedupKey(word: string): string {
@@ -916,6 +944,7 @@ async function popWordFromTodaySet(
     return {
       word: picked.word,
       meaningKo: picked.meaningKo,
+      ...(picked.readingHira ? { readingHira: picked.readingHira } : {}),
       ...(picked.example ? { example: picked.example } : {}),
       debugSource: "daily_set",
     };
@@ -964,6 +993,7 @@ async function popSentenceFromTodaySet(
     return {
       sentence: picked.sentence,
       meaningKo: picked.meaningKo,
+      ...(picked.sentenceHira ? { sentenceHira: picked.sentenceHira } : {}),
       debugSource: "daily_set",
     };
   });
@@ -1184,7 +1214,6 @@ export const pregenerateDailyLearningSets = onSchedule(
 /**
  * 레거시/미사용 문서 정리(스케줄).
  * - alpha-2 기반 글로벌 학습 세트 문서(예: 2026-04-09_ja_beginner) 삭제
- * - 퀴즈 기능 제거로 더 이상 쓰지 않는 global_quiz_owner 및 글로벌 퀴즈 세트 삭제
  *
  * 주의: 앱/Functions에서 더 이상 참조하지 않는 문서만 대상으로 합니다.
  */
@@ -1201,27 +1230,7 @@ export const cleanupLegacyFirestoreDocs = onSchedule(
     const todayKst = todayKstYyyyMmDd();
     console.log("[cleanupLegacyFirestoreDocs] start", { todayKst });
 
-    // 1) 글로벌 퀴즈 오너 + 세트 정리 (현재 앱에서 퀴즈 제거)
-    try {
-      const ownerRef = db.collection("users").doc(GLOBAL_QUIZ_SET_OWNER);
-      const ownerSnap = await ownerRef.get();
-      if (ownerSnap.exists) {
-        const col = ownerRef.collection("daily_quiz_sets");
-        for (;;) {
-          const snap = await col.limit(200).get();
-          if (snap.empty) break;
-          const batch = db.batch();
-          for (const d of snap.docs) batch.delete(d.ref);
-          await batch.commit();
-        }
-        await ownerRef.delete();
-        console.log("[cleanupLegacyFirestoreDocs] deleted global_quiz_owner");
-      }
-    } catch (e) {
-      console.error("[cleanupLegacyFirestoreDocs] global_quiz_owner cleanup failed", e);
-    }
-
-    // 2) alpha-2 기반 글로벌 학습 세트 문서 정리
+    // alpha-2 기반 글로벌 학습 세트 문서 정리
     // - Functions는 canonical alpha-3 docId만 사용하므로 alpha-2 문서는 미사용.
     const alpha2 = ["ja", "es", "en", "ko"];
     for (const sub of ["daily_word_sets", "daily_sentence_sets"] as const) {

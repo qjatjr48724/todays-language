@@ -26,6 +26,7 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
   bool _aiLoading = true;
   String? _aiError;
   String? _sentence;
+  String? _sentenceHira;
   String? _meaning;
   String? _debugSource;
   bool _completedCurrent = false;
@@ -86,6 +87,7 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
       _aiLoading = true;
       _aiError = null;
       _sentence = null;
+      _sentenceHira = null;
       _meaning = null;
       _debugSource = null;
       _completedCurrent = false;
@@ -108,12 +110,14 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
 
       final data = Map<String, dynamic>.from(result.data as Map);
       final sentence = data['sentence']?.toString() ?? '';
+      final sentenceHira = data['sentenceHira']?.toString();
       final meaning = data['meaningKo']?.toString() ?? '';
       final debugSource = data['debugSource']?.toString();
 
       if (!mounted) return;
       setState(() {
         _sentence = sentence;
+        _sentenceHira = sentenceHira;
         _meaning = meaning;
         _debugSource = debugSource;
         _aiLoading = false;
@@ -159,6 +163,11 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final showHiraLine =
+        widget.targetLanguage.toUpperCase() == 'JPN' &&
+        widget.level != 'beginner' &&
+        _sentenceHira != null &&
+        _sentenceHira!.trim().isNotEmpty;
     return Scaffold(
       appBar: AppBar(title: const Text('오늘의 문장')),
       body: Padding(
@@ -195,6 +204,15 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
                 _sentence ?? '-',
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
+              if (showHiraLine) ...[
+                const SizedBox(height: 8),
+                Text(
+                  _sentenceHira!,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                ),
+              ],
               const SizedBox(height: 8),
               Text(
                 _meaning ?? '-',

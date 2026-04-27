@@ -14,19 +14,27 @@ Future<void> main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  // navigatorKey는 build마다 새로 생성되면 네비게이터 트리가 리셋/꼬일 수 있어
+  // State에 고정합니다.
+  final GlobalKey<NavigatorState> _navKey = GlobalKey<NavigatorState>();
+
+  @override
   Widget build(BuildContext context) {
-    final navKey = GlobalKey<NavigatorState>();
     return MaterialApp(
       title: "Today's Language",
       theme: AppTheme.light(),
-      navigatorKey: navKey,
+      navigatorKey: _navKey,
       builder: (context, child) {
         return AuthSessionWatcher(
-          navigatorKey: navKey,
+          navigatorKey: _navKey,
           child: child ?? const SizedBox.shrink(),
         );
       },

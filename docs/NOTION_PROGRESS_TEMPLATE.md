@@ -435,8 +435,7 @@ unauthenticated: 로그인 상태 확인
 - 증상: `users/__global__` 문서가 생성되지 않음
 - 원인 추정: Firestore 예약 ID(`__...__`) 사용으로 문서 생성 실패
 - 해결/우회:
-  - 글로벌 owner ID를 `global_quiz_owner`로 변경하여 해결
-  - 이후 `users/global_quiz_owner/daily_quiz_sets/{todayKst}` 생성 확인
+  - 글로벌 owner ID를 `global_learning_set_owner`로 확정하여 사용
 
 ### 5) 다음 액션 (내일 바로 할 것)
 
@@ -568,7 +567,7 @@ unauthenticated: 로그인 상태 확인
   - 로그인 허브 화면에서 “구글/애플로 시작하기” 버튼을 실제 로그인 로직으로 연결
   - Apple 로그인은 iOS에서만 동작하도록 가드(Windows/Android에서는 안내 메시지)
 - **레거시 Firestore 문서 정리(스케줄)**
-  - 더 이상 사용하지 않는 레거시 문서(예: `users/global_quiz_owner`, alpha-2 기반 글로벌 학습 세트 문서 `*_ja_*`)를 제거하는 스케줄 함수 추가
+  - 더 이상 사용하지 않는 레거시 문서(예: alpha-2 기반 글로벌 학습 세트 문서 `*_ja_*`)를 제거하는 스케줄 함수 추가
 - **이메일 회원가입 동의 포맷 확정**
   - 동의 저장 포맷을 `terms/version+agreedAt`, `privacy/version+agreedAt` 형태로 확정
   - 약관/개인정보 전문 “보기” 다이얼로그 추가
@@ -610,7 +609,7 @@ unauthenticated: 로그인 상태 확인
 
 1. Windows 페이지 파일 증설/재부팅 후 Android 빌드 정상화
 2. Firebase Console에서 Google Sign-in Enable + SHA-1 등록 → Android에서 Google 로그인 E2E 확인
-3. Functions 배포(legacy cleanup 스케줄 포함) 후 Firestore에서 `global_quiz_owner` 및 `*_ja_*` 레거시 문서가 정리되는지 확인
+3. Functions 배포(legacy cleanup 스케줄 포함) 후 Firestore에서 `*_ja_*` 레거시 문서가 정리되는지 확인
 
 ---
 
@@ -631,7 +630,7 @@ unauthenticated: 로그인 상태 확인
 - **Firestore 권한(PERMISSION_DENIED) 해결**
   - 로그인 직후 `users/{uid}` listen/read에서 권한 거부가 발생해 앱 흐름이 깨지던 문제 수정
   - 본인 `users/{uid}` 및 하위 컬렉션은 본인만 read/write 가능하게 규칙 추가
-  - 글로벌 세트(`users/global_learning_set_owner/**`, `users/global_quiz_owner/**`)는 로그인한 사용자 read-only 허용
+  - 글로벌 세트(`users/global_learning_set_owner/**`)는 로그인한 사용자 read-only 허용
 - **진행률 페이지(1순위) 캘린더/스티커 구현**
   - 월 단위 캘린더 그리드 + 월 이동
   - 스티커 규칙: 0~39 빨강 네모 / 40~79 주황 세모 / 80~100 초록 동그라미

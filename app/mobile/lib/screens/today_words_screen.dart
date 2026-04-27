@@ -25,6 +25,7 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
   String? _aiError;
 
   String? _word;
+  String? _wordReadingHira;
   String? _meaning;
   String? _example;
   String? _debugSource;
@@ -91,6 +92,7 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
       _aiLoading = true;
       _aiError = null;
       _word = null;
+      _wordReadingHira = null;
       _meaning = null;
       _example = null;
       _debugSource = null;
@@ -117,6 +119,7 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
 
       final data = Map<String, dynamic>.from(result.data as Map);
       final word = data['word']?.toString() ?? '';
+      final readingHira = data['readingHira']?.toString();
       final meaning = data['meaningKo']?.toString() ?? '';
       final example = data['example']?.toString();
       final debugSource = data['debugSource']?.toString();
@@ -124,6 +127,7 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
       if (!mounted) return;
       setState(() {
         _word = word;
+        _wordReadingHira = readingHira;
         _meaning = meaning;
         _example = example;
         _debugSource = debugSource;
@@ -169,6 +173,11 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final showHiraLine =
+        widget.targetLanguage.toUpperCase() == 'JPN' &&
+        widget.level != 'beginner' &&
+        _wordReadingHira != null &&
+        _wordReadingHira!.trim().isNotEmpty;
     return Scaffold(
       appBar: AppBar(title: const Text('오늘의 단어')),
       body: Padding(
@@ -205,6 +214,15 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
                 _word ?? '-',
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
+              if (showHiraLine) ...[
+                const SizedBox(height: 6),
+                Text(
+                  _wordReadingHira!,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                ),
+              ],
               const SizedBox(height: 6),
               Text(
                 _meaning ?? '-',

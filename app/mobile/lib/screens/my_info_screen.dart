@@ -51,6 +51,7 @@ class MyInfoScreen extends StatelessWidget {
         final provider = (data['provider'] as String?) ?? 'unknown';
         final nativeLanguage = (data['nativeLanguage'] as String?) ?? 'KOR';
         final targetLanguage = (data['targetLanguage'] as String?) ?? 'JPN';
+        final level = (data['level'] as String?) ?? 'beginner';
         final createdAt = data['createdAt'];
 
         String createdText = '-';
@@ -118,6 +119,36 @@ class MyInfoScreen extends StatelessWidget {
                   Text(
                     '대상언어 : ${_languageLabel(targetLanguage)}',
                     style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  const SizedBox(height: 12),
+                  Divider(color: scheme.outlineVariant),
+                  const SizedBox(height: 16),
+                  Text(
+                    '학습 난이도',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          _levelLabel(level),
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                      ),
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 120),
+                        child: OutlinedButton.icon(
+                          onPressed: () => _openLevelPicker(
+                            context,
+                            currentLevel: level,
+                            targetLanguage: targetLanguage,
+                          ),
+                          icon: const Icon(Icons.tune, size: 18),
+                          label: const Text('변경'),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 12),
                   Divider(color: scheme.outlineVariant),
@@ -339,6 +370,96 @@ Future<void> _openLanguagePicker(BuildContext context) async {
   }
 }
 
+Future<void> _openLevelPicker(
+  BuildContext context, {
+  required String currentLevel,
+  required String targetLanguage,
+}) async {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user == null) return;
+
+  final normalizedCurrent = _normalizeLevel(currentLevel);
+  String selected = normalizedCurrent;
+
+  final confirmed = await showModalBottomSheet<bool>(
+    context: context,
+    showDragHandle: true,
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          Widget tile(String value, String label) {
+            return ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(label),
+              trailing: selected == value ? const Icon(Icons.check) : null,
+              onTap: () => setState(() => selected = value),
+            );
+          }
+
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('학습 난이도 선택', style: Theme.of(context).textTheme.titleLarge),
+                const SizedBox(height: 12),
+                tile('beginner', '초급 (어린이/입문)'),
+                tile('intermediate', '중급 (초등~중학생)'),
+                tile('advanced', '고급 (고등학생~)'),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: const Text('취소'),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: FilledButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        child: const Text('저장'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  );
+  if (!context.mounted) return;
+  if (confirmed != true) return;
+
+  final docRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+  await docRef.set({'level': selected}, SetOptions(merge: true));
+  if (!context.mounted) return;
+
+  // 선택된 난이도의 "오늘 세트"가 없으면 즉시 생성(사용자 액션 기반)
+  try {
+    await user.getIdToken(true);
+    final callable = FirebaseFunctions.instanceFor(region: 'asia-northeast3')
+        .httpsCallable('ensureLearningSetForToday');
+    await callable.call<Map<String, dynamic>>({
+      'targetLanguage': targetLanguage,
+      'level': selected,
+    });
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('난이도가 저장되었고, 오늘 세트를 준비했어요.')),
+    );
+  } catch (e) {
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('난이도 저장은 됐지만 세트 준비에 실패했어요: $e')),
+    );
+  }
+}
+
 String _normalizeTargetLanguageAlpha3(String raw) {
   final v = raw.trim();
   if (v.isEmpty) return 'JPN';
@@ -350,6 +471,30 @@ String _normalizeTargetLanguageAlpha3(String raw) {
     default:
       return v.toUpperCase();
   }
+}
+
+String _normalizeLevel(String raw) {
+  final v = raw.trim().toLowerCase();
+  switch (v) {
+    case 'beginner':
+    case 'intermediate':
+    case 'advanced':
+      return v;
+    default:
+      return 'beginner';
+  }
+}
+
+String _levelLabel(String raw) {
+  switch (_normalizeLevel(raw)) {
+    case 'beginner':
+      return '초급';
+    case 'intermediate':
+      return '중급';
+    case 'advanced':
+      return '고급';
+  }
+  return '초급';
 }
 
 class _ProviderBadge extends StatelessWidget {

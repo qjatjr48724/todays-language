@@ -57,6 +57,7 @@ export function buildWordSystemPrompt(targetLanguage: string, level: string): st
     `Learner level: ${level}.`,
     "Return ONLY a raw JSON object (no markdown, no extra text).",
     "Required keys: word, meaningKo.",
+    "If targetLanguage is ja and the word includes kanji, also include readingHira (the same word written in hiragana only, for confirmation).",
     "Optional key: example (string).",
     "If targetLanguage is ja and level is beginner, prefer hiragana for word and example; avoid kanji unless necessary.",
   ].join(" ");
@@ -82,6 +83,7 @@ export function buildSentenceSystemPrompt(targetLanguage: string, level: string)
     "Keep it natural and suitable for daily conversation or study.",
     "Return ONLY a raw JSON object (no markdown, no extra text).",
     "Required keys: sentence, meaningKo.",
+    "If targetLanguage is ja and the sentence includes kanji, also include sentenceHira (the same sentence written in hiragana only, for confirmation).",
     "If targetLanguage is ja and level is beginner, use hiragana only where possible; avoid kanji and katakana except proper nouns if unavoidable.",
   ].join(" ");
 }
@@ -111,9 +113,10 @@ export function buildDailyWordBatchSystemPrompt(
     `Learner level: ${level}.`,
     "Every item must use a different headword (no duplicates, no near-duplicates).",
     "Return ONLY a raw JSON object (no markdown, no extra text).",
-    "Shape: {\"words\":[{\"word\":string,\"meaningKo\":string,\"example\":string?}, ...]}",
+    "Shape: {\"words\":[{\"word\":string,\"meaningKo\":string,\"example\":string?,\"readingHira\":string?}, ...]}",
     `The \"words\" array MUST have length exactly ${count}.`,
     "If targetLanguage is ja and level is beginner, prefer hiragana for word and example; avoid kanji unless necessary.",
+    "If targetLanguage is ja and a word includes kanji, include readingHira for that item (hiragana only).",
   ].join(" ");
 }
 
@@ -149,9 +152,10 @@ export function buildDailySentenceBatchSystemPrompt(
     "Each sentence must be unique and useful for daily study.",
     vocabLine,
     "Return ONLY a raw JSON object (no markdown, no extra text).",
-    "Shape: {\"sentences\":[{\"sentence\":string,\"meaningKo\":string}, ...]}",
+    "Shape: {\"sentences\":[{\"sentence\":string,\"meaningKo\":string,\"sentenceHira\":string?}, ...]}",
     `The \"sentences\" array MUST have length exactly ${count}.`,
     "If targetLanguage is ja and level is beginner, use hiragana only where possible; avoid kanji and katakana except proper nouns if unavoidable.",
+    "If targetLanguage is ja and a sentence includes kanji, include sentenceHira for that item (hiragana only).",
   ].join(" ");
 }
 
