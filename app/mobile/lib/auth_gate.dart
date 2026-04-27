@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'screens/login_screen.dart';
 import 'screens/main_nav_screen.dart';
 import 'screens/language_setup_screen.dart';
+import 'screens/target_language_setup_screen.dart';
 
 /// 로그인 여부에 따라 로그인 화면 또는 홈을 보여줍니다.
 class AuthGate extends StatelessWidget {
@@ -32,7 +33,11 @@ class AuthGate extends StatelessWidget {
               }
               final data = profSnap.data?.data() ?? <String, dynamic>{};
               final done = (data['languageSetupDone'] as bool?) ?? false;
-              if (!done) return const LanguageSetupScreen();
+              if (!done) {
+                final hasNative = (data['nativeLanguage'] as String?)?.trim().isNotEmpty ?? false;
+                if (hasNative) return const TargetLanguageSetupScreen();
+                return const LanguageSetupScreen();
+              }
               return const MainNavScreen();
             },
           );
