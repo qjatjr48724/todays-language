@@ -24,6 +24,12 @@ service cloud.firestore {
       allow read: if isSignedIn();
       allow write: if false;
     }
+
+    // 공개 메타데이터(국가 목록/국기 URL 등): 로그인 사용자 read-only
+    match /public_metadata/{doc=**} {
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
   }
 }
 

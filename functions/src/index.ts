@@ -1,6 +1,7 @@
-import { onCall, HttpsError } from "firebase-functions/v2/https";
-import { onSchedule } from "firebase-functions/v2/scheduler";
-import * as admin from "firebase-admin";
+export { seedCountryCatalog, syncCountryFlags } from "./metadata/callables";
+export { scheduledSyncCountryFlags } from "./metadata/schedules";
+export { getWrapUpDeck } from "./wrap_up/callables";
+export { cleanupLegacyFirestoreDocs } from "./maintenance/cleanup";
 
 import {
   buildDailySentenceBatchSystemPrompt,
@@ -12,6 +13,10 @@ import {
   buildWordSystemPrompt,
   buildWordUserPromptJson,
 } from "./prompts";
+import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { onSchedule } from "firebase-functions/v2/scheduler";
+import * as admin from "firebase-admin";
+import { globalTodaySentenceSetRef, globalTodayWordSetRef } from "./learning_sets/refs";
 
 type GenerateWordResponse = {
   word: string;
@@ -61,11 +66,6 @@ type DailySentenceSet = {
   updatedAtMs: number;
 };
 
-type WrapUpDeckItem = {
-  kind: "word" | "sentence";
-  meaningKo: string;
-  answer: string;
-};
 
 const OPENAI_API_URL = "https://api.openai.com/v1/responses";
 const OPENAI_MODEL = process.env.OPENAI_MODEL ?? "gpt-4.1-mini";
@@ -753,35 +753,7 @@ async function buildDailySentenceItems(
   return out.slice(0, DAILY_SENTENCE_COUNT);
 }
 
-function globalTodayWordSetRef(
-  targetLanguage: string,
-  level: string,
-  dateKst?: string
-): FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData> {
-  const ymd = dateKst ?? todayKstYyyyMmDd();
-  const tl = normalizeTargetLanguage(targetLanguage);
-  const docId = learningSetDocId(ymd, tl.external, level);
-  return db
-    .collection("users")
-    .doc(GLOBAL_LEARNING_SET_OWNER)
-    .collection("daily_word_sets")
-    .doc(docId);
-}
-
-function globalTodaySentenceSetRef(
-  targetLanguage: string,
-  level: string,
-  dateKst?: string
-): FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData> {
-  const ymd = dateKst ?? todayKstYyyyMmDd();
-  const tl = normalizeTargetLanguage(targetLanguage);
-  const docId = learningSetDocId(ymd, tl.external, level);
-  return db
-    .collection("users")
-    .doc(GLOBAL_LEARNING_SET_OWNER)
-    .collection("daily_sentence_sets")
-    .doc(docId);
-}
+// globalTodayWordSetRef/globalTodaySentenceSetRef moved to ./learning_sets/refs.ts
 
 /** 스케줄러에서만 호출: 없거나 비어 있으면 AI로 채움. Callable에서는 사용하지 않음. */
 async function materializeGlobalTodayWordSetIfAbsent(
@@ -1140,46 +1112,6 @@ export const ensureLearningSetForToday = onCall(
 
 // NOTE: 단어 퀴즈(generateQuiz)는 현재 앱 기능에서 제거되어, Functions에서도 노출하지 않습니다.
 
-/** 마무리용 카드만 Firestore에서 읽음(AI·세트 생성 없음). */
-export const getWrapUpDeck = onCall({ region: "asia-northeast3" }, async (request): Promise<{ items: WrapUpDeckItem[] }> => {
-  if (!request.auth) {
-    throw new HttpsError("unauthenticated", "로그인이 필요합니다.");
-  }
-
-  const targetLanguage = (request.data?.targetLanguage ?? "JPN") as string;
-  const level = (request.data?.level ?? "beginner") as string;
-
-  const wordSnap = await globalTodayWordSetRef(targetLanguage, level).get();
-  const sentenceSnap = await globalTodaySentenceSetRef(targetLanguage, level).get();
-
-  const wdata = wordSnap.data() as Partial<DailyWordSet> | undefined;
-  const sdata = sentenceSnap.data() as Partial<DailySentenceSet> | undefined;
-  const words = Array.isArray(wdata?.words) ? wdata!.words : [];
-  const sentences = Array.isArray(sdata?.sentences) ? sdata!.sentences : [];
-
-  // 마무리 출제 정책:
-  // - 총 25문제
-  // - 단어 70% / 문장 30% (18 / 7)
-  const wrapUpWordCount = 18;
-  const wrapUpSentenceCount = 7;
-  const pickW = shuffle([...words]).slice(0, Math.min(wrapUpWordCount, words.length));
-  const pickS = shuffle([...sentences]).slice(0, Math.min(wrapUpSentenceCount, sentences.length));
-
-  const items: WrapUpDeckItem[] = [
-    ...pickW.map((w) => ({
-      kind: "word" as const,
-      meaningKo: w.meaningKo,
-      answer: w.word,
-    })),
-    ...pickS.map((s) => ({
-      kind: "sentence" as const,
-      meaningKo: s.meaningKo,
-      answer: s.sentence,
-    })),
-  ];
-  return { items: shuffle(items) };
-});
-
 /**
  * 매일 KST 자정 — (언어, 레벨)별 글로벌 단어 30·문장 10 세트를 AI로 생성·저장.
  * Blaze + Cloud Scheduler 필요. 앱 callable은 이 문서만 읽음.
@@ -1217,55 +1149,4 @@ export const pregenerateDailyLearningSets = onSchedule(
  *
  * 주의: 앱/Functions에서 더 이상 참조하지 않는 문서만 대상으로 합니다.
  */
-export const cleanupLegacyFirestoreDocs = onSchedule(
-  {
-    // 매일 KST 03:10에 정리 (트래픽 적은 시간대)
-    schedule: "10 3 * * *",
-    timeZone: "Asia/Seoul",
-    region: "asia-northeast3",
-    timeoutSeconds: 540,
-    memory: "512MiB",
-  },
-  async () => {
-    const todayKst = todayKstYyyyMmDd();
-    console.log("[cleanupLegacyFirestoreDocs] start", { todayKst });
-
-    // alpha-2 기반 글로벌 학습 세트 문서 정리
-    // - Functions는 canonical alpha-3 docId만 사용하므로 alpha-2 문서는 미사용.
-    const alpha2 = ["ja", "es", "en", "ko"];
-    for (const sub of ["daily_word_sets", "daily_sentence_sets"] as const) {
-      try {
-        const col = db
-          .collection("users")
-          .doc(GLOBAL_LEARNING_SET_OWNER)
-          .collection(sub);
-
-        for (;;) {
-          const snap = await col.limit(400).get();
-          if (snap.empty) break;
-
-          const batch = db.batch();
-          let delCount = 0;
-
-          for (const d of snap.docs) {
-            const id = d.id;
-            // id 형식: YYYY-MM-DD_LANG_LEVEL
-            const lower = id.toLowerCase();
-            if (alpha2.some((a2) => lower.includes(`_${a2}_`))) {
-              batch.delete(d.ref);
-              delCount++;
-            }
-          }
-
-          if (delCount === 0) break;
-          await batch.commit();
-          console.log("[cleanupLegacyFirestoreDocs] deleted alpha-2 docs", { sub, delCount });
-        }
-      } catch (e) {
-        console.error("[cleanupLegacyFirestoreDocs] alpha-2 cleanup failed", { sub, e });
-      }
-    }
-
-    console.log("[cleanupLegacyFirestoreDocs] done", { todayKst });
-  }
-);
+// moved to ./maintenance/cleanup.ts
