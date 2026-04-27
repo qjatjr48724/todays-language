@@ -4,11 +4,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../auth_gate.dart';
+import 'admin_tools_screen.dart';
 
 class MyInfoScreen extends StatelessWidget {
   const MyInfoScreen({super.key, this.embedded = false});
 
   final bool embedded;
+  static const _testAdminUid = AdminToolsScreen.testAdminUid;
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +35,7 @@ class MyInfoScreen extends StatelessWidget {
         .collection('users')
         .doc(user.uid)
         .snapshots();
+    final isAdmin = user.uid == _testAdminUid;
 
     final content = StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
       stream: docStream,
@@ -88,6 +91,16 @@ class MyInfoScreen extends StatelessWidget {
                       const SizedBox(width: 8),
                       _ProviderBadge(provider: provider),
                       const Spacer(),
+                      if (isAdmin)
+                        IconButton(
+                          tooltip: '관리자 도구',
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(builder: (_) => const AdminToolsScreen()),
+                            );
+                          },
+                          icon: const Icon(Icons.admin_panel_settings_outlined),
+                        ),
                       Text(
                         '최초 가입일 : $createdText',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -111,14 +124,14 @@ class MyInfoScreen extends StatelessWidget {
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    '로컬언어 : ${_languageLabel(nativeLanguage)}',
-                    style: Theme.of(context).textTheme.bodyLarge,
+                  _LanguageRow(
+                    label: '로컬언어',
+                    alpha3: nativeLanguage,
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    '대상언어 : ${_languageLabel(targetLanguage)}',
-                    style: Theme.of(context).textTheme.bodyLarge,
+                  _LanguageRow(
+                    label: '대상언어',
+                    alpha3: targetLanguage,
                   ),
                   const SizedBox(height: 12),
                   Divider(color: scheme.outlineVariant),
@@ -265,6 +278,16 @@ class MyInfoScreen extends StatelessWidget {
         ),
         title: const Text('내 정보'),
         actions: [
+          if (isAdmin)
+            IconButton(
+              icon: const Icon(Icons.admin_panel_settings_outlined),
+              tooltip: '관리자 도구',
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const AdminToolsScreen()),
+                );
+              },
+            ),
           IconButton(
             icon: const Icon(Icons.language),
             tooltip: '언어 설정',
@@ -273,6 +296,83 @@ class MyInfoScreen extends StatelessWidget {
         ],
       ),
       body: content,
+    );
+  }
+}
+
+class _LanguageRow extends StatelessWidget {
+  const _LanguageRow({
+    required this.label,
+    required this.alpha3,
+  });
+
+  final String label;
+  final String alpha3;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+      future: FirebaseFirestore.instance
+          .collection('public_metadata')
+          .doc('countries')
+          .collection('items')
+          .doc(alpha3.toUpperCase())
+          .get(),
+      builder: (context, snapshot) {
+        final data = snapshot.data?.data();
+        final endonym = (data?['endonym'] as String?)?.trim();
+        final flagUrl = (data?['flagUrl'] as String?)?.trim();
+        final name = (endonym == null || endonym.isEmpty) ? _languageLabel(alpha3) : endonym;
+        return Row(
+          children: [
+            Text(
+              '$label : ',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            const SizedBox(width: 6),
+            _FlagThumb(url: flagUrl),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                name,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ),
+            Text(
+              alpha3.toUpperCase(),
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.copyWith(color: scheme.onSurfaceVariant),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _FlagThumb extends StatelessWidget {
+  const _FlagThumb({required this.url});
+  final String? url;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(6),
+      child: Image.network(
+        (url ?? ''),
+        width: 28,
+        height: 20,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => Container(
+          width: 28,
+          height: 20,
+          color: scheme.surfaceContainerHighest,
+        ),
+      ),
     );
   }
 }
@@ -289,6 +389,27 @@ Future<void> _openLanguagePicker(BuildContext context) async {
   final current = _normalizeTargetLanguageAlpha3(currentRaw);
 
   String selected = current;
+  final enabledCountries = await FirebaseFirestore.instance
+      .collection('public_metadata')
+      .doc('countries')
+      .collection('items')
+      .where('enabled', isEqualTo: true)
+      .get();
+  if (!context.mounted) return;
+  final allCountries = await FirebaseFirestore.instance
+      .collection('public_metadata')
+      .doc('countries')
+      .collection('items')
+      .get();
+  if (!context.mounted) return;
+
+  final enabled = enabledCountries.docs
+      .map((d) => d.data())
+      .toList(growable: false);
+  final disabled = allCountries.docs
+      .map((d) => d.data())
+      .where((m) => (m['enabled'] as bool?) != true)
+      .toList(growable: false);
 
   final confirmed = await showModalBottomSheet<bool>(
     context: context,
@@ -304,17 +425,40 @@ Future<void> _openLanguagePicker(BuildContext context) async {
               children: [
                 Text('대상 언어 선택', style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 12),
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: const Text('일본어 (JPN)'),
-                  trailing: selected == 'JPN' ? const Icon(Icons.check) : null,
-                  onTap: () => setState(() => selected = 'JPN'),
-                ),
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: const Text('스페인어 (ESP)'),
-                  trailing: selected == 'ESP' ? const Icon(Icons.check) : null,
-                  onTap: () => setState(() => selected = 'ESP'),
+                Flexible(
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: [
+                      ...enabled.map((m) {
+                        final alpha3 = (m['alpha3'] as String?)?.trim().toUpperCase() ?? '';
+                        final endonym = (m['endonym'] as String?)?.trim() ?? alpha3;
+                        final flagUrl = (m['flagUrl'] as String?)?.trim();
+                        return ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: _FlagThumb(url: flagUrl),
+                          title: Text(endonym),
+                          subtitle: Text(alpha3),
+                          trailing: selected == alpha3 ? const Icon(Icons.check) : null,
+                          onTap: () => setState(() => selected = alpha3),
+                        );
+                      }),
+                      const SizedBox(height: 8),
+                      Text('추가 예정(선택 불가)',
+                          style: Theme.of(context).textTheme.labelLarge),
+                      ...disabled.map((m) {
+                        final alpha3 = (m['alpha3'] as String?)?.trim().toUpperCase() ?? '';
+                        final endonym = (m['endonym'] as String?)?.trim() ?? alpha3;
+                        final flagUrl = (m['flagUrl'] as String?)?.trim();
+                        return ListTile(
+                          enabled: false,
+                          contentPadding: EdgeInsets.zero,
+                          leading: _FlagThumb(url: flagUrl),
+                          title: Text(endonym),
+                          subtitle: Text(alpha3),
+                        );
+                      }),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Row(
