@@ -111,6 +111,9 @@ coverage/
 functions/node_modules/
 functions/lib/
 
+# Editor/IDE
+.vscode/
+
 # Symbols
 app.*.symbols
 
