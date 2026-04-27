@@ -1127,8 +1127,13 @@ export const getWrapUpDeck = onCall({ region: "asia-northeast3" }, async (reques
   const words = Array.isArray(wdata?.words) ? wdata!.words : [];
   const sentences = Array.isArray(sdata?.sentences) ? sdata!.sentences : [];
 
-  const pickW = shuffle([...words]).slice(0, Math.min(20, words.length));
-  const pickS = shuffle([...sentences]).slice(0, Math.min(5, sentences.length));
+  // 마무리 출제 정책:
+  // - 총 25문제
+  // - 단어 70% / 문장 30% (18 / 7)
+  const wrapUpWordCount = 18;
+  const wrapUpSentenceCount = 7;
+  const pickW = shuffle([...words]).slice(0, Math.min(wrapUpWordCount, words.length));
+  const pickS = shuffle([...sentences]).slice(0, Math.min(wrapUpSentenceCount, sentences.length));
 
   const items: WrapUpDeckItem[] = [
     ...pickW.map((w) => ({

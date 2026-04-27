@@ -300,10 +300,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 HomeFeatureCard(
                   title: '오늘의 마무리',
                   subtitle: canOpenWrapUp
-                      ? '단어 20 + 문장 5'
-                      : '단어/문장 학습 완료 후 열림',
+                      ? '25문제(단어 70% / 문장 30%)'
+                      : '단어 30 + 문장 10 완료 후 열림',
                   icon: Icons.fact_check_outlined,
                   progressText: p == null ? null : '${p.quizDone} / ${p.quizGoal}',
+                  enabled: canOpenWrapUp,
                   onTap: canOpenWrapUp
                       ? () {
                           Navigator.of(context)

@@ -139,7 +139,7 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '당일 학습 최종 점검: 단어 20개 + 문장 5개',
+                        '당일 학습 최종 점검: 25문제(단어 70% / 문장 30%)',
                         style: Theme.of(context)
                             .textTheme
                             .bodyMedium

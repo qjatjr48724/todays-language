@@ -8,6 +8,7 @@ class HomeFeatureCard extends StatelessWidget {
     required this.icon,
     required this.onTap,
     this.progressText,
+    this.enabled = true,
   });
 
   final String title;
@@ -15,17 +16,34 @@ class HomeFeatureCard extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
   final String? progressText;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final t = Theme.of(context).textTheme;
 
+    final muted = !enabled;
+    final cardOpacity = muted ? 0.65 : 1.0;
+    final iconBg = muted
+        ? scheme.surfaceContainerHighest.withValues(alpha: 0.7)
+        : scheme.primaryContainer;
+    final iconFg = muted ? scheme.onSurfaceVariant : scheme.onPrimaryContainer;
+
     return InkWell(
       borderRadius: BorderRadius.circular(16),
-      onTap: onTap,
-      child: Card(
-        child: Padding(
+      onTap: enabled ? onTap : null,
+      child: Opacity(
+        opacity: cardOpacity,
+        child: Card(
+          color: muted ? scheme.surfaceContainerLow : null,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: muted
+                ? BorderSide(color: scheme.outlineVariant.withValues(alpha: 0.6))
+                : BorderSide.none,
+          ),
+          child: Padding(
           padding: const EdgeInsets.all(12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,18 +55,18 @@ class HomeFeatureCard extends StatelessWidget {
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: scheme.primaryContainer,
+                      color: iconBg,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
                       icon,
                       size: 18,
-                      color: scheme.onPrimaryContainer,
+                      color: iconFg,
                     ),
                   ),
                   const Spacer(),
                   Icon(
-                    Icons.chevron_right,
+                    enabled ? Icons.chevron_right : Icons.lock_outline,
                     size: 20,
                     color: scheme.onSurfaceVariant,
                   ),
@@ -80,6 +98,7 @@ class HomeFeatureCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }
