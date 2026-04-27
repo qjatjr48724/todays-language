@@ -49,6 +49,20 @@
 
 
 
+
+
+
+
+
+
+---
+- 앱/브랜드 표기: `Today's Language`
+- GitHub 리포지토리 이름: `todays-language`
+- 목표 플랫폼: Android, iOS (Flutter)
+- 백엔드: Firebase (Auth, Firestore, Cloud Functions)
+
+
+<!-- 
 ## 기술적 의사결정
 ### Flutter & Firebase를 선택한 이유
   - 해당 프로젝트는 개인 프로젝트로 비용/효율적인 문제로 "AI를 이용해서 앱을 만들어보고 한번 출시까지 해보자!"라는 어쩌면 터무니없는 생각에서 시작되었다.
@@ -63,10 +77,7 @@
 
 
 ----------------
-- 앱/브랜드 표기: `Today's Language`
-- GitHub 리포지토리 이름: `todays-language`
-- 목표 플랫폼: Android, iOS (Flutter)
-- 백엔드: Firebase (Auth, Firestore, Cloud Functions)
+
 
 ## 프로젝트 구조
 
@@ -111,4 +122,4 @@ Firebase용 CLI를 쓸 때(한 번): `npm install -g firebase-tools` 후 `fireba
 
 ## 기획 원문 (Notion)
 
-- [Today's Language Notion](https://tabby-smile-a0e.notion.site/32b72820750a80d88ffdda575c5a16b6)
+- [Today's Language Notion](https://tabby-smile-a0e.notion.site/32b72820750a80d88ffdda575c5a16b6) -->
