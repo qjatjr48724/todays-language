@@ -254,6 +254,31 @@
   "email_login_error_user_disabled": "このアカウントは利用できません。",
   "email_login_error_credentials": "メールまたはパスワードが正しくありません。",
   "email_login_error_too_many_requests": "試行回数が多すぎます。しばらくしてから再試行してください。",
-  "email_login_error_failed": "ログインに失敗しました。({code})"
+  "email_login_error_failed": "ログインに失敗しました。({code})",
+
+  "email_register_appbar_title": "メール新規登録",
+  "email_register_email_label": "メール",
+  "email_register_password_label": "パスワード",
+  "email_register_name_label": "名前",
+
+  "email_register_validate_email_required": "メールアドレスを入力してください。",
+  "email_register_validate_email_format": "メール形式が正しくありません。",
+  "email_register_validate_password_min": "パスワードは6文字以上である必要があります。",
+  "email_register_validate_name_required": "名前を入力してください。",
+
+  "email_register_agree_required": "利用規約とプライバシーポリシーの両方に同意してください。",
+  "email_register_button": "登録完了",
+
+  "email_register_terms_agree_title": "利用規約に同意（必須）",
+  "email_register_privacy_agree_title": "プライバシーポリシーに同意（必須）",
+  "email_register_view_button": "表示",
+  "email_register_close_button": "閉じる",
+  "email_register_consent_dialog_title": "{title} (v{version})",
+
+  "email_register_error_unknown": "不明なエラーが発生しました。",
+  "email_register_error_invalid_email": "メール形式が正しくありません。",
+  "email_register_error_email_in_use": "このメールはすでに使用されています。",
+  "email_register_error_weak_password": "パスワードが弱すぎます。",
+  "email_register_error_failed": "登録に失敗しました。({code})"
 }
 

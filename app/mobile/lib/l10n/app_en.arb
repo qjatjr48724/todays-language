@@ -254,6 +254,31 @@
   "email_login_error_user_disabled": "This account is disabled.",
   "email_login_error_credentials": "The email or password is incorrect.",
   "email_login_error_too_many_requests": "Too many attempts. Please try again later.",
-  "email_login_error_failed": "Login failed. ({code})"
+  "email_login_error_failed": "Login failed. ({code})",
+
+  "email_register_appbar_title": "Email Sign Up",
+  "email_register_email_label": "Email",
+  "email_register_password_label": "Password",
+  "email_register_name_label": "Name",
+
+  "email_register_validate_email_required": "Please enter your email.",
+  "email_register_validate_email_format": "Invalid email format.",
+  "email_register_validate_password_min": "Password must be at least 6 characters.",
+  "email_register_validate_name_required": "Please enter your name.",
+
+  "email_register_agree_required": "Please agree to both the Terms and the Privacy Policy.",
+  "email_register_button": "Create account",
+
+  "email_register_terms_agree_title": "Agree to Terms of Service (Required)",
+  "email_register_privacy_agree_title": "Agree to Privacy Policy (Required)",
+  "email_register_view_button": "View",
+  "email_register_close_button": "Close",
+  "email_register_consent_dialog_title": "{title} (v{version})",
+
+  "email_register_error_unknown": "An unknown error occurred.",
+  "email_register_error_invalid_email": "The email address format is invalid.",
+  "email_register_error_email_in_use": "This email is already in use.",
+  "email_register_error_weak_password": "The password is too weak.",
+  "email_register_error_failed": "Sign up failed. ({code})"
 }
 

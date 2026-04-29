@@ -252,6 +252,31 @@
   "email_login_error_user_disabled": "이 계정은 사용할 수 없습니다.",
   "email_login_error_credentials": "이메일 또는 비밀번호가 올바르지 않습니다.",
   "email_login_error_too_many_requests": "시도가 너무 많습니다. 잠시 후 다시 시도해 주세요.",
-  "email_login_error_failed": "로그인에 실패했습니다. ({code})"
+  "email_login_error_failed": "로그인에 실패했습니다. ({code})",
+
+  "email_register_appbar_title": "이메일 회원가입",
+  "email_register_email_label": "이메일",
+  "email_register_password_label": "비밀번호",
+  "email_register_name_label": "이름",
+
+  "email_register_validate_email_required": "이메일을 입력해 주세요.",
+  "email_register_validate_email_format": "올바른 이메일 형식이 아닙니다.",
+  "email_register_validate_password_min": "비밀번호는 6자 이상이어야 합니다.",
+  "email_register_validate_name_required": "이름을 입력해 주세요.",
+
+  "email_register_agree_required": "약관 및 개인정보 수집에 모두 동의해 주세요.",
+  "email_register_button": "회원가입 완료",
+
+  "email_register_terms_agree_title": "서비스 이용약관 동의 (필수)",
+  "email_register_privacy_agree_title": "개인정보 처리방침 동의 (필수)",
+  "email_register_view_button": "보기",
+  "email_register_close_button": "닫기",
+  "email_register_consent_dialog_title": "{title} (v{version})",
+
+  "email_register_error_unknown": "알 수 없는 오류가 발생했습니다.",
+  "email_register_error_invalid_email": "이메일 형식이 올바르지 않습니다.",
+  "email_register_error_email_in_use": "이미 사용 중인 이메일입니다.",
+  "email_register_error_weak_password": "비밀번호가 너무 짧습니다.",
+  "email_register_error_failed": "회원가입에 실패했습니다. ({code})"
 }
 

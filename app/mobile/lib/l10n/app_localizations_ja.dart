@@ -695,4 +695,68 @@ class AppLocalizationsJa extends AppLocalizations {
   String email_login_error_failed(Object code) {
     return 'ログインに失敗しました。($code)';
   }
+
+  @override
+  String get email_register_appbar_title => 'メール新規登録';
+
+  @override
+  String get email_register_email_label => 'メール';
+
+  @override
+  String get email_register_password_label => 'パスワード';
+
+  @override
+  String get email_register_name_label => '名前';
+
+  @override
+  String get email_register_validate_email_required => 'メールアドレスを入力してください。';
+
+  @override
+  String get email_register_validate_email_format => 'メール形式が正しくありません。';
+
+  @override
+  String get email_register_validate_password_min => 'パスワードは6文字以上である必要があります。';
+
+  @override
+  String get email_register_validate_name_required => '名前を入力してください。';
+
+  @override
+  String get email_register_agree_required => '利用規約とプライバシーポリシーの両方に同意してください。';
+
+  @override
+  String get email_register_button => '登録完了';
+
+  @override
+  String get email_register_terms_agree_title => '利用規約に同意（必須）';
+
+  @override
+  String get email_register_privacy_agree_title => 'プライバシーポリシーに同意（必須）';
+
+  @override
+  String get email_register_view_button => '表示';
+
+  @override
+  String get email_register_close_button => '閉じる';
+
+  @override
+  String email_register_consent_dialog_title(Object title, Object version) {
+    return '$title (v$version)';
+  }
+
+  @override
+  String get email_register_error_unknown => '不明なエラーが発生しました。';
+
+  @override
+  String get email_register_error_invalid_email => 'メール形式が正しくありません。';
+
+  @override
+  String get email_register_error_email_in_use => 'このメールはすでに使用されています。';
+
+  @override
+  String get email_register_error_weak_password => 'パスワードが弱すぎます。';
+
+  @override
+  String email_register_error_failed(Object code) {
+    return '登録に失敗しました。($code)';
+  }
 }

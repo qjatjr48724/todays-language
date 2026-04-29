@@ -1312,6 +1312,126 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'로그인에 실패했습니다. ({code})'**
   String email_login_error_failed(Object code);
+
+  /// No description provided for @email_register_appbar_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'이메일 회원가입'**
+  String get email_register_appbar_title;
+
+  /// No description provided for @email_register_email_label.
+  ///
+  /// In ko, this message translates to:
+  /// **'이메일'**
+  String get email_register_email_label;
+
+  /// No description provided for @email_register_password_label.
+  ///
+  /// In ko, this message translates to:
+  /// **'비밀번호'**
+  String get email_register_password_label;
+
+  /// No description provided for @email_register_name_label.
+  ///
+  /// In ko, this message translates to:
+  /// **'이름'**
+  String get email_register_name_label;
+
+  /// No description provided for @email_register_validate_email_required.
+  ///
+  /// In ko, this message translates to:
+  /// **'이메일을 입력해 주세요.'**
+  String get email_register_validate_email_required;
+
+  /// No description provided for @email_register_validate_email_format.
+  ///
+  /// In ko, this message translates to:
+  /// **'올바른 이메일 형식이 아닙니다.'**
+  String get email_register_validate_email_format;
+
+  /// No description provided for @email_register_validate_password_min.
+  ///
+  /// In ko, this message translates to:
+  /// **'비밀번호는 6자 이상이어야 합니다.'**
+  String get email_register_validate_password_min;
+
+  /// No description provided for @email_register_validate_name_required.
+  ///
+  /// In ko, this message translates to:
+  /// **'이름을 입력해 주세요.'**
+  String get email_register_validate_name_required;
+
+  /// No description provided for @email_register_agree_required.
+  ///
+  /// In ko, this message translates to:
+  /// **'약관 및 개인정보 수집에 모두 동의해 주세요.'**
+  String get email_register_agree_required;
+
+  /// No description provided for @email_register_button.
+  ///
+  /// In ko, this message translates to:
+  /// **'회원가입 완료'**
+  String get email_register_button;
+
+  /// No description provided for @email_register_terms_agree_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'서비스 이용약관 동의 (필수)'**
+  String get email_register_terms_agree_title;
+
+  /// No description provided for @email_register_privacy_agree_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'개인정보 처리방침 동의 (필수)'**
+  String get email_register_privacy_agree_title;
+
+  /// No description provided for @email_register_view_button.
+  ///
+  /// In ko, this message translates to:
+  /// **'보기'**
+  String get email_register_view_button;
+
+  /// No description provided for @email_register_close_button.
+  ///
+  /// In ko, this message translates to:
+  /// **'닫기'**
+  String get email_register_close_button;
+
+  /// No description provided for @email_register_consent_dialog_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'{title} (v{version})'**
+  String email_register_consent_dialog_title(Object title, Object version);
+
+  /// No description provided for @email_register_error_unknown.
+  ///
+  /// In ko, this message translates to:
+  /// **'알 수 없는 오류가 발생했습니다.'**
+  String get email_register_error_unknown;
+
+  /// No description provided for @email_register_error_invalid_email.
+  ///
+  /// In ko, this message translates to:
+  /// **'이메일 형식이 올바르지 않습니다.'**
+  String get email_register_error_invalid_email;
+
+  /// No description provided for @email_register_error_email_in_use.
+  ///
+  /// In ko, this message translates to:
+  /// **'이미 사용 중인 이메일입니다.'**
+  String get email_register_error_email_in_use;
+
+  /// No description provided for @email_register_error_weak_password.
+  ///
+  /// In ko, this message translates to:
+  /// **'비밀번호가 너무 짧습니다.'**
+  String get email_register_error_weak_password;
+
+  /// No description provided for @email_register_error_failed.
+  ///
+  /// In ko, this message translates to:
+  /// **'회원가입에 실패했습니다. ({code})'**
+  String email_register_error_failed(Object code);
 }
 
 class _AppLocalizationsDelegate

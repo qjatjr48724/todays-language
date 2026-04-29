@@ -722,4 +722,75 @@ class AppLocalizationsEn extends AppLocalizations {
   String email_login_error_failed(Object code) {
     return 'Login failed. ($code)';
   }
+
+  @override
+  String get email_register_appbar_title => 'Email Sign Up';
+
+  @override
+  String get email_register_email_label => 'Email';
+
+  @override
+  String get email_register_password_label => 'Password';
+
+  @override
+  String get email_register_name_label => 'Name';
+
+  @override
+  String get email_register_validate_email_required =>
+      'Please enter your email.';
+
+  @override
+  String get email_register_validate_email_format => 'Invalid email format.';
+
+  @override
+  String get email_register_validate_password_min =>
+      'Password must be at least 6 characters.';
+
+  @override
+  String get email_register_validate_name_required => 'Please enter your name.';
+
+  @override
+  String get email_register_agree_required =>
+      'Please agree to both the Terms and the Privacy Policy.';
+
+  @override
+  String get email_register_button => 'Create account';
+
+  @override
+  String get email_register_terms_agree_title =>
+      'Agree to Terms of Service (Required)';
+
+  @override
+  String get email_register_privacy_agree_title =>
+      'Agree to Privacy Policy (Required)';
+
+  @override
+  String get email_register_view_button => 'View';
+
+  @override
+  String get email_register_close_button => 'Close';
+
+  @override
+  String email_register_consent_dialog_title(Object title, Object version) {
+    return '$title (v$version)';
+  }
+
+  @override
+  String get email_register_error_unknown => 'An unknown error occurred.';
+
+  @override
+  String get email_register_error_invalid_email =>
+      'The email address format is invalid.';
+
+  @override
+  String get email_register_error_email_in_use =>
+      'This email is already in use.';
+
+  @override
+  String get email_register_error_weak_password => 'The password is too weak.';
+
+  @override
+  String email_register_error_failed(Object code) {
+    return 'Sign up failed. ($code)';
+  }
 }

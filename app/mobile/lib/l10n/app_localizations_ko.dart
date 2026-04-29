@@ -694,4 +694,68 @@ class AppLocalizationsKo extends AppLocalizations {
   String email_login_error_failed(Object code) {
     return '로그인에 실패했습니다. ($code)';
   }
+
+  @override
+  String get email_register_appbar_title => '이메일 회원가입';
+
+  @override
+  String get email_register_email_label => '이메일';
+
+  @override
+  String get email_register_password_label => '비밀번호';
+
+  @override
+  String get email_register_name_label => '이름';
+
+  @override
+  String get email_register_validate_email_required => '이메일을 입력해 주세요.';
+
+  @override
+  String get email_register_validate_email_format => '올바른 이메일 형식이 아닙니다.';
+
+  @override
+  String get email_register_validate_password_min => '비밀번호는 6자 이상이어야 합니다.';
+
+  @override
+  String get email_register_validate_name_required => '이름을 입력해 주세요.';
+
+  @override
+  String get email_register_agree_required => '약관 및 개인정보 수집에 모두 동의해 주세요.';
+
+  @override
+  String get email_register_button => '회원가입 완료';
+
+  @override
+  String get email_register_terms_agree_title => '서비스 이용약관 동의 (필수)';
+
+  @override
+  String get email_register_privacy_agree_title => '개인정보 처리방침 동의 (필수)';
+
+  @override
+  String get email_register_view_button => '보기';
+
+  @override
+  String get email_register_close_button => '닫기';
+
+  @override
+  String email_register_consent_dialog_title(Object title, Object version) {
+    return '$title (v$version)';
+  }
+
+  @override
+  String get email_register_error_unknown => '알 수 없는 오류가 발생했습니다.';
+
+  @override
+  String get email_register_error_invalid_email => '이메일 형식이 올바르지 않습니다.';
+
+  @override
+  String get email_register_error_email_in_use => '이미 사용 중인 이메일입니다.';
+
+  @override
+  String get email_register_error_weak_password => '비밀번호가 너무 짧습니다.';
+
+  @override
+  String email_register_error_failed(Object code) {
+    return '회원가입에 실패했습니다. ($code)';
+  }
 }
