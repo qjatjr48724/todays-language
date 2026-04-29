@@ -27,6 +27,23 @@ alwaysApply: true
 - 디버그 전용 UI/기능은 `kDebugMode`로 감싸고, 운영 노출을 금지한다.
 - 사용자 액션 기반 진도(+1)는 중복 탭 방지(1회 처리) 규칙을 유지한다.
 
+## 3-1) i18n(로컬라이제이션) 규칙 (UI 문구 치환)
+- 앱 UI 언어는 **디바이스 언어(locale)** 를 따른다. (`ko/en/ja` 지원, 미지원 언어는 `en` fallback)
+- 사용자에게 노출되는 UI 문구는 하드코딩하지 않고 `AppLocalizations` 키로 관리한다.
+  - 대상: `Text`, `SnackBar`, `tooltip`, `InputDecoration.labelText`, `AlertDialog`, 버튼 라벨, validator 메시지 등
+  - 예외(우선순위 낮음): `%` 같은 숫자/기호 단독 표기(필요 시 추후 정리)
+- 새 문구를 추가할 때는 아래를 **같이** 수행한다.
+  - `app/mobile/lib/l10n/app_ko.arb`에 키 추가(템플릿 역할)
+  - `app_en.arb`, `app_ja.arb`에 동일 키 추가(최소한 의미가 통하는 번역으로)
+  - `flutter gen-l10n` 실행 후, 생성된 getter/메서드 시그니처에 맞게 코드에서 호출한다.
+    - 현재 프로젝트는 ARB 키가 그대로 getter/메서드로 생성되므로(underscore 유지) `my_key_name` 형태로 호출한다.
+    - placeholder가 있는 키는 positional argument로 생성될 수 있으니, 호출 순서를 반드시 확인한다.
+- 에러 메시지 처리 원칙
+  - 사용자 안내용 문구는 i18n 메시지를 우선 사용한다.
+  - 필요 시(`FirebaseAuthException`) `e.message`를 fallback으로 사용하되, 앱 UI는 i18n 문구 중심으로 유지한다.
+- i18n 변경 후 품질 게이트
+  - 최소 `flutter gen-l10n`, `flutter analyze`, `flutter test`를 통과한다.
+
 ## 4) Firebase/Functions 규칙
 - Functions region은 기본 `asia-northeast3`를 사용한다.
 - Firestore 스키마 필드명은 기존 문서(`users/{uid}/daily_progress/{yyyy-MM-dd}`)와 호환되게 유지한다.
