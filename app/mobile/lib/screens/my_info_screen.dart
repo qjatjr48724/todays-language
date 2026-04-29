@@ -99,7 +99,7 @@ class MyInfoScreen extends StatelessWidget {
                       const Spacer(),
                       if (isAdmin)
                         IconButton(
-                          tooltip: '관리자 도구',
+                          tooltip: l10n.my_info_admin_tools_tooltip,
                           onPressed: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(builder: (_) => const AdminToolsScreen()),
