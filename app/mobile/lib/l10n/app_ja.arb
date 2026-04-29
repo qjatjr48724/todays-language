@@ -235,6 +235,25 @@
   "wrapup_meaning_label": "意味:",
   "wrapup_word_instruction": "該当する単語を確認してください。",
   "wrapup_sentence_instruction": "該当する文を確認してください。",
-  "wrapup_answer_prefix": "答え: "
+  "wrapup_answer_prefix": "答え: ",
+
+  "email_login_appbar_title": "メールログイン",
+  "email_login_email_label": "メール",
+  "email_login_password_label": "パスワード",
+  "email_login_button": "ログイン",
+  "email_login_to_register_prefix": "アカウントをお持ちではありませんか？ ",
+  "email_login_to_register_button": "新規登録",
+
+  "email_login_validate_email_required": "メールアドレスを入力してください。",
+  "email_login_validate_email_format": "メール形式が正しくありません。",
+  "email_login_validate_password_required": "パスワードを入力してください。",
+  "email_login_validate_password_min": "パスワードは6文字以上である必要があります。",
+
+  "email_login_error_unknown": "不明なエラーが発生しました。",
+  "email_login_error_invalid_email": "メール形式が正しくありません。",
+  "email_login_error_user_disabled": "このアカウントは利用できません。",
+  "email_login_error_credentials": "メールまたはパスワードが正しくありません。",
+  "email_login_error_too_many_requests": "試行回数が多すぎます。しばらくしてから再試行してください。",
+  "email_login_error_failed": "ログインに失敗しました。({code})"
 }
 

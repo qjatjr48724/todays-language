@@ -667,4 +667,59 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get wrapup_answer_prefix => 'Answer: ';
+
+  @override
+  String get email_login_appbar_title => 'Email Login';
+
+  @override
+  String get email_login_email_label => 'Email';
+
+  @override
+  String get email_login_password_label => 'Password';
+
+  @override
+  String get email_login_button => 'Log in';
+
+  @override
+  String get email_login_to_register_prefix => 'Don\'t have an account? ';
+
+  @override
+  String get email_login_to_register_button => 'Sign up';
+
+  @override
+  String get email_login_validate_email_required => 'Please enter your email.';
+
+  @override
+  String get email_login_validate_email_format => 'Invalid email format.';
+
+  @override
+  String get email_login_validate_password_required =>
+      'Please enter your password.';
+
+  @override
+  String get email_login_validate_password_min =>
+      'Password must be at least 6 characters.';
+
+  @override
+  String get email_login_error_unknown => 'An unknown error occurred.';
+
+  @override
+  String get email_login_error_invalid_email =>
+      'The email address format is invalid.';
+
+  @override
+  String get email_login_error_user_disabled => 'This account is disabled.';
+
+  @override
+  String get email_login_error_credentials =>
+      'The email or password is incorrect.';
+
+  @override
+  String get email_login_error_too_many_requests =>
+      'Too many attempts. Please try again later.';
+
+  @override
+  String email_login_error_failed(Object code) {
+    return 'Login failed. ($code)';
+  }
 }

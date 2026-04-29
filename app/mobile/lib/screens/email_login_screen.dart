@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'email_register_screen.dart';
+import '../l10n/app_localizations.dart';
 
 class EmailLoginScreen extends StatefulWidget {
   const EmailLoginScreen({super.key});
@@ -26,6 +27,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
 
   Future<void> _signIn() async {
     if (!_formKey.currentState!.validate()) return;
+    final l10n = AppLocalizations.of(context)!;
     setState(() {
       _loading = true;
       _errorMessage = null;
@@ -38,9 +40,9 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
       if (!mounted) return;
       Navigator.of(context).pop();
     } on FirebaseAuthException catch (e) {
-      setState(() => _errorMessage = _messageForAuthException(e));
+      setState(() => _errorMessage = _messageForAuthException(e, context));
     } catch (_) {
-      setState(() => _errorMessage = '알 수 없는 오류가 발생했습니다.');
+      setState(() => _errorMessage = l10n.email_login_error_unknown);
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -49,8 +51,9 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('이메일 로그인')),
+      appBar: AppBar(title: Text(l10n.email_login_appbar_title)),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -64,14 +67,16 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                   keyboardType: TextInputType.emailAddress,
                   autocorrect: false,
                   textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    labelText: '이메일',
+                  decoration: InputDecoration(
+                    labelText: l10n.email_login_email_label,
                     border: OutlineInputBorder(),
                   ),
                   validator: (v) {
                     final s = v?.trim() ?? '';
-                    if (s.isEmpty) return '이메일을 입력해 주세요.';
-                    if (!s.contains('@')) return '올바른 이메일 형식이 아닙니다.';
+                    if (s.isEmpty) return l10n.email_login_validate_email_required;
+                    if (!s.contains('@')) {
+                      return l10n.email_login_validate_email_format;
+                    }
                     return null;
                   },
                 ),
@@ -80,14 +85,14 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                   controller: _passwordController,
                   obscureText: true,
                   textInputAction: TextInputAction.done,
-                  decoration: const InputDecoration(
-                    labelText: '비밀번호',
+                  decoration: InputDecoration(
+                    labelText: l10n.email_login_password_label,
                     border: OutlineInputBorder(),
                   ),
                   validator: (v) {
                     final s = v ?? '';
-                    if (s.isEmpty) return '비밀번호를 입력해 주세요.';
-                    if (s.length < 6) return '비밀번호는 6자 이상이어야 합니다.';
+                    if (s.isEmpty) return l10n.email_login_validate_password_required;
+                    if (s.length < 6) return l10n.email_login_validate_password_min;
                     return null;
                   },
                 ),
@@ -104,13 +109,13 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                           width: 20,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const Text('로그인'),
+                      : Text(l10n.email_login_button),
                 ),
                 const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('아이디가 없나요? ',
+                    Text(l10n.email_login_to_register_prefix,
                         style: TextStyle(color: scheme.onSurfaceVariant)),
                     TextButton(
                       onPressed: _loading
@@ -122,7 +127,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                                 ),
                               );
                             },
-                      child: const Text('회원가입'),
+                      child: Text(l10n.email_login_to_register_button),
                     ),
                   ],
                 ),
@@ -135,19 +140,20 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
   }
 }
 
-String _messageForAuthException(FirebaseAuthException e) {
+String _messageForAuthException(FirebaseAuthException e, BuildContext context) {
+  final l10n = AppLocalizations.of(context)!;
   switch (e.code) {
     case 'invalid-email':
-      return '이메일 형식이 올바르지 않습니다.';
+      return l10n.email_login_error_invalid_email;
     case 'user-disabled':
-      return '이 계정은 사용할 수 없습니다.';
+      return l10n.email_login_error_user_disabled;
     case 'user-not-found':
     case 'wrong-password':
     case 'invalid-credential':
-      return '이메일 또는 비밀번호가 올바르지 않습니다.';
+      return l10n.email_login_error_credentials;
     case 'too-many-requests':
-      return '시도가 너무 많습니다. 잠시 후 다시 시도해 주세요.';
+      return l10n.email_login_error_too_many_requests;
     default:
-      return e.message ?? '로그인에 실패했습니다. (${e.code})';
+      return e.message ?? l10n.email_login_error_failed(e.code);
   }
 }

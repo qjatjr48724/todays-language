@@ -643,4 +643,55 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get wrapup_answer_prefix => '정답: ';
+
+  @override
+  String get email_login_appbar_title => '이메일 로그인';
+
+  @override
+  String get email_login_email_label => '이메일';
+
+  @override
+  String get email_login_password_label => '비밀번호';
+
+  @override
+  String get email_login_button => '로그인';
+
+  @override
+  String get email_login_to_register_prefix => '아이디가 없나요? ';
+
+  @override
+  String get email_login_to_register_button => '회원가입';
+
+  @override
+  String get email_login_validate_email_required => '이메일을 입력해 주세요.';
+
+  @override
+  String get email_login_validate_email_format => '올바른 이메일 형식이 아닙니다.';
+
+  @override
+  String get email_login_validate_password_required => '비밀번호를 입력해 주세요.';
+
+  @override
+  String get email_login_validate_password_min => '비밀번호는 6자 이상이어야 합니다.';
+
+  @override
+  String get email_login_error_unknown => '알 수 없는 오류가 발생했습니다.';
+
+  @override
+  String get email_login_error_invalid_email => '이메일 형식이 올바르지 않습니다.';
+
+  @override
+  String get email_login_error_user_disabled => '이 계정은 사용할 수 없습니다.';
+
+  @override
+  String get email_login_error_credentials => '이메일 또는 비밀번호가 올바르지 않습니다.';
+
+  @override
+  String get email_login_error_too_many_requests =>
+      '시도가 너무 많습니다. 잠시 후 다시 시도해 주세요.';
+
+  @override
+  String email_login_error_failed(Object code) {
+    return '로그인에 실패했습니다. ($code)';
+  }
 }

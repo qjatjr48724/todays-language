@@ -235,6 +235,25 @@
   "wrapup_meaning_label": "Meaning:",
   "wrapup_word_instruction": "Check the corresponding word.",
   "wrapup_sentence_instruction": "Check the corresponding sentence.",
-  "wrapup_answer_prefix": "Answer: "
+  "wrapup_answer_prefix": "Answer: ",
+
+  "email_login_appbar_title": "Email Login",
+  "email_login_email_label": "Email",
+  "email_login_password_label": "Password",
+  "email_login_button": "Log in",
+  "email_login_to_register_prefix": "Don't have an account? ",
+  "email_login_to_register_button": "Sign up",
+
+  "email_login_validate_email_required": "Please enter your email.",
+  "email_login_validate_email_format": "Invalid email format.",
+  "email_login_validate_password_required": "Please enter your password.",
+  "email_login_validate_password_min": "Password must be at least 6 characters.",
+
+  "email_login_error_unknown": "An unknown error occurred.",
+  "email_login_error_invalid_email": "The email address format is invalid.",
+  "email_login_error_user_disabled": "This account is disabled.",
+  "email_login_error_credentials": "The email or password is incorrect.",
+  "email_login_error_too_many_requests": "Too many attempts. Please try again later.",
+  "email_login_error_failed": "Login failed. ({code})"
 }
 

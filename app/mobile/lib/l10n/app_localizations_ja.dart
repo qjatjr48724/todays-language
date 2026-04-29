@@ -644,4 +644,55 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get wrapup_answer_prefix => '答え: ';
+
+  @override
+  String get email_login_appbar_title => 'メールログイン';
+
+  @override
+  String get email_login_email_label => 'メール';
+
+  @override
+  String get email_login_password_label => 'パスワード';
+
+  @override
+  String get email_login_button => 'ログイン';
+
+  @override
+  String get email_login_to_register_prefix => 'アカウントをお持ちではありませんか？ ';
+
+  @override
+  String get email_login_to_register_button => '新規登録';
+
+  @override
+  String get email_login_validate_email_required => 'メールアドレスを入力してください。';
+
+  @override
+  String get email_login_validate_email_format => 'メール形式が正しくありません。';
+
+  @override
+  String get email_login_validate_password_required => 'パスワードを入力してください。';
+
+  @override
+  String get email_login_validate_password_min => 'パスワードは6文字以上である必要があります。';
+
+  @override
+  String get email_login_error_unknown => '不明なエラーが発生しました。';
+
+  @override
+  String get email_login_error_invalid_email => 'メール形式が正しくありません。';
+
+  @override
+  String get email_login_error_user_disabled => 'このアカウントは利用できません。';
+
+  @override
+  String get email_login_error_credentials => 'メールまたはパスワードが正しくありません。';
+
+  @override
+  String get email_login_error_too_many_requests =>
+      '試行回数が多すぎます。しばらくしてから再試行してください。';
+
+  @override
+  String email_login_error_failed(Object code) {
+    return 'ログインに失敗しました。($code)';
+  }
 }

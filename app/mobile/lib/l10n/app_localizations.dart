@@ -1216,6 +1216,102 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'정답: '**
   String get wrapup_answer_prefix;
+
+  /// No description provided for @email_login_appbar_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'이메일 로그인'**
+  String get email_login_appbar_title;
+
+  /// No description provided for @email_login_email_label.
+  ///
+  /// In ko, this message translates to:
+  /// **'이메일'**
+  String get email_login_email_label;
+
+  /// No description provided for @email_login_password_label.
+  ///
+  /// In ko, this message translates to:
+  /// **'비밀번호'**
+  String get email_login_password_label;
+
+  /// No description provided for @email_login_button.
+  ///
+  /// In ko, this message translates to:
+  /// **'로그인'**
+  String get email_login_button;
+
+  /// No description provided for @email_login_to_register_prefix.
+  ///
+  /// In ko, this message translates to:
+  /// **'아이디가 없나요? '**
+  String get email_login_to_register_prefix;
+
+  /// No description provided for @email_login_to_register_button.
+  ///
+  /// In ko, this message translates to:
+  /// **'회원가입'**
+  String get email_login_to_register_button;
+
+  /// No description provided for @email_login_validate_email_required.
+  ///
+  /// In ko, this message translates to:
+  /// **'이메일을 입력해 주세요.'**
+  String get email_login_validate_email_required;
+
+  /// No description provided for @email_login_validate_email_format.
+  ///
+  /// In ko, this message translates to:
+  /// **'올바른 이메일 형식이 아닙니다.'**
+  String get email_login_validate_email_format;
+
+  /// No description provided for @email_login_validate_password_required.
+  ///
+  /// In ko, this message translates to:
+  /// **'비밀번호를 입력해 주세요.'**
+  String get email_login_validate_password_required;
+
+  /// No description provided for @email_login_validate_password_min.
+  ///
+  /// In ko, this message translates to:
+  /// **'비밀번호는 6자 이상이어야 합니다.'**
+  String get email_login_validate_password_min;
+
+  /// No description provided for @email_login_error_unknown.
+  ///
+  /// In ko, this message translates to:
+  /// **'알 수 없는 오류가 발생했습니다.'**
+  String get email_login_error_unknown;
+
+  /// No description provided for @email_login_error_invalid_email.
+  ///
+  /// In ko, this message translates to:
+  /// **'이메일 형식이 올바르지 않습니다.'**
+  String get email_login_error_invalid_email;
+
+  /// No description provided for @email_login_error_user_disabled.
+  ///
+  /// In ko, this message translates to:
+  /// **'이 계정은 사용할 수 없습니다.'**
+  String get email_login_error_user_disabled;
+
+  /// No description provided for @email_login_error_credentials.
+  ///
+  /// In ko, this message translates to:
+  /// **'이메일 또는 비밀번호가 올바르지 않습니다.'**
+  String get email_login_error_credentials;
+
+  /// No description provided for @email_login_error_too_many_requests.
+  ///
+  /// In ko, this message translates to:
+  /// **'시도가 너무 많습니다. 잠시 후 다시 시도해 주세요.'**
+  String get email_login_error_too_many_requests;
+
+  /// No description provided for @email_login_error_failed.
+  ///
+  /// In ko, this message translates to:
+  /// **'로그인에 실패했습니다. ({code})'**
+  String email_login_error_failed(Object code);
 }
 
 class _AppLocalizationsDelegate
