@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'target_language_setup_screen.dart';
+import '../l10n/app_localizations.dart';
 
 class LanguageSetupScreen extends StatefulWidget {
   const LanguageSetupScreen({super.key});
@@ -45,7 +46,8 @@ class _LanguageSetupScreenState extends State<LanguageSetupScreen> {
       });
     } catch (e) {
       if (!mounted) return;
-      setState(() => _error = '언어 설정 불러오기 실패: $e');
+      final l10n = AppLocalizations.of(context)!;
+      setState(() => _error = l10n.setup_load_failed(e.toString()));
     }
   }
 
@@ -118,7 +120,8 @@ class _LanguageSetupScreenState extends State<LanguageSetupScreen> {
       );
     } catch (e) {
       if (!mounted) return;
-      setState(() => _error = '저장 실패: $e');
+      final l10n = AppLocalizations.of(context)!;
+      setState(() => _error = l10n.setup_save_failed(e.toString()));
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -126,12 +129,13 @@ class _LanguageSetupScreenState extends State<LanguageSetupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     final canSave = !_saving && _native != null;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('언어 선택'),
+        title: Text(l10n.language_setup_appbar_title),
         automaticallyImplyLeading: false,
       ),
       body: SafeArea(
@@ -142,12 +146,12 @@ class _LanguageSetupScreenState extends State<LanguageSetupScreen> {
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
                 children: [
                   Text(
-                    '처음 시작하기',
+                    l10n.language_setup_welcome_title,
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '로컬 언어(설명)와 대상 언어(학습)를 선택해주세요.',
+                    l10n.language_setup_welcome_subtitle,
                     style: Theme.of(context)
                         .textTheme
                         .bodyMedium
@@ -155,8 +159,8 @@ class _LanguageSetupScreenState extends State<LanguageSetupScreen> {
                   ),
                   const SizedBox(height: 16),
                   _PickerCard(
-                    title: '로컬 언어',
-                    subtitle: '설명/해석 표기에 사용됩니다.',
+                    title: l10n.language_setup_local_language_card_title,
+                    subtitle: l10n.language_setup_local_language_card_subtitle,
                     child: _loadingCountries
                         ? const Padding(
                             padding: EdgeInsets.all(12),
@@ -191,7 +195,7 @@ class _LanguageSetupScreenState extends State<LanguageSetupScreen> {
                             height: 22,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : const Text('다음'),
+                        : Text(l10n.setup_next_button),
                   ),
                 ],
               ),

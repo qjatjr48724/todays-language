@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'main_nav_screen.dart';
+import '../l10n/app_localizations.dart';
 
 class TargetLanguageSetupScreen extends StatefulWidget {
   const TargetLanguageSetupScreen({super.key});
@@ -49,7 +50,8 @@ class _TargetLanguageSetupScreenState extends State<TargetLanguageSetupScreen> {
       setState(() => _targetChoice = targetChoice);
     } catch (e) {
       if (!mounted) return;
-      setState(() => _error = '언어 설정 불러오기 실패: $e');
+      final l10n = AppLocalizations.of(context)!;
+      setState(() => _error = l10n.setup_load_failed(e.toString()));
     }
   }
 
@@ -136,7 +138,8 @@ class _TargetLanguageSetupScreenState extends State<TargetLanguageSetupScreen> {
       );
     } catch (e) {
       if (!mounted) return;
-      setState(() => _error = '저장 실패: $e');
+      final l10n = AppLocalizations.of(context)!;
+      setState(() => _error = l10n.setup_save_failed(e.toString()));
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -144,12 +147,13 @@ class _TargetLanguageSetupScreenState extends State<TargetLanguageSetupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     final canSave = !_saving && _targetChoice != null;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('대상 언어 선택'),
+        title: Text(l10n.target_language_setup_appbar_title),
         automaticallyImplyLeading: false,
       ),
       body: SafeArea(
@@ -160,12 +164,12 @@ class _TargetLanguageSetupScreenState extends State<TargetLanguageSetupScreen> {
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
                 children: [
                   Text(
-                    '학습 언어를 선택해주세요.',
+                    l10n.target_language_setup_welcome_title,
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '단어/문장/마무리에 사용됩니다.',
+                    l10n.target_language_setup_welcome_subtitle,
                     style: Theme.of(context)
                         .textTheme
                         .bodyMedium
@@ -173,8 +177,8 @@ class _TargetLanguageSetupScreenState extends State<TargetLanguageSetupScreen> {
                   ),
                   const SizedBox(height: 16),
                   _PickerCard(
-                    title: '대상 언어',
-                    subtitle: '학습(단어/문장/마무리)에 사용됩니다.',
+                    title: l10n.target_language_setup_card_title,
+                    subtitle: l10n.target_language_setup_card_subtitle,
                     child: _loadingCountries
                         ? const Padding(
                             padding: EdgeInsets.all(12),
@@ -206,7 +210,7 @@ class _TargetLanguageSetupScreenState extends State<TargetLanguageSetupScreen> {
                             height: 22,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : const Text('저장하고 시작하기'),
+                        : Text(l10n.target_language_setup_save_and_start_button),
                   ),
                 ],
               ),

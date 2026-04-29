@@ -12,6 +12,7 @@ import 'dart:math';
 import 'email_login_screen.dart';
 import '../services/user_profile_sync.dart';
 import 'main_nav_screen.dart';
+import '../l10n/app_localizations.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -60,6 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _signInWithGoogle() async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() {
       _loading = true;
       _errorMessage = null;
@@ -77,18 +79,21 @@ class _LoginScreenState extends State<LoginScreen> {
         await ensureUserProfileDocument(result.user!);
       }
     } on FirebaseAuthException catch (e) {
-      setState(() => _errorMessage = _messageForAuthException(e));
+      if (!mounted) return;
+      setState(() => _errorMessage = _messageForAuthException(e, context));
     } catch (e) {
-      setState(() => _errorMessage = '구글 로그인에 실패했습니다: $e');
+      if (!mounted) return;
+      setState(() => _errorMessage = l10n.login_google_failed(e.toString()));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
 
   Future<void> _signInWithApple() async {
+    final l10n = AppLocalizations.of(context)!;
     if (!Platform.isIOS) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('애플 로그인은 iOS에서만 지원합니다.')),
+        SnackBar(content: Text(l10n.login_apple_not_supported)),
       );
       return;
     }
@@ -120,17 +125,21 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } on SignInWithAppleAuthorizationException catch (e) {
       if (e.code == AuthorizationErrorCode.canceled) return;
-      setState(() => _errorMessage = '애플 로그인에 실패했습니다: ${e.message}');
+      if (!mounted) return;
+      setState(() => _errorMessage = l10n.login_apple_failed(e.message));
     } on FirebaseAuthException catch (e) {
-      setState(() => _errorMessage = _messageForAuthException(e));
+      if (!mounted) return;
+      setState(() => _errorMessage = _messageForAuthException(e, context));
     } catch (e) {
-      setState(() => _errorMessage = '애플 로그인에 실패했습니다: $e');
+      if (!mounted) return;
+      setState(() => _errorMessage = l10n.login_apple_failed_generic(e.toString()));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
 
   Future<void> _signInTestAccount() async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() {
       _loading = true;
       _errorMessage = null;
@@ -153,9 +162,11 @@ class _LoginScreenState extends State<LoginScreen> {
         );
         return;
       }
-      setState(() => _errorMessage = _messageForAuthException(e));
+      if (!mounted) return;
+      setState(() => _errorMessage = _messageForAuthException(e, context));
     } catch (_) {
-      setState(() => _errorMessage = '알 수 없는 오류가 발생했습니다.');
+      if (!mounted) return;
+      setState(() => _errorMessage = l10n.login_test_unknown_error);
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -163,21 +174,22 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     final t = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Today's Language")),
+      appBar: AppBar(title: Text(l10n.login_appbar_title)),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('시작하기', style: t.headlineSmall),
+              Text(l10n.login_welcome_title, style: t.headlineSmall),
               const SizedBox(height: 6),
               Text(
-                '원하는 로그인/회원가입 방식을 선택하세요.',
+                l10n.login_welcome_subtitle,
                 style: t.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
               ),
               const SizedBox(height: 18),
@@ -191,17 +203,17 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         );
                       },
-                child: const Text('이메일로 시작하기'),
+                child: Text(l10n.login_email_button),
               ),
               const SizedBox(height: 8),
               OutlinedButton(
                 onPressed: _loading ? null : _signInWithGoogle,
-                child: const Text('구글로 시작하기'),
+                child: Text(l10n.login_google_button),
               ),
               const SizedBox(height: 8),
               OutlinedButton(
                 onPressed: _loading ? null : _signInWithApple,
-                child: const Text('애플로 시작하기'),
+                child: Text(l10n.login_apple_button),
               ),
               if (_errorMessage != null) ...[
                 const SizedBox(height: 12),
@@ -215,12 +227,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 OutlinedButton.icon(
                   onPressed: _loading ? null : _signInTestAccount,
                   icon: const Icon(Icons.bolt),
-                  label: const Text('테스트 계정으로 자동 로그인'),
+                  label: Text(l10n.login_debug_test_login),
                 ),
               ],
               const SizedBox(height: 16),
               Text(
-                '휴대폰 인증(PASS) 연동은 다음 단계에서 추가됩니다.',
+                l10n.login_pass_hint,
                 style: t.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
               ),
             ],
@@ -231,17 +243,18 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-String _messageForAuthException(FirebaseAuthException e) {
+String _messageForAuthException(FirebaseAuthException e, BuildContext context) {
+  final l10n = AppLocalizations.of(context)!;
   switch (e.code) {
     case 'invalid-email':
-      return '이메일 형식이 올바르지 않습니다.';
+      return l10n.login_error_invalid_email;
     case 'user-not-found':
     case 'wrong-password':
     case 'invalid-credential':
-      return '이메일 또는 비밀번호가 올바르지 않습니다.';
+      return l10n.login_error_credentials;
     case 'too-many-requests':
-      return '시도가 너무 많습니다. 잠시 후 다시 시도해 주세요.';
+      return l10n.login_error_too_many_requests;
     default:
-      return e.message ?? '인증에 실패했습니다. (${e.code})';
+      return e.message ?? l10n.login_error_unknown(e.code);
   }
 }

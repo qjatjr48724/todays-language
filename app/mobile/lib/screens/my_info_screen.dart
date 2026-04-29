@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../auth_gate.dart';
 import 'admin_tools_screen.dart';
+import '../l10n/app_localizations.dart';
 
 class MyInfoScreen extends StatelessWidget {
   const MyInfoScreen({super.key, this.embedded = false});
@@ -16,17 +17,18 @@ class MyInfoScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
     final scheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     if (user == null) {
       final child = Center(
         child: Text(
-          '로그인 후 이용할 수 있습니다.',
+          l10n.my_info_login_required,
           style: TextStyle(color: scheme.onSurfaceVariant),
         ),
       );
       if (embedded) return child;
       return Scaffold(
-        appBar: AppBar(title: const Text('내 정보')),
+        appBar: AppBar(title: Text(l10n.my_info_screen_title)),
         body: child,
       );
     }
@@ -43,7 +45,11 @@ class MyInfoScreen extends StatelessWidget {
         if (snapshot.hasError) {
           return Center(
             child: Text(
-              '내 정보 불러오기 실패: ${snapshot.error}',
+              l10n.my_info_load_failed_error(
+                (snapshot.error?.toString() ?? '').isEmpty
+                    ? '-'
+                    : snapshot.error.toString(),
+              ),
               textAlign: TextAlign.center,
               style: TextStyle(color: scheme.error),
             ),
@@ -102,7 +108,7 @@ class MyInfoScreen extends StatelessWidget {
                           icon: const Icon(Icons.admin_panel_settings_outlined),
                         ),
                       Text(
-                        '최초 가입일 : $createdText',
+                        l10n.my_info_first_joined_at_prefix(createdText),
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: scheme.onSurfaceVariant,
                             ),
@@ -120,24 +126,24 @@ class MyInfoScreen extends StatelessWidget {
                   Divider(color: scheme.outlineVariant),
                   const SizedBox(height: 16),
                   Text(
-                    '설정된 언어',
+                    l10n.my_info_settings_language_header,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 8),
                   _LanguageRow(
-                    label: '로컬언어',
+                    label: l10n.my_info_local_language_label,
                     alpha3: nativeLanguage,
                   ),
                   const SizedBox(height: 4),
                   _LanguageRow(
-                    label: '대상언어',
+                    label: l10n.my_info_target_language_label,
                     alpha3: targetLanguage,
                   ),
                   const SizedBox(height: 12),
                   Divider(color: scheme.outlineVariant),
                   const SizedBox(height: 16),
                   Text(
-                    '학습 난이도',
+                    l10n.my_info_difficulty_header,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 8),
@@ -158,7 +164,7 @@ class MyInfoScreen extends StatelessWidget {
                             targetLanguage: targetLanguage,
                           ),
                           icon: const Icon(Icons.tune, size: 18),
-                          label: const Text('변경'),
+                          label: Text(l10n.my_info_change_button),
                         ),
                       ),
                     ],
@@ -167,7 +173,7 @@ class MyInfoScreen extends StatelessWidget {
                   Divider(color: scheme.outlineVariant),
                   const SizedBox(height: 16),
                   Text(
-                    '기기변경',
+                    l10n.my_info_device_change_header,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 10),
@@ -175,10 +181,12 @@ class MyInfoScreen extends StatelessWidget {
                     child: OutlinedButton(
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('백업 기능은 다음 단계에서 구현합니다.')),
+                          SnackBar(
+                            content: Text(l10n.my_info_backup_not_ready_snackbar),
+                          ),
                         );
                       },
-                      child: const Text('전체 데이터 백업'),
+                      child: Text(l10n.my_info_backup_button),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -191,7 +199,7 @@ class MyInfoScreen extends StatelessWidget {
                           minimumSize: const Size(0, 40),
                         ),
                         icon: const Icon(Icons.logout, size: 18),
-                        label: const Text('로그아웃'),
+                        label: Text(l10n.my_info_logout_button),
                         onPressed: () async {
                           // 로그아웃 시 StreamBuilder가 permission error를 뿜기 전에
                           // 2초 로딩을 보여주고 로그인/회원가입(AuthGate)로 이동합니다.
@@ -213,7 +221,7 @@ class MyInfoScreen extends StatelessWidget {
                                       const SizedBox(width: 12),
                                       Expanded(
                                         child: Text(
-                                          '로그아웃 중…',
+                                          l10n.my_info_logout_loading,
                                           style: TextStyle(color: scheme.onSurface),
                                         ),
                                       ),
@@ -246,10 +254,14 @@ class MyInfoScreen extends StatelessWidget {
                         ),
                         onPressed: () {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('리뷰 작성 연결은 다음 단계에서 구현합니다.')),
+                            SnackBar(
+                              content: Text(
+                                l10n.my_info_review_not_ready_snackbar,
+                              ),
+                            ),
                           );
                         },
-                        child: const Text('리뷰 작성'),
+                        child: Text(l10n.my_info_review_button),
                       ),
                     ],
                   ),
@@ -274,14 +286,14 @@ class MyInfoScreen extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
-          tooltip: '뒤로가기',
+          tooltip: l10n.my_info_back_tooltip,
         ),
-        title: const Text('내 정보'),
+        title: Text(l10n.my_info_screen_title),
         actions: [
           if (isAdmin)
             IconButton(
               icon: const Icon(Icons.admin_panel_settings_outlined),
-              tooltip: '관리자 도구',
+              tooltip: l10n.my_info_admin_tools_tooltip,
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const AdminToolsScreen()),
@@ -290,7 +302,7 @@ class MyInfoScreen extends StatelessWidget {
             ),
           IconButton(
             icon: const Icon(Icons.language),
-            tooltip: '언어 설정',
+            tooltip: l10n.my_info_language_settings_tooltip,
             onPressed: () => _openLanguagePicker(context),
           ),
         ],
@@ -380,6 +392,7 @@ class _FlagThumb extends StatelessWidget {
 Future<void> _openLanguagePicker(BuildContext context) async {
   final user = FirebaseAuth.instance.currentUser;
   if (user == null) return;
+  final l10n = AppLocalizations.of(context)!;
 
   final docRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
   final snap = await docRef.get();
@@ -423,7 +436,10 @@ Future<void> _openLanguagePicker(BuildContext context) async {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('대상 언어 선택', style: Theme.of(context).textTheme.titleLarge),
+                Text(
+                  l10n.my_info_language_picker_title,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
                 const SizedBox(height: 12),
                 Flexible(
                   child: ListView(
@@ -443,8 +459,10 @@ Future<void> _openLanguagePicker(BuildContext context) async {
                         );
                       }),
                       const SizedBox(height: 8),
-                      Text('추가 예정(선택 불가)',
-                          style: Theme.of(context).textTheme.labelLarge),
+                      Text(
+                        l10n.my_info_language_picker_additional_disabled,
+                        style: Theme.of(context).textTheme.labelLarge,
+                      ),
                       ...disabled.map((m) {
                         final alpha3 = (m['alpha3'] as String?)?.trim().toUpperCase() ?? '';
                         final endonym = (m['endonym'] as String?)?.trim() ?? alpha3;
@@ -466,14 +484,14 @@ Future<void> _openLanguagePicker(BuildContext context) async {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () => Navigator.of(context).pop(false),
-                        child: const Text('취소'),
+                        child: Text(l10n.common_cancel),
                       ),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: FilledButton(
                         onPressed: () => Navigator.of(context).pop(true),
-                        child: const Text('저장'),
+                        child: Text(l10n.common_save),
                       ),
                     ),
                   ],
@@ -504,12 +522,16 @@ Future<void> _openLanguagePicker(BuildContext context) async {
     });
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('언어가 저장되었고, 오늘 문제 세트를 준비했어요.')),
+      SnackBar(content: Text(l10n.my_info_language_saved_snackbar)),
     );
   } catch (e) {
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('언어 저장은 됐지만 세트 준비에 실패했어요: $e')),
+      SnackBar(
+        content: Text(
+          l10n.my_info_language_save_failed_snackbar(e.toString()),
+        ),
+      ),
     );
   }
 }
@@ -521,6 +543,8 @@ Future<void> _openLevelPicker(
 }) async {
   final user = FirebaseAuth.instance.currentUser;
   if (user == null) return;
+
+  final l10n = AppLocalizations.of(context)!;
 
   final normalizedCurrent = _normalizeLevel(currentLevel);
   String selected = normalizedCurrent;
@@ -546,25 +570,31 @@ Future<void> _openLevelPicker(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('학습 난이도 선택', style: Theme.of(context).textTheme.titleLarge),
+                Text(
+                  l10n.my_info_difficulty_picker_title,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
                 const SizedBox(height: 12),
-                tile('beginner', '초급 (어린이/입문)'),
-                tile('intermediate', '중급 (초등~중학생)'),
-                tile('advanced', '고급 (고등학생~)'),
+                tile('beginner', l10n.my_info_difficulty_tile_beginner_label),
+                tile(
+                  'intermediate',
+                  l10n.my_info_difficulty_tile_intermediate_label,
+                ),
+                tile('advanced', l10n.my_info_difficulty_tile_advanced_label),
                 const SizedBox(height: 8),
                 Row(
                   children: [
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () => Navigator.of(context).pop(false),
-                        child: const Text('취소'),
+                        child: Text(l10n.common_cancel),
                       ),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: FilledButton(
                         onPressed: () => Navigator.of(context).pop(true),
-                        child: const Text('저장'),
+                        child: Text(l10n.common_save),
                       ),
                     ),
                   ],
@@ -594,12 +624,16 @@ Future<void> _openLevelPicker(
     });
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('난이도가 저장되었고, 오늘 세트를 준비했어요.')),
+      SnackBar(content: Text(l10n.my_info_difficulty_saved_snackbar)),
     );
   } catch (e) {
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('난이도 저장은 됐지만 세트 준비에 실패했어요: $e')),
+      SnackBar(
+        content: Text(
+          l10n.my_info_difficulty_save_failed_snackbar(e.toString()),
+        ),
+      ),
     );
   }
 }

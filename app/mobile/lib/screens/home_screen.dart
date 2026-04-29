@@ -15,6 +15,7 @@ import 'today_sentences_screen.dart';
 import 'today_words_screen.dart';
 import 'today_wrap_up_screen.dart';
 import '../utils/kst_date.dart';
+import '../l10n/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -96,8 +97,9 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     } catch (e) {
       if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
       setState(() {
-        _profileError = '프로필 또는 진도 동기화 실패: $e';
+        _profileError = l10n.home_profile_sync_failed(e.toString());
         _loadingProgress = false;
       });
     }
@@ -124,18 +126,19 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _resetTodayProgress() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
+    final l10n = AppLocalizations.of(context)!;
     setState(() => _resettingProgress = true);
     try {
       final p = await resetTodayDailyProgress(user);
       if (!mounted) return;
       setState(() => _todayProgress = p);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('오늘 진행률을 초기화했어요.')),
+        SnackBar(content: Text(l10n.home_reset_success)),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('초기화 실패: $e')),
+        SnackBar(content: Text(l10n.home_reset_failed(e.toString()))),
       );
     } finally {
       if (mounted) setState(() => _resettingProgress = false);
@@ -144,23 +147,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _confirmAndResetTodayProgress() async {
     if (_resettingProgress) return;
+    final l10n = AppLocalizations.of(context)!;
     final shouldReset = await showDialog<bool>(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('진행률 초기화'),
-          content: const Text(
-            '오늘 진행률(단어/문장/마무리)을 0으로 초기화할까요?\n'
-            '이 작업은 디버그용이며 되돌릴 수 없습니다.',
-          ),
+          title: Text(l10n.home_reset_dialog_title),
+          content: Text(l10n.home_reset_dialog_content),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('취소'),
+              child: Text(l10n.home_cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('초기화'),
+              child: Text(l10n.home_reset),
             ),
           ],
         );
@@ -194,6 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final user = FirebaseAuth.instance.currentUser;
     final scheme = Theme.of(context).colorScheme;
     final p = _todayProgress;
@@ -206,11 +208,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Today's Language"),
+        title: Text(l10n.launch_subtitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.person_outline),
-            tooltip: '내 정보',
+            tooltip: l10n.home_my_info_tooltip,
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -230,7 +232,7 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Expanded(
                   child: Text(
-                    '홈',
+                    l10n.home_home_tab_title,
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                 ),
@@ -260,8 +262,8 @@ class _HomeScreenState extends State<HomeScreen> {
               childAspectRatio: 0.9,
               children: [
                 HomeFeatureCard(
-                  title: '오늘의 단어',
-                  subtitle: '매일 30개',
+                  title: l10n.home_today_words_title,
+                  subtitle: l10n.home_today_words_subtitle,
                   icon: Icons.translate,
                   progressText: p == null ? null : '${p.wordDone} / ${p.wordGoal}',
                   onTap: () {
@@ -278,8 +280,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 ),
                 HomeFeatureCard(
-                  title: '오늘의 문장',
-                  subtitle: '매일 10개',
+                  title: l10n.home_today_sentences_title,
+                  subtitle: l10n.home_today_sentences_subtitle,
                   icon: Icons.format_quote,
                   progressText: p == null
                       ? null
@@ -298,10 +300,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 ),
                 HomeFeatureCard(
-                  title: '오늘의 마무리',
+                  title: l10n.home_today_wrap_up_title,
                   subtitle: canOpenWrapUp
-                      ? '25문제(단어 70% / 문장 30%)'
-                      : '단어 30 + 문장 10 완료 후 열림',
+                      ? l10n.home_today_wrap_up_subtitle_ready
+                      : l10n.home_today_wrap_up_subtitle_locked,
                   icon: Icons.fact_check_outlined,
                   progressText: p == null ? null : '${p.quizDone} / ${p.quizGoal}',
                   enabled: canOpenWrapUp,
@@ -325,12 +327,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
             const SizedBox(height: 16),
             SectionCard(
-              title: '오늘의 진행률',
-              subtitle: 'KST · ${todayKstYyyyMmDd()}',
+              title: l10n.home_progress_section_title,
+              subtitle: l10n.home_progress_section_subtitle_prefix(todayKstYyyyMmDd()),
               child: _loadingProgress
                   ? const LinearProgressIndicator()
                   : (percent == null)
-                      ? Text('데이터가 없습니다.', style: TextStyle(color: scheme.error))
+                      ? Text(l10n.home_no_data, style: TextStyle(color: scheme.error))
                       : Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -357,7 +359,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             const SizedBox(height: 10),
                             if (p != null)
                               Text(
-                                '단어 ${p.wordDone}/${p.wordGoal} · 문장 ${p.sentenceDone}/${p.sentenceGoal} · 마무리 ${p.quizDone}/${p.quizGoal}',
+                            l10n.home_progress_counts(
+                              p.wordDone,
+                              p.wordGoal,
+                              p.sentenceDone,
+                              p.sentenceGoal,
+                              p.quizDone,
+                              p.quizGoal,
+                            ),
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyMedium
@@ -376,7 +385,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         child: CircularProgressIndicator(strokeWidth: 2),
                                       )
                                     : const Icon(Icons.restart_alt),
-                                label: const Text('진행률 초기화(디버그)'),
+                                label: Text(l10n.home_reset_debug_button_label),
                               ),
                             ],
                           ],

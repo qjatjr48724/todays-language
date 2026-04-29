@@ -6,6 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../auth_gate.dart';
+import '../l10n/app_localizations.dart';
+
+enum _BlockReason {
+  internet,
+  login,
+}
 
 class LaunchScreen extends StatefulWidget {
   const LaunchScreen({super.key});
@@ -21,7 +27,7 @@ class _LaunchScreenState extends State<LaunchScreen> {
   bool _firstLaunch = false;
   bool _navigating = false;
 
-  String? _blockingMessage;
+  _BlockReason? _blockReason;
 
   @override
   void initState() {
@@ -37,7 +43,7 @@ class _LaunchScreenState extends State<LaunchScreen> {
     setState(() {
       _firstLaunch = !hasLaunched;
       _loading = false;
-      _blockingMessage = null;
+      _blockReason = null;
     });
 
     // 재실행 시: 1초 로고 유지 후 자동 전환
@@ -63,7 +69,7 @@ class _LaunchScreenState extends State<LaunchScreen> {
     if (_navigating) return;
     setState(() {
       _navigating = true;
-      _blockingMessage = null;
+      _blockReason = null;
     });
 
     final hasInternet = await _hasInternetConnection();
@@ -71,7 +77,7 @@ class _LaunchScreenState extends State<LaunchScreen> {
     if (!hasInternet) {
       setState(() {
         _navigating = false;
-        _blockingMessage = '인터넷 연결이 필요합니다.\n네트워크 연결을 확인한 뒤 다시 시도해 주세요.';
+        _blockReason = _BlockReason.internet;
       });
       return;
     }
@@ -88,7 +94,7 @@ class _LaunchScreenState extends State<LaunchScreen> {
 
     setState(() {
       _navigating = false;
-      _blockingMessage = '로그인이 필요합니다.\n시작하려면 터치해주세요.';
+      _blockReason = _BlockReason.login;
     });
   }
 
@@ -111,8 +117,8 @@ class _LaunchScreenState extends State<LaunchScreen> {
     }
 
     // 재실행인데 로그인 풀림/오프라인 등으로 자동 전환이 막힌 경우
-    if (_blockingMessage != null) {
-      if (_blockingMessage!.contains('인터넷')) {
+    if (_blockReason != null) {
+      if (_blockReason == _BlockReason.internet) {
         await _autoNavigate();
         return;
       }
@@ -139,10 +145,11 @@ class _LaunchScreenState extends State<LaunchScreen> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final t = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context)!;
 
     final showPrompt = !_loading &&
         (_firstLaunch ||
-            _blockingMessage != null ||
+            _blockReason != null ||
             (!_navigating && FirebaseAuth.instance.currentUser == null));
 
     return Scaffold(
@@ -157,12 +164,12 @@ class _LaunchScreenState extends State<LaunchScreen> {
             children: [
               const Spacer(),
               Text(
-                '오늘의 언어',
+                l10n.launch_title,
                 style: t.headlineMedium,
               ),
               const SizedBox(height: 10),
               Text(
-                "Today's Language",
+                l10n.launch_subtitle,
                 style: t.titleMedium?.copyWith(color: scheme.onSurfaceVariant),
               ),
               const Spacer(),
@@ -185,8 +192,12 @@ class _LaunchScreenState extends State<LaunchScreen> {
                             ? Text(
                                 key: const ValueKey('prompt'),
                                 _firstLaunch
-                                    ? '시작하려면 터치해주세요'
-                                    : (_blockingMessage ?? '시작하려면 터치해주세요'),
+                                    ? l10n.launch_prompt_tap
+                                    : (_blockReason == _BlockReason.internet
+                                        ? l10n.launch_internet_required
+                                        : _blockReason == _BlockReason.login
+                                            ? l10n.launch_login_required
+                                            : l10n.launch_prompt_tap),
                                 textAlign: TextAlign.center,
                                 style: t.bodyMedium?.copyWith(
                                   color: scheme.onSurfaceVariant,

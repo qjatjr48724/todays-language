@@ -1,10 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'auth_session_watcher.dart';
 import 'firebase_options.dart';
 import 'screens/launch_screen.dart';
 import 'ui/app_theme.dart';
+import 'l10n/app_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,6 +34,12 @@ class _MyAppState extends State<MyApp> {
       title: "Today's Language",
       theme: AppTheme.light(),
       navigatorKey: _navKey,
+      localizationsDelegates: [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
       builder: (context, child) {
         return AuthSessionWatcher(
           navigatorKey: _navKey,
