@@ -691,3 +691,208 @@ unauthenticated: 로그인 상태 확인
 
 ---
 
+## [단계 13] 내 정보(1순위) 난이도 설정 + (언어/난이도) 세트 즉시 준비
+
+### 1) 오늘 한 일
+
+- **내 정보에서 학습 난이도(초/중/고) 선택 UI 추가**
+  - 내 정보 화면에 “학습 난이도” 섹션 + 변경 버튼
+  - 바텀시트에서 초/중/고 선택 후 `users/{uid}.level` 저장
+- **난이도 변경 즉시 오늘 세트 준비**
+  - 난이도 변경 시 Functions `ensureLearningSetForToday(targetLanguage, level)` 호출
+  - 난이도/언어 조합의 당일 세트가 없으면 즉시 생성되도록 트리거
+
+### 2) 완료 기준 체크
+
+- [x] 난이도 저장/반영 확인
+- [x] 난이도 변경 후 학습 화면에서 해당 레벨 세트가 생성/조회됨 확인
+
+### 3) 추가/변경한 코드 포인트
+
+- `app/mobile/lib/screens/my_info_screen.dart` (난이도 선택 UI + 저장 + callable 호출)
+
+---
+
+## [단계 14] 일본어 중급/고급: 한자+히라가나 + 히라가나 확인용 표기 추가
+
+### 1) 오늘 한 일
+
+- **중급/고급 일본어에서 “히라가나만(확인용)”을 추가로 제공**
+  - 단어: `readingHira`
+  - 문장: `sentenceHira`
+- **앱 표시**
+  - `JPN`이고 `beginner`가 아닌 경우, 본문(한자 포함) 아래에 히라가나 확인용 한 줄 추가 표시
+
+### 2) 완료 기준 체크
+
+- [x] Firestore 세트 재생성 후 `readingHira/sentenceHira` 필드 생성 확인
+- [x] 앱에서 중급/고급 JPN에서 보조 표기 노출 확인
+
+### 3) 추가/변경한 코드 포인트
+
+- `functions/src/prompts.ts` (프롬프트 스키마 확장)
+- `functions/src/index.ts` (파싱/저장/응답 스키마 확장)
+- `app/mobile/lib/screens/today_words_screen.dart`, `app/mobile/lib/screens/today_sentences_screen.dart` (표시)
+
+---
+
+## [단계 15] 레거시 정리: `global_quiz_owner` 완전 제거 + 규칙/문서 정합
+
+### 1) 오늘 한 일
+
+- **`global_quiz_owner` 흔적 완전 제거**
+  - 앱에서 참조 없음 확인 후, Functions/Rules/Docs에서 언급 및 규칙 제거
+  - Firestore 레거시 문서/컬렉션 정리(사용하지 않는 문서 삭제)
+
+### 2) 완료 기준 체크
+
+- [x] 코드베이스에서 `global_quiz_owner` 문자열 0건 확인
+- [x] Firestore에서도 불필요 문서 삭제 확인
+
+### 3) 추가/변경한 코드 포인트
+
+- `functions/src/index.ts`, `firestore.rules`, `docs/*` (관련 내용 정리)
+
+---
+
+## [단계 16] 언어 확장/첫 진입 언어 선택(Phase 1→3) + 국기 메타데이터 캐시(Functions 프록시)
+
+### 1) 오늘 한 일
+
+- **첫 로그인(앱 첫 진입) 시 언어 선택 강제**
+  - `users/{uid}.languageSetupDone` 기준으로 `AuthGate`에서 라우팅
+- **언어 선택 UI 2단계화**
+  - 1단계: 로컬 언어 선택(현재 선택은 KOR만 허용, 목록은 노출)
+  - 2단계: 대상 언어 선택(일본어 variant 포함)
+- **국가/국기 메타데이터 Phase 3**
+  - 앱(alpha-3) ↔ 국기 API(alpha-2) **매핑 카탈로그**를 서버에 구축
+  - 공공데이터포털 국기 API는 **Functions에서만 호출**하고 Firestore에 캐시(`public_metadata/countries/items`) 저장
+  - 스케줄러로 1일 1회 갱신 + 필요 시 callable로 강제 동기화
+
+### 2) 완료 기준 체크
+
+- [x] ServiceKey secrets 등록 + Functions 배포
+- [x] `seedCountryCatalog` / `syncCountryFlags(force:true)` 실행 후 Firestore에 `flagUrl` 캐시 확인
+- [x] 첫 진입 언어 선택 화면 정상 진입/전환/저장 확인
+
+### 3) 추가/변경한 코드 포인트
+
+- 파일(Flutter):
+  - `app/mobile/lib/auth_gate.dart` (첫 진입 라우팅)
+  - `app/mobile/lib/screens/language_setup_screen.dart` (1단계)
+  - `app/mobile/lib/screens/target_language_setup_screen.dart` (2단계)
+- 파일(Firebase):
+  - `firestore.rules` ( `public_metadata/**` read-only 추가 )
+- 파일(Functions):
+  - `functions/src/metadata/*` (카탈로그/프록시/스케줄)
+  - `functions/src/shared/firebase.ts`
+
+---
+
+## [단계 17] 관리자(테스트 계정) 전용 디버그 허브 + 내정보 언어 UI 최신화
+
+### 1) 오늘 한 일
+
+- **테스트 UID만 접근 가능한 관리자 도구 화면**
+  - 언어 선택 플로우 초기화/진입
+  - `seedCountryCatalog`, `syncCountryFlags(force:true)`
+  - 국기 캐시 상태(국가별 `flagUrl` 유무) 확인 UI
+- **내정보 언어 표시/변경 UI 최신화**
+  - 표시: “국기 + 국가명(endonym)” 형태로 변경
+  - 변경 바텀시트: Firestore `enabled/disabled` 목록 기반으로 최신화
+
+### 2) 완료 기준 체크
+
+- [x] 테스트 UID에서만 관리자 버튼 노출 확인
+- [x] 관리자 화면에서 국기 캐시 상태 확인/동기화 확인
+- [x] 내정보 언어 표시/변경 UI에서 국기/국가명 기반 표시 확인
+
+### 3) 추가/변경한 코드 포인트
+
+- `app/mobile/lib/screens/admin_tools_screen.dart`
+- `app/mobile/lib/screens/my_info_screen.dart`
+
+---
+
+## [단계 18] i18n(UI 다국어) 인프라 구축 + 핵심 화면 문구 치환 (ko/en/ja)
+
+### 1) 오늘 한 일
+
+- **Flutter i18n(gen-l10n) 인프라 구축**
+  - `app/mobile/pubspec.yaml`에 `flutter_localizations` 추가 + `flutter: generate: true` 활성화
+  - `app/mobile/l10n.yaml` 추가(ARB 경로/템플릿 지정) 및 `ko/en/ja` 지원 로케일 구성
+  - `MaterialApp`에 `localizationsDelegates`, `supportedLocales` 연결
+- **기기 언어(locale) 기반 UI 언어 적용**
+  - 앱 UI 언어는 디바이스 언어를 따르며, 지원하지 않는 경우 영어로 fallback
+- **핵심 화면 하드코딩 문자열 i18n 치환**
+  - 스플래시/로그인/온보딩: `LaunchScreen`, `LoginScreen`, `LanguageSetupScreen`, `TargetLanguageSetupScreen`
+  - 메인 화면: `HomeScreen`, `ProgressScreen`, `MyInfoScreen`
+  - 학습 화면: `TodayWordsScreen`, `TodaySentencesScreen`, `TodayWrapUpScreen`
+  - 이메일 인증: `EmailLoginScreen`, `EmailRegisterScreen`
+  - 관리자 디버그: `AdminToolsScreen`
+- **ARB 리소스 구축**
+  - `app/mobile/lib/l10n/app_ko.arb`, `app_en.arb`, `app_ja.arb`에 키/문구 추가
+  - `flutter gen-l10n`으로 생성되는 `AppLocalizations`의 호출 규칙(underscore 유지, placeholder는 positional arg 가능)을 기준으로 코드 적용
+
+### 2) 완료 기준 체크
+
+- [x] `flutter gen-l10n` 성공
+- [x] `flutter analyze` 통과
+- [x] `flutter test` 통과 (로케일/비동기 흐름으로 인한 테스트 불안정 포인트 보완 포함)
+- [x] 핵심 화면의 사용자 노출 문구가 locale에 맞게 표시되는지 확인 (ko/en/ja)
+
+### 3) 추가/변경한 코드 포인트
+
+- 파일(Flutter/i18n):
+  - `app/mobile/pubspec.yaml` — `flutter_localizations`, `generate: true`
+  - `app/mobile/l10n.yaml` — ARB 설정 및 지원 로케일
+  - `app/mobile/lib/main.dart` — `localizationsDelegates`, `supportedLocales` 연결
+  - `app/mobile/lib/l10n/app_ko.arb`, `app_en.arb`, `app_ja.arb` — 번역 리소스
+- 파일(Flutter/화면 치환):
+  - `app/mobile/lib/screens/launch_screen.dart`
+  - `app/mobile/lib/screens/login_screen.dart`
+  - `app/mobile/lib/screens/language_setup_screen.dart`
+  - `app/mobile/lib/screens/target_language_setup_screen.dart`
+  - `app/mobile/lib/screens/home_screen.dart`
+  - `app/mobile/lib/screens/progress_screen.dart`
+  - `app/mobile/lib/screens/my_info_screen.dart`
+  - `app/mobile/lib/screens/today_words_screen.dart`
+  - `app/mobile/lib/screens/today_sentences_screen.dart`
+  - `app/mobile/lib/screens/today_wrap_up_screen.dart`
+  - `app/mobile/lib/screens/email_login_screen.dart`
+  - `app/mobile/lib/screens/email_register_screen.dart`
+  - `app/mobile/lib/screens/admin_tools_screen.dart`
+
+### 4) 이슈/막힌 점
+
+- **증상:** `AppLocalizations` getter/메서드 이름 불일치로 컴파일 에러
+  - **원인:** ARB 키가 camelCase로 변환되지 않고 underscore 그대로 생성됨(프로젝트 설정/생성 방식)
+  - **해결:** 코드에서 `l10n.my_key_name` 형태로 통일 + placeholder 메서드는 생성 시그니처 확인 후 positional argument로 호출
+- **증상:** PowerShell에서 커밋 메시지 heredoc(`cat <<EOF`) 사용 시 커밋 실패
+  - **해결:** PowerShell here-string + `git commit -F` 방식으로 멀티라인 한글 메시지 커밋
+
+### 5) 다음 액션 (다음 작업 후보)
+
+1. (선택) `home_screen.dart`/`progress_screen.dart`의 `%` 등 단순 숫자 표기까지 100% i18n로 통일(우선순위 낮음)
+2. 신규 UI 문구 추가 시 Base-Rule의 i18n 체크리스트에 맞춰 “문구 추가 + ARB + gen-l10n + 테스트”를 한 세트로 처리
+
+---
+
+## [단계 19] 개발 규칙 보강: i18n 치환 체크리스트 추가
+
+### 1) 오늘 한 일
+
+- `docs/Base-Rule.mdc`에 **i18n(로컬라이제이션) 규칙/체크리스트** 섹션 추가
+  - 사용자 노출 문구 하드코딩 금지 범위(Text/SnackBar/tooltip/InputDecoration/validator 등)
+  - ARB 3개 언어(ko/en/ja) 동시 반영 규칙
+  - `flutter gen-l10n` 생성 시그니처(underscore 유지/positional arg) 확인 규칙
+  - i18n 변경 후 품질 게이트(`gen-l10n`/`analyze`/`test`) 명시
+
+### 2) 완료 기준 체크
+
+- [x] Base-Rule에 i18n 규칙이 반영되어 이후 작업 시 재발 방지 기준으로 사용 가능
+
+### 3) 추가/변경한 코드 포인트
+
+- `docs/Base-Rule.mdc`
+
