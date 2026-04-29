@@ -345,4 +345,303 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get my_info_user_fallback_name => 'ユーザー';
+
+  @override
+  String get progress_appbar_title => '進捗';
+
+  @override
+  String get progress_no_data => '進捗データがありません。';
+
+  @override
+  String get progress_home_title => '今日の進捗';
+
+  @override
+  String progress_kst_subtitle_prefix(Object date) {
+    return 'KST · $date';
+  }
+
+  @override
+  String progress_word_line(Object wordDone, Object wordGoal) {
+    return '単語 $wordDone/$wordGoal';
+  }
+
+  @override
+  String progress_sentence_line(Object sentenceDone, Object sentenceGoal) {
+    return '文 $sentenceDone/$sentenceGoal';
+  }
+
+  @override
+  String progress_wrapup_line(Object quizDone, Object quizGoal) {
+    return 'まとめ $quizDone/$quizGoal';
+  }
+
+  @override
+  String get progress_calendar_card_title => 'カレンダー';
+
+  @override
+  String get progress_calendar_card_subtitle => '日別の進捗シール';
+
+  @override
+  String progress_month_label(Object month, Object year) {
+    return '$year年$month月';
+  }
+
+  @override
+  String get progress_prev_month_tooltip => '前の月';
+
+  @override
+  String get progress_next_month_tooltip => '次の月';
+
+  @override
+  String get progress_legend_0_39 => '0〜39%';
+
+  @override
+  String get progress_legend_40_79 => '40〜79%';
+
+  @override
+  String get progress_legend_80_100 => '80〜100%';
+
+  @override
+  String get progress_legend_no_record => '記録なし';
+
+  @override
+  String get progress_weekday_sun => '日';
+
+  @override
+  String get progress_weekday_mon => '月';
+
+  @override
+  String get progress_weekday_tue => '火';
+
+  @override
+  String get progress_weekday_wed => '水';
+
+  @override
+  String get progress_weekday_thu => '木';
+
+  @override
+  String get progress_weekday_fri => '金';
+
+  @override
+  String get progress_weekday_sat => '土';
+
+  @override
+  String get progress_detail_loading => '詳細な記録を読み込み中…';
+
+  @override
+  String progress_detail_load_failed(Object error) {
+    return '詳細な記録を読み込めませんでした。\n$error';
+  }
+
+  @override
+  String get progress_detail_login_required => 'ログインが必要です。';
+
+  @override
+  String progress_detail_header(Object date) {
+    return '$date の詳細記録';
+  }
+
+  @override
+  String get progress_detail_no_record => 'この日の学習記録がありません。';
+
+  @override
+  String get progress_detail_word_title => '今日の単語';
+
+  @override
+  String get progress_detail_sentence_title => '今日の文';
+
+  @override
+  String get progress_detail_wrapup_title => '今日のまとめ';
+
+  @override
+  String get progress_close_button => '閉じる';
+
+  @override
+  String progress_calendar_load_failed(Object error) {
+    return 'カレンダーデータを読み込めませんでした: $error';
+  }
+
+  @override
+  String get words_appbar_title => '今日の単語';
+
+  @override
+  String get words_loading_sample => 'サンプルを読み込み中…';
+
+  @override
+  String get words_sample_reload => 'サンプルを再読み込み';
+
+  @override
+  String get words_relearn_snackbar =>
+      '練習モードです。「次の単語」で復習できます。（今日の進捗はすでに目標に到達しています。）';
+
+  @override
+  String words_description_goal_reached(Object goal) {
+    return '今日の単語目標（$goal個）を達成しました。「再学習開始」後、「次の単語」で復習できます。';
+  }
+
+  @override
+  String get words_description_relearn_mode =>
+      '練習モード：新しい単語を読み込み、復習できます。（進捗は増えません。）';
+
+  @override
+  String get words_description_normal =>
+      '完了ボタンは現在の単語で +1 が1回だけ適用されます。その後「次の単語」に進んでください。';
+
+  @override
+  String words_ai_sample_load_failed(Object error) {
+    return 'サンプル単語の読み込みに失敗しました: $error';
+  }
+
+  @override
+  String words_save_failed(Object error) {
+    return '保存に失敗しました: $error';
+  }
+
+  @override
+  String get words_completed_snackbar => '単語の学習が完了しました。進捗 +1';
+
+  @override
+  String get words_button_goal_reached => '目標達成（進捗 +0）';
+
+  @override
+  String get words_button_saving => '保存中…';
+
+  @override
+  String get words_button_completed_reflected => '完了が反映されました (+1)';
+
+  @override
+  String get words_button_increment => 'この単語を完了 (+1)';
+
+  @override
+  String get words_relearn_button_label => '再学習開始';
+
+  @override
+  String get words_next_button_label => '次の単語';
+
+  @override
+  String words_debug_source(Object source) {
+    return 'debugSource: $source';
+  }
+
+  @override
+  String words_example_prefix(Object example) {
+    return '例文: $example';
+  }
+
+  @override
+  String get sentences_appbar_title => '今日の文';
+
+  @override
+  String get sentences_loading_sample => 'サンプルを読み込み中…';
+
+  @override
+  String get sentences_sample_reload => 'サンプルを再読み込み';
+
+  @override
+  String get sentences_relearn_snackbar =>
+      '練習モードです。「次の文」で復習できます。（今日の進捗はすでに目標に到達しています。）';
+
+  @override
+  String sentences_description_goal_reached(Object goal) {
+    return '今日の文目標（$goal個）を達成しました。「再学習開始」後、「次の文」で復習できます。';
+  }
+
+  @override
+  String get sentences_description_relearn_mode =>
+      '練習モード：新しい文を読み込み、復習できます。（進捗は増えません。）';
+
+  @override
+  String get sentences_description_normal =>
+      '完了ボタンは現在の文で +1 が1回だけ適用されます。その後「次の文」に進んでください。';
+
+  @override
+  String sentences_ai_sample_load_failed(Object error) {
+    return 'サンプル文の読み込みに失敗しました: $error';
+  }
+
+  @override
+  String sentences_save_failed(Object error) {
+    return '保存に失敗しました: $error';
+  }
+
+  @override
+  String get sentences_completed_snackbar => '文の学習が完了しました。進捗 +1';
+
+  @override
+  String get sentences_button_goal_reached => '目標達成（進捗 +0）';
+
+  @override
+  String get sentences_button_saving => '保存中…';
+
+  @override
+  String get sentences_button_completed_reflected => '完了が反映されました (+1)';
+
+  @override
+  String get sentences_button_increment => 'この文を完了 (+1)';
+
+  @override
+  String get sentences_relearn_button_label => '再学習開始';
+
+  @override
+  String get sentences_next_button_label => '次の文';
+
+  @override
+  String sentences_debug_source(Object source) {
+    return 'debugSource: $source';
+  }
+
+  @override
+  String get wrapup_appbar_title => '今日のまとめ';
+
+  @override
+  String get wrapup_summary_title => '当日の学習最終チェック: 25問（単語 70% / 文 30%）';
+
+  @override
+  String wrapup_load_failed(Object error) {
+    return 'まとめ問題を読み込めませんでした: $error';
+  }
+
+  @override
+  String get wrapup_completed_snackbar => '今日のまとめの反映が完了しました。';
+
+  @override
+  String wrapup_finish_failed_snackbar(Object error) {
+    return 'まとめの反映に失敗しました: $error';
+  }
+
+  @override
+  String get wrapup_reload_button => '再読み込み';
+
+  @override
+  String get wrapup_problem_new_button => '問題を新しく受け取る';
+
+  @override
+  String get wrapup_show_answer_button => '答えを見る';
+
+  @override
+  String get wrapup_reflecting_progress => '反映中…';
+
+  @override
+  String get wrapup_finish_button_label => 'まとめを完了';
+
+  @override
+  String get wrapup_kind_word => '単語';
+
+  @override
+  String get wrapup_kind_sentence => '文';
+
+  @override
+  String get wrapup_problem_label => '問題';
+
+  @override
+  String get wrapup_meaning_label => '意味:';
+
+  @override
+  String get wrapup_word_instruction => '該当する単語を確認してください。';
+
+  @override
+  String get wrapup_sentence_instruction => '該当する文を確認してください。';
+
+  @override
+  String get wrapup_answer_prefix => '答え: ';
 }

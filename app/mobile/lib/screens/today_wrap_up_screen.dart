@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../services/daily_progress_sync.dart';
+import '../l10n/app_localizations.dart';
 
 class TodayWrapUpScreen extends StatefulWidget {
   const TodayWrapUpScreen({
@@ -33,6 +34,7 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
   }
 
   Future<void> _loadWrapUp() async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() {
       _loading = true;
       _error = null;
@@ -66,14 +68,16 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
         if (meaning.isEmpty || answer.isEmpty) continue;
         if (kind == 'word') {
           _items.add(_WrapUpItem(
-            kind: '단어',
-            question: '뜻: $meaning\n해당하는 단어를 확인해보세요.',
+            kind: l10n.wrapup_kind_word,
+            question:
+                '${l10n.wrapup_meaning_label} $meaning\n${l10n.wrapup_word_instruction}',
             answer: answer,
           ));
         } else if (kind == 'sentence') {
           _items.add(_WrapUpItem(
-            kind: '문장',
-            question: '뜻: $meaning\n해당하는 문장을 확인해보세요.',
+            kind: l10n.wrapup_kind_sentence,
+            question:
+                '${l10n.wrapup_meaning_label} $meaning\n${l10n.wrapup_sentence_instruction}',
             answer: answer,
           ));
         }
@@ -82,8 +86,9 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
       setState(() => _loading = false);
     } catch (e) {
       if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
       setState(() {
-        _error = '마무리 문제를 불러오지 못했습니다: $e';
+        _error = l10n.wrapup_load_failed(e.toString());
         _loading = false;
       });
     }
@@ -93,6 +98,7 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
     if (_submitting) return;
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
+    final l10n = AppLocalizations.of(context)!;
     setState(() => _submitting = true);
     try {
       final current = await ensureTodayDailyProgress(user);
@@ -102,12 +108,12 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
       }
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('오늘의 마무리 완료가 반영되었습니다.')),
+        SnackBar(content: Text(l10n.wrapup_completed_snackbar)),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('마무리 반영 실패: $e')),
+        SnackBar(content: Text(l10n.wrapup_finish_failed_snackbar(e.toString()))),
       );
     } finally {
       if (mounted) setState(() => _submitting = false);
@@ -117,8 +123,9 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('오늘의 마무리')),
+      appBar: AppBar(title: Text(l10n.wrapup_appbar_title)),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: _loading
@@ -131,7 +138,7 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
                       const SizedBox(height: 12),
                       FilledButton(
                         onPressed: _loadWrapUp,
-                        child: const Text('다시 불러오기'),
+                        child: Text(l10n.wrapup_reload_button),
                       ),
                     ],
                   )
@@ -139,7 +146,7 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '당일 학습 최종 점검: 25문제(단어 70% / 문장 30%)',
+                        l10n.wrapup_summary_title,
                         style: Theme.of(context)
                             .textTheme
                             .bodyMedium
@@ -160,13 +167,13 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      '[${item.kind}] 문제 ${i + 1}\n${item.question}',
+                                      '[${item.kind}] ${l10n.wrapup_problem_label} ${i + 1}\n${item.question}',
                                       style: Theme.of(context).textTheme.titleMedium,
                                     ),
                                     const SizedBox(height: 8),
                                     if (shown)
                                       Text(
-                                        '정답: ${item.answer}',
+                                        '${l10n.wrapup_answer_prefix}${item.answer}',
                                         style: TextStyle(
                                           color: scheme.primary,
                                           fontWeight: FontWeight.w600,
@@ -178,7 +185,7 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
                                           _revealed[i] = true;
                                           _checked.add(i);
                                         }),
-                                        child: const Text('정답 보기'),
+                                        child: Text(l10n.wrapup_show_answer_button),
                                       ),
                                   ],
                                 ),
@@ -193,7 +200,7 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
                             child: OutlinedButton.icon(
                               onPressed: _loadWrapUp,
                               icon: const Icon(Icons.refresh),
-                              label: const Text('문제 새로 받기'),
+                            label: Text(l10n.wrapup_problem_new_button),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -207,7 +214,9 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
                                       child: CircularProgressIndicator(strokeWidth: 2),
                                     )
                                   : const Icon(Icons.task_alt),
-                              label: Text(_submitting ? '반영 중…' : '마무리 완료'),
+                              label: Text(_submitting
+                                  ? l10n.wrapup_reflecting_progress
+                                  : l10n.wrapup_finish_button_label),
                             ),
                           ),
                         ],

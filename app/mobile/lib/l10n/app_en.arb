@@ -124,5 +124,117 @@
   "language_usa_label": "English (USA)",
 
   "my_info_user_fallback_name": "User"
+
+  ,
+
+  "progress_appbar_title": "Progress",
+  "progress_no_data": "No progress data available.",
+
+  "progress_home_title": "Today's Progress",
+  "progress_kst_subtitle_prefix": "KST · {date}",
+  "progress_word_line": "Words {wordDone}/{wordGoal}",
+  "progress_sentence_line": "Sentences {sentenceDone}/{sentenceGoal}",
+  "progress_wrapup_line": "Wrap-up {quizDone}/{quizGoal}",
+
+  "progress_calendar_card_title": "Calendar",
+  "progress_calendar_card_subtitle": "Progress stickers by date",
+
+  "progress_month_label": "{year}-{month}",
+  "progress_prev_month_tooltip": "Previous month",
+  "progress_next_month_tooltip": "Next month",
+
+  "progress_legend_0_39": "0~39%",
+  "progress_legend_40_79": "40~79%",
+  "progress_legend_80_100": "80~100%",
+  "progress_legend_no_record": "No record",
+
+  "progress_weekday_sun": "Sun",
+  "progress_weekday_mon": "Mon",
+  "progress_weekday_tue": "Tue",
+  "progress_weekday_wed": "Wed",
+  "progress_weekday_thu": "Thu",
+  "progress_weekday_fri": "Fri",
+  "progress_weekday_sat": "Sat",
+
+  "progress_detail_loading": "Loading detailed record…",
+  "progress_detail_load_failed": "Failed to load detailed record.\n{error}",
+  "progress_detail_login_required": "Login is required.",
+  "progress_detail_header": "{date} Detailed Record",
+  "progress_detail_no_record": "No learning record for this date.",
+  "progress_detail_word_title": "Today's Words",
+  "progress_detail_sentence_title": "Today's Sentences",
+  "progress_detail_wrapup_title": "Today's Wrap-up",
+  "progress_close_button": "Close",
+
+  "progress_calendar_load_failed": "Failed to load calendar data: {error}",
+
+  "words_appbar_title": "Today's Words",
+  "words_loading_sample": "Loading sample…",
+  "words_sample_reload": "Reload sample",
+
+  "words_relearn_snackbar": "This is practice mode. You can review with “Next Word”. (Your daily progress has already reached the goal.)",
+  "words_description_goal_reached": "You reached today's word goal ({goal} items). After starting relearn, you can review with “Next Word”.",
+  "words_description_relearn_mode": "Practice mode: Load a new word and review. (Your progress will not increase.)",
+  "words_description_normal": "The complete button adds +1 only once for the current word. After that, move on to the next word.",
+
+  "words_ai_sample_load_failed": "Failed to load sample word: {error}",
+  "words_save_failed": "Save failed: {error}",
+  "words_completed_snackbar": "Word learning completed! Daily progress +1",
+
+  "words_button_goal_reached": "Goal reached (Progress +0)",
+  "words_button_saving": "Saving…",
+  "words_button_completed_reflected": "Completed and reflected (+1)",
+  "words_button_increment": "Complete this word (+1)",
+
+  "words_relearn_button_label": "Start relearn",
+  "words_next_button_label": "Next word",
+
+  "words_debug_source": "debugSource: {source}",
+  "words_example_prefix": "Example: {example}",
+
+  "sentences_appbar_title": "Today's Sentences",
+  "sentences_loading_sample": "Loading sample…",
+  "sentences_sample_reload": "Reload sample",
+
+  "sentences_relearn_snackbar": "This is practice mode. You can review with “Next Sentence”. (Your daily progress has already reached the goal.)",
+  "sentences_description_goal_reached": "You reached today's sentence goal ({goal} items). After starting relearn, you can review with “Next Sentence”.",
+  "sentences_description_relearn_mode": "Practice mode: Load a new sentence and review. (Your progress will not increase.)",
+  "sentences_description_normal": "The complete button adds +1 only once for the current sentence. After that, move on to the next sentence.",
+
+  "sentences_ai_sample_load_failed": "Failed to load sample sentence: {error}",
+  "sentences_save_failed": "Save failed: {error}",
+  "sentences_completed_snackbar": "Sentence learning completed! Daily progress +1",
+
+  "sentences_button_goal_reached": "Goal reached (Progress +0)",
+  "sentences_button_saving": "Saving…",
+  "sentences_button_completed_reflected": "Completed and reflected (+1)",
+  "sentences_button_increment": "Complete this sentence (+1)",
+
+  "sentences_relearn_button_label": "Start relearn",
+  "sentences_next_button_label": "Next sentence",
+
+  "sentences_debug_source": "debugSource: {source}",
+
+  "wrapup_appbar_title": "Today's Wrap-up",
+  "wrapup_summary_title": "Today's final learning check: 25 questions (Words 70% / Sentences 30%)",
+
+  "wrapup_load_failed": "Failed to load wrap-up questions: {error}",
+  "wrapup_completed_snackbar": "Today's wrap-up completion has been applied.",
+  "wrapup_finish_failed_snackbar": "Wrap-up completion failed: {error}",
+
+  "wrapup_reload_button": "Reload",
+  "wrapup_problem_new_button": "Get new questions",
+  "wrapup_show_answer_button": "Show answer",
+
+  "wrapup_reflecting_progress": "Applying…",
+  "wrapup_finish_button_label": "Finish wrap-up",
+
+  "wrapup_kind_word": "Word",
+  "wrapup_kind_sentence": "Sentence",
+  "wrapup_problem_label": "Question",
+  "wrapup_meaning_label": "Meaning:",
+  "wrapup_word_instruction": "Check the corresponding word.",
+  "wrapup_sentence_instruction": "Check the corresponding sentence.",
+  "wrapup_answer_prefix": "Answer: "
 }
 

@@ -706,6 +706,516 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'사용자'**
   String get my_info_user_fallback_name;
+
+  /// No description provided for @progress_appbar_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'진행률'**
+  String get progress_appbar_title;
+
+  /// No description provided for @progress_no_data.
+  ///
+  /// In ko, this message translates to:
+  /// **'진행률 데이터가 없습니다.'**
+  String get progress_no_data;
+
+  /// No description provided for @progress_home_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'오늘의 진행률'**
+  String get progress_home_title;
+
+  /// No description provided for @progress_kst_subtitle_prefix.
+  ///
+  /// In ko, this message translates to:
+  /// **'KST · {date}'**
+  String progress_kst_subtitle_prefix(Object date);
+
+  /// No description provided for @progress_word_line.
+  ///
+  /// In ko, this message translates to:
+  /// **'단어 {wordDone}/{wordGoal}'**
+  String progress_word_line(Object wordDone, Object wordGoal);
+
+  /// No description provided for @progress_sentence_line.
+  ///
+  /// In ko, this message translates to:
+  /// **'문장 {sentenceDone}/{sentenceGoal}'**
+  String progress_sentence_line(Object sentenceDone, Object sentenceGoal);
+
+  /// No description provided for @progress_wrapup_line.
+  ///
+  /// In ko, this message translates to:
+  /// **'마무리 {quizDone}/{quizGoal}'**
+  String progress_wrapup_line(Object quizDone, Object quizGoal);
+
+  /// No description provided for @progress_calendar_card_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'캘린더'**
+  String get progress_calendar_card_title;
+
+  /// No description provided for @progress_calendar_card_subtitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'날짜별 진행률 스티커'**
+  String get progress_calendar_card_subtitle;
+
+  /// No description provided for @progress_month_label.
+  ///
+  /// In ko, this message translates to:
+  /// **'{year}년 {month}월'**
+  String progress_month_label(Object month, Object year);
+
+  /// No description provided for @progress_prev_month_tooltip.
+  ///
+  /// In ko, this message translates to:
+  /// **'이전 달'**
+  String get progress_prev_month_tooltip;
+
+  /// No description provided for @progress_next_month_tooltip.
+  ///
+  /// In ko, this message translates to:
+  /// **'다음 달'**
+  String get progress_next_month_tooltip;
+
+  /// No description provided for @progress_legend_0_39.
+  ///
+  /// In ko, this message translates to:
+  /// **'0~39%'**
+  String get progress_legend_0_39;
+
+  /// No description provided for @progress_legend_40_79.
+  ///
+  /// In ko, this message translates to:
+  /// **'40~79%'**
+  String get progress_legend_40_79;
+
+  /// No description provided for @progress_legend_80_100.
+  ///
+  /// In ko, this message translates to:
+  /// **'80~100%'**
+  String get progress_legend_80_100;
+
+  /// No description provided for @progress_legend_no_record.
+  ///
+  /// In ko, this message translates to:
+  /// **'기록 없음'**
+  String get progress_legend_no_record;
+
+  /// No description provided for @progress_weekday_sun.
+  ///
+  /// In ko, this message translates to:
+  /// **'일'**
+  String get progress_weekday_sun;
+
+  /// No description provided for @progress_weekday_mon.
+  ///
+  /// In ko, this message translates to:
+  /// **'월'**
+  String get progress_weekday_mon;
+
+  /// No description provided for @progress_weekday_tue.
+  ///
+  /// In ko, this message translates to:
+  /// **'화'**
+  String get progress_weekday_tue;
+
+  /// No description provided for @progress_weekday_wed.
+  ///
+  /// In ko, this message translates to:
+  /// **'수'**
+  String get progress_weekday_wed;
+
+  /// No description provided for @progress_weekday_thu.
+  ///
+  /// In ko, this message translates to:
+  /// **'목'**
+  String get progress_weekday_thu;
+
+  /// No description provided for @progress_weekday_fri.
+  ///
+  /// In ko, this message translates to:
+  /// **'금'**
+  String get progress_weekday_fri;
+
+  /// No description provided for @progress_weekday_sat.
+  ///
+  /// In ko, this message translates to:
+  /// **'토'**
+  String get progress_weekday_sat;
+
+  /// No description provided for @progress_detail_loading.
+  ///
+  /// In ko, this message translates to:
+  /// **'상세 기록을 불러오는 중…'**
+  String get progress_detail_loading;
+
+  /// No description provided for @progress_detail_load_failed.
+  ///
+  /// In ko, this message translates to:
+  /// **'상세 기록을 불러오지 못했습니다.\n{error}'**
+  String progress_detail_load_failed(Object error);
+
+  /// No description provided for @progress_detail_login_required.
+  ///
+  /// In ko, this message translates to:
+  /// **'로그인이 필요합니다.'**
+  String get progress_detail_login_required;
+
+  /// No description provided for @progress_detail_header.
+  ///
+  /// In ko, this message translates to:
+  /// **'{date} 상세 기록'**
+  String progress_detail_header(Object date);
+
+  /// No description provided for @progress_detail_no_record.
+  ///
+  /// In ko, this message translates to:
+  /// **'해당 날짜의 학습 기록이 없습니다.'**
+  String get progress_detail_no_record;
+
+  /// No description provided for @progress_detail_word_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'오늘의 단어'**
+  String get progress_detail_word_title;
+
+  /// No description provided for @progress_detail_sentence_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'오늘의 문장'**
+  String get progress_detail_sentence_title;
+
+  /// No description provided for @progress_detail_wrapup_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'오늘의 마무리'**
+  String get progress_detail_wrapup_title;
+
+  /// No description provided for @progress_close_button.
+  ///
+  /// In ko, this message translates to:
+  /// **'닫기'**
+  String get progress_close_button;
+
+  /// No description provided for @progress_calendar_load_failed.
+  ///
+  /// In ko, this message translates to:
+  /// **'캘린더 데이터를 불러오지 못했습니다: {error}'**
+  String progress_calendar_load_failed(Object error);
+
+  /// No description provided for @words_appbar_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'오늘의 단어'**
+  String get words_appbar_title;
+
+  /// No description provided for @words_loading_sample.
+  ///
+  /// In ko, this message translates to:
+  /// **'샘플을 불러오는 중…'**
+  String get words_loading_sample;
+
+  /// No description provided for @words_sample_reload.
+  ///
+  /// In ko, this message translates to:
+  /// **'샘플 다시 불러오기'**
+  String get words_sample_reload;
+
+  /// No description provided for @words_relearn_snackbar.
+  ///
+  /// In ko, this message translates to:
+  /// **'연습 모드입니다. 「다음 단어」로 복습할 수 있어요. (오늘 진도는 이미 목표에 도달했습니다.)'**
+  String get words_relearn_snackbar;
+
+  /// No description provided for @words_description_goal_reached.
+  ///
+  /// In ko, this message translates to:
+  /// **'오늘 단어 목표({goal}개)를 달성했습니다. 「재학습 시작」 후 「다음 단어」로 복습할 수 있어요.'**
+  String words_description_goal_reached(Object goal);
+
+  /// No description provided for @words_description_relearn_mode.
+  ///
+  /// In ko, this message translates to:
+  /// **'연습 모드: 새 단어를 불러오며 복습할 수 있습니다. (진도는 더 올라가지 않습니다.)'**
+  String get words_description_relearn_mode;
+
+  /// No description provided for @words_description_normal.
+  ///
+  /// In ko, this message translates to:
+  /// **'완료 버튼은 현재 단어에서 1회만 +1 됩니다. 이후 다음 단어로 넘어가세요.'**
+  String get words_description_normal;
+
+  /// No description provided for @words_ai_sample_load_failed.
+  ///
+  /// In ko, this message translates to:
+  /// **'샘플 단어 불러오기 실패: {error}'**
+  String words_ai_sample_load_failed(Object error);
+
+  /// No description provided for @words_save_failed.
+  ///
+  /// In ko, this message translates to:
+  /// **'저장 실패: {error}'**
+  String words_save_failed(Object error);
+
+  /// No description provided for @words_completed_snackbar.
+  ///
+  /// In ko, this message translates to:
+  /// **'단어 학습 완료! 오늘 진도 +1'**
+  String get words_completed_snackbar;
+
+  /// No description provided for @words_button_goal_reached.
+  ///
+  /// In ko, this message translates to:
+  /// **'오늘 목표 달성 (진도 +0)'**
+  String get words_button_goal_reached;
+
+  /// No description provided for @words_button_saving.
+  ///
+  /// In ko, this message translates to:
+  /// **'저장 중…'**
+  String get words_button_saving;
+
+  /// No description provided for @words_button_completed_reflected.
+  ///
+  /// In ko, this message translates to:
+  /// **'완료 반영됨 (+1)'**
+  String get words_button_completed_reflected;
+
+  /// No description provided for @words_button_increment.
+  ///
+  /// In ko, this message translates to:
+  /// **'이 단어 완료(+1)'**
+  String get words_button_increment;
+
+  /// No description provided for @words_relearn_button_label.
+  ///
+  /// In ko, this message translates to:
+  /// **'재학습 시작'**
+  String get words_relearn_button_label;
+
+  /// No description provided for @words_next_button_label.
+  ///
+  /// In ko, this message translates to:
+  /// **'다음 단어'**
+  String get words_next_button_label;
+
+  /// No description provided for @words_debug_source.
+  ///
+  /// In ko, this message translates to:
+  /// **'debugSource: {source}'**
+  String words_debug_source(Object source);
+
+  /// No description provided for @words_example_prefix.
+  ///
+  /// In ko, this message translates to:
+  /// **'예문: {example}'**
+  String words_example_prefix(Object example);
+
+  /// No description provided for @sentences_appbar_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'오늘의 문장'**
+  String get sentences_appbar_title;
+
+  /// No description provided for @sentences_loading_sample.
+  ///
+  /// In ko, this message translates to:
+  /// **'샘플을 불러오는 중…'**
+  String get sentences_loading_sample;
+
+  /// No description provided for @sentences_sample_reload.
+  ///
+  /// In ko, this message translates to:
+  /// **'샘플 다시 불러오기'**
+  String get sentences_sample_reload;
+
+  /// No description provided for @sentences_relearn_snackbar.
+  ///
+  /// In ko, this message translates to:
+  /// **'연습 모드입니다. 「다음 문장」으로 복습할 수 있어요. (오늘 진도는 이미 목표에 도달했습니다.)'**
+  String get sentences_relearn_snackbar;
+
+  /// No description provided for @sentences_description_goal_reached.
+  ///
+  /// In ko, this message translates to:
+  /// **'오늘 문장 목표({goal}개)를 달성했습니다. 「재학습 시작」 후 「다음 문장」으로 복습할 수 있어요.'**
+  String sentences_description_goal_reached(Object goal);
+
+  /// No description provided for @sentences_description_relearn_mode.
+  ///
+  /// In ko, this message translates to:
+  /// **'연습 모드: 새 문장을 불러오며 복습할 수 있습니다. (진도는 더 올라가지 않습니다.)'**
+  String get sentences_description_relearn_mode;
+
+  /// No description provided for @sentences_description_normal.
+  ///
+  /// In ko, this message translates to:
+  /// **'완료 버튼은 현재 문장에서 1회만 +1 됩니다. 이후 다음 문장으로 넘어가세요.'**
+  String get sentences_description_normal;
+
+  /// No description provided for @sentences_ai_sample_load_failed.
+  ///
+  /// In ko, this message translates to:
+  /// **'샘플 문장 불러오기 실패: {error}'**
+  String sentences_ai_sample_load_failed(Object error);
+
+  /// No description provided for @sentences_save_failed.
+  ///
+  /// In ko, this message translates to:
+  /// **'저장 실패: {error}'**
+  String sentences_save_failed(Object error);
+
+  /// No description provided for @sentences_completed_snackbar.
+  ///
+  /// In ko, this message translates to:
+  /// **'문장 학습 완료! 오늘 진도 +1'**
+  String get sentences_completed_snackbar;
+
+  /// No description provided for @sentences_button_goal_reached.
+  ///
+  /// In ko, this message translates to:
+  /// **'오늘 목표 달성 (진도 +0)'**
+  String get sentences_button_goal_reached;
+
+  /// No description provided for @sentences_button_saving.
+  ///
+  /// In ko, this message translates to:
+  /// **'저장 중…'**
+  String get sentences_button_saving;
+
+  /// No description provided for @sentences_button_completed_reflected.
+  ///
+  /// In ko, this message translates to:
+  /// **'완료 반영됨 (+1)'**
+  String get sentences_button_completed_reflected;
+
+  /// No description provided for @sentences_button_increment.
+  ///
+  /// In ko, this message translates to:
+  /// **'이 문장 완료(+1)'**
+  String get sentences_button_increment;
+
+  /// No description provided for @sentences_relearn_button_label.
+  ///
+  /// In ko, this message translates to:
+  /// **'재학습 시작'**
+  String get sentences_relearn_button_label;
+
+  /// No description provided for @sentences_next_button_label.
+  ///
+  /// In ko, this message translates to:
+  /// **'다음 문장'**
+  String get sentences_next_button_label;
+
+  /// No description provided for @sentences_debug_source.
+  ///
+  /// In ko, this message translates to:
+  /// **'debugSource: {source}'**
+  String sentences_debug_source(Object source);
+
+  /// No description provided for @wrapup_appbar_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'오늘의 마무리'**
+  String get wrapup_appbar_title;
+
+  /// No description provided for @wrapup_summary_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'당일 학습 최종 점검: 25문제(단어 70% / 문장 30%)'**
+  String get wrapup_summary_title;
+
+  /// No description provided for @wrapup_load_failed.
+  ///
+  /// In ko, this message translates to:
+  /// **'마무리 문제를 불러오지 못했습니다: {error}'**
+  String wrapup_load_failed(Object error);
+
+  /// No description provided for @wrapup_completed_snackbar.
+  ///
+  /// In ko, this message translates to:
+  /// **'오늘의 마무리 완료가 반영되었습니다.'**
+  String get wrapup_completed_snackbar;
+
+  /// No description provided for @wrapup_finish_failed_snackbar.
+  ///
+  /// In ko, this message translates to:
+  /// **'마무리 반영 실패: {error}'**
+  String wrapup_finish_failed_snackbar(Object error);
+
+  /// No description provided for @wrapup_reload_button.
+  ///
+  /// In ko, this message translates to:
+  /// **'다시 불러오기'**
+  String get wrapup_reload_button;
+
+  /// No description provided for @wrapup_problem_new_button.
+  ///
+  /// In ko, this message translates to:
+  /// **'문제 새로 받기'**
+  String get wrapup_problem_new_button;
+
+  /// No description provided for @wrapup_show_answer_button.
+  ///
+  /// In ko, this message translates to:
+  /// **'정답 보기'**
+  String get wrapup_show_answer_button;
+
+  /// No description provided for @wrapup_reflecting_progress.
+  ///
+  /// In ko, this message translates to:
+  /// **'반영 중…'**
+  String get wrapup_reflecting_progress;
+
+  /// No description provided for @wrapup_finish_button_label.
+  ///
+  /// In ko, this message translates to:
+  /// **'마무리 완료'**
+  String get wrapup_finish_button_label;
+
+  /// No description provided for @wrapup_kind_word.
+  ///
+  /// In ko, this message translates to:
+  /// **'단어'**
+  String get wrapup_kind_word;
+
+  /// No description provided for @wrapup_kind_sentence.
+  ///
+  /// In ko, this message translates to:
+  /// **'문장'**
+  String get wrapup_kind_sentence;
+
+  /// No description provided for @wrapup_problem_label.
+  ///
+  /// In ko, this message translates to:
+  /// **'문제'**
+  String get wrapup_problem_label;
+
+  /// No description provided for @wrapup_meaning_label.
+  ///
+  /// In ko, this message translates to:
+  /// **'뜻:'**
+  String get wrapup_meaning_label;
+
+  /// No description provided for @wrapup_word_instruction.
+  ///
+  /// In ko, this message translates to:
+  /// **'해당하는 단어를 확인해보세요.'**
+  String get wrapup_word_instruction;
+
+  /// No description provided for @wrapup_sentence_instruction.
+  ///
+  /// In ko, this message translates to:
+  /// **'해당하는 문장을 확인해보세요.'**
+  String get wrapup_sentence_instruction;
+
+  /// No description provided for @wrapup_answer_prefix.
+  ///
+  /// In ko, this message translates to:
+  /// **'정답: '**
+  String get wrapup_answer_prefix;
 }
 
 class _AppLocalizationsDelegate

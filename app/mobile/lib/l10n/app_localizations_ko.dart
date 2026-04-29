@@ -344,4 +344,303 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get my_info_user_fallback_name => '사용자';
+
+  @override
+  String get progress_appbar_title => '진행률';
+
+  @override
+  String get progress_no_data => '진행률 데이터가 없습니다.';
+
+  @override
+  String get progress_home_title => '오늘의 진행률';
+
+  @override
+  String progress_kst_subtitle_prefix(Object date) {
+    return 'KST · $date';
+  }
+
+  @override
+  String progress_word_line(Object wordDone, Object wordGoal) {
+    return '단어 $wordDone/$wordGoal';
+  }
+
+  @override
+  String progress_sentence_line(Object sentenceDone, Object sentenceGoal) {
+    return '문장 $sentenceDone/$sentenceGoal';
+  }
+
+  @override
+  String progress_wrapup_line(Object quizDone, Object quizGoal) {
+    return '마무리 $quizDone/$quizGoal';
+  }
+
+  @override
+  String get progress_calendar_card_title => '캘린더';
+
+  @override
+  String get progress_calendar_card_subtitle => '날짜별 진행률 스티커';
+
+  @override
+  String progress_month_label(Object month, Object year) {
+    return '$year년 $month월';
+  }
+
+  @override
+  String get progress_prev_month_tooltip => '이전 달';
+
+  @override
+  String get progress_next_month_tooltip => '다음 달';
+
+  @override
+  String get progress_legend_0_39 => '0~39%';
+
+  @override
+  String get progress_legend_40_79 => '40~79%';
+
+  @override
+  String get progress_legend_80_100 => '80~100%';
+
+  @override
+  String get progress_legend_no_record => '기록 없음';
+
+  @override
+  String get progress_weekday_sun => '일';
+
+  @override
+  String get progress_weekday_mon => '월';
+
+  @override
+  String get progress_weekday_tue => '화';
+
+  @override
+  String get progress_weekday_wed => '수';
+
+  @override
+  String get progress_weekday_thu => '목';
+
+  @override
+  String get progress_weekday_fri => '금';
+
+  @override
+  String get progress_weekday_sat => '토';
+
+  @override
+  String get progress_detail_loading => '상세 기록을 불러오는 중…';
+
+  @override
+  String progress_detail_load_failed(Object error) {
+    return '상세 기록을 불러오지 못했습니다.\n$error';
+  }
+
+  @override
+  String get progress_detail_login_required => '로그인이 필요합니다.';
+
+  @override
+  String progress_detail_header(Object date) {
+    return '$date 상세 기록';
+  }
+
+  @override
+  String get progress_detail_no_record => '해당 날짜의 학습 기록이 없습니다.';
+
+  @override
+  String get progress_detail_word_title => '오늘의 단어';
+
+  @override
+  String get progress_detail_sentence_title => '오늘의 문장';
+
+  @override
+  String get progress_detail_wrapup_title => '오늘의 마무리';
+
+  @override
+  String get progress_close_button => '닫기';
+
+  @override
+  String progress_calendar_load_failed(Object error) {
+    return '캘린더 데이터를 불러오지 못했습니다: $error';
+  }
+
+  @override
+  String get words_appbar_title => '오늘의 단어';
+
+  @override
+  String get words_loading_sample => '샘플을 불러오는 중…';
+
+  @override
+  String get words_sample_reload => '샘플 다시 불러오기';
+
+  @override
+  String get words_relearn_snackbar =>
+      '연습 모드입니다. 「다음 단어」로 복습할 수 있어요. (오늘 진도는 이미 목표에 도달했습니다.)';
+
+  @override
+  String words_description_goal_reached(Object goal) {
+    return '오늘 단어 목표($goal개)를 달성했습니다. 「재학습 시작」 후 「다음 단어」로 복습할 수 있어요.';
+  }
+
+  @override
+  String get words_description_relearn_mode =>
+      '연습 모드: 새 단어를 불러오며 복습할 수 있습니다. (진도는 더 올라가지 않습니다.)';
+
+  @override
+  String get words_description_normal =>
+      '완료 버튼은 현재 단어에서 1회만 +1 됩니다. 이후 다음 단어로 넘어가세요.';
+
+  @override
+  String words_ai_sample_load_failed(Object error) {
+    return '샘플 단어 불러오기 실패: $error';
+  }
+
+  @override
+  String words_save_failed(Object error) {
+    return '저장 실패: $error';
+  }
+
+  @override
+  String get words_completed_snackbar => '단어 학습 완료! 오늘 진도 +1';
+
+  @override
+  String get words_button_goal_reached => '오늘 목표 달성 (진도 +0)';
+
+  @override
+  String get words_button_saving => '저장 중…';
+
+  @override
+  String get words_button_completed_reflected => '완료 반영됨 (+1)';
+
+  @override
+  String get words_button_increment => '이 단어 완료(+1)';
+
+  @override
+  String get words_relearn_button_label => '재학습 시작';
+
+  @override
+  String get words_next_button_label => '다음 단어';
+
+  @override
+  String words_debug_source(Object source) {
+    return 'debugSource: $source';
+  }
+
+  @override
+  String words_example_prefix(Object example) {
+    return '예문: $example';
+  }
+
+  @override
+  String get sentences_appbar_title => '오늘의 문장';
+
+  @override
+  String get sentences_loading_sample => '샘플을 불러오는 중…';
+
+  @override
+  String get sentences_sample_reload => '샘플 다시 불러오기';
+
+  @override
+  String get sentences_relearn_snackbar =>
+      '연습 모드입니다. 「다음 문장」으로 복습할 수 있어요. (오늘 진도는 이미 목표에 도달했습니다.)';
+
+  @override
+  String sentences_description_goal_reached(Object goal) {
+    return '오늘 문장 목표($goal개)를 달성했습니다. 「재학습 시작」 후 「다음 문장」으로 복습할 수 있어요.';
+  }
+
+  @override
+  String get sentences_description_relearn_mode =>
+      '연습 모드: 새 문장을 불러오며 복습할 수 있습니다. (진도는 더 올라가지 않습니다.)';
+
+  @override
+  String get sentences_description_normal =>
+      '완료 버튼은 현재 문장에서 1회만 +1 됩니다. 이후 다음 문장으로 넘어가세요.';
+
+  @override
+  String sentences_ai_sample_load_failed(Object error) {
+    return '샘플 문장 불러오기 실패: $error';
+  }
+
+  @override
+  String sentences_save_failed(Object error) {
+    return '저장 실패: $error';
+  }
+
+  @override
+  String get sentences_completed_snackbar => '문장 학습 완료! 오늘 진도 +1';
+
+  @override
+  String get sentences_button_goal_reached => '오늘 목표 달성 (진도 +0)';
+
+  @override
+  String get sentences_button_saving => '저장 중…';
+
+  @override
+  String get sentences_button_completed_reflected => '완료 반영됨 (+1)';
+
+  @override
+  String get sentences_button_increment => '이 문장 완료(+1)';
+
+  @override
+  String get sentences_relearn_button_label => '재학습 시작';
+
+  @override
+  String get sentences_next_button_label => '다음 문장';
+
+  @override
+  String sentences_debug_source(Object source) {
+    return 'debugSource: $source';
+  }
+
+  @override
+  String get wrapup_appbar_title => '오늘의 마무리';
+
+  @override
+  String get wrapup_summary_title => '당일 학습 최종 점검: 25문제(단어 70% / 문장 30%)';
+
+  @override
+  String wrapup_load_failed(Object error) {
+    return '마무리 문제를 불러오지 못했습니다: $error';
+  }
+
+  @override
+  String get wrapup_completed_snackbar => '오늘의 마무리 완료가 반영되었습니다.';
+
+  @override
+  String wrapup_finish_failed_snackbar(Object error) {
+    return '마무리 반영 실패: $error';
+  }
+
+  @override
+  String get wrapup_reload_button => '다시 불러오기';
+
+  @override
+  String get wrapup_problem_new_button => '문제 새로 받기';
+
+  @override
+  String get wrapup_show_answer_button => '정답 보기';
+
+  @override
+  String get wrapup_reflecting_progress => '반영 중…';
+
+  @override
+  String get wrapup_finish_button_label => '마무리 완료';
+
+  @override
+  String get wrapup_kind_word => '단어';
+
+  @override
+  String get wrapup_kind_sentence => '문장';
+
+  @override
+  String get wrapup_problem_label => '문제';
+
+  @override
+  String get wrapup_meaning_label => '뜻:';
+
+  @override
+  String get wrapup_word_instruction => '해당하는 단어를 확인해보세요.';
+
+  @override
+  String get wrapup_sentence_instruction => '해당하는 문장을 확인해보세요.';
+
+  @override
+  String get wrapup_answer_prefix => '정답: ';
 }

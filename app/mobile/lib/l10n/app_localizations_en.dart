@@ -363,4 +363,308 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get my_info_user_fallback_name => 'User';
+
+  @override
+  String get progress_appbar_title => 'Progress';
+
+  @override
+  String get progress_no_data => 'No progress data available.';
+
+  @override
+  String get progress_home_title => 'Today\'s Progress';
+
+  @override
+  String progress_kst_subtitle_prefix(Object date) {
+    return 'KST · $date';
+  }
+
+  @override
+  String progress_word_line(Object wordDone, Object wordGoal) {
+    return 'Words $wordDone/$wordGoal';
+  }
+
+  @override
+  String progress_sentence_line(Object sentenceDone, Object sentenceGoal) {
+    return 'Sentences $sentenceDone/$sentenceGoal';
+  }
+
+  @override
+  String progress_wrapup_line(Object quizDone, Object quizGoal) {
+    return 'Wrap-up $quizDone/$quizGoal';
+  }
+
+  @override
+  String get progress_calendar_card_title => 'Calendar';
+
+  @override
+  String get progress_calendar_card_subtitle => 'Progress stickers by date';
+
+  @override
+  String progress_month_label(Object month, Object year) {
+    return '$year-$month';
+  }
+
+  @override
+  String get progress_prev_month_tooltip => 'Previous month';
+
+  @override
+  String get progress_next_month_tooltip => 'Next month';
+
+  @override
+  String get progress_legend_0_39 => '0~39%';
+
+  @override
+  String get progress_legend_40_79 => '40~79%';
+
+  @override
+  String get progress_legend_80_100 => '80~100%';
+
+  @override
+  String get progress_legend_no_record => 'No record';
+
+  @override
+  String get progress_weekday_sun => 'Sun';
+
+  @override
+  String get progress_weekday_mon => 'Mon';
+
+  @override
+  String get progress_weekday_tue => 'Tue';
+
+  @override
+  String get progress_weekday_wed => 'Wed';
+
+  @override
+  String get progress_weekday_thu => 'Thu';
+
+  @override
+  String get progress_weekday_fri => 'Fri';
+
+  @override
+  String get progress_weekday_sat => 'Sat';
+
+  @override
+  String get progress_detail_loading => 'Loading detailed record…';
+
+  @override
+  String progress_detail_load_failed(Object error) {
+    return 'Failed to load detailed record.\n$error';
+  }
+
+  @override
+  String get progress_detail_login_required => 'Login is required.';
+
+  @override
+  String progress_detail_header(Object date) {
+    return '$date Detailed Record';
+  }
+
+  @override
+  String get progress_detail_no_record => 'No learning record for this date.';
+
+  @override
+  String get progress_detail_word_title => 'Today\'s Words';
+
+  @override
+  String get progress_detail_sentence_title => 'Today\'s Sentences';
+
+  @override
+  String get progress_detail_wrapup_title => 'Today\'s Wrap-up';
+
+  @override
+  String get progress_close_button => 'Close';
+
+  @override
+  String progress_calendar_load_failed(Object error) {
+    return 'Failed to load calendar data: $error';
+  }
+
+  @override
+  String get words_appbar_title => 'Today\'s Words';
+
+  @override
+  String get words_loading_sample => 'Loading sample…';
+
+  @override
+  String get words_sample_reload => 'Reload sample';
+
+  @override
+  String get words_relearn_snackbar =>
+      'This is practice mode. You can review with “Next Word”. (Your daily progress has already reached the goal.)';
+
+  @override
+  String words_description_goal_reached(Object goal) {
+    return 'You reached today\'s word goal ($goal items). After starting relearn, you can review with “Next Word”.';
+  }
+
+  @override
+  String get words_description_relearn_mode =>
+      'Practice mode: Load a new word and review. (Your progress will not increase.)';
+
+  @override
+  String get words_description_normal =>
+      'The complete button adds +1 only once for the current word. After that, move on to the next word.';
+
+  @override
+  String words_ai_sample_load_failed(Object error) {
+    return 'Failed to load sample word: $error';
+  }
+
+  @override
+  String words_save_failed(Object error) {
+    return 'Save failed: $error';
+  }
+
+  @override
+  String get words_completed_snackbar =>
+      'Word learning completed! Daily progress +1';
+
+  @override
+  String get words_button_goal_reached => 'Goal reached (Progress +0)';
+
+  @override
+  String get words_button_saving => 'Saving…';
+
+  @override
+  String get words_button_completed_reflected => 'Completed and reflected (+1)';
+
+  @override
+  String get words_button_increment => 'Complete this word (+1)';
+
+  @override
+  String get words_relearn_button_label => 'Start relearn';
+
+  @override
+  String get words_next_button_label => 'Next word';
+
+  @override
+  String words_debug_source(Object source) {
+    return 'debugSource: $source';
+  }
+
+  @override
+  String words_example_prefix(Object example) {
+    return 'Example: $example';
+  }
+
+  @override
+  String get sentences_appbar_title => 'Today\'s Sentences';
+
+  @override
+  String get sentences_loading_sample => 'Loading sample…';
+
+  @override
+  String get sentences_sample_reload => 'Reload sample';
+
+  @override
+  String get sentences_relearn_snackbar =>
+      'This is practice mode. You can review with “Next Sentence”. (Your daily progress has already reached the goal.)';
+
+  @override
+  String sentences_description_goal_reached(Object goal) {
+    return 'You reached today\'s sentence goal ($goal items). After starting relearn, you can review with “Next Sentence”.';
+  }
+
+  @override
+  String get sentences_description_relearn_mode =>
+      'Practice mode: Load a new sentence and review. (Your progress will not increase.)';
+
+  @override
+  String get sentences_description_normal =>
+      'The complete button adds +1 only once for the current sentence. After that, move on to the next sentence.';
+
+  @override
+  String sentences_ai_sample_load_failed(Object error) {
+    return 'Failed to load sample sentence: $error';
+  }
+
+  @override
+  String sentences_save_failed(Object error) {
+    return 'Save failed: $error';
+  }
+
+  @override
+  String get sentences_completed_snackbar =>
+      'Sentence learning completed! Daily progress +1';
+
+  @override
+  String get sentences_button_goal_reached => 'Goal reached (Progress +0)';
+
+  @override
+  String get sentences_button_saving => 'Saving…';
+
+  @override
+  String get sentences_button_completed_reflected =>
+      'Completed and reflected (+1)';
+
+  @override
+  String get sentences_button_increment => 'Complete this sentence (+1)';
+
+  @override
+  String get sentences_relearn_button_label => 'Start relearn';
+
+  @override
+  String get sentences_next_button_label => 'Next sentence';
+
+  @override
+  String sentences_debug_source(Object source) {
+    return 'debugSource: $source';
+  }
+
+  @override
+  String get wrapup_appbar_title => 'Today\'s Wrap-up';
+
+  @override
+  String get wrapup_summary_title =>
+      'Today\'s final learning check: 25 questions (Words 70% / Sentences 30%)';
+
+  @override
+  String wrapup_load_failed(Object error) {
+    return 'Failed to load wrap-up questions: $error';
+  }
+
+  @override
+  String get wrapup_completed_snackbar =>
+      'Today\'s wrap-up completion has been applied.';
+
+  @override
+  String wrapup_finish_failed_snackbar(Object error) {
+    return 'Wrap-up completion failed: $error';
+  }
+
+  @override
+  String get wrapup_reload_button => 'Reload';
+
+  @override
+  String get wrapup_problem_new_button => 'Get new questions';
+
+  @override
+  String get wrapup_show_answer_button => 'Show answer';
+
+  @override
+  String get wrapup_reflecting_progress => 'Applying…';
+
+  @override
+  String get wrapup_finish_button_label => 'Finish wrap-up';
+
+  @override
+  String get wrapup_kind_word => 'Word';
+
+  @override
+  String get wrapup_kind_sentence => 'Sentence';
+
+  @override
+  String get wrapup_problem_label => 'Question';
+
+  @override
+  String get wrapup_meaning_label => 'Meaning:';
+
+  @override
+  String get wrapup_word_instruction => 'Check the corresponding word.';
+
+  @override
+  String get wrapup_sentence_instruction => 'Check the corresponding sentence.';
+
+  @override
+  String get wrapup_answer_prefix => 'Answer: ';
 }

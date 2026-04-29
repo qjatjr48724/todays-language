@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 
 import '../services/daily_progress_sync.dart';
+import '../l10n/app_localizations.dart';
 
 class TodaySentencesScreen extends StatefulWidget {
   const TodaySentencesScreen({
@@ -72,13 +73,10 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
   }
 
   void _startRelearn() {
+    final l10n = AppLocalizations.of(context)!;
     setState(() => _relearnActive = true);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          '연습 모드입니다. 「다음 문장」으로 복습할 수 있어요. (오늘 진도는 이미 목표에 도달했습니다.)',
-        ),
-      ),
+      SnackBar(content: Text(l10n.sentences_relearn_snackbar)),
     );
   }
 
@@ -124,8 +122,9 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
       });
     } catch (e) {
       if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
       setState(() {
-        _aiError = '샘플 문장 불러오기 실패: $e';
+        _aiError = l10n.sentences_ai_sample_load_failed(e.toString());
         _aiLoading = false;
       });
     }
@@ -135,6 +134,7 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
     if (_completedCurrent) return;
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
+    final l10n = AppLocalizations.of(context)!;
     setState(() {
       _savingProgress = true;
       _error = null;
@@ -151,10 +151,11 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
         }
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('문장 학습 완료! 오늘 진도 +1')),
+        SnackBar(content: Text(l10n.sentences_completed_snackbar)),
       );
     } catch (e) {
-      setState(() => _error = '저장 실패: $e');
+      final l10n = AppLocalizations.of(context)!;
+      setState(() => _error = l10n.sentences_save_failed(e.toString()));
     } finally {
       if (mounted) setState(() => _savingProgress = false);
     }
@@ -163,13 +164,14 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
     final showHiraLine =
         widget.targetLanguage.toUpperCase() == 'JPN' &&
         widget.level != 'beginner' &&
         _sentenceHira != null &&
         _sentenceHira!.trim().isNotEmpty;
     return Scaffold(
-      appBar: AppBar(title: const Text('오늘의 문장')),
+      appBar: AppBar(title: Text(l10n.sentences_appbar_title)),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -177,10 +179,12 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
           children: [
             Text(
               _sentenceCapReached && !_relearnActive
-                  ? '오늘 문장 목표(${_todayProgress?.sentenceGoal ?? 10}개)를 달성했습니다. 「재학습 시작」 후 「다음 문장」으로 복습할 수 있어요.'
+                  ? l10n.sentences_description_goal_reached(
+                      _todayProgress?.sentenceGoal ?? 10,
+                    )
                   : _sentenceCapReached && _relearnActive
-                      ? '연습 모드: 새 문장을 불러오며 복습할 수 있습니다. (진도는 더 올라가지 않습니다.)'
-                      : '완료 버튼은 현재 문장에서 1회만 +1 됩니다. 이후 다음 문장으로 넘어가세요.',
+                      ? l10n.sentences_description_relearn_mode
+                      : l10n.sentences_description_normal,
               style: Theme.of(context)
                   .textTheme
                   .bodyMedium
@@ -190,14 +194,14 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
             if (_aiLoading) ...[
               const LinearProgressIndicator(),
               const SizedBox(height: 12),
-              Text('샘플을 불러오는 중…',
+              Text(l10n.sentences_loading_sample,
                   style: TextStyle(color: scheme.onSurfaceVariant)),
             ] else if (_aiError != null) ...[
               Text(_aiError!, style: TextStyle(color: scheme.error)),
               const SizedBox(height: 12),
               FilledButton(
                 onPressed: _fetchSentenceSample,
-                child: const Text('샘플 다시 불러오기'),
+                child: Text(l10n.sentences_sample_reload),
               ),
             ] else ...[
               Text(
@@ -242,10 +246,12 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
                   : const Icon(Icons.check),
               label: Text(
                 _sentenceCapReached
-                    ? '오늘 목표 달성 (진도 +0)'
+                    ? l10n.sentences_button_goal_reached
                     : _savingProgress
-                        ? '저장 중…'
-                        : (_completedCurrent ? '완료 반영됨 (+1)' : '이 문장 완료(+1)'),
+                        ? l10n.sentences_button_saving
+                        : (_completedCurrent
+                            ? l10n.sentences_button_completed_reflected
+                            : l10n.sentences_button_increment),
               ),
             ),
             const SizedBox(height: 8),
@@ -253,14 +259,14 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
               FilledButton.tonalIcon(
                 onPressed: (_aiLoading || _savingProgress) ? null : _startRelearn,
                 icon: const Icon(Icons.school_outlined),
-                label: const Text('재학습 시작'),
+                label: Text(l10n.sentences_relearn_button_label),
               ),
               const SizedBox(height: 8),
             ],
             OutlinedButton.icon(
               onPressed: _canUseNextButton ? _fetchSentenceSample : null,
               icon: const Icon(Icons.refresh),
-              label: const Text('다음 문장'),
+              label: Text(l10n.sentences_next_button_label),
             ),
             if (_error != null) ...[
               const SizedBox(height: 12),

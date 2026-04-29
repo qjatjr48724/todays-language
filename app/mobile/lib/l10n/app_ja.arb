@@ -124,5 +124,117 @@
   "language_usa_label": "英語（USA）",
 
   "my_info_user_fallback_name": "ユーザー"
+
+  ,
+
+  "progress_appbar_title": "進捗",
+  "progress_no_data": "進捗データがありません。",
+
+  "progress_home_title": "今日の進捗",
+  "progress_kst_subtitle_prefix": "KST · {date}",
+  "progress_word_line": "単語 {wordDone}/{wordGoal}",
+  "progress_sentence_line": "文 {sentenceDone}/{sentenceGoal}",
+  "progress_wrapup_line": "まとめ {quizDone}/{quizGoal}",
+
+  "progress_calendar_card_title": "カレンダー",
+  "progress_calendar_card_subtitle": "日別の進捗シール",
+
+  "progress_month_label": "{year}年{month}月",
+  "progress_prev_month_tooltip": "前の月",
+  "progress_next_month_tooltip": "次の月",
+
+  "progress_legend_0_39": "0〜39%",
+  "progress_legend_40_79": "40〜79%",
+  "progress_legend_80_100": "80〜100%",
+  "progress_legend_no_record": "記録なし",
+
+  "progress_weekday_sun": "日",
+  "progress_weekday_mon": "月",
+  "progress_weekday_tue": "火",
+  "progress_weekday_wed": "水",
+  "progress_weekday_thu": "木",
+  "progress_weekday_fri": "金",
+  "progress_weekday_sat": "土",
+
+  "progress_detail_loading": "詳細な記録を読み込み中…",
+  "progress_detail_load_failed": "詳細な記録を読み込めませんでした。\n{error}",
+  "progress_detail_login_required": "ログインが必要です。",
+  "progress_detail_header": "{date} の詳細記録",
+  "progress_detail_no_record": "この日の学習記録がありません。",
+  "progress_detail_word_title": "今日の単語",
+  "progress_detail_sentence_title": "今日の文",
+  "progress_detail_wrapup_title": "今日のまとめ",
+  "progress_close_button": "閉じる",
+
+  "progress_calendar_load_failed": "カレンダーデータを読み込めませんでした: {error}",
+
+  "words_appbar_title": "今日の単語",
+  "words_loading_sample": "サンプルを読み込み中…",
+  "words_sample_reload": "サンプルを再読み込み",
+
+  "words_relearn_snackbar": "練習モードです。「次の単語」で復習できます。（今日の進捗はすでに目標に到達しています。）",
+  "words_description_goal_reached": "今日の単語目標（{goal}個）を達成しました。「再学習開始」後、「次の単語」で復習できます。",
+  "words_description_relearn_mode": "練習モード：新しい単語を読み込み、復習できます。（進捗は増えません。）",
+  "words_description_normal": "完了ボタンは現在の単語で +1 が1回だけ適用されます。その後「次の単語」に進んでください。",
+
+  "words_ai_sample_load_failed": "サンプル単語の読み込みに失敗しました: {error}",
+  "words_save_failed": "保存に失敗しました: {error}",
+  "words_completed_snackbar": "単語の学習が完了しました。進捗 +1",
+
+  "words_button_goal_reached": "目標達成（進捗 +0）",
+  "words_button_saving": "保存中…",
+  "words_button_completed_reflected": "完了が反映されました (+1)",
+  "words_button_increment": "この単語を完了 (+1)",
+
+  "words_relearn_button_label": "再学習開始",
+  "words_next_button_label": "次の単語",
+
+  "words_debug_source": "debugSource: {source}",
+  "words_example_prefix": "例文: {example}",
+
+  "sentences_appbar_title": "今日の文",
+  "sentences_loading_sample": "サンプルを読み込み中…",
+  "sentences_sample_reload": "サンプルを再読み込み",
+
+  "sentences_relearn_snackbar": "練習モードです。「次の文」で復習できます。（今日の進捗はすでに目標に到達しています。）",
+  "sentences_description_goal_reached": "今日の文目標（{goal}個）を達成しました。「再学習開始」後、「次の文」で復習できます。",
+  "sentences_description_relearn_mode": "練習モード：新しい文を読み込み、復習できます。（進捗は増えません。）",
+  "sentences_description_normal": "完了ボタンは現在の文で +1 が1回だけ適用されます。その後「次の文」に進んでください。",
+
+  "sentences_ai_sample_load_failed": "サンプル文の読み込みに失敗しました: {error}",
+  "sentences_save_failed": "保存に失敗しました: {error}",
+  "sentences_completed_snackbar": "文の学習が完了しました。進捗 +1",
+
+  "sentences_button_goal_reached": "目標達成（進捗 +0）",
+  "sentences_button_saving": "保存中…",
+  "sentences_button_completed_reflected": "完了が反映されました (+1)",
+  "sentences_button_increment": "この文を完了 (+1)",
+
+  "sentences_relearn_button_label": "再学習開始",
+  "sentences_next_button_label": "次の文",
+
+  "sentences_debug_source": "debugSource: {source}",
+
+  "wrapup_appbar_title": "今日のまとめ",
+  "wrapup_summary_title": "当日の学習最終チェック: 25問（単語 70% / 文 30%）",
+
+  "wrapup_load_failed": "まとめ問題を読み込めませんでした: {error}",
+  "wrapup_completed_snackbar": "今日のまとめの反映が完了しました。",
+  "wrapup_finish_failed_snackbar": "まとめの反映に失敗しました: {error}",
+
+  "wrapup_reload_button": "再読み込み",
+  "wrapup_problem_new_button": "問題を新しく受け取る",
+  "wrapup_show_answer_button": "答えを見る",
+
+  "wrapup_reflecting_progress": "反映中…",
+  "wrapup_finish_button_label": "まとめを完了",
+
+  "wrapup_kind_word": "単語",
+  "wrapup_kind_sentence": "文",
+  "wrapup_problem_label": "問題",
+  "wrapup_meaning_label": "意味:",
+  "wrapup_word_instruction": "該当する単語を確認してください。",
+  "wrapup_sentence_instruction": "該当する文を確認してください。",
+  "wrapup_answer_prefix": "答え: "
 }
 

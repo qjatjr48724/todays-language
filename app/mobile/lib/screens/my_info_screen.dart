@@ -71,7 +71,7 @@ class MyInfoScreen extends StatelessWidget {
         }
 
         final shownName = (displayName == null || displayName.isEmpty)
-            ? (user.email?.split('@').first ?? '사용자')
+            ? (user.email?.split('@').first ?? l10n.my_info_user_fallback_name)
             : displayName;
 
         return SingleChildScrollView(
@@ -117,7 +117,7 @@ class MyInfoScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    _providerLabel(provider),
+                    _providerLabel(provider, l10n),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: scheme.onSurfaceVariant,
                         ),
@@ -151,7 +151,7 @@ class MyInfoScreen extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          _levelLabel(level),
+                          _levelLabel(level, l10n),
                           style: Theme.of(context).textTheme.bodyLarge,
                         ),
                       ),
@@ -332,10 +332,13 @@ class _LanguageRow extends StatelessWidget {
           .doc(alpha3.toUpperCase())
           .get(),
       builder: (context, snapshot) {
+        final rowL10n = AppLocalizations.of(context)!;
         final data = snapshot.data?.data();
         final endonym = (data?['endonym'] as String?)?.trim();
         final flagUrl = (data?['flagUrl'] as String?)?.trim();
-        final name = (endonym == null || endonym.isEmpty) ? _languageLabel(alpha3) : endonym;
+        final name = (endonym == null || endonym.isEmpty)
+            ? _languageLabel(alpha3, rowL10n)
+            : endonym;
         return Row(
           children: [
             Text(
@@ -663,16 +666,16 @@ String _normalizeLevel(String raw) {
   }
 }
 
-String _levelLabel(String raw) {
+String _levelLabel(String raw, AppLocalizations l10n) {
   switch (_normalizeLevel(raw)) {
     case 'beginner':
-      return '초급';
+      return l10n.level_beginner_label;
     case 'intermediate':
-      return '중급';
+      return l10n.level_intermediate_label;
     case 'advanced':
-      return '고급';
+      return l10n.level_advanced_label;
   }
-  return '초급';
+  return l10n.level_beginner_label;
 }
 
 class _ProviderBadge extends StatelessWidget {
@@ -714,30 +717,30 @@ class _ProviderBadge extends StatelessWidget {
   }
 }
 
-String _providerLabel(String provider) {
+String _providerLabel(String provider, AppLocalizations l10n) {
   switch (provider) {
     case 'google':
-      return '로그인 방식 : Google';
+      return l10n.provider_google_label;
     case 'apple':
-      return '로그인 방식 : Apple';
+      return l10n.provider_apple_label;
     case 'email':
-      return '로그인 방식 : Email';
+      return l10n.provider_email_label;
     default:
-      return '로그인 방식 : Unknown';
+      return l10n.provider_unknown_label;
   }
 }
 
-String _languageLabel(String code) {
+String _languageLabel(String code, AppLocalizations l10n) {
   switch (code) {
     // ISO-3166-1 alpha-3 (프로젝트 내부 표준)
     case 'KOR':
-      return '한국어 (KOR)';
+      return l10n.language_kor_label;
     case 'JPN':
-      return '일본어 (JPN)';
+      return l10n.language_jpn_label;
     case 'ESP':
-      return '스페인어 (ESP)';
+      return l10n.language_esp_label;
     case 'USA':
-      return '영어 (USA)';
+      return l10n.language_usa_label;
     default:
       return code;
   }

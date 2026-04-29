@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 
 import '../services/daily_progress_sync.dart';
+import '../l10n/app_localizations.dart';
 
 class TodayWordsScreen extends StatefulWidget {
   const TodayWordsScreen({
@@ -77,12 +78,11 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
   }
 
   void _startRelearn() {
+    final l10n = AppLocalizations.of(context)!;
     setState(() => _relearnActive = true);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          '연습 모드입니다. 「다음 단어」로 복습할 수 있어요. (오늘 진도는 이미 목표에 도달했습니다.)',
-        ),
+      SnackBar(
+        content: Text(l10n.words_relearn_snackbar),
       ),
     );
   }
@@ -135,8 +135,9 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
       });
     } catch (e) {
       if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
       setState(() {
-        _aiError = '샘플 단어 불러오기 실패: $e';
+        _aiError = l10n.words_ai_sample_load_failed(e.toString());
         _aiLoading = false;
       });
     }
@@ -146,6 +147,7 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
     if (_completedCurrent) return;
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
+    final l10n = AppLocalizations.of(context)!;
     setState(() {
       _savingProgress = true;
       _error = null;
@@ -161,10 +163,11 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
         }
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('단어 학습 완료! 오늘 진도 +1')),
+        SnackBar(content: Text(l10n.words_completed_snackbar)),
       );
     } catch (e) {
-      setState(() => _error = '저장 실패: $e');
+      final l10n = AppLocalizations.of(context)!;
+      setState(() => _error = l10n.words_save_failed(e.toString()));
     } finally {
       if (mounted) setState(() => _savingProgress = false);
     }
@@ -173,13 +176,14 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
     final showHiraLine =
         widget.targetLanguage.toUpperCase() == 'JPN' &&
         widget.level != 'beginner' &&
         _wordReadingHira != null &&
         _wordReadingHira!.trim().isNotEmpty;
     return Scaffold(
-      appBar: AppBar(title: const Text('오늘의 단어')),
+      appBar: AppBar(title: Text(l10n.words_appbar_title)),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -187,10 +191,12 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
           children: [
             Text(
               _wordCapReached && !_relearnActive
-                  ? '오늘 단어 목표(${_todayProgress?.wordGoal ?? 30}개)를 달성했습니다. 「재학습 시작」 후 「다음 단어」로 복습할 수 있어요.'
+                  ? l10n.words_description_goal_reached(
+                      _todayProgress?.wordGoal ?? 30,
+                    )
                   : _wordCapReached && _relearnActive
-                      ? '연습 모드: 새 단어를 불러오며 복습할 수 있습니다. (진도는 더 올라가지 않습니다.)'
-                      : '완료 버튼은 현재 단어에서 1회만 +1 됩니다. 이후 다음 단어로 넘어가세요.',
+                      ? l10n.words_description_relearn_mode
+                      : l10n.words_description_normal,
               style: Theme.of(context)
                   .textTheme
                   .bodyMedium
@@ -201,13 +207,14 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
             if (_aiLoading) ...[
               const LinearProgressIndicator(),
               const SizedBox(height: 12),
-              Text('샘플을 불러오는 중…', style: TextStyle(color: scheme.onSurfaceVariant)),
+              Text(l10n.words_loading_sample,
+                  style: TextStyle(color: scheme.onSurfaceVariant)),
             ] else if (_aiError != null) ...[
               Text(_aiError!, style: TextStyle(color: scheme.error)),
               const SizedBox(height: 12),
               FilledButton(
                 onPressed: _fetchWordSample,
-                child: const Text('샘플 다시 불러오기'),
+                child: Text(l10n.words_sample_reload),
               ),
             ] else ...[
               Text(
@@ -233,7 +240,7 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
               if (kDebugMode && _debugSource != null) ...[
                 const SizedBox(height: 10),
                 Text(
-                  'debugSource: $_debugSource',
+                  l10n.words_debug_source(_debugSource!),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: scheme.onSurfaceVariant,
                       ),
@@ -242,7 +249,7 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
               if (_example != null && _example!.isNotEmpty) ...[
                 const SizedBox(height: 12),
                 Text(
-                  '예문: ${_example!}',
+                  l10n.words_example_prefix(_example!),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: scheme.onSurfaceVariant,
                       ),
@@ -262,10 +269,12 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
                   : const Icon(Icons.check),
               label: Text(
                 _wordCapReached
-                    ? '오늘 목표 달성 (진도 +0)'
+                    ? l10n.words_button_goal_reached
                     : _savingProgress
-                        ? '저장 중…'
-                        : (_completedCurrent ? '완료 반영됨 (+1)' : '이 단어 완료(+1)'),
+                        ? l10n.words_button_saving
+                        : (_completedCurrent
+                            ? l10n.words_button_completed_reflected
+                            : l10n.words_button_increment),
               ),
             ),
             const SizedBox(height: 8),
@@ -273,14 +282,14 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
               FilledButton.tonalIcon(
                 onPressed: (_aiLoading || _savingProgress) ? null : _startRelearn,
                 icon: const Icon(Icons.school_outlined),
-                label: const Text('재학습 시작'),
+                label: Text(l10n.words_relearn_button_label),
               ),
               const SizedBox(height: 8),
             ],
             OutlinedButton.icon(
               onPressed: _canUseNextButton ? _fetchWordSample : null,
               icon: const Icon(Icons.refresh),
-              label: const Text('다음 단어'),
+              label: Text(l10n.words_next_button_label),
             ),
             if (_error != null) ...[
               const SizedBox(height: 12),

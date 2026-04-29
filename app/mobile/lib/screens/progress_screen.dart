@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/daily_progress_sync.dart';
 import '../ui/section_card.dart';
 import '../utils/kst_date.dart';
+import '../l10n/app_localizations.dart';
 
 class ProgressScreen extends StatefulWidget {
   const ProgressScreen({super.key});
@@ -81,8 +82,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
       });
     } catch (e) {
       if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
       setState(() {
-        _calendarError = '캘린더 데이터를 불러오지 못했습니다: $e';
+        _calendarError = l10n.progress_calendar_load_failed(e.toString());
         _calendarLoading = false;
       });
     }
@@ -123,6 +125,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
         isScrollControlled: true,
         builder: (context) {
           final scheme = Theme.of(context).colorScheme;
+          final l10n = AppLocalizations.of(context)!;
           return MediaQuery(
             // 바텀시트 텍스트만 20% 축소(다른 화면 영향 없음)
             data: MediaQuery.of(context).copyWith(
@@ -149,7 +152,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                             ),
                             const SizedBox(height: 12),
                             Text(
-                              '상세 기록을 불러오는 중…',
+                              l10n.progress_detail_loading,
                               style: Theme.of(context)
                                   .textTheme
                                   .bodyMedium
@@ -166,7 +169,11 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       height: 220,
                       child: Center(
                         child: Text(
-                          '상세 기록을 불러오지 못했습니다.\n${snapshot.error}',
+                          l10n.progress_detail_load_failed(
+                            (snapshot.error?.toString() ?? '').isEmpty
+                                ? '-'
+                                : snapshot.error.toString(),
+                          ),
                           textAlign: TextAlign.center,
                           style: TextStyle(color: scheme.error),
                         ),
@@ -180,7 +187,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       height: 220,
                       child: Center(
                         child: Text(
-                          '로그인이 필요합니다.',
+                          l10n.progress_detail_login_required,
                           style: TextStyle(color: scheme.onSurfaceVariant),
                         ),
                       ),
@@ -219,13 +226,13 @@ class _ProgressScreenState extends State<ProgressScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '$dateId 상세 기록',
+                        l10n.progress_detail_header(dateId),
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       const SizedBox(height: 10),
                       if (!hasAny) ...[
                         Text(
-                          '해당 날짜의 학습 기록이 없습니다.',
+                          l10n.progress_detail_no_record,
                           style: Theme.of(context)
                               .textTheme
                               .bodyMedium
@@ -253,17 +260,17 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       ),
                       const SizedBox(height: 14),
                       _DetailRow(
-                        title: '오늘의 단어',
+                        title: l10n.progress_detail_word_title,
                         value: '$wordDone / $wordGoal',
                       ),
                       const SizedBox(height: 8),
                       _DetailRow(
-                        title: '오늘의 문장',
+                        title: l10n.progress_detail_sentence_title,
                         value: '$sentenceDone / $sentenceGoal',
                       ),
                       const SizedBox(height: 8),
                       _DetailRow(
-                        title: '오늘의 마무리',
+                        title: l10n.progress_detail_wrapup_title,
                         value: '$quizDone / $quizGoal',
                       ),
                       const SizedBox(height: 14),
@@ -271,7 +278,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         width: double.infinity,
                         child: FilledButton(
                           onPressed: () => Navigator.of(context).pop(),
-                          child: const Text('닫기'),
+                          child: Text(l10n.progress_close_button),
                         ),
                       ),
                     ],
@@ -291,6 +298,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
   Widget _buildCalendar(ColorScheme scheme) {
     final year = _focusedMonth.year;
     final month = _focusedMonth.month;
+    final l10n = AppLocalizations.of(context)!;
 
     final firstDay = DateTime(year, month, 1);
     final daysInMonth = DateTime(year, month + 1, 0).day;
@@ -305,7 +313,15 @@ class _ProgressScreenState extends State<ProgressScreen> {
     final today = kstNowDate();
     final isCurrentMonth = today.year == year && today.month == month;
 
-    const weekdayLabels = ['일', '월', '화', '수', '목', '금', '토'];
+    final weekdayLabels = <String>[
+      l10n.progress_weekday_sun,
+      l10n.progress_weekday_mon,
+      l10n.progress_weekday_tue,
+      l10n.progress_weekday_wed,
+      l10n.progress_weekday_thu,
+      l10n.progress_weekday_fri,
+      l10n.progress_weekday_sat,
+    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -313,19 +329,22 @@ class _ProgressScreenState extends State<ProgressScreen> {
         Row(
           children: [
             Text(
-              '$year년 ${month.toString().padLeft(2, '0')}월',
+              l10n.progress_month_label(
+                month.toString().padLeft(2, '0'),
+                year.toString(),
+              ),
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const Spacer(),
             IconButton(
               onPressed: _calendarLoading ? null : () => _changeMonth(-1),
               icon: const Icon(Icons.chevron_left),
-              tooltip: '이전 달',
+              tooltip: l10n.progress_prev_month_tooltip,
             ),
             IconButton(
               onPressed: _calendarLoading ? null : () => _changeMonth(1),
               icon: const Icon(Icons.chevron_right),
-              tooltip: '다음 달',
+              tooltip: l10n.progress_next_month_tooltip,
             ),
           ],
         ),
@@ -333,22 +352,22 @@ class _ProgressScreenState extends State<ProgressScreen> {
         Row(
           children: [
             _LegendItem(
-              label: '0~39%',
+              label: l10n.progress_legend_0_39,
               child: _Sticker(shape: _StickerShape.square, color: Colors.red),
             ),
             const SizedBox(width: 10),
             _LegendItem(
-              label: '40~79%',
+              label: l10n.progress_legend_40_79,
               child: _Sticker(shape: _StickerShape.triangle, color: Colors.orange),
             ),
             const SizedBox(width: 10),
             _LegendItem(
-              label: '80~100%',
+              label: l10n.progress_legend_80_100,
               child: _Sticker(shape: _StickerShape.circle, color: Colors.green),
             ),
             const SizedBox(width: 10),
             _LegendItem(
-              label: '기록 없음',
+              label: l10n.progress_legend_no_record,
               child: _Sticker(shape: _StickerShape.square, color: Colors.grey),
             ),
           ],
@@ -477,17 +496,19 @@ class _ProgressScreenState extends State<ProgressScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     final p = _progress;
     return Scaffold(
-      appBar: AppBar(title: const Text('진행률')),
+      appBar: AppBar(title: Text(l10n.progress_appbar_title)),
       body: Padding(
         // 카드가 화면에 더 꽉 차 보이도록 좌우 여백을 줄입니다.
         padding: const EdgeInsets.all(16),
         child: _loading
             ? const Center(child: CircularProgressIndicator())
             : (p == null)
-                ? Text('진행률 데이터가 없습니다.', style: TextStyle(color: scheme.error))
+                ? Text(l10n.progress_no_data,
+                    style: TextStyle(color: scheme.error))
                 : RefreshIndicator(
                     onRefresh: () async {
                       await _load();
@@ -499,8 +520,10 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           SectionCard(
-                            title: '오늘의 진행률',
-                            subtitle: 'KST · ${todayKstYyyyMmDd()}',
+                            title: l10n.progress_home_title,
+                            subtitle: l10n.progress_kst_subtitle_prefix(
+                              todayKstYyyyMmDd(),
+                            ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -516,16 +539,31 @@ class _ProgressScreenState extends State<ProgressScreen> {
                                 const SizedBox(height: 8),
                                 Text('${p.progressPercent}%'),
                                 const SizedBox(height: 12),
-                                Text('단어 ${p.wordDone}/${p.wordGoal}'),
-                                Text('문장 ${p.sentenceDone}/${p.sentenceGoal}'),
-                                Text('마무리 ${p.quizDone}/${p.quizGoal}'),
+                                Text(
+                                  l10n.progress_word_line(
+                                    p.wordDone,
+                                    p.wordGoal,
+                                  ),
+                                ),
+                                Text(
+                                  l10n.progress_sentence_line(
+                                    p.sentenceDone,
+                                    p.sentenceGoal,
+                                  ),
+                                ),
+                                Text(
+                                  l10n.progress_wrapup_line(
+                                    p.quizDone,
+                                    p.quizGoal,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
                           const SizedBox(height: 16),
                           SectionCard(
-                            title: '캘린더',
-                            subtitle: '날짜별 진행률 스티커',
+                            title: l10n.progress_calendar_card_title,
+                            subtitle: l10n.progress_calendar_card_subtitle,
                             trailing: _calendarLoading
                                 ? const SizedBox(
                                     width: 16,
