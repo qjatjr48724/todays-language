@@ -758,4 +758,74 @@ class AppLocalizationsKo extends AppLocalizations {
   String email_register_error_failed(Object code) {
     return '회원가입에 실패했습니다. ($code)';
   }
+
+  @override
+  String get admin_tools_title => '관리자 도구';
+
+  @override
+  String get admin_tools_no_permission => '권한이 없습니다.';
+
+  @override
+  String get admin_tools_done_snackbar => '완료';
+
+  @override
+  String get admin_tools_confirm_cancel => '취소';
+
+  @override
+  String get admin_tools_confirm_run => '실행';
+
+  @override
+  String get admin_tools_test_only => '테스트 계정 전용';
+
+  @override
+  String admin_tools_uid_prefix(Object uid) {
+    return 'uid: $uid';
+  }
+
+  @override
+  String get admin_tools_section_language_flow => '언어 선택 플로우';
+
+  @override
+  String get admin_tools_open_step1 => '1단계(로컬 언어) 화면 열기';
+
+  @override
+  String get admin_tools_open_step2 => '2단계(대상 언어) 화면 열기';
+
+  @override
+  String get admin_tools_reset_language_flow_button => '언어 선택 초기화(다시 처음부터)';
+
+  @override
+  String get admin_tools_reset_language_flow_title => '언어 선택 초기화';
+
+  @override
+  String get admin_tools_reset_language_flow_message =>
+      'languageSetupDone을 false로 되돌리고, native/target/variant를 삭제합니다.';
+
+  @override
+  String get admin_tools_section_country_cache => '국가/국기 캐시';
+
+  @override
+  String get admin_tools_seed_catalog => 'seedCountryCatalog 실행';
+
+  @override
+  String get admin_tools_sync_flags_force => 'syncCountryFlags(force:true) 실행';
+
+  @override
+  String get admin_tools_refresh_cache_status => '캐시 상태 새로고침';
+
+  @override
+  String get admin_tools_cache_empty =>
+      'public_metadata/countries/items 가 비어있습니다. seedCountryCatalog를 먼저 실행하세요.';
+
+  @override
+  String admin_tools_enabled_label(Object value) {
+    return 'enabled=$value';
+  }
+
+  @override
+  String get admin_tools_section_learning_set => '학습 세트';
+
+  @override
+  String get admin_tools_ensure_learning_set =>
+      'ensureLearningSetForToday(현재 프로필)';
 }

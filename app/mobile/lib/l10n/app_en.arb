@@ -279,6 +279,33 @@
   "email_register_error_invalid_email": "The email address format is invalid.",
   "email_register_error_email_in_use": "This email is already in use.",
   "email_register_error_weak_password": "The password is too weak.",
-  "email_register_error_failed": "Sign up failed. ({code})"
+  "email_register_error_failed": "Sign up failed. ({code})",
+
+  "admin_tools_title": "Admin Tools",
+  "admin_tools_no_permission": "No permission.",
+  "admin_tools_done_snackbar": "Done",
+
+  "admin_tools_confirm_cancel": "Cancel",
+  "admin_tools_confirm_run": "Run",
+
+  "admin_tools_test_only": "Test account only",
+  "admin_tools_uid_prefix": "uid: {uid}",
+
+  "admin_tools_section_language_flow": "Language setup flow",
+  "admin_tools_open_step1": "Open step 1 (Local language)",
+  "admin_tools_open_step2": "Open step 2 (Target language)",
+  "admin_tools_reset_language_flow_button": "Reset language setup (start over)",
+  "admin_tools_reset_language_flow_title": "Reset language setup",
+  "admin_tools_reset_language_flow_message": "Set languageSetupDone to false and delete native/target/variant.",
+
+  "admin_tools_section_country_cache": "Country/flag cache",
+  "admin_tools_seed_catalog": "Run seedCountryCatalog",
+  "admin_tools_sync_flags_force": "Run syncCountryFlags(force:true)",
+  "admin_tools_refresh_cache_status": "Refresh cache status",
+  "admin_tools_cache_empty": "public_metadata/countries/items is empty. Run seedCountryCatalog first.",
+  "admin_tools_enabled_label": "enabled={value}",
+
+  "admin_tools_section_learning_set": "Learning set",
+  "admin_tools_ensure_learning_set": "ensureLearningSetForToday (current profile)"
 }
 

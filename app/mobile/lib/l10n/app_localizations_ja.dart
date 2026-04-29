@@ -759,4 +759,74 @@ class AppLocalizationsJa extends AppLocalizations {
   String email_register_error_failed(Object code) {
     return '登録に失敗しました。($code)';
   }
+
+  @override
+  String get admin_tools_title => '管理者ツール';
+
+  @override
+  String get admin_tools_no_permission => '権限がありません。';
+
+  @override
+  String get admin_tools_done_snackbar => '完了';
+
+  @override
+  String get admin_tools_confirm_cancel => 'キャンセル';
+
+  @override
+  String get admin_tools_confirm_run => '実行';
+
+  @override
+  String get admin_tools_test_only => 'テストアカウント専用';
+
+  @override
+  String admin_tools_uid_prefix(Object uid) {
+    return 'uid: $uid';
+  }
+
+  @override
+  String get admin_tools_section_language_flow => '言語設定フロー';
+
+  @override
+  String get admin_tools_open_step1 => 'ステップ1（ローカル言語）を開く';
+
+  @override
+  String get admin_tools_open_step2 => 'ステップ2（対象言語）を開く';
+
+  @override
+  String get admin_tools_reset_language_flow_button => '言語設定をリセット（最初から）';
+
+  @override
+  String get admin_tools_reset_language_flow_title => '言語設定をリセット';
+
+  @override
+  String get admin_tools_reset_language_flow_message =>
+      'languageSetupDone を false に戻し、native/target/variant を削除します。';
+
+  @override
+  String get admin_tools_section_country_cache => '国/旗キャッシュ';
+
+  @override
+  String get admin_tools_seed_catalog => 'seedCountryCatalog を実行';
+
+  @override
+  String get admin_tools_sync_flags_force => 'syncCountryFlags(force:true) を実行';
+
+  @override
+  String get admin_tools_refresh_cache_status => 'キャッシュ状態を更新';
+
+  @override
+  String get admin_tools_cache_empty =>
+      'public_metadata/countries/items が空です。先に seedCountryCatalog を実行してください。';
+
+  @override
+  String admin_tools_enabled_label(Object value) {
+    return 'enabled=$value';
+  }
+
+  @override
+  String get admin_tools_section_learning_set => '学習セット';
+
+  @override
+  String get admin_tools_ensure_learning_set =>
+      'ensureLearningSetForToday（現在のプロフィール）';
 }

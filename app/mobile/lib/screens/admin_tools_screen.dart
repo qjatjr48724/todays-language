@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'language_setup_screen.dart';
 import 'target_language_setup_screen.dart';
+import '../l10n/app_localizations.dart';
 
 class AdminToolsScreen extends StatefulWidget {
   const AdminToolsScreen({super.key});
@@ -28,8 +29,9 @@ class _AdminToolsScreenState extends State<AdminToolsScreen> {
     try {
       await fn();
       if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('완료')),
+        SnackBar(content: Text(l10n.admin_tools_done_snackbar)),
       );
     } catch (e) {
       if (!mounted) return;
@@ -43,17 +45,18 @@ class _AdminToolsScreenState extends State<AdminToolsScreen> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (context) {
+        final l10n = AppLocalizations.of(context)!;
         return AlertDialog(
           title: Text(title),
           content: Text(message),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('취소'),
+              child: Text(l10n.admin_tools_confirm_cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('실행'),
+              child: Text(l10n.admin_tools_confirm_run),
             ),
           ],
         );
@@ -65,15 +68,16 @@ class _AdminToolsScreenState extends State<AdminToolsScreen> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
     final user = FirebaseAuth.instance.currentUser;
     final isAdmin = user != null && user.uid == AdminToolsScreen.testAdminUid;
 
     if (!isAdmin) {
       return Scaffold(
-        appBar: AppBar(title: const Text('관리자 도구')),
+        appBar: AppBar(title: Text(l10n.admin_tools_title)),
         body: Center(
           child: Text(
-            '권한이 없습니다.',
+            l10n.admin_tools_no_permission,
             style: TextStyle(color: scheme.onSurfaceVariant),
           ),
         ),
@@ -87,19 +91,19 @@ class _AdminToolsScreenState extends State<AdminToolsScreen> {
         .collection('items');
 
     return Scaffold(
-      appBar: AppBar(title: const Text('관리자 도구')),
+      appBar: AppBar(title: Text(l10n.admin_tools_title)),
       body: AbsorbPointer(
         absorbing: _busy,
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
           children: [
             Text(
-              '테스트 계정 전용',
+              l10n.admin_tools_test_only,
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 4),
             Text(
-              'uid: ${user.uid}',
+              l10n.admin_tools_uid_prefix(user.uid),
               style: Theme.of(context)
                   .textTheme
                   .bodySmall
@@ -108,27 +112,27 @@ class _AdminToolsScreenState extends State<AdminToolsScreen> {
             const SizedBox(height: 12),
 
             _Section(
-              title: '언어 선택 플로우',
+              title: l10n.admin_tools_section_language_flow,
               children: [
                 FilledButton.tonal(
                   onPressed: () => Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const LanguageSetupScreen()),
                   ),
-                  child: const Text('1단계(로컬 언어) 화면 열기'),
+                  child: Text(l10n.admin_tools_open_step1),
                 ),
                 const SizedBox(height: 8),
                 FilledButton.tonal(
                   onPressed: () => Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const TargetLanguageSetupScreen()),
                   ),
-                  child: const Text('2단계(대상 언어) 화면 열기'),
+                  child: Text(l10n.admin_tools_open_step2),
                 ),
                 const SizedBox(height: 8),
                 OutlinedButton(
                   onPressed: () async {
                     final ok = await _confirm(
-                      '언어 선택 초기화',
-                      'languageSetupDone을 false로 되돌리고, native/target/variant를 삭제합니다.',
+                      l10n.admin_tools_reset_language_flow_title,
+                      l10n.admin_tools_reset_language_flow_message,
                     );
                     if (!ok) {
                       return;
@@ -145,14 +149,14 @@ class _AdminToolsScreenState extends State<AdminToolsScreen> {
                       );
                     });
                   },
-                  child: const Text('언어 선택 초기화(다시 처음부터)'),
+                  child: Text(l10n.admin_tools_reset_language_flow_button),
                 ),
               ],
             ),
 
             const SizedBox(height: 16),
             _Section(
-              title: '국가/국기 캐시',
+              title: l10n.admin_tools_section_country_cache,
               children: [
                 FilledButton.tonal(
                   onPressed: () => _run(() async {
@@ -161,7 +165,7 @@ class _AdminToolsScreenState extends State<AdminToolsScreen> {
                         .httpsCallable('seedCountryCatalog');
                     await callable.call<Map<String, dynamic>>({});
                   }),
-                  child: const Text('seedCountryCatalog 실행'),
+                  child: Text(l10n.admin_tools_seed_catalog),
                 ),
                 const SizedBox(height: 8),
                 FilledButton.tonal(
@@ -171,25 +175,26 @@ class _AdminToolsScreenState extends State<AdminToolsScreen> {
                         .httpsCallable('syncCountryFlags');
                     await callable.call<Map<String, dynamic>>({'force': true});
                   }),
-                  child: const Text('syncCountryFlags(force:true) 실행'),
+                  child: Text(l10n.admin_tools_sync_flags_force),
                 ),
                 const SizedBox(height: 8),
                 OutlinedButton.icon(
                   onPressed: () => setState(() => _countryStatusNonce++),
                   icon: const Icon(Icons.refresh),
-                  label: const Text('캐시 상태 새로고침'),
+                  label: Text(l10n.admin_tools_refresh_cache_status),
                 ),
                 const SizedBox(height: 12),
                 FutureBuilder<QuerySnapshot<Map<String, dynamic>>>(
                   future: countryCol.get(),
                   builder: (context, snapshot) {
+                    final innerL10n = AppLocalizations.of(context)!;
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const LinearProgressIndicator();
                     }
                     final docs = snapshot.data?.docs ?? const [];
                     if (docs.isEmpty) {
                       return Text(
-                        'public_metadata/countries/items 가 비어있습니다. seedCountryCatalog를 먼저 실행하세요.',
+                        innerL10n.admin_tools_cache_empty,
                         style: TextStyle(color: scheme.onSurfaceVariant),
                       );
                     }
@@ -211,7 +216,9 @@ class _AdminToolsScreenState extends State<AdminToolsScreen> {
                         contentPadding: EdgeInsets.zero,
                         leading: _FlagThumb(url: flagUrl),
                         title: Text(endonym.isEmpty ? alpha3 : endonym),
-                        subtitle: Text('$alpha3  •  enabled=${enabled ? "true" : "false"}'),
+                        subtitle: Text(
+                          '$alpha3  •  ${innerL10n.admin_tools_enabled_label(enabled ? "true" : "false")}',
+                        ),
                         trailing: Icon(
                           hasFlag ? Icons.check_circle : Icons.error_outline,
                           color: hasFlag ? scheme.primary : scheme.error,
@@ -231,7 +238,7 @@ class _AdminToolsScreenState extends State<AdminToolsScreen> {
 
             const SizedBox(height: 16),
             _Section(
-              title: '학습 세트',
+              title: l10n.admin_tools_section_learning_set,
               children: [
                 OutlinedButton(
                   onPressed: () => _run(() async {
@@ -247,7 +254,7 @@ class _AdminToolsScreenState extends State<AdminToolsScreen> {
                       'level': level,
                     });
                   }),
-                  child: const Text('ensureLearningSetForToday(현재 프로필)'),
+                  child: Text(l10n.admin_tools_ensure_learning_set),
                 ),
               ],
             ),

@@ -1432,6 +1432,132 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'회원가입에 실패했습니다. ({code})'**
   String email_register_error_failed(Object code);
+
+  /// No description provided for @admin_tools_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'관리자 도구'**
+  String get admin_tools_title;
+
+  /// No description provided for @admin_tools_no_permission.
+  ///
+  /// In ko, this message translates to:
+  /// **'권한이 없습니다.'**
+  String get admin_tools_no_permission;
+
+  /// No description provided for @admin_tools_done_snackbar.
+  ///
+  /// In ko, this message translates to:
+  /// **'완료'**
+  String get admin_tools_done_snackbar;
+
+  /// No description provided for @admin_tools_confirm_cancel.
+  ///
+  /// In ko, this message translates to:
+  /// **'취소'**
+  String get admin_tools_confirm_cancel;
+
+  /// No description provided for @admin_tools_confirm_run.
+  ///
+  /// In ko, this message translates to:
+  /// **'실행'**
+  String get admin_tools_confirm_run;
+
+  /// No description provided for @admin_tools_test_only.
+  ///
+  /// In ko, this message translates to:
+  /// **'테스트 계정 전용'**
+  String get admin_tools_test_only;
+
+  /// No description provided for @admin_tools_uid_prefix.
+  ///
+  /// In ko, this message translates to:
+  /// **'uid: {uid}'**
+  String admin_tools_uid_prefix(Object uid);
+
+  /// No description provided for @admin_tools_section_language_flow.
+  ///
+  /// In ko, this message translates to:
+  /// **'언어 선택 플로우'**
+  String get admin_tools_section_language_flow;
+
+  /// No description provided for @admin_tools_open_step1.
+  ///
+  /// In ko, this message translates to:
+  /// **'1단계(로컬 언어) 화면 열기'**
+  String get admin_tools_open_step1;
+
+  /// No description provided for @admin_tools_open_step2.
+  ///
+  /// In ko, this message translates to:
+  /// **'2단계(대상 언어) 화면 열기'**
+  String get admin_tools_open_step2;
+
+  /// No description provided for @admin_tools_reset_language_flow_button.
+  ///
+  /// In ko, this message translates to:
+  /// **'언어 선택 초기화(다시 처음부터)'**
+  String get admin_tools_reset_language_flow_button;
+
+  /// No description provided for @admin_tools_reset_language_flow_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'언어 선택 초기화'**
+  String get admin_tools_reset_language_flow_title;
+
+  /// No description provided for @admin_tools_reset_language_flow_message.
+  ///
+  /// In ko, this message translates to:
+  /// **'languageSetupDone을 false로 되돌리고, native/target/variant를 삭제합니다.'**
+  String get admin_tools_reset_language_flow_message;
+
+  /// No description provided for @admin_tools_section_country_cache.
+  ///
+  /// In ko, this message translates to:
+  /// **'국가/국기 캐시'**
+  String get admin_tools_section_country_cache;
+
+  /// No description provided for @admin_tools_seed_catalog.
+  ///
+  /// In ko, this message translates to:
+  /// **'seedCountryCatalog 실행'**
+  String get admin_tools_seed_catalog;
+
+  /// No description provided for @admin_tools_sync_flags_force.
+  ///
+  /// In ko, this message translates to:
+  /// **'syncCountryFlags(force:true) 실행'**
+  String get admin_tools_sync_flags_force;
+
+  /// No description provided for @admin_tools_refresh_cache_status.
+  ///
+  /// In ko, this message translates to:
+  /// **'캐시 상태 새로고침'**
+  String get admin_tools_refresh_cache_status;
+
+  /// No description provided for @admin_tools_cache_empty.
+  ///
+  /// In ko, this message translates to:
+  /// **'public_metadata/countries/items 가 비어있습니다. seedCountryCatalog를 먼저 실행하세요.'**
+  String get admin_tools_cache_empty;
+
+  /// No description provided for @admin_tools_enabled_label.
+  ///
+  /// In ko, this message translates to:
+  /// **'enabled={value}'**
+  String admin_tools_enabled_label(Object value);
+
+  /// No description provided for @admin_tools_section_learning_set.
+  ///
+  /// In ko, this message translates to:
+  /// **'학습 세트'**
+  String get admin_tools_section_learning_set;
+
+  /// No description provided for @admin_tools_ensure_learning_set.
+  ///
+  /// In ko, this message translates to:
+  /// **'ensureLearningSetForToday(현재 프로필)'**
+  String get admin_tools_ensure_learning_set;
 }
 
 class _AppLocalizationsDelegate

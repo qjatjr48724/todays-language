@@ -793,4 +793,75 @@ class AppLocalizationsEn extends AppLocalizations {
   String email_register_error_failed(Object code) {
     return 'Sign up failed. ($code)';
   }
+
+  @override
+  String get admin_tools_title => 'Admin Tools';
+
+  @override
+  String get admin_tools_no_permission => 'No permission.';
+
+  @override
+  String get admin_tools_done_snackbar => 'Done';
+
+  @override
+  String get admin_tools_confirm_cancel => 'Cancel';
+
+  @override
+  String get admin_tools_confirm_run => 'Run';
+
+  @override
+  String get admin_tools_test_only => 'Test account only';
+
+  @override
+  String admin_tools_uid_prefix(Object uid) {
+    return 'uid: $uid';
+  }
+
+  @override
+  String get admin_tools_section_language_flow => 'Language setup flow';
+
+  @override
+  String get admin_tools_open_step1 => 'Open step 1 (Local language)';
+
+  @override
+  String get admin_tools_open_step2 => 'Open step 2 (Target language)';
+
+  @override
+  String get admin_tools_reset_language_flow_button =>
+      'Reset language setup (start over)';
+
+  @override
+  String get admin_tools_reset_language_flow_title => 'Reset language setup';
+
+  @override
+  String get admin_tools_reset_language_flow_message =>
+      'Set languageSetupDone to false and delete native/target/variant.';
+
+  @override
+  String get admin_tools_section_country_cache => 'Country/flag cache';
+
+  @override
+  String get admin_tools_seed_catalog => 'Run seedCountryCatalog';
+
+  @override
+  String get admin_tools_sync_flags_force => 'Run syncCountryFlags(force:true)';
+
+  @override
+  String get admin_tools_refresh_cache_status => 'Refresh cache status';
+
+  @override
+  String get admin_tools_cache_empty =>
+      'public_metadata/countries/items is empty. Run seedCountryCatalog first.';
+
+  @override
+  String admin_tools_enabled_label(Object value) {
+    return 'enabled=$value';
+  }
+
+  @override
+  String get admin_tools_section_learning_set => 'Learning set';
+
+  @override
+  String get admin_tools_ensure_learning_set =>
+      'ensureLearningSetForToday (current profile)';
 }

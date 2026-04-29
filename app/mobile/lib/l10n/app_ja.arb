@@ -279,6 +279,33 @@
   "email_register_error_invalid_email": "メール形式が正しくありません。",
   "email_register_error_email_in_use": "このメールはすでに使用されています。",
   "email_register_error_weak_password": "パスワードが弱すぎます。",
-  "email_register_error_failed": "登録に失敗しました。({code})"
+  "email_register_error_failed": "登録に失敗しました。({code})",
+
+  "admin_tools_title": "管理者ツール",
+  "admin_tools_no_permission": "権限がありません。",
+  "admin_tools_done_snackbar": "完了",
+
+  "admin_tools_confirm_cancel": "キャンセル",
+  "admin_tools_confirm_run": "実行",
+
+  "admin_tools_test_only": "テストアカウント専用",
+  "admin_tools_uid_prefix": "uid: {uid}",
+
+  "admin_tools_section_language_flow": "言語設定フロー",
+  "admin_tools_open_step1": "ステップ1（ローカル言語）を開く",
+  "admin_tools_open_step2": "ステップ2（対象言語）を開く",
+  "admin_tools_reset_language_flow_button": "言語設定をリセット（最初から）",
+  "admin_tools_reset_language_flow_title": "言語設定をリセット",
+  "admin_tools_reset_language_flow_message": "languageSetupDone を false に戻し、native/target/variant を削除します。",
+
+  "admin_tools_section_country_cache": "国/旗キャッシュ",
+  "admin_tools_seed_catalog": "seedCountryCatalog を実行",
+  "admin_tools_sync_flags_force": "syncCountryFlags(force:true) を実行",
+  "admin_tools_refresh_cache_status": "キャッシュ状態を更新",
+  "admin_tools_cache_empty": "public_metadata/countries/items が空です。先に seedCountryCatalog を実行してください。",
+  "admin_tools_enabled_label": "enabled={value}",
+
+  "admin_tools_section_learning_set": "学習セット",
+  "admin_tools_ensure_learning_set": "ensureLearningSetForToday（現在のプロフィール）"
 }
 
