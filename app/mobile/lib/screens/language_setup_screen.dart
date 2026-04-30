@@ -266,6 +266,7 @@ class _CountryList extends StatelessWidget {
     final list = items ?? _CountryItem.items;
     final selectable = list.where((e) => e.selectable).toList(growable: false);
     final disabled = list.where((e) => !e.selectable).toList(growable: false);
+    final scheme = Theme.of(context).colorScheme;
 
     Widget tile(_CountryItem item, {bool enabled = true}) {
       final selected = selectedAlpha3 == item.alpha3;
@@ -275,9 +276,12 @@ class _CountryList extends StatelessWidget {
         dense: true,
         contentPadding: const EdgeInsets.symmetric(horizontal: 8),
         leading: _Flag(item.flagUrl),
-        title: Text(item.endonym),
+        // 로컬언어 선택 화면에서는 "국가명"이 아니라 "언어명"을 노출합니다.
+        title: Text(_languageEndonymForAlpha3(item.alpha3)),
         subtitle: Text(item.alpha3),
-        trailing: selected ? const Icon(Icons.check) : null,
+        tileColor: selected ? scheme.surfaceContainerHighest : null,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        trailing: selected ? Icon(Icons.check, color: scheme.primary) : null,
         onTap: !canTap ? null : () => onSelect(item.alpha3, item),
       );
     }
@@ -413,6 +417,34 @@ class _CountryItem {
       selectable: false,
     ),
   ];
+}
+
+String _languageEndonymForAlpha3(String alpha3Raw) {
+  final alpha3 = alpha3Raw.toUpperCase();
+  switch (alpha3) {
+    case 'KOR':
+      return '한국어';
+    case 'USA':
+      return 'English';
+    case 'JPN':
+      return '日本語';
+    case 'FRA':
+      return 'Français';
+    case 'DEU':
+      return 'Deutsch';
+    case 'CHN':
+      return '中文';
+    case 'ESP':
+      return 'Español';
+    case 'ITA':
+      return 'Italiano';
+    case 'RUS':
+      return 'Русский';
+    case 'BRA':
+      return 'Português';
+    default:
+      return alpha3;
+  }
 }
 
 String? _normalizeAlpha3(String? raw) {

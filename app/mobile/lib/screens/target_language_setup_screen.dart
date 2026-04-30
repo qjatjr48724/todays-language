@@ -40,11 +40,15 @@ class _TargetLanguageSetupScreenState extends State<TargetLanguageSetupScreen> {
       final target = (data[_fieldTarget] as String?)?.trim();
       final variant = (data[_fieldTargetVariant] as String?)?.trim();
 
-      final targetChoice = _TargetChoice.fromStored(
-            _normalizeAlpha3(target) ?? 'JPN',
-            variant,
-          ) ??
-          _TargetChoice.jpMixed;
+      // 첫 진입(저장된 값 없음)에는 "미선택" 상태로 시작합니다.
+      // 기존 유저(이미 저장된 값 있음)만 복원합니다.
+      _TargetChoice? targetChoice;
+      final normalized = _normalizeAlpha3(target);
+      if (normalized != null && normalized.isNotEmpty) {
+        targetChoice = _TargetChoice.fromStored(normalized, variant) ??
+            // 알 수 없는 값이 들어있으면 최소한 alpha3 기준으로 안전 복원
+            _TargetChoice.fromStored(normalized, null);
+      }
 
       if (!mounted) return;
       setState(() => _targetChoice = targetChoice);
@@ -277,17 +281,28 @@ class _TargetList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = _TargetChoice.buildSelectableChoices(countries);
+    final scheme = Theme.of(context).colorScheme;
     return Column(
       children: items.map((c) {
-        final isSelected = selected == c;
-        return ListTile(
-          dense: true,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-          leading: _Flag(c.flagUrl),
-          title: Text(c.label),
-          subtitle: Text(c.alpha3),
-          trailing: isSelected ? const Icon(Icons.check) : null,
-          onTap: () => onSelect(c),
+        final isSelected = selected?.sameKey(c) ?? false;
+        return Container(
+          margin: const EdgeInsets.symmetric(vertical: 4),
+          decoration: BoxDecoration(
+            color: isSelected ? scheme.surfaceContainerHighest : null,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected ? scheme.primary : scheme.outlineVariant,
+            ),
+          ),
+          child: ListTile(
+            dense: true,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+            leading: _Flag(c.flagUrl),
+            title: Text(c.label),
+            subtitle: Text(c.alpha3),
+            trailing: isSelected ? Icon(Icons.check, color: scheme.primary) : null,
+            onTap: () => onSelect(c),
+          ),
         );
       }).toList(growable: false),
     );
@@ -450,6 +465,19 @@ class _TargetChoice {
       flagUrl: flagUrl ?? this.flagUrl,
     );
   }
+
+  bool sameKey(_TargetChoice other) {
+    return alpha3.toUpperCase() == other.alpha3.toUpperCase() &&
+        (variant ?? '') == (other.variant ?? '');
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is _TargetChoice && sameKey(other);
+  }
+
+  @override
+  int get hashCode => Object.hash(alpha3.toUpperCase(), variant ?? '');
 }
 
 String? _normalizeAlpha3(String? raw) {
