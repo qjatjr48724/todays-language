@@ -215,6 +215,11 @@ class AppLocalizationsKo extends AppLocalizations {
   String get common_save => '저장';
 
   @override
+  String common_percent(Object value) {
+    return '$value%';
+  }
+
+  @override
   String get my_info_login_required => '로그인 후 이용할 수 있습니다.';
 
   @override

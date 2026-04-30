@@ -68,6 +68,12 @@
 
   "common_cancel": "キャンセル",
   "common_save": "保存",
+  "common_percent": "{value}%",
+  "@common_percent": {
+    "placeholders": {
+      "value": {}
+    }
+  },
 
   "my_info_login_required": "ログイン後にご利用いただけます。",
   "my_info_screen_title": "マイ情報",

@@ -216,6 +216,11 @@ class AppLocalizationsJa extends AppLocalizations {
   String get common_save => '保存';
 
   @override
+  String common_percent(Object value) {
+    return '$value%';
+  }
+
+  @override
   String get my_info_login_required => 'ログイン後にご利用いただけます。';
 
   @override

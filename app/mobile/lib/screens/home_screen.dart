@@ -18,7 +18,9 @@ import '../utils/kst_date.dart';
 import '../l10n/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, this.showMyInfoButton = true});
+
+  final bool showMyInfoButton;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -210,17 +212,18 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text(l10n.launch_subtitle),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.person_outline),
-            tooltip: l10n.home_my_info_tooltip,
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => const MyInfoScreen(),
-                ),
-              );
-            },
-          ),
+          if (widget.showMyInfoButton)
+            IconButton(
+              icon: const Icon(Icons.person_outline),
+              tooltip: l10n.home_my_info_tooltip,
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const MyInfoScreen(),
+                  ),
+                );
+              },
+            ),
         ],
       ),
       body: SingleChildScrollView(
@@ -353,7 +356,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ),
                                 const SizedBox(width: 12),
-                                Text('$percent%'),
+                              Text(l10n.common_percent(percent)),
                               ],
                             ),
                             const SizedBox(height: 10),

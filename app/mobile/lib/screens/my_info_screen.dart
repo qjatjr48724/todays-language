@@ -26,10 +26,11 @@ class MyInfoScreen extends StatelessWidget {
           style: TextStyle(color: scheme.onSurfaceVariant),
         ),
       );
-      if (embedded) return child;
       return Scaffold(
         appBar: AppBar(title: Text(l10n.my_info_screen_title)),
-        body: child,
+        body: embedded
+            ? SafeArea(top: true, bottom: false, child: child)
+            : child,
       );
     }
 
@@ -274,10 +275,28 @@ class MyInfoScreen extends StatelessWidget {
     );
 
     if (embedded) {
-      return SafeArea(
-        top: true,
-        bottom: false,
-        child: content,
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(l10n.my_info_screen_title),
+          actions: [
+            if (isAdmin)
+              IconButton(
+                icon: const Icon(Icons.admin_panel_settings_outlined),
+                tooltip: l10n.my_info_admin_tools_tooltip,
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const AdminToolsScreen()),
+                  );
+                },
+              ),
+            IconButton(
+              icon: const Icon(Icons.language),
+              tooltip: l10n.my_info_language_settings_tooltip,
+              onPressed: () => _openLanguagePicker(context),
+            ),
+          ],
+        ),
+        body: SafeArea(top: true, bottom: false, child: content),
       );
     }
 

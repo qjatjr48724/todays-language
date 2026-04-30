@@ -28,6 +28,28 @@ class _MyAppState extends State<MyApp> {
   // State에 고정합니다.
   final GlobalKey<NavigatorState> _navKey = GlobalKey<NavigatorState>();
 
+  Locale _resolveLocale(Locale? locale, Iterable<Locale> supportedLocales) {
+    if (locale == null) return const Locale('en');
+
+    // 1) exact match (language+country)
+    for (final supported in supportedLocales) {
+      if (supported.languageCode == locale.languageCode &&
+          (supported.countryCode ?? '') == (locale.countryCode ?? '')) {
+        return supported;
+      }
+    }
+
+    // 2) language-only match
+    for (final supported in supportedLocales) {
+      if (supported.languageCode == locale.languageCode) {
+        return supported;
+      }
+    }
+
+    // 3) fallback to English (project rule)
+    return const Locale('en');
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -38,8 +60,19 @@ class _MyAppState extends State<MyApp> {
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.supportedLocales,
+      // Android는 locale "리스트"를 전달합니다.
+      // 규칙: (1) 첫 번째(기본) locale만 기준으로 판단한다.
+      //      (2) 미지원 언어이면, 리스트의 다음 언어로 넘어가지 않고 무조건 en으로 fallback 한다.
+      localeListResolutionCallback: (locales, supportedLocales) {
+        final primary = (locales == null || locales.isEmpty) ? null : locales.first;
+        return _resolveLocale(primary, supportedLocales);
+      },
+      localeResolutionCallback: (locale, supportedLocales) {
+        return _resolveLocale(locale, supportedLocales);
+      },
       builder: (context, child) {
         return AuthSessionWatcher(
           navigatorKey: _navKey,

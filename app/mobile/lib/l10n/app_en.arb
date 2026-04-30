@@ -68,6 +68,12 @@
 
   "common_cancel": "Cancel",
   "common_save": "Save",
+  "common_percent": "{value}%",
+  "@common_percent": {
+    "placeholders": {
+      "value": {}
+    }
+  },
 
   "my_info_login_required": "You can use this after logging in.",
   "my_info_screen_title": "My Info",

@@ -255,7 +255,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                             ),
                           ),
                           const SizedBox(width: 12),
-                          Text('$percent%'),
+                          Text(l10n.common_percent(percent)),
                         ],
                       ),
                       const SizedBox(height: 14),
@@ -537,7 +537,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                                           : Colors.red,
                                 ),
                                 const SizedBox(height: 8),
-                                Text('${p.progressPercent}%'),
+                                Text(l10n.common_percent(p.progressPercent)),
                                 const SizedBox(height: 12),
                                 Text(
                                   l10n.progress_word_line(

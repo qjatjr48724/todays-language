@@ -67,6 +67,12 @@
 
   "common_cancel": "취소",
   "common_save": "저장",
+  "common_percent": "{value}%",
+  "@common_percent": {
+    "placeholders": {
+      "value": {}
+    }
+  },
 
   "my_info_login_required": "로그인 후 이용할 수 있습니다.",
   "my_info_screen_title": "내 정보",

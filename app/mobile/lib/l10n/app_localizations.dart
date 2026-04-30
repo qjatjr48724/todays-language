@@ -461,6 +461,12 @@ abstract class AppLocalizations {
   /// **'저장'**
   String get common_save;
 
+  /// No description provided for @common_percent.
+  ///
+  /// In ko, this message translates to:
+  /// **'{value}%'**
+  String common_percent(Object value);
+
   /// No description provided for @my_info_login_required.
   ///
   /// In ko, this message translates to:
