@@ -896,3 +896,64 @@ unauthenticated: 로그인 상태 확인
 
 - `docs/Base-Rule.mdc`
 
+---
+
+## [단계 20] i18n 품질 보강: 탭바/내정보/미지원 로케일 fallback + % 표기 통일
+
+### 1) 오늘 한 일
+
+- **하단 탭바(i18n) 치환 누락 해결**
+  - `MainNavScreen`의 탭 라벨을 `AppLocalizations` 기반으로 치환하여 `ko/en/ja`에서 동일하게 동작하도록 정리
+- **내정보 탭(embedded)에서도 상단 액션 노출**
+  - 탭으로 들어오는 `MyInfoScreen(embedded:true)`에서도 `AppBar`를 제공하여 우측 상단 “대상언어 변경(언어 아이콘)” 버튼이 보이도록 수정
+- **미지원 언어에서 영어 fallback 강제**
+  - Android는 locale “리스트”를 전달할 수 있어(예: `zh, ja, en`), 기본 해석 시 “중국어(미지원)인데 일본어로 표기”될 수 있음
+  - `localeListResolutionCallback`을 추가하여 **첫 번째(기본) locale만 기준으로 판단**하고, 미지원이면 **무조건 `en`으로 fallback** 되도록 강제
+- **% 표기 공통 키로 통일**
+  - `common_percent(value)` 키를 추가하고, 홈/진도 화면의 `%` 표기를 i18n 호출로 통일
+- (부가) **Cupertino 로컬라이제이션 delegate 추가**
+  - `GlobalCupertinoLocalizations.delegate` 추가로 `ko/ja` 관련 경고 제거
+
+### 2) 완료 기준 체크
+
+- [x] 일본어 설정 시 하단 탭바 라벨이 일본어로 표시됨 확인
+- [x] 미지원 언어(예: 중국어) 설정 시 영어 fallback 동작 확인
+- [x] 내정보 탭 우측 상단에 대상언어 변경 버튼 노출 확인
+- [x] `flutter analyze`, `flutter test` 통과
+
+### 3) 추가/변경한 코드 포인트
+
+- `app/mobile/lib/main.dart` — `localeListResolutionCallback`, `GlobalCupertinoLocalizations.delegate`
+- `app/mobile/lib/screens/main_nav_screen.dart` — 탭 라벨 i18n 치환
+- `app/mobile/lib/screens/my_info_screen.dart` — embedded에서도 AppBar/actions 제공
+- `app/mobile/lib/screens/home_screen.dart`, `app/mobile/lib/screens/progress_screen.dart` — `%` 표기 i18n 통일
+- `app/mobile/lib/l10n/app_*.arb` — `common_percent` 추가
+
+---
+
+## [단계 21] 온보딩 언어 선택 UX 개선: 로컬언어 표기/대상언어 선택 표시/첫 진입 미선택
+
+### 1) 오늘 한 일
+
+- **로컬언어(1단계) 표기를 “국가명” → “언어명”으로 변경**
+  - 기존 `countries/items.endonym`(국가명) 대신, `alpha3` 기반으로 언어명(자국어 표기)으로 노출
+  - 선택 항목은 배경 하이라이트 + 체크 표시로 선택 상태를 명확화
+- **대상언어(2단계) 선택 상태 표시 개선**
+  - 선택 시 배경 하이라이트 + 우측 체크 아이콘 표시
+  - `_TargetChoice`는 `alpha3 + variant` 기준의 값 비교로 처리해 선택 표시가 항상 일관되게 동작하도록 수정
+- **대상언어 첫 진입 시 기본 선택 제거**
+  - 저장된 값이 없는 “첫 진입”에는 아무 것도 선택되지 않은 상태로 시작
+  - 기존 유저(이미 저장된 값 있음)는 기존 선택값을 그대로 복원
+
+### 2) 완료 기준 체크
+
+- [x] 로컬언어 목록이 언어명으로 보이는지 확인
+- [x] 대상언어 선택 시 하이라이트/체크가 즉시 보이는지 확인
+- [x] 첫 진입 시 기본 선택이 없고, 선택 후에만 진행 가능한지 확인
+- [x] `flutter analyze`, `flutter test` 통과
+
+### 3) 추가/변경한 코드 포인트
+
+- `app/mobile/lib/screens/language_setup_screen.dart`
+- `app/mobile/lib/screens/target_language_setup_screen.dart`
+
