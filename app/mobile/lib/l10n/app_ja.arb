@@ -43,6 +43,12 @@
   "target_language_setup_card_subtitle": "学習（単語／文／ラップアップ）に使用します。",
   "target_language_setup_save_and_start_button": "保存して開始",
 
+  "notification_permission_title": "通知設定",
+  "notification_permission_heading": "通知を許可しますか？",
+  "notification_permission_description": "学習リマインダーや重要なお知らせを受け取れます。\nいつでも端末の設定から変更できます。",
+  "notification_permission_deny_button": "後で",
+  "notification_permission_allow_button": "許可",
+
   "home_profile_sync_failed": "プロフィールと進捗の同期に失敗しました: {error}",
   "home_reset_success": "今日の進捗をリセットしました。",
   "home_reset_failed": "リセットに失敗しました: {error}",

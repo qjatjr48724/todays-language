@@ -131,6 +131,22 @@ class AppLocalizationsJa extends AppLocalizations {
   String get target_language_setup_save_and_start_button => '保存して開始';
 
   @override
+  String get notification_permission_title => '通知設定';
+
+  @override
+  String get notification_permission_heading => '通知を許可しますか？';
+
+  @override
+  String get notification_permission_description =>
+      '学習リマインダーや重要なお知らせを受け取れます。\nいつでも端末の設定から変更できます。';
+
+  @override
+  String get notification_permission_deny_button => '後で';
+
+  @override
+  String get notification_permission_allow_button => '許可';
+
+  @override
   String home_profile_sync_failed(Object error) {
     return 'プロフィールと進捗の同期に失敗しました: $error';
   }

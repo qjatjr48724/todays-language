@@ -140,6 +140,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get target_language_setup_save_and_start_button => 'Save and start';
 
   @override
+  String get notification_permission_title => 'Notifications';
+
+  @override
+  String get notification_permission_heading => 'Allow notifications?';
+
+  @override
+  String get notification_permission_description =>
+      'Get important updates such as learning reminders.\nYou can change this anytime in device settings.';
+
+  @override
+  String get notification_permission_deny_button => 'Not now';
+
+  @override
+  String get notification_permission_allow_button => 'Allow';
+
+  @override
   String home_profile_sync_failed(Object error) {
     return 'Failed to sync profile and progress: $error';
   }

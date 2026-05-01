@@ -130,6 +130,22 @@ class AppLocalizationsKo extends AppLocalizations {
   String get target_language_setup_save_and_start_button => '저장하고 시작하기';
 
   @override
+  String get notification_permission_title => '알림 설정';
+
+  @override
+  String get notification_permission_heading => '알림을 허용할까요?';
+
+  @override
+  String get notification_permission_description =>
+      '학습 리마인더, 업데이트 등 중요한 안내를 받을 수 있어요.\n언제든 기기 설정에서 변경할 수 있습니다.';
+
+  @override
+  String get notification_permission_deny_button => '나중에';
+
+  @override
+  String get notification_permission_allow_button => '허용';
+
+  @override
   String home_profile_sync_failed(Object error) {
     return '프로필 또는 진도 동기화 실패: $error';
   }

@@ -316,6 +316,36 @@ abstract class AppLocalizations {
   /// **'저장하고 시작하기'**
   String get target_language_setup_save_and_start_button;
 
+  /// No description provided for @notification_permission_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'알림 설정'**
+  String get notification_permission_title;
+
+  /// No description provided for @notification_permission_heading.
+  ///
+  /// In ko, this message translates to:
+  /// **'알림을 허용할까요?'**
+  String get notification_permission_heading;
+
+  /// No description provided for @notification_permission_description.
+  ///
+  /// In ko, this message translates to:
+  /// **'학습 리마인더, 업데이트 등 중요한 안내를 받을 수 있어요.\n언제든 기기 설정에서 변경할 수 있습니다.'**
+  String get notification_permission_description;
+
+  /// No description provided for @notification_permission_deny_button.
+  ///
+  /// In ko, this message translates to:
+  /// **'나중에'**
+  String get notification_permission_deny_button;
+
+  /// No description provided for @notification_permission_allow_button.
+  ///
+  /// In ko, this message translates to:
+  /// **'허용'**
+  String get notification_permission_allow_button;
+
   /// No description provided for @home_profile_sync_failed.
   ///
   /// In ko, this message translates to:

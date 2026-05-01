@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../auth_gate.dart';
 import '../l10n/app_localizations.dart';
+import 'notification_permission_screen.dart';
 
 enum _BlockReason {
   internet,
@@ -22,6 +23,8 @@ class LaunchScreen extends StatefulWidget {
 
 class _LaunchScreenState extends State<LaunchScreen> {
   static const _prefsKeyHasLaunched = 'hasLaunched';
+  static const _prefsKeyNotificationPermissionAsked =
+      NotificationPermissionScreen.prefsKeyAsked;
 
   bool _loading = true;
   bool _firstLaunch = false;
@@ -86,6 +89,8 @@ class _LaunchScreenState extends State<LaunchScreen> {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       if (!mounted) return;
+      await _maybeAskNotificationPermission();
+      if (!mounted) return;
       // 로그인 상태라도 AuthGate를 거쳐서 들어가야,
       // 이후 세션 변경(로그아웃/토큰 무효화)에도 일관되게 화면 전환이 됩니다.
       Navigator.of(context).pushReplacement(_fadeRoute(const AuthGate()));
@@ -103,6 +108,21 @@ class _LaunchScreenState extends State<LaunchScreen> {
     await prefs.setBool(_prefsKeyHasLaunched, true);
   }
 
+  Future<void> _maybeAskNotificationPermission() async {
+    final prefs = await SharedPreferences.getInstance();
+    final asked = prefs.getBool(_prefsKeyNotificationPermissionAsked) ?? false;
+    if (asked) return;
+
+    if (!mounted) return;
+    final nav = Navigator.of(context);
+    await nav.push(
+      MaterialPageRoute(builder: (_) => const NotificationPermissionScreen()),
+    );
+
+    // 사용자가 허용/거부 어떤 선택을 하든 "한 번은 물어봤다"로 기록합니다.
+    await prefs.setBool(_prefsKeyNotificationPermissionAsked, true);
+  }
+
   Future<void> _onTap() async {
     if (_navigating || _loading) return;
 
@@ -110,6 +130,8 @@ class _LaunchScreenState extends State<LaunchScreen> {
     if (_firstLaunch) {
       setState(() => _navigating = true);
       await _markLaunched();
+      if (!mounted) return;
+      await _maybeAskNotificationPermission();
       if (!mounted) return;
       // 이후 로그인 성공 시 자동으로 홈으로 전환되도록 AuthGate를 루트로 둡니다.
       Navigator.of(context).pushReplacement(_fadeRoute(const AuthGate()));
@@ -124,6 +146,8 @@ class _LaunchScreenState extends State<LaunchScreen> {
       }
       // 로그인 안내 문구 상태면 로그인 화면으로 이동
       setState(() => _navigating = true);
+      await _maybeAskNotificationPermission();
+      if (!mounted) return;
       Navigator.of(context).pushReplacement(_fadeRoute(const AuthGate()));
     }
   }

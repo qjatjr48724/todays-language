@@ -43,6 +43,12 @@
   "target_language_setup_card_subtitle": "Used for learning (words/sentences/wrap-up).",
   "target_language_setup_save_and_start_button": "Save and start",
 
+  "notification_permission_title": "Notifications",
+  "notification_permission_heading": "Allow notifications?",
+  "notification_permission_description": "Get important updates such as learning reminders.\nYou can change this anytime in device settings.",
+  "notification_permission_deny_button": "Not now",
+  "notification_permission_allow_button": "Allow",
+
   "home_profile_sync_failed": "Failed to sync profile and progress: {error}",
   "home_reset_success": "Today's progress has been reset.",
   "home_reset_failed": "Reset failed: {error}",
