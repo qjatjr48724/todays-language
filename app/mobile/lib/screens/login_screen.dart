@@ -10,6 +10,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'email_login_screen.dart';
+import '../config/apple_sign_in_config.dart';
 import '../services/user_profile_sync.dart';
 import 'main_nav_screen.dart';
 import '../l10n/app_localizations.dart';
@@ -89,13 +90,56 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<void> _applyAppleDisplayNameIfNeeded(
+    User user,
+    AuthorizationCredentialAppleID cred,
+  ) async {
+    final given = cred.givenName?.trim() ?? '';
+    final family = cred.familyName?.trim() ?? '';
+    if (given.isEmpty && family.isEmpty) {
+      return;
+    }
+    final combined = '$given $family'.trim();
+    if (combined.isEmpty) {
+      return;
+    }
+    if ((user.displayName ?? '').trim().isNotEmpty) {
+      return;
+    }
+    await user.updateDisplayName(combined);
+    await user.reload();
+  }
+
   Future<void> _signInWithApple() async {
     final l10n = AppLocalizations.of(context)!;
-    if (!Platform.isIOS) {
+
+    final webClientId = kAppleSignInServicesIdForWeb?.trim();
+    final useWebOnAndroid =
+        Platform.isAndroid && (webClientId != null && webClientId.isNotEmpty);
+
+    if (Platform.isWindows || Platform.isLinux) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.login_apple_not_supported)),
       );
       return;
+    }
+
+    if (Platform.isAndroid && !useWebOnAndroid) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.login_apple_not_supported)),
+      );
+      return;
+    }
+
+    if (Platform.isIOS || Platform.isMacOS) {
+      final available = await SignInWithApple.isAvailable();
+      if (!available) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.login_apple_not_supported)),
+        );
+        return;
+      }
     }
 
     setState(() {
@@ -106,22 +150,38 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final rawNonce = _randomNonce();
       final nonce = _sha256OfString(rawNonce);
+      WebAuthenticationOptions? webOptions;
+      if (useWebOnAndroid) {
+        webOptions = WebAuthenticationOptions(
+          clientId: webClientId,
+          redirectUri: appleSignInRedirectUri(),
+        );
+      }
       final appleCredential = await SignInWithApple.getAppleIDCredential(
         scopes: [
           AppleIDAuthorizationScopes.email,
           AppleIDAuthorizationScopes.fullName,
         ],
         nonce: nonce,
+        webAuthenticationOptions: webOptions,
       );
 
+      final idToken = appleCredential.identityToken;
+      if (idToken == null || idToken.isEmpty) {
+        throw Exception('Apple identity token is missing');
+      }
+
       final oauth = OAuthProvider('apple.com').credential(
-        idToken: appleCredential.identityToken,
+        idToken: idToken,
         rawNonce: rawNonce,
       );
 
       final result = await FirebaseAuth.instance.signInWithCredential(oauth);
-      if (result.user != null) {
-        await ensureUserProfileDocument(result.user!);
+      var user = result.user;
+      if (user != null) {
+        await _applyAppleDisplayNameIfNeeded(user, appleCredential);
+        user = FirebaseAuth.instance.currentUser ?? user;
+        await ensureUserProfileDocument(user);
       }
     } on SignInWithAppleAuthorizationException catch (e) {
       if (e.code == AuthorizationErrorCode.canceled) return;
