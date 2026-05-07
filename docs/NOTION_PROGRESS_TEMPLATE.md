@@ -957,3 +957,43 @@ unauthenticated: 로그인 상태 확인
 - `app/mobile/lib/screens/language_setup_screen.dart`
 - `app/mobile/lib/screens/target_language_setup_screen.dart`
 
+---
+
+## [단계 22] iOS 실기기 디버깅: 서명/Capability 정리(개발용)
+
+### 1) 오늘 한 일
+
+- Mac + Xcode 환경에서 Flutter iOS 프로젝트를 열어 실기기(아이폰) 실행을 시도
+- `Personal Team`에서 발생하는 프로비저닝 경고 원인 확인
+  - `Sign In with Apple` capability는 개인 팀에서 프로비저닝 프로파일 생성이 제한될 수 있음
+- 개발용 번들 ID/팀 설정을 반영하고, 실기기 실행을 막는 entitlements를 정리
+
+### 2) 완료 기준 체크
+
+- [x] 실기기 빌드/실행을 막는 Signing 경고 원인 파악
+- [x] 개발용 설정으로 빌드 가능 상태로 정리(Apple 로그인 기능은 제외)
+- [ ] 실제 실기기에서 `flutter run -d <device>`로 설치/실행 확인
+
+### 3) 추가/변경한 코드 포인트
+
+- 파일:
+  - `app/mobile/ios/Runner.xcodeproj/project.pbxproj`
+  - `app/mobile/ios/Runner/Runner.entitlements`
+- 핵심 포인트:
+  - `Sign in with Apple` entitlement(`com.apple.developer.applesignin`) 제거
+  - `DEVELOPMENT_TEAM`, `PRODUCT_BUNDLE_IDENTIFIER`를 실기기 개발용으로 반영
+
+### 4) 이슈/막힌 점
+
+- 증상:
+  - `Cannot create a iOS App Development provisioning profile ... Personal development teams ... do not support the Sign In with Apple capability`
+- 해결/우회:
+  - 실기기 디버깅 목적이면 `Sign In with Apple` capability/entitlements를 제거하고 실행
+  - Apple 로그인까지 실기기에서 테스트하려면 유료 개발자 프로그램/팀 권한으로 진행
+
+### 5) 다음 액션 (내일 바로 할 것)
+
+1. 실기기에서 설치/실행 1회 검증(USB/무선 디버깅 포함)
+2. Apple 로그인 필요 여부 결정
+3. 필요 시 dev/release 구성을 분리(개발용은 capability 제거, 릴리즈는 유지)
+
