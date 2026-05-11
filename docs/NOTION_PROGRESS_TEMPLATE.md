@@ -423,12 +423,12 @@ unauthenticated: 로그인 상태 확인
   - `app/mobile/lib/screens/today_wrap_up_screen.dart`
   - `app/mobile/lib/services/daily_progress_sync.dart`
   - `functions/src/index.ts`
-  - `docs/Base-Rule.mdc`
+  - `docs/DEV_RULES.md`
 - 핵심 포인트:
   - 인증 진입 구조를 "시작 화면 → 로그인 허브 → 이메일 로그인/회원가입 분리"로 재구성
   - 공통 문제세트 + 사용자별 커서 구조 유지, 중복 문제 방지 로직 강화
   - 진행률 초기화 시 개인 커서 동시 초기화
-  - 사용자 요청 누락 방지/파일 반영 우선 규칙을 `docs/Base-Rule.mdc`에 명시
+  - 사용자 요청 누락 방지/파일 반영 우선 규칙을 `docs/DEV_RULES.md`에 명시
 
 ### 4) 이슈/막힌 점
 
@@ -874,7 +874,7 @@ unauthenticated: 로그인 상태 확인
 ### 5) 다음 액션 (다음 작업 후보)
 
 1. (선택) `home_screen.dart`/`progress_screen.dart`의 `%` 등 단순 숫자 표기까지 100% i18n로 통일(우선순위 낮음)
-2. 신규 UI 문구 추가 시 Base-Rule의 i18n 체크리스트에 맞춰 “문구 추가 + ARB + gen-l10n + 테스트”를 한 세트로 처리
+2. 신규 UI 문구 추가 시 DEV_RULES의 i18n 체크리스트에 맞춰 “문구 추가 + ARB + gen-l10n + 테스트”를 한 세트로 처리
 
 ---
 
@@ -882,7 +882,7 @@ unauthenticated: 로그인 상태 확인
 
 ### 1) 오늘 한 일
 
-- `docs/Base-Rule.mdc`에 **i18n(로컬라이제이션) 규칙/체크리스트** 섹션 추가
+- `docs/DEV_RULES.md`에 **i18n(로컬라이제이션) 규칙/체크리스트** 섹션 추가
   - 사용자 노출 문구 하드코딩 금지 범위(Text/SnackBar/tooltip/InputDecoration/validator 등)
   - ARB 3개 언어(ko/en/ja) 동시 반영 규칙
   - `flutter gen-l10n` 생성 시그니처(underscore 유지/positional arg) 확인 규칙
@@ -890,11 +890,11 @@ unauthenticated: 로그인 상태 확인
 
 ### 2) 완료 기준 체크
 
-- [x] Base-Rule에 i18n 규칙이 반영되어 이후 작업 시 재발 방지 기준으로 사용 가능
+- [x] DEV_RULES에 i18n 규칙이 반영되어 이후 작업 시 재발 방지 기준으로 사용 가능
 
 ### 3) 추가/변경한 코드 포인트
 
-- `docs/Base-Rule.mdc`
+- `docs/DEV_RULES.md`
 
 ---
 

@@ -7,7 +7,7 @@
 
 ## 0) 가장 먼저 보는 기준(우선순위)
 
-1. **프로젝트 개발 규칙(최우선)**: `docs/Base-Rule.mdc` 또는 `.cursor/rules/base-rule.mdc`
+1. **프로젝트 개발 규칙(최우선)**: `docs/DEV_RULES.md` 또는 `.cursor/rules/Dev-Rules.mdc`
 2. **프로젝트 전체 컨텍스트/기획**: `docs/PROJECT_CONTEXT.md`
 3. **실행/셋업 가이드**: `docs/IMPLEMENTATION_GUIDE.md`
 4. **Firestore 최소 스키마(MVP)**: `docs/FIRESTORE_MIN_SCHEMA.md`
@@ -20,7 +20,7 @@
 ### A. Flutter 앱(UI/상태/화면) 작업
 
 - **우선 참고**
-  - 개발 규칙: `docs/Base-Rule.mdc` (로딩/에러 상태, 홈 복귀 시 refresh, 디버그 기능 `kDebugMode`)
+  - 개발 규칙: `docs/DEV_RULES.md` (로딩/에러 상태, 홈 복귀 시 refresh, 디버그 기능 `kDebugMode`)
   - 제품/화면 방향: `docs/PROJECT_CONTEXT.md`
   - 실행 가이드(환경/셋업): `docs/IMPLEMENTATION_GUIDE.md`
 - **자주 놓치는 체크**
@@ -33,7 +33,7 @@
 
 - **우선 참고**
   - 스키마: `docs/FIRESTORE_MIN_SCHEMA.md`
-  - 시간대 정책: `docs/Base-Rule.mdc` (KST 고정)
+  - 시간대 정책: `docs/DEV_RULES.md` (KST 고정)
   - 제품 정책(목표치/구성): `docs/PROJECT_CONTEXT.md` (수치/정책은 Notion 최신이 우선일 수 있음)
 - **자주 놓치는 체크**
   - **KST 날짜 키 일관성**: 문서 키/조회/리셋이 같은 “KST 날짜 함수”를 쓰는가
@@ -44,7 +44,7 @@
 ### C. Cloud Functions(Callable) / 인증 / AI 연동 작업
 
 - **우선 참고**
-  - 기본 원칙: `docs/Base-Rule.mdc` (Auth 없으면 `unauthenticated`, region `asia-northeast3`, secrets로 관리)
+  - 기본 원칙: `docs/DEV_RULES.md` (Auth 없으면 `unauthenticated`, region `asia-northeast3`, secrets로 관리)
   - 프로토타입 가이드: `docs/CLOUD_FUNCTIONS_PROTOTYPE.md`
 - **자주 놓치는 체크**
   - **인증 강제**: callable entry에서 `context.auth` 확인 후 미인증 거부
@@ -59,7 +59,7 @@
   - 노션 기록 템플릿: `docs/NOTION_PROGRESS_TEMPLATE.md`
 - **자주 놓치는 체크**
   - “작업 완료” 기록은 **코드와 실제 동작 기준**으로 작성
-  - 긴 작업은 “끝나는 시점에 한 번에” 정리(규칙: `docs/Base-Rule.mdc`)
+  - 긴 작업은 “끝나는 시점에 한 번에” 정리(규칙: `docs/DEV_RULES.md`)
 
 ---
 
@@ -101,7 +101,7 @@
 
 ## 4) 빠른 링크(문서 모음)
 
-- 개발 규칙: `docs/Base-Rule.mdc` / `.cursor/rules/base-rule.mdc`
+- 개발 규칙: `docs/DEV_RULES.md` / `.cursor/rules/Dev-Rules.mdc`
 - 전체 컨텍스트: `docs/PROJECT_CONTEXT.md`
 - 실행 가이드: `docs/IMPLEMENTATION_GUIDE.md`
 - Firestore 스키마: `docs/FIRESTORE_MIN_SCHEMA.md`

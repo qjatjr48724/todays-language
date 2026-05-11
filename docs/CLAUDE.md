@@ -13,7 +13,7 @@ alwaysApply: true
 - **전체적인 가이드라인**: **`docs/KARPATHY_GUIDELINE.md`**
 - **프로젝트 컨텍스트(기획/정책)**: `docs/PROJECT_CONTEXT.md`
   - 프로젝트 개요, 기술 스택, 프로젝트 대상과 목적 등
-- **개발 규칙**: `docs/DEV_RULES.md` (동일 내용: `.cursor/rules/Dev_Rules.md`)
+- **개발 규칙**: `docs/DEV_RULES.md` (동일 내용: `.cursor/rules/Dev-Rules.mdc`)
 - **실행/셋업 가이드(Windows)**: `docs/SETUP_GUIDE_WINDOWS.md`
 - **실행/셋업 가이드(macOS)**: `docs/SETUP_GUIDE_MACOS.md`
 - **Notion 기록 템플릿**: `docs/NOTION_PROGRESS_TEMPLATE.md`

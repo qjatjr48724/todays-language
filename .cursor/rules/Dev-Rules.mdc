@@ -1,20 +1,23 @@
 ---
-description: Today's Language 기본 개발 규칙 (Flutter + Firebase + Functions)
 alwaysApply: true
 ---
 
-# Base Rule
+# Today's Language — 기본 개발 규칙
 
 ## 0) 기본 규칙
 - 파일 작명 규칙은 Snake Case를 따른다.
 - 들여쓰기는 기본적으로 4 space 방식을 사용한다.
 - 가독성을 위해 각 함수, 클래스 등 문단 간 2번 개행으로 구분한다.
+- 코드를 작성할 때, 기능에 대한 간단한 설명을 주석으로 함께 작성한다.
+- 프로젝트는 **테스트 주도 개발(TDD)**방식으로 개발한다.
+  - Red-Green-Refactor
 
 ## 1) 아키텍처/보안
 - 모바일 앱(Flutter)에는 API 키를 절대 하드코딩하지 않는다.
 - 외부 AI/OpenAI 호출은 Cloud Functions(서버)에서만 수행한다.
 - Functions 비밀값은 `secrets`/환경변수로 관리하고 Git에 커밋하지 않는다.
 - Auth 없는 요청은 Functions에서 `unauthenticated`로 거부한다.
+- 환경 변수를 무조건으로 사용한다.
 
 ## 2) 데이터/시간 기준
 - 일일 진도 기준 시간대는 항상 `Asia/Seoul (KST)`를 사용한다.
@@ -64,6 +67,7 @@ alwaysApply: true
 - 개발자가 "지금까지의 작업내용을 정리해줘." 라고 하면 `docs/NOTION_PROGRESS_TEMPLATE.md`에 정리된 내용을 확인하고, **가장 최근 작성된 단계 이후에 이어서** 템플릿 형태로 추가 작성한다.
 
 ## 7) 테스트 규칙
+- 기능 테스트 이후에 ```console.log``` 같은 로그를 남기는 코드는 삭제한다.
 - 테스트 전제(최소 품질 게이트)
   - 앱(Flutter) 변경 후에는 최소 `flutter analyze`를 통과해야 한다.
   - Functions 변경 후에는 최소 `npm run build`를 통과해야 한다. (프로젝트에 `lint/test` 스크립트가 있으면 함께 수행)
@@ -136,4 +140,3 @@ alwaysApply: true
   - **스키마 호환성** 영향 여부 (`users/{uid}/daily_progress/{yyyy-MM-dd}`)
 - 구현 중에는 변경 단위를 작게 유지하고, 앱에 외부 AI 호출/비밀값이 들어가지 않게 유지한다.
 - 종료(머지/푸시) 전에는 `7) 테스트 규칙`의 품질 게이트를 통과하고, KST/진도/스키마/인증 변경이면 핵심 플로우를 1회 이상 수동 검증한다.
-
