@@ -146,6 +146,16 @@ class AppLocalizationsKo extends AppLocalizations {
   String get notification_permission_allow_button => '허용';
 
   @override
+  String get notification_permission_settings_needed =>
+      '알림 권한이 허용되지 않았습니다.\n설정에서 알림을 허용한 뒤 다시 시도해 주세요.';
+
+  @override
+  String get notification_permission_dialog_close => '닫기';
+
+  @override
+  String get notification_permission_open_settings => '설정 열기';
+
+  @override
   String home_profile_sync_failed(Object error) {
     return '프로필 또는 진도 동기화 실패: $error';
   }

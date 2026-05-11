@@ -115,12 +115,14 @@ class _LaunchScreenState extends State<LaunchScreen> {
 
     if (!mounted) return;
     final nav = Navigator.of(context);
-    await nav.push(
+    final result = await nav.push<bool>(
       MaterialPageRoute(builder: (_) => const NotificationPermissionScreen()),
     );
 
     // 사용자가 허용/거부 어떤 선택을 하든 "한 번은 물어봤다"로 기록합니다.
-    await prefs.setBool(_prefsKeyNotificationPermissionAsked, true);
+    if (result != null) {
+      await prefs.setBool(_prefsKeyNotificationPermissionAsked, true);
+    }
   }
 
   Future<void> _onTap() async {
