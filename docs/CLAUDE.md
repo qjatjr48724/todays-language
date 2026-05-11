@@ -1,3 +1,8 @@
+---
+description: 
+alwaysApply: true
+---
+
 # CLAUDE.md
 - 이 파일은 AI 어시스턴스를 이용한 LLM 코딩(=바이브코딩) 시 흔히 발생하는 오류를 줄이기 위한 행동 지침이다.
 - 작업에 대한 기본적인 규칙에 대한 내용이며, 필요에 따라 프로젝트별 지침과 병합한다.
@@ -12,9 +17,3 @@
 - **실행/셋업 가이드(Windows)**: `docs/SETUP_GUIDE_WINDOWS.md`
 - **실행/셋업 가이드(macOS)**: `docs/SETUP_GUIDE_MACOS.md`
 - **Notion 기록 템플릿**: `docs/NOTION_PROGRESS_TEMPLATE.md`
-- 
-
-
-
-
-
