@@ -1,20 +1,5 @@
 # Today's Language — 프로젝트 컨텍스트 (전체 정리)
 
-> 새 에이전트/새 대화에서 이 파일(`docs/PROJECT_CONTEXT.md`) 또는 `docs/AGENTS.md`를 참조하면 된다.
-
----
-
-## 0. 필수 문서(작업 시작 루트)
-
-- **개발 규칙(최우선)**: `docs/Base-Rule.mdc` (동일 내용: `.cursor/rules/base-rule.mdc`)
-- **실행/셋업(Windows 우선)**: `docs/IMPLEMENTATION_GUIDE.md`
-- **작업 유형별 참고/체크리스트(인덱스)**: `docs/WORKFLOW_REFERENCE.md`
-- **Firestore 최소 스키마(MVP)**: `docs/FIRESTORE_MIN_SCHEMA.md`
-- **Cloud Functions AI 호출 프로토타입**: `docs/CLOUD_FUNCTIONS_PROTOTYPE.md`
-- **Notion 기록 템플릿**: `docs/NOTION_PROGRESS_TEMPLATE.md`
-
----
-
 ## 1. 이름·저장소
 
 | 항목 | 값 |
@@ -25,7 +10,7 @@
 
 ---
 
-## 2. 제품 개요
+## 2. 프로젝트 개요
 
 - **한 줄:** 초보자도 부담 없이, **매일 조금씩** 다양한 언어를 학습할 수 있게 돕는 **AI 기반 데일리 학습 앱**.
 - **핵심 가치:** 적은 양 + 매일 반복 + 쉬운 접근성. 유료 강의/앱 부담을 줄이고 **가능한 무료** 제공을 지향 (상황에 따라 유료 전환 가능성은 열어 둠).
@@ -62,6 +47,9 @@
 - **인터넷 연결 필수** — 오프라인 동작 범위는 초기에 정하지 않음.
 - **일일 리셋:** **한국 자정**, 타임존 **Asia/Seoul (KST)** 명시.
 - **보안 원칙:** 앱(Flutter)에 API 키/비밀값을 두지 않으며, 외부 AI 호출은 Cloud Functions(서버)에서만 수행.
+- **개인정보 보호**: 회원가입 시 개인정보 수집에 관하여 동의를 받고, 수집된 개인정보를 보호하고 사용자 환경을 안전하게 유지하도록 노력함.
+- 
+- 
 
 ---
 
