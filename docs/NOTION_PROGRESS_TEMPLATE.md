@@ -1039,3 +1039,49 @@ unauthenticated: 로그인 상태 확인
   - `docs/FIRESTORE_GUIDE.md`
   - `docs/CLOUD_FUNCTIONS_GUIDE.md`
 
+---
+
+## [단계 24] 홈 진행률 표시 수정 · 오늘의 단어 UX·타이포 · 예문 뜻(exampleMeaningKo) 파이프라인
+
+### 1) 오늘 한 일
+
+- **홈「오늘의 진행률」단어/마무리 수치 뒤바뀤 수정**
+  - `home_progress_counts`는 `flutter gen-l10n`이 placeholder 이름 **알파벳 순**으로 인자 순서를 만들어, 호출부가 `word*` → `quiz*` 순으로 넘기면 라벨과 숫자가 엇갈림
+  - `app/mobile/lib/screens/home_screen.dart`에서 인자 순서를 `quizDone`/`quizGoal` → `sentence*` → `word*`로 맞춤(주석으로 이유 명시)
+- **오늘의 단어 화면**
+  - `words_description_normal`·디버그(`debugSource`) 문구를 **완료 버튼 바로 위**로 배치(하단 고정이 아님)
+  - 단어·뜻·예문 본문에 **기본 `fontSize` + 4lp** 적용(테마 `textTheme` 기준)
+  - **예문의 한국어 뜻** 표시: Callable `generateWord` 응답 및 일일 단어 세트에 `exampleMeaningKo`를 실어 주면 UI에서 `words_example_meaning_line`으로 노출
+- **Cloud Functions(일일 단어 세트 = 문제 세트 쪽 단어 풀)**
+  - `StoredWordItem` / `GenerateWordResponse`에 **`exampleMeaningKo`** 선택 필드 추가
+  - 단일 단어·일괄 단어 프롬프트에서 **예문을 넣을 때 예문 뜻(한국어) 필수**로 유도
+  - `parseWordItem`, `generateWordWithOpenAI`, `fallbackWord`, `popWordFromTodaySet`, `buildDailyWordItems` 보충 루프에서 필드 전달·저장
+- **i18n**
+  - `words_example_meaning_line` 키를 `ko`/`en`/`ja` ARB에 추가 후 `flutter gen-l10n`
+
+### 2) 완료 기준 체크
+
+- [x] `npm run build`(functions) 통과
+- [x] `flutter analyze`(변경 화면·l10n 경로) 통과
+- [x] 앱 커밋: 홈 진행률·오늘의 단어·l10n·Functions 소스 포함(`eaea849` 등)
+
+### 3) 추가/변경한 코드 포인트
+
+- 앱:
+  - `app/mobile/lib/screens/home_screen.dart`
+  - `app/mobile/lib/screens/today_words_screen.dart`
+  - `app/mobile/lib/l10n/app_ko.arb`, `app_en.arb`, `app_ja.arb` 및 생성물 `app_localizations*.dart`
+- Functions:
+  - `functions/src/index.ts`
+  - `functions/src/prompts.ts`
+
+### 4) 이슈/막힌 점
+
+- **기존 Firestore 일일 단어 세트**에는 `exampleMeaningKo`가 없을 수 있음 → 해당 항목은 예문만 표시되고 뜻 줄은 생략(신규 생성 세트부터 채워짐)
+
+### 5) 다음 액션 (내일 바로 할 것)
+
+1. Functions 배포 후 실제 `generateWord` 응답에 `exampleMeaningKo` 포함 여부 스모크 테스트
+2. 필요 시 `docs/FIRESTORE_MIN_SCHEMA.md` 또는 운영 문서에 글로벌 `daily_word_sets` 단어 항목 필드 보강
+3. `flutter test` 전체 + 푸시 전 품질 게이트(프로젝트 규칙)
+
