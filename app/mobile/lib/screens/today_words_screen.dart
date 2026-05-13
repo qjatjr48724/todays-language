@@ -29,6 +29,7 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
   String? _wordReadingHira;
   String? _meaning;
   String? _example;
+  String? _exampleMeaningKo;
   String? _debugSource;
   bool _completedCurrent = false;
 
@@ -95,6 +96,7 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
       _wordReadingHira = null;
       _meaning = null;
       _example = null;
+      _exampleMeaningKo = null;
       _debugSource = null;
       _completedCurrent = false;
       _error = null;
@@ -122,6 +124,7 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
       final readingHira = data['readingHira']?.toString();
       final meaning = data['meaningKo']?.toString() ?? '';
       final example = data['example']?.toString();
+      final exampleMeaningKo = data['exampleMeaningKo']?.toString();
       final debugSource = data['debugSource']?.toString();
 
       if (!mounted) return;
@@ -130,6 +133,7 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
         _wordReadingHira = readingHira;
         _meaning = meaning;
         _example = example;
+        _exampleMeaningKo = exampleMeaningKo;
         _debugSource = debugSource;
         _aiLoading = false;
       });
@@ -176,6 +180,7 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     final l10n = AppLocalizations.of(context)!;
     final showHiraLine =
         widget.targetLanguage.toUpperCase() == 'JPN' &&
@@ -189,20 +194,27 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              _wordCapReached && !_relearnActive
-                  ? l10n.words_description_goal_reached(
-                      _todayProgress?.wordGoal ?? 30,
-                    )
-                  : _wordCapReached && _relearnActive
-                      ? l10n.words_description_relearn_mode
-                      : l10n.words_description_normal,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(color: scheme.onSurfaceVariant),
-            ),
-            const SizedBox(height: 16),
+            if (_wordCapReached && !_relearnActive) ...[
+              Text(
+                l10n.words_description_goal_reached(
+                  _todayProgress?.wordGoal ?? 30,
+                ),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(color: scheme.onSurfaceVariant),
+              ),
+              const SizedBox(height: 16),
+            ] else if (_wordCapReached && _relearnActive) ...[
+              Text(
+                l10n.words_description_relearn_mode,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(color: scheme.onSurfaceVariant),
+              ),
+              const SizedBox(height: 16),
+            ],
 
             if (_aiLoading) ...[
               const LinearProgressIndicator(),
@@ -219,7 +231,9 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
             ] else ...[
               Text(
                 _word ?? '-',
-                style: Theme.of(context).textTheme.headlineMedium,
+                style: textTheme.headlineMedium?.copyWith(
+                  fontSize: (textTheme.headlineMedium?.fontSize ?? 28) + 4,
+                ),
               ),
               if (showHiraLine) ...[
                 const SizedBox(height: 6),
@@ -233,31 +247,56 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
               const SizedBox(height: 6),
               Text(
                 _meaning ?? '-',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: scheme.onSurfaceVariant,
-                    ),
-              ),
-              if (kDebugMode && _debugSource != null) ...[
-                const SizedBox(height: 10),
-                Text(
-                  l10n.words_debug_source(_debugSource!),
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
+                style: textTheme.titleMedium?.copyWith(
+                  fontSize: (textTheme.titleMedium?.fontSize ?? 16) + 4,
+                  color: scheme.onSurfaceVariant,
                 ),
-              ],
+              ),
               if (_example != null && _example!.isNotEmpty) ...[
                 const SizedBox(height: 12),
                 Text(
                   l10n.words_example_prefix(_example!),
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
+                  style: textTheme.bodyMedium?.copyWith(
+                    fontSize: (textTheme.bodyMedium?.fontSize ?? 14) + 4,
+                    color: scheme.onSurfaceVariant,
+                  ),
                 ),
+                if (_exampleMeaningKo != null &&
+                    _exampleMeaningKo!.trim().isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    l10n.words_example_meaning_line(
+                      _exampleMeaningKo!.trim(),
+                    ),
+                    style: textTheme.bodyMedium?.copyWith(
+                      fontSize: (textTheme.bodyMedium?.fontSize ?? 14) + 4,
+                      color: scheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
               ],
             ],
 
             const Spacer(),
+            if (!_wordCapReached)
+              Text(
+                l10n.words_description_normal,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(color: scheme.onSurfaceVariant),
+              ),
+            if (kDebugMode && _debugSource != null) ...[
+              if (!_wordCapReached) const SizedBox(height: 8),
+              Text(
+                l10n.words_debug_source(_debugSource!),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
+              ),
+            ],
+            if (!_wordCapReached || (kDebugMode && _debugSource != null))
+              const SizedBox(height: 12),
             FilledButton.icon(
               onPressed: _canMarkComplete ? _markDone : null,
               icon: _savingProgress

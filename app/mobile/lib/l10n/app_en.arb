@@ -206,6 +206,12 @@
 
   "words_debug_source": "debugSource: {source}",
   "words_example_prefix": "Example: {example}",
+  "words_example_meaning_line": "Example meaning: {meaning}",
+  "@words_example_meaning_line": {
+    "placeholders": {
+      "meaning": {}
+    }
+  },
 
   "sentences_appbar_title": "Today's Sentences",
   "sentences_loading_sample": "Loading sample…",

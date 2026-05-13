@@ -559,6 +559,11 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String words_example_meaning_line(Object meaning) {
+    return '예문 뜻: $meaning';
+  }
+
+  @override
   String get sentences_appbar_title => '오늘의 문장';
 
   @override

@@ -58,7 +58,8 @@ export function buildWordSystemPrompt(targetLanguage: string, level: string): st
     "Return ONLY a raw JSON object (no markdown, no extra text).",
     "Required keys: word, meaningKo.",
     "If targetLanguage is ja and the word includes kanji, also include readingHira (the same word written in hiragana only, for confirmation).",
-    "Optional key: example (string).",
+    "Optional keys: example (string), exampleMeaningKo (string, Korean).",
+    "If you include example, you MUST also include exampleMeaningKo: a short Korean gloss of what the example sentence means.",
     "If targetLanguage is ja and level is beginner, prefer hiragana for word and example; avoid kanji unless necessary.",
   ].join(" ");
 }
@@ -113,8 +114,9 @@ export function buildDailyWordBatchSystemPrompt(
     `Learner level: ${level}.`,
     "Every item must use a different headword (no duplicates, no near-duplicates).",
     "Return ONLY a raw JSON object (no markdown, no extra text).",
-    "Shape: {\"words\":[{\"word\":string,\"meaningKo\":string,\"example\":string?,\"readingHira\":string?}, ...]}",
+    "Shape: {\"words\":[{\"word\":string,\"meaningKo\":string,\"example\":string?,\"exampleMeaningKo\":string?,\"readingHira\":string?}, ...]}",
     `The \"words\" array MUST have length exactly ${count}.`,
+    "Whenever you include example for an item, you MUST also include exampleMeaningKo (Korean meaning of that example sentence).",
     "If targetLanguage is ja and level is beginner, prefer hiragana for word and example; avoid kanji unless necessary.",
     "If targetLanguage is ja and a word includes kanji, include readingHira for that item (hiragana only).",
   ].join(" ");

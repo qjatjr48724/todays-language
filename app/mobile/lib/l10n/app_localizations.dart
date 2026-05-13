@@ -1067,6 +1067,12 @@ abstract class AppLocalizations {
   /// **'예문: {example}'**
   String words_example_prefix(Object example);
 
+  /// No description provided for @words_example_meaning_line.
+  ///
+  /// In ko, this message translates to:
+  /// **'예문 뜻: {meaning}'**
+  String words_example_meaning_line(Object meaning);
+
   /// No description provided for @sentences_appbar_title.
   ///
   /// In ko, this message translates to:

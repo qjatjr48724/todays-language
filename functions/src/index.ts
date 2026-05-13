@@ -24,6 +24,8 @@ type GenerateWordResponse = {
   readingHira?: string;
   meaningKo: string;
   example?: string;
+  /** 예문(example)의 한국어 해석·뜻 */
+  exampleMeaningKo?: string;
   debugSource?: "openai" | "fallback" | "daily_set";
 };
 
@@ -40,6 +42,7 @@ type StoredWordItem = {
   readingHira?: string;
   meaningKo: string;
   example?: string;
+  exampleMeaningKo?: string;
 };
 
 type DailyWordSet = {
@@ -172,12 +175,14 @@ function fallbackWord(targetLanguage: string, level: string): GenerateWordRespon
       word: "ありがとう",
       meaningKo: "고마워요",
       example: "ありがとう、助かりました。",
+      exampleMeaningKo: "고마워요, 덕분에 살았어요.",
     };
   }
   return {
     word: "hola",
     meaningKo: "안녕",
     example: "Hola, ¿cómo estás?",
+    exampleMeaningKo: "안녕, 잘 지내?",
   };
 }
 
@@ -325,6 +330,11 @@ async function generateWordWithOpenAI(
       readOptionalString(parsed, ["meaningKo"]) ??
       readOptionalString(parsed, ["meaning", "koMeaning", "koreanMeaning"]);
     const ex = readOptionalString(parsed, ["example", "exampleSentence"]);
+    const exMean = readOptionalString(parsed, [
+      "exampleMeaningKo",
+      "exampleMeaning",
+      "exampleKoMeaning",
+    ]);
 
     if (!word || !meaningKo) {
       throw new Error("OpenAI response JSON schema mismatch (word)");
@@ -334,6 +344,7 @@ async function generateWordWithOpenAI(
       ...(readingHira && readingHira.length > 0 ? { readingHira } : {}),
       meaningKo,
       example: ex && ex.length > 0 ? ex : undefined,
+      exampleMeaningKo: exMean && exMean.length > 0 ? exMean : undefined,
     };
   } finally {
     clearTimeout(timeout);
@@ -421,11 +432,17 @@ function parseWordItem(value: unknown): StoredWordItem | null {
     readOptionalString(value, ["meaning", "koMeaning", "koreanMeaning"]);
   if (!word || !meaningKo) return null;
   const example = readOptionalString(value, ["example", "exampleSentence"]);
+  const exampleMeaningKo = readOptionalString(value, [
+    "exampleMeaningKo",
+    "exampleMeaning",
+    "exampleKoMeaning",
+  ]);
   return {
     word,
     ...(readingHira && readingHira.length > 0 ? { readingHira } : {}),
     meaningKo,
     ...(example ? { example } : {}),
+    ...(exampleMeaningKo ? { exampleMeaningKo } : {}),
   };
 }
 
@@ -680,6 +697,7 @@ async function buildDailyWordItems(targetLanguage: string, level: string): Promi
           word: one.word,
           meaningKo: one.meaningKo,
           ...(one.example ? { example: one.example } : {}),
+          ...(one.exampleMeaningKo ? { exampleMeaningKo: one.exampleMeaningKo } : {}),
         });
       }
     } catch {
@@ -691,6 +709,7 @@ async function buildDailyWordItems(targetLanguage: string, level: string): Promi
           word: fb.word,
           meaningKo: fb.meaningKo,
           ...(fb.example ? { example: fb.example } : {}),
+          ...(fb.exampleMeaningKo ? { exampleMeaningKo: fb.exampleMeaningKo } : {}),
         });
       }
     }
@@ -918,6 +937,7 @@ async function popWordFromTodaySet(
       meaningKo: picked.meaningKo,
       ...(picked.readingHira ? { readingHira: picked.readingHira } : {}),
       ...(picked.example ? { example: picked.example } : {}),
+      ...(picked.exampleMeaningKo ? { exampleMeaningKo: picked.exampleMeaningKo } : {}),
       debugSource: "daily_set",
     };
   });

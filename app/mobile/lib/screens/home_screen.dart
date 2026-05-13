@@ -362,13 +362,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             const SizedBox(height: 10),
                             if (p != null)
                               Text(
+                            // gen-l10n 인자 순서: quiz*, sentence*, word* (알파벳순)
                             l10n.home_progress_counts(
-                              p.wordDone,
-                              p.wordGoal,
-                              p.sentenceDone,
-                              p.sentenceGoal,
                               p.quizDone,
                               p.quizGoal,
+                              p.sentenceDone,
+                              p.sentenceGoal,
+                              p.wordDone,
+                              p.wordGoal,
                             ),
                                 style: Theme.of(context)
                                     .textTheme

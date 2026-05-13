@@ -579,6 +579,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String words_example_meaning_line(Object meaning) {
+    return 'Example meaning: $meaning';
+  }
+
+  @override
   String get sentences_appbar_title => 'Today\'s Sentences';
 
   @override

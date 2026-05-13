@@ -560,6 +560,11 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String words_example_meaning_line(Object meaning) {
+    return '例文の意味: $meaning';
+  }
+
+  @override
   String get sentences_appbar_title => '今日の文';
 
   @override

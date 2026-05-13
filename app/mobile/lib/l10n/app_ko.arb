@@ -205,6 +205,12 @@
 
   "words_debug_source": "debugSource: {source}",
   "words_example_prefix": "예문: {example}",
+  "words_example_meaning_line": "예문 뜻: {meaning}",
+  "@words_example_meaning_line": {
+    "placeholders": {
+      "meaning": {}
+    }
+  },
 
   "sentences_appbar_title": "오늘의 문장",
   "sentences_loading_sample": "샘플을 불러오는 중…",
