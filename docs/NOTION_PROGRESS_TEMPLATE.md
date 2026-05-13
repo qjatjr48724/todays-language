@@ -1045,7 +1045,7 @@ unauthenticated: 로그인 상태 확인
 
 ### 1) 오늘 한 일
 
-- **홈「오늘의 진행률」단어/마무리 수치 뒤바뀤 수정**
+- **홈「오늘의 진행률」단어/마무리 수치 뒤바뀜 수정**
   - `home_progress_counts`는 `flutter gen-l10n`이 placeholder 이름 **알파벳 순**으로 인자 순서를 만들어, 호출부가 `word*` → `quiz*` 순으로 넘기면 라벨과 숫자가 엇갈림
   - `app/mobile/lib/screens/home_screen.dart`에서 인자 순서를 `quizDone`/`quizGoal` → `sentence*` → `word*`로 맞춤(주석으로 이유 명시)
 - **오늘의 단어 화면**
