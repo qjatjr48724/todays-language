@@ -128,6 +128,12 @@ npm install -g firebase-tools
 firebase --version
 ```
 
+<!-- 배포/에뮬레이터를 사용하는 경우 로그인까지 필요합니다. -->
+
+```powershell
+firebase login
+```
+
 ---
 
 ## 7단계: 저장소 클론
@@ -149,6 +155,15 @@ cd TodaysLanguage
 - Android: `app/mobile/android/app/google-services.json`
 - iOS(맥에서 주로): `app/mobile/ios/Runner/GoogleService-Info.plist`
 - FlutterFire: `app/mobile/lib/firebase_options.dart`
+
+<!-- 필요 시(프로젝트 재연결/옵션 재생성) FlutterFire CLI를 사용합니다. 저장소에 `firebase_options.dart`가 이미 있으면 보통 생략합니다. -->
+
+```powershell
+dart pub global activate flutterfire_cli
+flutterfire --version
+cd app\mobile
+flutterfire configure
+```
 
 파일이 준비된 뒤 다음 단계로 진행합니다.
 

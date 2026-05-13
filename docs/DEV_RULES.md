@@ -1,5 +1,8 @@
 # Today's Language — 기본 개발 규칙
 
+> **정본(원본)은 `.cursor/rules/Dev-Rules.mdc` 입니다.**  
+> 이 문서(`docs/DEV_RULES.md`)는 사람이 읽기 쉬운 사본/안내용이며, 규칙 수정은 정본을 우선으로 반영합니다.
+
 ## 0) 기본 규칙
 - 파일 작명 규칙은 Snake Case를 따른다.
 - 들여쓰기는 기본적으로 4 space 방식을 사용한다.
@@ -25,6 +28,9 @@
 - 화면 전환 후 홈 요약 데이터는 반드시 재동기화한다(복귀 시 refresh).
 - 디버그 전용 UI/기능은 `kDebugMode`로 감싸고, 운영 노출을 금지한다.
 - 사용자 액션 기반 진도(+1)는 중복 탭 방지(1회 처리) 규칙을 유지한다.
+- 첫 로그인 언어 선택은 “프로필 플래그”로 통제한다.
+  - `users/{uid}.languageSetupDone == true` 인 경우에만 홈 진입
+  - 미설정이면 `LanguageSetupScreen`으로 강제 진입
 
 ## 3-1) i18n(로컬라이제이션) 규칙 (UI 문구 치환)
 - 앱 UI 언어는 **디바이스 언어(locale)** 를 따른다. (`ko/en/ja` 지원, 미지원 언어는 `en` fallback)

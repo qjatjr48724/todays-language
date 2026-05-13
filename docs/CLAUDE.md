@@ -17,3 +17,6 @@ alwaysApply: true
 - **실행/셋업 가이드(Windows)**: `docs/SETUP_GUIDE_WINDOWS.md`
 - **실행/셋업 가이드(macOS)**: `docs/SETUP_GUIDE_MACOS.md`
 - **Notion 기록 템플릿**: `docs/NOTION_PROGRESS_TEMPLATE.md`
+- **Firebase 셋업 가이드**: `docs/FIREBASE_SETUP_GUIDE.md`
+- **Firestore 가이드**: `docs/FIRESTORE_GUIDE.md`
+- **Cloud Functions 가이드**: `docs/CLOUD_FUNCTIONS_GUIDE.md`

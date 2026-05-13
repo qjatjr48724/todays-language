@@ -41,7 +41,14 @@ sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 xcodebuild -version
 ```
 
-<!-- 라이선스 프롬프트가 뜨면 허용합니다. CI/자동화 환경에서는 `sudo xcodebuild -license accept`를 쓰기도 하지만, 로컬에서는 Xcode UI로 동의하는 편이 안전합니다. -->
+<!-- 라이선스 프롬프트가 뜨면 허용합니다. 로컬에서는 Xcode UI로 동의하는 편이 안전합니다. -->
+
+<!-- (선택) Xcode 첫 실행 초기화가 덜 끝난 경우, 아래 명령으로 “첫 실행 처리”를 완료할 수 있습니다. -->
+
+```bash
+sudo xcodebuild -license accept
+sudo xcodebuild -runFirstLaunch
+```
 
 ---
 
@@ -54,7 +61,12 @@ xcodebuild -version
 brew --version
 ```
 
-<!-- Apple Silicon(M1/M2…)이라면 설치 마지막에 PATH 안내가 출력됩니다. `eval "$(/opt/homebrew/bin/brew shellenv)"`를 `~/.zprofile`에 추가하라는 안내가 나오면 따릅니다. -->
+<!-- Apple Silicon(M1/M2…)이라면 PATH가 안 잡혀 brew가 바로 안 될 수 있습니다. 아래를 한 번 실행하고, 안내대로 `~/.zprofile`에 추가합니다. -->
+
+```bash
+eval "$(/opt/homebrew/bin/brew shellenv)"
+brew --version
+```
 
 ---
 
@@ -77,6 +89,12 @@ flutter doctor -v
 ```bash
 brew install cocoapods
 pod --version
+```
+
+<!-- (권장) pod repo가 오래되어 설치가 깨질 때가 있어, 에러가 나면 아래를 먼저 시도합니다. -->
+
+```bash
+pod repo update
 ```
 
 ---
@@ -116,6 +134,12 @@ npm install -g firebase-tools
 firebase --version
 ```
 
+<!-- 배포/에뮬레이터를 쓰는 경우 로그인까지 필요합니다. -->
+
+```bash
+firebase login
+```
+
 ---
 
 ## 8단계: 저장소 클론
@@ -137,6 +161,15 @@ cd TodaysLanguage
 - iOS: `app/mobile/ios/Runner/GoogleService-Info.plist`
 - FlutterFire: `app/mobile/lib/firebase_options.dart`
 
+<!-- 필요 시(프로젝트 재연결/옵션 재생성) FlutterFire CLI를 사용합니다. 저장소에 `firebase_options.dart`가 이미 있으면 보통 생략합니다. -->
+
+```bash
+dart pub global activate flutterfire_cli
+flutterfire --version
+cd app/mobile
+flutterfire configure
+```
+
 ---
 
 ## 10단계: iOS Pods 설치
@@ -145,6 +178,16 @@ cd TodaysLanguage
 
 ```bash
 cd app/mobile/ios
+pod install
+cd ..
+```
+
+<!-- Pod 충돌/오염이 의심될 때만(선택) “재설치”를 시도합니다. -->
+
+```bash
+cd app/mobile/ios
+pod deintegrate
+rm -rf Pods Podfile.lock
 pod install
 cd ..
 ```
