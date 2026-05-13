@@ -48,6 +48,9 @@
   "notification_permission_description": "Get important updates such as learning reminders.\nYou can change this anytime in device settings.",
   "notification_permission_deny_button": "Not now",
   "notification_permission_allow_button": "Allow",
+  "notification_permission_settings_needed": "Notifications are not allowed.\nPlease enable notifications in Settings and try again.",
+  "notification_permission_dialog_close": "Close",
+  "notification_permission_open_settings": "Open Settings",
 
   "home_profile_sync_failed": "Failed to sync profile and progress: {error}",
   "home_reset_success": "Today's progress has been reset.",

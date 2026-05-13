@@ -156,6 +156,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notification_permission_allow_button => 'Allow';
 
   @override
+  String get notification_permission_settings_needed =>
+      'Notifications are not allowed.\nPlease enable notifications in Settings and try again.';
+
+  @override
+  String get notification_permission_dialog_close => 'Close';
+
+  @override
+  String get notification_permission_open_settings => 'Open Settings';
+
+  @override
   String home_profile_sync_failed(Object error) {
     return 'Failed to sync profile and progress: $error';
   }

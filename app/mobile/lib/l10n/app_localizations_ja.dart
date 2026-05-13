@@ -147,6 +147,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String get notification_permission_allow_button => '許可';
 
   @override
+  String get notification_permission_settings_needed =>
+      '通知が許可されていません。\n設定で通知を許可してから、もう一度お試しください。';
+
+  @override
+  String get notification_permission_dialog_close => '閉じる';
+
+  @override
+  String get notification_permission_open_settings => '設定を開く';
+
+  @override
   String home_profile_sync_failed(Object error) {
     return 'プロフィールと進捗の同期に失敗しました: $error';
   }

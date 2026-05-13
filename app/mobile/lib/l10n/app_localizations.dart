@@ -346,6 +346,24 @@ abstract class AppLocalizations {
   /// **'허용'**
   String get notification_permission_allow_button;
 
+  /// No description provided for @notification_permission_settings_needed.
+  ///
+  /// In ko, this message translates to:
+  /// **'알림 권한이 허용되지 않았습니다.\n설정에서 알림을 허용한 뒤 다시 시도해 주세요.'**
+  String get notification_permission_settings_needed;
+
+  /// No description provided for @notification_permission_dialog_close.
+  ///
+  /// In ko, this message translates to:
+  /// **'닫기'**
+  String get notification_permission_dialog_close;
+
+  /// No description provided for @notification_permission_open_settings.
+  ///
+  /// In ko, this message translates to:
+  /// **'설정 열기'**
+  String get notification_permission_open_settings;
+
   /// No description provided for @home_profile_sync_failed.
   ///
   /// In ko, this message translates to:

@@ -7,6 +7,15 @@
 .buildlog/
 .history
 
+# macOS (모든 경로)
+.DS_Store
+
+# Finder 등으로 생기는 Flutter iOS 생성물 중복본 (예: Generated 2.xcconfig, flutter_export_environment 2.sh)
+**/ios/Flutter/Generated *.xcconfig
+**/ios/Flutter/flutter_export_environment *.sh
+
+# pub 플러그인 목록 중복본 (예: .flutter-plugins-dependencies 2)
+**/.flutter-plugins-dependencies *
 
 
 # Flutter repo-specific
