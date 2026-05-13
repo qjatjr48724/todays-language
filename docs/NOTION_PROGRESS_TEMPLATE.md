@@ -997,3 +997,45 @@ unauthenticated: 로그인 상태 확인
 2. Apple 로그인 필요 여부 결정
 3. 필요 시 dev/release 구성을 분리(개발용은 capability 제거, 릴리즈는 유지)
 
+---
+
+## [단계 23] 개발 문서/규칙 정리: 정본 지정 + Setup 가이드 검증 + 중복 문서 제거
+
+### 1) 오늘 한 일
+
+- **규칙 문서 정본 지정(혼선 방지)**
+  - 개발 규칙의 **정본을 `.cursor/rules/Dev-Rules.mdc`**로 지정하고, `docs/DEV_RULES.md`에는 “정본 안내” 문구를 추가
+  - `docs/CLAUDE.md`에도 규칙 정본 경로를 명시
+- **macOS/Windows Setup 가이드 검증 및 보강**
+  - `docs/SETUP_GUIDE_MACOS.md`
+    - Xcode 초기화(`xcodebuild -runFirstLaunch`), Apple Silicon Homebrew PATH(`brew shellenv`), CocoaPods repo update, Firebase login, FlutterFire configure, Pod 재설치 루틴 보강
+  - `docs/SETUP_GUIDE_WINDOWS.md`
+    - Firebase login, FlutterFire configure(필요 시) 보강
+- **Firebase/Firestore/Cloud Functions 가이드 문서 분리 생성**
+  - `docs/FIREBASE_SETUP_GUIDE.md`
+  - `docs/FIRESTORE_GUIDE.md`
+  - `docs/CLOUD_FUNCTIONS_GUIDE.md` (기존 `DEV_GUIDE_NOTES.md`의 Functions 운영 메모를 통합)
+- **중복 문서 제거**
+  - `docs/SETUP_MACBOOK.md`, `docs/SETUP_MACBOOK_COMMANDS.md` 삭제 (정본은 `docs/SETUP_GUIDE_MACOS.md`)
+  - `docs/WORKFLOW_REFERENCE.md` 삭제 (내용 중복을 제거하고, `docs/CLAUDE.md` + `docs/DEV_RULES.md` + 가이드 문서로 역할 분리)
+  - `docs/DEV_GUIDE_NOTES.md` 삭제 (내용을 `CLOUD_FUNCTIONS_GUIDE.md`/`FIRESTORE_GUIDE.md`/`DEV_RULES.md`로 흡수)
+
+### 2) 완료 기준 체크
+
+- [x] 규칙 정본 경로가 `DEV_RULES`/`CLAUDE`에서 명시되어 혼선이 줄어듦
+- [x] Setup 가이드에 `firebase login`/`flutterfire configure` 등 실제 셋업에서 막히기 쉬운 항목 보강
+- [x] 중복 문서 삭제 후, 문서 내 깨진 링크(삭제된 파일 참조) 제거/미존재 확인
+
+### 3) 추가/변경한 문서 포인트
+
+- 규칙/인덱스:
+  - `.cursor/rules/Dev-Rules.mdc` (정본)
+  - `docs/DEV_RULES.md`, `docs/CLAUDE.md`
+- Setup:
+  - `docs/SETUP_GUIDE_MACOS.md`
+  - `docs/SETUP_GUIDE_WINDOWS.md`
+- Firebase/Firestore/Functions 가이드:
+  - `docs/FIREBASE_SETUP_GUIDE.md`
+  - `docs/FIRESTORE_GUIDE.md`
+  - `docs/CLOUD_FUNCTIONS_GUIDE.md`
+
