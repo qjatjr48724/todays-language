@@ -29,6 +29,7 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
   String? _sentence;
   String? _sentenceHira;
   String? _meaning;
+  List<_SentenceVocabHint> _vocabHints = const [];
   String? _debugSource;
   bool _completedCurrent = false;
 
@@ -87,6 +88,7 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
       _sentence = null;
       _sentenceHira = null;
       _meaning = null;
+      _vocabHints = const [];
       _debugSource = null;
       _completedCurrent = false;
       _error = null;
@@ -111,12 +113,25 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
       final sentenceHira = data['sentenceHira']?.toString();
       final meaning = data['meaningKo']?.toString() ?? '';
       final debugSource = data['debugSource']?.toString();
+      final hintsRaw = data['vocabularyHints'];
+      final hints = <_SentenceVocabHint>[];
+      if (hintsRaw is List) {
+        for (final el in hintsRaw) {
+          if (el is! Map) continue;
+          final m = Map<String, dynamic>.from(el);
+          final mk = m['meaningKo']?.toString().trim() ?? '';
+          final w = m['word']?.toString().trim() ?? '';
+          if (mk.isEmpty || w.isEmpty) continue;
+          hints.add(_SentenceVocabHint(meaningKo: mk, word: w));
+        }
+      }
 
       if (!mounted) return;
       setState(() {
         _sentence = sentence;
         _sentenceHira = sentenceHira;
         _meaning = meaning;
+        _vocabHints = hints;
         _debugSource = debugSource;
         _aiLoading = false;
       });
@@ -164,6 +179,7 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     final l10n = AppLocalizations.of(context)!;
     final showHiraLine =
         widget.targetLanguage.toUpperCase() == 'JPN' &&
@@ -177,20 +193,26 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              _sentenceCapReached && !_relearnActive
-                  ? l10n.sentences_description_goal_reached(
-                      _todayProgress?.sentenceGoal ?? 10,
-                    )
-                  : _sentenceCapReached && _relearnActive
-                      ? l10n.sentences_description_relearn_mode
-                      : l10n.sentences_description_normal,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(color: scheme.onSurfaceVariant),
-            ),
-            const SizedBox(height: 16),
+            if (_sentenceCapReached && !_relearnActive) ...[
+              Text(
+                l10n.sentences_description_goal_reached(
+                  _todayProgress?.sentenceGoal ?? 10,
+                ),
+                style: textTheme.bodyMedium?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 16),
+            ] else if (_sentenceCapReached && _relearnActive) ...[
+              Text(
+                l10n.sentences_description_relearn_mode,
+                style: textTheme.bodyMedium?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+
             if (_aiLoading) ...[
               const LinearProgressIndicator(),
               const SizedBox(height: 12),
@@ -206,13 +228,13 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
             ] else ...[
               Text(
                 _sentence ?? '-',
-                style: Theme.of(context).textTheme.headlineSmall,
+                style: textTheme.headlineSmall,
               ),
               if (showHiraLine) ...[
                 const SizedBox(height: 8),
                 Text(
                   _sentenceHira!,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  style: textTheme.titleMedium?.copyWith(
                         color: scheme.onSurfaceVariant,
                       ),
                 ),
@@ -220,21 +242,51 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
               const SizedBox(height: 8),
               Text(
                 _meaning ?? '-',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                style: textTheme.titleMedium?.copyWith(
                       color: scheme.onSurfaceVariant,
                     ),
               ),
-              if (kDebugMode && _debugSource != null) ...[
-                const SizedBox(height: 10),
+              if (_vocabHints.isNotEmpty) ...[
+                const SizedBox(height: 16),
                 Text(
-                  'debugSource: $_debugSource',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  l10n.sentences_vocab_section_title,
+                  style: textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                ..._vocabHints.map(
+                  (h) => Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: Text(
+                      l10n.sentences_vocab_row(h.meaningKo, h.word),
+                      style: textTheme.bodyMedium?.copyWith(
                         color: scheme.onSurfaceVariant,
                       ),
+                    ),
+                  ),
                 ),
               ],
             ],
             const Spacer(),
+            if (!_sentenceCapReached)
+              Text(
+                l10n.sentences_description_normal,
+                style: textTheme.bodyMedium?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+            if (kDebugMode && _debugSource != null) ...[
+              if (!_sentenceCapReached) const SizedBox(height: 8),
+              Text(
+                l10n.sentences_debug_source(_debugSource!),
+                style: textTheme.bodyMedium?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+            if (!_sentenceCapReached || (kDebugMode && _debugSource != null))
+              const SizedBox(height: 12),
             FilledButton.icon(
               onPressed: _canMarkComplete ? _markDone : null,
               icon: _savingProgress
@@ -277,5 +329,13 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
       ),
     );
   }
+}
+
+
+class _SentenceVocabHint {
+  const _SentenceVocabHint({required this.meaningKo, required this.word});
+
+  final String meaningKo;
+  final String word;
 }
 

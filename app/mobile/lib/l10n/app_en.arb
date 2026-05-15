@@ -222,6 +222,15 @@
   "sentences_description_relearn_mode": "Practice mode: Load a new sentence and review. (Your progress will not increase.)",
   "sentences_description_normal": "The complete button adds +1 only once for the current sentence. After that, move on to the next sentence.",
 
+  "sentences_vocab_section_title": "Expressions in this sentence",
+  "sentences_vocab_row": "{meaningKo} → {word}",
+  "@sentences_vocab_row": {
+    "placeholders": {
+      "meaningKo": {},
+      "word": {}
+    }
+  },
+
   "sentences_ai_sample_load_failed": "Failed to load sample sentence: {error}",
   "sentences_save_failed": "Save failed: {error}",
   "sentences_completed_snackbar": "Sentence learning completed! Daily progress +1",

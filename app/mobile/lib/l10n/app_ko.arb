@@ -221,6 +221,15 @@
   "sentences_description_relearn_mode": "연습 모드: 새 문장을 불러오며 복습할 수 있습니다. (진도는 더 올라가지 않습니다.)",
   "sentences_description_normal": "완료 버튼은 현재 문장에서 1회만 +1 됩니다. 이후 다음 문장으로 넘어가세요.",
 
+  "sentences_vocab_section_title": "문장 속 표현",
+  "sentences_vocab_row": "{meaningKo} → {word}",
+  "@sentences_vocab_row": {
+    "placeholders": {
+      "meaningKo": {},
+      "word": {}
+    }
+  },
+
   "sentences_ai_sample_load_failed": "샘플 문장 불러오기 실패: {error}",
   "sentences_save_failed": "저장 실패: {error}",
   "sentences_completed_snackbar": "문장 학습 완료! 오늘 진도 +1",

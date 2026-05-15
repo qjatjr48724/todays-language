@@ -610,6 +610,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'The complete button adds +1 only once for the current sentence. After that, move on to the next sentence.';
 
   @override
+  String get sentences_vocab_section_title => 'Expressions in this sentence';
+
+  @override
+  String sentences_vocab_row(Object meaningKo, Object word) {
+    return '$meaningKo → $word';
+  }
+
+  @override
   String sentences_ai_sample_load_failed(Object error) {
     return 'Failed to load sample sentence: $error';
   }

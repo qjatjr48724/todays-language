@@ -591,6 +591,14 @@ class AppLocalizationsJa extends AppLocalizations {
       '完了ボタンは現在の文で +1 が1回だけ適用されます。その後「次の文」に進んでください。';
 
   @override
+  String get sentences_vocab_section_title => '文の表現';
+
+  @override
+  String sentences_vocab_row(Object meaningKo, Object word) {
+    return '$meaningKo → $word';
+  }
+
+  @override
   String sentences_ai_sample_load_failed(Object error) {
     return 'サンプル文の読み込みに失敗しました: $error';
   }

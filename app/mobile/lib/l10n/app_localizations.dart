@@ -1115,6 +1115,18 @@ abstract class AppLocalizations {
   /// **'완료 버튼은 현재 문장에서 1회만 +1 됩니다. 이후 다음 문장으로 넘어가세요.'**
   String get sentences_description_normal;
 
+  /// No description provided for @sentences_vocab_section_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'문장 속 표현'**
+  String get sentences_vocab_section_title;
+
+  /// No description provided for @sentences_vocab_row.
+  ///
+  /// In ko, this message translates to:
+  /// **'{meaningKo} → {word}'**
+  String sentences_vocab_row(Object meaningKo, Object word);
+
   /// No description provided for @sentences_ai_sample_load_failed.
   ///
   /// In ko, this message translates to:

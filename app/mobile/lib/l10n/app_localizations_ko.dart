@@ -590,6 +590,14 @@ class AppLocalizationsKo extends AppLocalizations {
       '완료 버튼은 현재 문장에서 1회만 +1 됩니다. 이후 다음 문장으로 넘어가세요.';
 
   @override
+  String get sentences_vocab_section_title => '문장 속 표현';
+
+  @override
+  String sentences_vocab_row(Object meaningKo, Object word) {
+    return '$meaningKo → $word';
+  }
+
+  @override
   String sentences_ai_sample_load_failed(Object error) {
     return '샘플 문장 불러오기 실패: $error';
   }

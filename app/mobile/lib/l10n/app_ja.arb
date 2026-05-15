@@ -222,6 +222,15 @@
   "sentences_description_relearn_mode": "練習モード：新しい文を読み込み、復習できます。（進捗は増えません。）",
   "sentences_description_normal": "完了ボタンは現在の文で +1 が1回だけ適用されます。その後「次の文」に進んでください。",
 
+  "sentences_vocab_section_title": "文の表現",
+  "sentences_vocab_row": "{meaningKo} → {word}",
+  "@sentences_vocab_row": {
+    "placeholders": {
+      "meaningKo": {},
+      "word": {}
+    }
+  },
+
   "sentences_ai_sample_load_failed": "サンプル文の読み込みに失敗しました: {error}",
   "sentences_save_failed": "保存に失敗しました: {error}",
   "sentences_completed_snackbar": "文の学習が完了しました。進捗 +1",
