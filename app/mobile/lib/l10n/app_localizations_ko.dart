@@ -564,6 +564,9 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get words_example_section_title => '예문';
+
+  @override
   String get sentences_appbar_title => '오늘의 문장';
 
   @override
@@ -642,6 +645,44 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String wrapup_load_failed(Object error) {
     return '마무리 문제를 불러오지 못했습니다: $error';
+  }
+
+  @override
+  String get wrapup_empty_deck =>
+      '오늘 학습 세트에 마무리용 단어·문장이 없습니다. 단어·문장 학습을 먼저 진행한 뒤 다시 시도해 주세요.';
+
+  @override
+  String get wrapup_insufficient_for_quiz =>
+      '4지선다를 만들 수 있을 만큼 문제가 부족합니다. 다시 불러오거나 학습을 더 진행해 주세요.';
+
+  @override
+  String wrapup_progress(Object current, Object total) {
+    return '$current / $total';
+  }
+
+  @override
+  String get wrapup_pick_word => '다음 뜻에 맞는 단어를 고르세요.';
+
+  @override
+  String get wrapup_pick_sentence => '다음 뜻에 맞는 문장을 고르세요.';
+
+  @override
+  String get wrapup_next_button => '다음';
+
+  @override
+  String get wrapup_correct_feedback => '정답입니다!';
+
+  @override
+  String wrapup_incorrect_feedback(Object answer) {
+    return '오답입니다. 정답: $answer';
+  }
+
+  @override
+  String get wrapup_session_complete_title => '점검 완료';
+
+  @override
+  String wrapup_score_line(Object correct, Object total) {
+    return '$correct / $total 정답';
   }
 
   @override

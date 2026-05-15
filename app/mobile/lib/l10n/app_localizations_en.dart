@@ -584,6 +584,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get words_example_section_title => 'Example';
+
+  @override
   String get sentences_appbar_title => 'Today\'s Sentences';
 
   @override
@@ -665,6 +668,46 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String wrapup_load_failed(Object error) {
     return 'Failed to load wrap-up questions: $error';
+  }
+
+  @override
+  String get wrapup_empty_deck =>
+      'Today\'s learning set has no words or sentences for wrap-up. Complete word and sentence practice first, then try again.';
+
+  @override
+  String get wrapup_insufficient_for_quiz =>
+      'Not enough questions to build a 4-choice quiz. Reload or complete more practice first.';
+
+  @override
+  String wrapup_progress(Object current, Object total) {
+    return '$current / $total';
+  }
+
+  @override
+  String get wrapup_pick_word =>
+      'Choose the word that matches the meaning below.';
+
+  @override
+  String get wrapup_pick_sentence =>
+      'Choose the sentence that matches the meaning below.';
+
+  @override
+  String get wrapup_next_button => 'Next';
+
+  @override
+  String get wrapup_correct_feedback => 'Correct!';
+
+  @override
+  String wrapup_incorrect_feedback(Object answer) {
+    return 'Incorrect. Answer: $answer';
+  }
+
+  @override
+  String get wrapup_session_complete_title => 'Check complete';
+
+  @override
+  String wrapup_score_line(Object correct, Object total) {
+    return '$correct / $total correct';
   }
 
   @override

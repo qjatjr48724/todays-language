@@ -212,6 +212,7 @@
       "meaning": {}
     }
   },
+  "words_example_section_title": "Example",
 
   "sentences_appbar_title": "Today's Sentences",
   "sentences_loading_sample": "Loading sample…",
@@ -249,6 +250,33 @@
   "wrapup_summary_title": "Today's final learning check: 25 questions (Words 70% / Sentences 30%)",
 
   "wrapup_load_failed": "Failed to load wrap-up questions: {error}",
+  "wrapup_empty_deck": "Today's learning set has no words or sentences for wrap-up. Complete word and sentence practice first, then try again.",
+  "wrapup_insufficient_for_quiz": "Not enough questions to build a 4-choice quiz. Reload or complete more practice first.",
+  "wrapup_progress": "{current} / {total}",
+  "@wrapup_progress": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "wrapup_pick_word": "Choose the word that matches the meaning below.",
+  "wrapup_pick_sentence": "Choose the sentence that matches the meaning below.",
+  "wrapup_next_button": "Next",
+  "wrapup_correct_feedback": "Correct!",
+  "wrapup_incorrect_feedback": "Incorrect. Answer: {answer}",
+  "@wrapup_incorrect_feedback": {
+    "placeholders": {
+      "answer": {}
+    }
+  },
+  "wrapup_session_complete_title": "Check complete",
+  "wrapup_score_line": "{correct} / {total} correct",
+  "@wrapup_score_line": {
+    "placeholders": {
+      "correct": {},
+      "total": {}
+    }
+  },
   "wrapup_completed_snackbar": "Today's wrap-up completion has been applied.",
   "wrapup_finish_failed_snackbar": "Wrap-up completion failed: {error}",
 

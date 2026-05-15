@@ -565,6 +565,9 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get words_example_section_title => '例文';
+
+  @override
   String get sentences_appbar_title => '今日の文';
 
   @override
@@ -643,6 +646,44 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String wrapup_load_failed(Object error) {
     return 'まとめ問題を読み込めませんでした: $error';
+  }
+
+  @override
+  String get wrapup_empty_deck =>
+      '今日の学習セットにまとめ用の単語・文がありません。単語・文の学習を先に進めてから、もう一度お試しください。';
+
+  @override
+  String get wrapup_insufficient_for_quiz =>
+      '4択クイズを作るには問題数が足りません。再読み込みするか、学習を進めてからお試しください。';
+
+  @override
+  String wrapup_progress(Object current, Object total) {
+    return '$current / $total';
+  }
+
+  @override
+  String get wrapup_pick_word => '次の意味に合う単語を選んでください。';
+
+  @override
+  String get wrapup_pick_sentence => '次の意味に合う文を選んでください。';
+
+  @override
+  String get wrapup_next_button => '次へ';
+
+  @override
+  String get wrapup_correct_feedback => '正解です！';
+
+  @override
+  String wrapup_incorrect_feedback(Object answer) {
+    return '不正解です。答え: $answer';
+  }
+
+  @override
+  String get wrapup_session_complete_title => 'チェック完了';
+
+  @override
+  String wrapup_score_line(Object correct, Object total) {
+    return '$correct / $total 正解';
   }
 
   @override

@@ -1073,6 +1073,12 @@ abstract class AppLocalizations {
   /// **'예문 뜻: {meaning}'**
   String words_example_meaning_line(Object meaning);
 
+  /// No description provided for @words_example_section_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'예문'**
+  String get words_example_section_title;
+
   /// No description provided for @sentences_appbar_title.
   ///
   /// In ko, this message translates to:
@@ -1204,6 +1210,66 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'마무리 문제를 불러오지 못했습니다: {error}'**
   String wrapup_load_failed(Object error);
+
+  /// No description provided for @wrapup_empty_deck.
+  ///
+  /// In ko, this message translates to:
+  /// **'오늘 학습 세트에 마무리용 단어·문장이 없습니다. 단어·문장 학습을 먼저 진행한 뒤 다시 시도해 주세요.'**
+  String get wrapup_empty_deck;
+
+  /// No description provided for @wrapup_insufficient_for_quiz.
+  ///
+  /// In ko, this message translates to:
+  /// **'4지선다를 만들 수 있을 만큼 문제가 부족합니다. 다시 불러오거나 학습을 더 진행해 주세요.'**
+  String get wrapup_insufficient_for_quiz;
+
+  /// No description provided for @wrapup_progress.
+  ///
+  /// In ko, this message translates to:
+  /// **'{current} / {total}'**
+  String wrapup_progress(Object current, Object total);
+
+  /// No description provided for @wrapup_pick_word.
+  ///
+  /// In ko, this message translates to:
+  /// **'다음 뜻에 맞는 단어를 고르세요.'**
+  String get wrapup_pick_word;
+
+  /// No description provided for @wrapup_pick_sentence.
+  ///
+  /// In ko, this message translates to:
+  /// **'다음 뜻에 맞는 문장을 고르세요.'**
+  String get wrapup_pick_sentence;
+
+  /// No description provided for @wrapup_next_button.
+  ///
+  /// In ko, this message translates to:
+  /// **'다음'**
+  String get wrapup_next_button;
+
+  /// No description provided for @wrapup_correct_feedback.
+  ///
+  /// In ko, this message translates to:
+  /// **'정답입니다!'**
+  String get wrapup_correct_feedback;
+
+  /// No description provided for @wrapup_incorrect_feedback.
+  ///
+  /// In ko, this message translates to:
+  /// **'오답입니다. 정답: {answer}'**
+  String wrapup_incorrect_feedback(Object answer);
+
+  /// No description provided for @wrapup_session_complete_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'점검 완료'**
+  String get wrapup_session_complete_title;
+
+  /// No description provided for @wrapup_score_line.
+  ///
+  /// In ko, this message translates to:
+  /// **'{correct} / {total} 정답'**
+  String wrapup_score_line(Object correct, Object total);
 
   /// No description provided for @wrapup_completed_snackbar.
   ///

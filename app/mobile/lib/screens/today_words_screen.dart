@@ -252,28 +252,15 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
                   color: scheme.onSurfaceVariant,
                 ),
               ),
-              if (_example != null && _example!.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                Text(
-                  l10n.words_example_prefix(_example!),
-                  style: textTheme.bodyMedium?.copyWith(
-                    fontSize: (textTheme.bodyMedium?.fontSize ?? 14) + 4,
-                    color: scheme.onSurfaceVariant,
-                  ),
+              if (_example != null && _example!.trim().isNotEmpty) ...[
+                const SizedBox(height: 20),
+                Divider(height: 1, thickness: 1, color: scheme.outlineVariant),
+                const SizedBox(height: 16),
+                _WordExampleCard(
+                  l10n: l10n,
+                  example: _example!.trim(),
+                  exampleMeaningKo: _exampleMeaningKo?.trim(),
                 ),
-                if (_exampleMeaningKo != null &&
-                    _exampleMeaningKo!.trim().isNotEmpty) ...[
-                  const SizedBox(height: 6),
-                  Text(
-                    l10n.words_example_meaning_line(
-                      _exampleMeaningKo!.trim(),
-                    ),
-                    style: textTheme.bodyMedium?.copyWith(
-                      fontSize: (textTheme.bodyMedium?.fontSize ?? 14) + 4,
-                      color: scheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
               ],
             ],
 
@@ -333,6 +320,79 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
             if (_error != null) ...[
               const SizedBox(height: 12),
               Text(_error!, style: TextStyle(color: scheme.error)),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+/// 예문·예문 뜻: 오늘의 문장의 문장 속 표현 카드와 동일한 카드 UI 패턴.
+class _WordExampleCard extends StatelessWidget {
+  const _WordExampleCard({
+    required this.l10n,
+    required this.example,
+    this.exampleMeaningKo,
+  });
+
+  final AppLocalizations l10n;
+  final String example;
+  final String? exampleMeaningKo;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final meaning = exampleMeaningKo?.trim() ?? '';
+    final bodySize = (textTheme.bodyLarge?.fontSize ?? 16) + 2;
+
+    return Card(
+      elevation: 0,
+      color: scheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: scheme.outlineVariant),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.words_example_section_title,
+              style: textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: scheme.onSurface,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              example,
+              style: textTheme.bodyLarge?.copyWith(
+                fontSize: bodySize,
+                color: scheme.onSurface,
+                fontWeight: FontWeight.w600,
+                height: 1.35,
+              ),
+            ),
+            if (meaning.isNotEmpty) ...[
+              Divider(
+                height: 24,
+                thickness: 1,
+                color: scheme.outlineVariant.withValues(alpha: 0.65),
+              ),
+              Text(
+                meaning,
+                style: textTheme.bodyLarge?.copyWith(
+                  fontSize: bodySize,
+                  color: scheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w500,
+                  height: 1.35,
+                ),
+              ),
             ],
           ],
         ),
