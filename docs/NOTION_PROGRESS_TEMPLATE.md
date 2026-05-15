@@ -1085,3 +1085,52 @@ unauthenticated: 로그인 상태 확인
 2. 필요 시 `docs/FIRESTORE_MIN_SCHEMA.md` 또는 운영 문서에 글로벌 `daily_word_sets` 단어 항목 필드 보강
 3. `flutter test` 전체 + 푸시 전 품질 게이트(프로젝트 규칙)
 
+---
+
+## [단계 25] 오늘의 단어 예문 카드화 · 오늘의 마무리 로딩 수정 · 4지선다 퀴즈 UX · 임시 파일 정리
+
+### 1) 오늘 한 일
+
+- **오늘의 단어 — 예문·예문 뜻**
+  - 예문·예문 뜻을 오늘의 문장「문장 속 표현」과 유사한 **카드 UI**로 표시
+  - 단어·뜻 아래 `Divider` → `_WordExampleCard`(섹션 제목 `words_example_section_title` → 예문 → 구분선 → 예문 뜻)
+- **오늘의 마무리 — 로딩 멈춤**
+  - `initState`에서 `AppLocalizations.of(context)`를 호출하며 예외가 나면 `_loading`이 해제되지 않던 버그 수정
+  - `addPostFrameCallback`으로 로드 시작, 타임아웃(45s), 빈 덱·항목 부족 시 사용자 안내(`wrapup_empty_deck`, `wrapup_insufficient_for_quiz`)
+- **오늘의 마무리 — 4지선다 UX**
+  - 전체 목록 + 정답 보기 → **1문항씩 4지선다** 선택 → 피드백 → 다음 → 완료 시 점수 요약 → `마무리 완료`로 진도 반영 후 홈 복귀
+  - `app/mobile/lib/services/wrap_up_quiz_builder.dart` + `test/wrap_up_quiz_builder_test.dart`
+  - `getWrapUpDeck` 호출 결과는 변경 없음(클라이언트에서 보기 조합)
+- **품질**
+  - `flutter gen-l10n`, `flutter analyze`, `flutter test` 통과
+- **Git**
+  - 커밋: `628cbf3` — `ui(app): 오늘의 단어 예문 카드화 및 마무리 4지선다 퀴즈 전환`
+  - 레포 루트 임시 Notion/인자 JSON 4개 삭제(args_one_line, notion_api_args, notion_mcp_args, notion_new_str_only) — 앱/Functions 무관
+
+### 2) 완료 기준 체크
+
+- [x] 로컬: gen-l10n · analyze · test 통과
+- [x] 오늘의 마무리 4지선다·예문 카드 사용자 확인
+- [ ] 필요 시 `git push`(원격 반영은 개발자 실행)
+
+### 3) 추가/변경한 코드 포인트
+
+- 파일:
+  - `app/mobile/lib/screens/today_words_screen.dart`
+  - `app/mobile/lib/screens/today_wrap_up_screen.dart`
+  - `app/mobile/lib/services/wrap_up_quiz_builder.dart`
+  - `app/mobile/test/wrap_up_quiz_builder_test.dart`
+  - `app/mobile/lib/l10n/app_ko.arb`, `app_en.arb`, `app_ja.arb` 및 `app_localizations*.dart`
+
+### 4) 이슈/막힌 점
+
+- 증상: 마무리 화면이 로딩만 돌던 현상  
+- 원인: `initState` 직후 l10n 조회로 예외 → 로딩 플래그 미해제  
+- 해결: 프레임 이후 로드, 예외 처리·타임아웃·빈 덱 안내
+
+### 5) 다음 액션 (선택)
+
+1. 원격 미반영이면 `git push`
+2. `docs/CLAUDE.md` 줄바꿈만 다른 변경 시 `git restore`로 정리
+3. (선택) 미사용 i18n 키 정리 (`words_example_prefix` 등)
+
