@@ -29,11 +29,20 @@ type GenerateWordResponse = {
   debugSource?: "openai" | "fallback" | "daily_set";
 };
 
+type SentenceVocabHint = {
+  /** 문장에 실제로 등장하는 표기 */
+  word: string;
+  /** 한국어 짧은 뜻 */
+  meaningKo: string;
+};
+
 type GenerateSentenceResponse = {
   sentence: string;
   /** 일본어용: 히라가나만(확인용) */
   sentenceHira?: string;
   meaningKo: string;
+  /** 문장에 나온 표현·단어와 한국어 뜻 (생성 시점에 선별) */
+  vocabularyHints?: SentenceVocabHint[];
   debugSource?: "openai" | "fallback" | "daily_set";
 };
 
@@ -58,6 +67,7 @@ type StoredSentenceItem = {
   sentence: string;
   sentenceHira?: string;
   meaningKo: string;
+  vocabularyHints?: SentenceVocabHint[];
 };
 
 type DailySentenceSet = {
@@ -76,6 +86,8 @@ const OPENAI_MODEL = process.env.OPENAI_MODEL ?? "gpt-4.1-mini";
 const DAILY_WORD_COUNT = 30;
 /** 오늘의 문장 화면 일일 목표와 동일하게 유지 */
 const DAILY_SENTENCE_COUNT = 10;
+/** 문장별 vocabularyHints 최대 개수 (과다 저장·응답 크기 방지) */
+const MAX_SENTENCE_VOCAB_HINTS = 6;
 /** 단어 배치 한 번에 요청할 개수 (두 배치 병렬 호출 → 문장 1회와 비슷한 체감에 가깝게) */
 const DAILY_WORD_BATCH_SIZE = 15;
 const DEFAULT_RETENTION_DAYS = 7;
@@ -192,11 +204,21 @@ function fallbackSentence(targetLanguage: string, level: string): GenerateSenten
     return {
       sentence: "きょうはいいてんきですね。",
       meaningKo: "오늘은 날씨가 좋네요.",
+      vocabularyHints: [
+        { word: "きょう", meaningKo: "오늘" },
+        { word: "いい", meaningKo: "좋다" },
+        { word: "てんき", meaningKo: "날씨" },
+      ],
     };
   }
   return {
     sentence: "Hoy hace buen tiempo.",
     meaningKo: "오늘 날씨가 좋아요.",
+    vocabularyHints: [
+      { word: "Hoy", meaningKo: "오늘" },
+      { word: "buen", meaningKo: "좋은" },
+      { word: "tiempo", meaningKo: "날씨" },
+    ],
   };
 }
 
@@ -235,6 +257,37 @@ function readOptionalString(obj: unknown, keys: string[]): string | undefined {
   }
   return undefined;
 }
+
+
+function parseSentenceVocabularyHints(container: unknown): SentenceVocabHint[] | undefined {
+  if (typeof container !== "object" || container === null) {
+    return undefined;
+  }
+  const o = container as Record<string, unknown>;
+  const raw = o.vocabularyHints ?? o.vocabulary_hints;
+  if (!Array.isArray(raw)) {
+    return undefined;
+  }
+  const out: SentenceVocabHint[] = [];
+  for (const el of raw) {
+    if (typeof el !== "object" || el === null) {
+      continue;
+    }
+    const word = readOptionalString(el, ["word", "expression", "target", "fragment"]) ?? "";
+    const meaningKo =
+      readOptionalString(el, ["meaningKo", "glossKo", "koMeaning", "koreanMeaning", "meaning"]) ??
+      "";
+    if (!word || !meaningKo) {
+      continue;
+    }
+    out.push({ word, meaningKo });
+    if (out.length >= MAX_SENTENCE_VOCAB_HINTS) {
+      break;
+    }
+  }
+  return out.length > 0 ? out : undefined;
+}
+
 
 /**
  * OpenAI Responses API (`POST /v1/responses`) 응답에서 모델 텍스트를 꺼낸다.
@@ -411,10 +464,12 @@ async function generateSentenceWithOpenAI(
     if (!sentence || !meaningKo) {
       throw new Error("OpenAI response JSON schema mismatch (sentence)");
     }
+    const vocabularyHints = parseSentenceVocabularyHints(parsed);
     return {
       sentence,
       ...(sentenceHira && sentenceHira.length > 0 ? { sentenceHira } : {}),
       meaningKo,
+      ...(vocabularyHints ? { vocabularyHints } : {}),
     };
   } finally {
     clearTimeout(timeout);
@@ -456,10 +511,12 @@ function parseSentenceItem(value: unknown): StoredSentenceItem | null {
     readOptionalString(value, ["meaningKo"]) ??
     readOptionalString(value, ["meaning", "koMeaning", "koreanMeaning"]);
   if (!sentence || !meaningKo) return null;
+  const vocabularyHints = parseSentenceVocabularyHints(value);
   return {
     sentence,
     ...(sentenceHira && sentenceHira.length > 0 ? { sentenceHira } : {}),
     meaningKo,
+    ...(vocabularyHints ? { vocabularyHints } : {}),
   };
 }
 
@@ -758,14 +815,24 @@ async function buildDailySentenceItems(
       const key = sentenceDedupKey(one.sentence);
       if (key && !used.has(key)) {
         used.add(key);
-        out.push({ sentence: one.sentence, meaningKo: one.meaningKo });
+        out.push({
+          sentence: one.sentence,
+          meaningKo: one.meaningKo,
+          ...(one.sentenceHira ? { sentenceHira: one.sentenceHira } : {}),
+          ...(one.vocabularyHints ? { vocabularyHints: one.vocabularyHints } : {}),
+        });
       }
     } catch {
       const fb = fallbackSentence(internalLang, level);
       const fk = `${sentenceDedupKey(fb.sentence)}#${out.length}`;
       if (!used.has(fk)) {
         used.add(fk);
-        out.push({ sentence: fb.sentence, meaningKo: fb.meaningKo });
+        out.push({
+          sentence: fb.sentence,
+          meaningKo: fb.meaningKo,
+          ...(fb.sentenceHira ? { sentenceHira: fb.sentenceHira } : {}),
+          ...(fb.vocabularyHints ? { vocabularyHints: fb.vocabularyHints } : {}),
+        });
       }
     }
   }
@@ -986,6 +1053,9 @@ async function popSentenceFromTodaySet(
       sentence: picked.sentence,
       meaningKo: picked.meaningKo,
       ...(picked.sentenceHira ? { sentenceHira: picked.sentenceHira } : {}),
+      ...(picked.vocabularyHints && picked.vocabularyHints.length > 0
+          ? { vocabularyHints: picked.vocabularyHints }
+          : {}),
       debugSource: "daily_set",
     };
   });

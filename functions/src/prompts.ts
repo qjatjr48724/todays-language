@@ -84,6 +84,9 @@ export function buildSentenceSystemPrompt(targetLanguage: string, level: string)
     "Keep it natural and suitable for daily conversation or study.",
     "Return ONLY a raw JSON object (no markdown, no extra text).",
     "Required keys: sentence, meaningKo.",
+    "Also include vocabularyHints: an array of 3 to 6 objects {word, meaningKo}.",
+    "Each word must be a substring that actually appears in sentence (same spelling/casing as in the sentence). meaningKo is a short Korean gloss for that expression.",
+    "Pick useful chunks (words or short phrases), not the whole sentence.",
     "If targetLanguage is ja and the sentence includes kanji, also include sentenceHira (the same sentence written in hiragana only, for confirmation).",
     "If targetLanguage is ja and level is beginner, use hiragana only where possible; avoid kanji and katakana except proper nouns if unavoidable.",
   ].join(" ");
@@ -154,8 +157,9 @@ export function buildDailySentenceBatchSystemPrompt(
     "Each sentence must be unique and useful for daily study.",
     vocabLine,
     "Return ONLY a raw JSON object (no markdown, no extra text).",
-    "Shape: {\"sentences\":[{\"sentence\":string,\"meaningKo\":string,\"sentenceHira\":string?}, ...]}",
+    "Shape: {\"sentences\":[{\"sentence\":string,\"meaningKo\":string,\"sentenceHira\":string?,\"vocabularyHints\":[{word:string,meaningKo:string},...]}, ...]}",
     `The \"sentences\" array MUST have length exactly ${count}.`,
+    "For each sentence, vocabularyHints MUST have 3 to 6 items; each word must appear as a substring in that sentence; meaningKo is Korean.",
     "If targetLanguage is ja and level is beginner, use hiragana only where possible; avoid kanji and katakana except proper nouns if unavoidable.",
     "If targetLanguage is ja and a sentence includes kanji, include sentenceHira for that item (hiragana only).",
   ].join(" ");
