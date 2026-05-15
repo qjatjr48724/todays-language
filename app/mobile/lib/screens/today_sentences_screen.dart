@@ -247,25 +247,10 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
                     ),
               ),
               if (_vocabHints.isNotEmpty) ...[
+                const SizedBox(height: 20),
+                Divider(height: 1, thickness: 1, color: scheme.outlineVariant),
                 const SizedBox(height: 16),
-                Text(
-                  l10n.sentences_vocab_section_title,
-                  style: textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                ..._vocabHints.map(
-                  (h) => Padding(
-                    padding: const EdgeInsets.only(bottom: 6),
-                    child: Text(
-                      l10n.sentences_vocab_row(h.meaningKo, h.word),
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
-                ),
+                _VocabularyHintsCard(l10n: l10n, hints: _vocabHints),
               ],
             ],
             const Spacer(),
@@ -323,6 +308,93 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
             if (_error != null) ...[
               const SizedBox(height: 12),
               Text(_error!, style: TextStyle(color: scheme.error)),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+/// 문장 속 표현: 목업과 같이 한 카드 안에 행(뜻 → 표현)으로 묶는다.
+class _VocabularyHintsCard extends StatelessWidget {
+  const _VocabularyHintsCard({
+    required this.l10n,
+    required this.hints,
+  });
+
+  final AppLocalizations l10n;
+  final List<_SentenceVocabHint> hints;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Card(
+      elevation: 0,
+      color: scheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: scheme.outlineVariant),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.sentences_vocab_section_title,
+              style: textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: scheme.onSurface,
+              ),
+            ),
+            const SizedBox(height: 12),
+            for (var i = 0; i < hints.length; i++) ...[
+              if (i > 0)
+                Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: scheme.outlineVariant.withValues(alpha: 0.65),
+                ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        hints[i].meaningKo,
+                        style: textTheme.bodyLarge?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Icon(
+                        Icons.arrow_forward_rounded,
+                        size: 20,
+                        color: scheme.outline,
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        hints[i].word,
+                        textAlign: TextAlign.right,
+                        style: textTheme.bodyLarge?.copyWith(
+                          color: scheme.onSurface,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ],
         ),
