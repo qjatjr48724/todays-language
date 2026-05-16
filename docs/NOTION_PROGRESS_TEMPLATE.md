@@ -1134,3 +1134,43 @@ unauthenticated: 로그인 상태 확인
 2. `docs/CLAUDE.md` 줄바꿈만 다른 변경 시 `git restore`로 정리
 3. (선택) 미사용 i18n 키 정리 (`words_example_prefix` 등)
 
+---
+
+## [단계 26] now_progress 2026-05-17 갱신 · Notion 진행상황 동기화
+
+### 1) 오늘 한 일
+
+- **`docs/now_progress_2026-05-02.md` 전면 갱신 (기준일 2026-05-17)**
+  - 기능명세 매핑 표에 **플랫폼 열**(공통 / Android / iOS) 추가 — 알림, Apple 로그인, 스토어 리뷰 등 행 분리
+  - 구현 상태 반영: 알림 권한(구현), 마무리 4지선다·예문 카드·문장 속 표현, 진도 목표(word 30 / sentence 10 / quiz 25)
+  - **로드맵 우선순위** 확정: 1순위 **기초 문자표** → 2순위 커뮤니티·채팅 → 3순위 코스메틱 스킨
+  - 2·3순위 도입 전 **필수 정책·가이드라인** 체크리스트(이용약관, UGC, 신고·차단, rate limit 등)
+  - 명칭 「**기초 문자표**」로 통일
+- **Notion 진행상황 페이지 업데이트**
+  - 페이지: [Today's Language 진행상황 (2026-05-17)](https://www.notion.so/35f72820750a81afa6dfd38c57ff1647) (`35f72820750a81afa6dfd38c57ff1647`)
+  - 제목·본문을 `now_progress` 요약본으로 교체(오늘 반영 요약, 매핑 표, 로드맵, 정책 요약, 빌드 메모)
+- **커밋 제외(검토용):** `docs/dev-copy.md` — 범용/프로젝트 규칙 분리 초안, 레포에 미포함
+
+### 2) 완료 기준 체크
+
+- [x] `now_progress` 문서가 현재 코드·정책 결정과 정합
+- [x] Notion 페이지 제목·본문 갱신 확인(브라우저)
+- [ ] (선택) `git push`로 원격 반영
+
+### 3) 추가/변경한 코드·문서 포인트
+
+- 파일:
+  - `docs/now_progress_2026-05-02.md`
+  - `docs/NOTION_PROGRESS_TEMPLATE.md` (본 단계)
+- Notion: `user-Notion` MCP `notion-update-page` (title + `replace_content`)
+
+### 4) 이슈/막힌 점
+
+- Notion 본문은 가독성상 표 행 수를 레포 정본보다 압축 — 상세는 `docs/now_progress_2026-05-02.md` 유지
+
+### 5) 다음 액션 (선택)
+
+1. `docs/dev-copy.md` 검토 후 정본 규칙 반영 여부 결정
+2. 1순위 **기초 문자표** 기획·화면 스펙 초안
+3. `git push` 및 팀 Notion 링크 공유
+
