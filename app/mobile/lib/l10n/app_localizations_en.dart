@@ -198,6 +198,84 @@ class AppLocalizationsEn extends AppLocalizations {
   String get home_home_tab_title => 'Home';
 
   @override
+  String get home_basic_characters_button => 'Study basic characters';
+
+  @override
+  String get home_basic_characters_subtitle =>
+      'Table: character · sound · spelling';
+
+  @override
+  String get basic_characters_screen_title => 'Basic characters';
+
+  @override
+  String get basic_characters_option_kor_ganada =>
+      'Korean (Hangul / 가나다 order)';
+
+  @override
+  String get basic_characters_option_eng_alphabet => 'English (alphabet)';
+
+  @override
+  String get basic_characters_option_jpn_hiragana => 'Japanese (hiragana)';
+
+  @override
+  String get basic_characters_option_jpn_katakana => 'Japanese (katakana)';
+
+  @override
+  String get basic_characters_option_fra => 'French';
+
+  @override
+  String get basic_characters_option_deu => 'German';
+
+  @override
+  String get basic_characters_option_esp => 'Spanish';
+
+  @override
+  String get basic_characters_col_character => 'Character';
+
+  @override
+  String get basic_characters_col_pronunciation => 'Pronunciation';
+
+  @override
+  String basic_characters_col_pronunciation_for_locale(String language) {
+    return 'Pronunciation ($language)';
+  }
+
+  @override
+  String get basic_characters_col_orthography => 'Spelling / notes';
+
+  @override
+  String get basic_characters_kor_tab_all => 'All';
+
+  @override
+  String get basic_characters_kor_tab_consonants => 'Consonants';
+
+  @override
+  String get basic_characters_kor_tab_vowels => 'Vowels';
+
+  @override
+  String get basic_characters_kor_matrix_hint =>
+      'Columns: vowels · Rows: consonants';
+
+  @override
+  String get basic_characters_kor_section_consonants => 'Consonants';
+
+  @override
+  String get basic_characters_kor_section_vowels => 'Vowels';
+
+  @override
+  String get basic_characters_kor_section_syllables =>
+      'Consonant + vowel (가나다 order)';
+
+  @override
+  String get basic_characters_ui_lang_ko => 'Korean (app UI)';
+
+  @override
+  String get basic_characters_ui_lang_en => 'English (app UI)';
+
+  @override
+  String get basic_characters_ui_lang_ja => 'Japanese (app UI)';
+
+  @override
   String get home_today_words_title => 'Today\'s Words';
 
   @override
@@ -944,6 +1022,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String admin_tools_enabled_label(Object value) {
     return 'enabled=$value';
   }
+
+  @override
+  String get admin_tools_section_daily_progress => 'Today\'s progress (debug)';
 
   @override
   String get admin_tools_section_learning_set => 'Learning set';

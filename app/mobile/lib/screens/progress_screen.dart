@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../services/daily_progress_sync.dart';
+import '../ui/bordered_linear_progress.dart';
 import '../ui/section_card.dart';
 import '../utils/kst_date.dart';
 import '../l10n/app_localizations.dart';
@@ -215,12 +216,6 @@ class _ProgressScreenState extends State<ProgressScreen> {
                   final hasAny =
                       (wordDone + sentenceDone + quizDone) > 0 || percent > 0;
 
-                  Color barColor() {
-                    if (percent >= 80) return Colors.green;
-                    if (percent >= 40) return Colors.orange;
-                    return Colors.red;
-                  }
-
                   return Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -243,16 +238,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       Row(
                         children: [
                           Expanded(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(999),
-                              child: LinearProgressIndicator(
-                                value: (percent / 100).clamp(0.0, 1.0),
-                                minHeight: 12,
-                                backgroundColor: scheme.surfaceContainerHighest,
-                                valueColor:
-                                    AlwaysStoppedAnimation<Color>(barColor()),
-                              ),
-                            ),
+                            child: BorderedLinearProgress(percent: percent),
                           ),
                           const SizedBox(width: 12),
                           Text(l10n.common_percent(percent)),
@@ -527,17 +513,17 @@ class _ProgressScreenState extends State<ProgressScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                LinearProgressIndicator(
-                                  value: (p.progressPercent / 100).clamp(0.0, 1.0),
-                                  minHeight: 14,
-                                  color: p.progressPercent >= 80
-                                      ? Colors.green
-                                      : p.progressPercent >= 40
-                                          ? Colors.orange
-                                          : Colors.red,
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: BorderedLinearProgress(
+                                        percent: p.progressPercent,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(l10n.common_percent(p.progressPercent)),
+                                  ],
                                 ),
-                                const SizedBox(height: 8),
-                                Text(l10n.common_percent(p.progressPercent)),
                                 const SizedBox(height: 12),
                                 Text(
                                   l10n.progress_word_line(

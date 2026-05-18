@@ -62,6 +62,36 @@
 
   "home_my_info_tooltip": "My Info",
   "home_home_tab_title": "Home",
+  "home_basic_characters_button": "Study basic characters",
+  "home_basic_characters_subtitle": "Table: character · sound · spelling",
+  "basic_characters_screen_title": "Basic characters",
+  "basic_characters_option_kor_ganada": "Korean (Hangul / 가나다 order)",
+  "basic_characters_option_eng_alphabet": "English (alphabet)",
+  "basic_characters_option_jpn_hiragana": "Japanese (hiragana)",
+  "basic_characters_option_jpn_katakana": "Japanese (katakana)",
+  "basic_characters_option_fra": "French",
+  "basic_characters_option_deu": "German",
+  "basic_characters_option_esp": "Spanish",
+  "basic_characters_col_character": "Character",
+  "basic_characters_col_pronunciation": "Pronunciation",
+  "basic_characters_col_pronunciation_for_locale": "Pronunciation ({language})",
+  "@basic_characters_col_pronunciation_for_locale": {
+    "placeholders": {
+      "language": { "type": "String" }
+    }
+  },
+  "basic_characters_col_orthography": "Spelling / notes",
+  "basic_characters_kor_tab_all": "All",
+  "basic_characters_kor_tab_consonants": "Consonants",
+  "basic_characters_kor_tab_vowels": "Vowels",
+  "basic_characters_kor_matrix_hint": "Columns: vowels · Rows: consonants",
+  "basic_characters_kor_section_consonants": "Consonants",
+  "basic_characters_kor_section_vowels": "Vowels",
+  "basic_characters_kor_section_syllables": "Consonant + vowel (가나다 order)",
+  "basic_characters_ui_lang_ko": "Korean (app UI)",
+  "basic_characters_ui_lang_en": "English (app UI)",
+  "basic_characters_ui_lang_ja": "Japanese (app UI)",
+
   "home_today_words_title": "Today's Words",
   "home_today_words_subtitle": "30 per day",
   "home_today_sentences_title": "Today's Sentences",
@@ -363,6 +393,7 @@
   "admin_tools_cache_empty": "public_metadata/countries/items is empty. Run seedCountryCatalog first.",
   "admin_tools_enabled_label": "enabled={value}",
 
+  "admin_tools_section_daily_progress": "Today's progress (debug)",
   "admin_tools_section_learning_set": "Learning set",
   "admin_tools_ensure_learning_set": "ensureLearningSetForToday (current profile)"
 }

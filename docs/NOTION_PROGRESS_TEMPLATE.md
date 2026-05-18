@@ -1174,3 +1174,60 @@ unauthenticated: 로그인 상태 확인
 2. 1순위 **기초 문자표** 기획·화면 스펙 초안
 3. `git push` 및 팀 Notion 링크 공유
 
+---
+
+## [단계 27] 기초 문자표(1순위) 구현 · 홈 UX · Notion 2026-05-18 동기화
+
+### 1) 오늘 한 일
+
+- **기초 문자표 화면 (`BasicCharacterChartScreen`)**
+  - 홈 상단 `HomeFeatureCard(compactRow)` → 기초문자 공부하기 진입
+  - 언어 선택 7종: 한국어(가나다), 영어, 일본어 히라가나/카타카나, 프랑스어, 독일어, 스페인어
+  - 한국어: **전체 / 자음 / 모음** 탭 — 전체는 자음×모음 **조합표**(가로 스크롤), 자음·모음은 2열(문자 | 발음)
+  - 그 외 언어: 3열(문자 | 발음 | 표기법), 한국어는 표기법 열 없음
+  - 발음 열: **디바이스 UI 로케일**(`ko`/`ja`/미지원→`en`) — `BasicCharacterKorPronunciation`
+  - 언어 선택 UI: `MenuAnchor`로 **아래 방향만** 메뉴 펼침 (크기 축소 시도 후 원복)
+- **데이터·로직**
+  - `basic_character_chart_repository.dart` 정적 차트 + `basic_character_kor_combine.dart` 한글 조합
+  - `basic_character_entry.dart` 모델
+- **홈·진행률 UI 보조**
+  - `bordered_linear_progress.dart`, `home_feature_card` compactRow, 홈 AppBar·진행 요약 정리
+  - 관리자: 진행률 초기화 등 (`admin_tools_screen`)
+- **i18n:** `basic_characters_*` 키 ko/en/ja + `flutter gen-l10n`
+- **테스트:** `basic_character_chart_repository_test.dart`, `basic_character_kor_combine_test.dart`
+- **문서:** `docs/now_progress_2026-05-02.md` 기준일 **2026-05-18**, 기초 문자표 **구현** 반영
+- **Notion:** [Today's Language 진행상황](https://www.notion.so/35f72820750a81afa6dfd38c57ff1647) 제목·본문 **2026-05-18** 갱신
+
+### 2) 완료 기준 체크
+
+- [x] `flutter gen-l10n` · `flutter analyze` · 관련 `flutter test` 통과
+- [x] 한국어 전체 탭 조합표·자음/모음 탭·다른 언어 3열 수동 확인 권장
+- [x] Notion 진행상황 페이지 갱신
+- [ ] (선택) `git push`
+
+### 3) 추가/변경한 코드 포인트
+
+- 신규:
+  - `app/mobile/lib/screens/basic_character_chart_screen.dart`
+  - `app/mobile/lib/services/basic_character_chart_repository.dart`
+  - `app/mobile/lib/services/basic_character_kor_pronunciation.dart`
+  - `app/mobile/lib/services/basic_character_kor_combine.dart`
+  - `app/mobile/lib/models/basic_character_entry.dart`
+  - `app/mobile/lib/ui/bordered_linear_progress.dart`
+  - `app/mobile/test/basic_character_chart_repository_test.dart`
+  - `app/mobile/test/basic_character_kor_combine_test.dart`
+- 수정:
+  - `app/mobile/lib/screens/home_screen.dart`, `home_feature_card.dart`
+  - `app/mobile/lib/screens/progress_screen.dart`, `admin_tools_screen.dart`
+  - `app/mobile/lib/l10n/app_*.arb`, `app_localizations*.dart`
+
+### 4) 이슈/막힌 점
+
+- 없음 (언어 선택 40% 축소는 사용자 피드백으로 **원복**)
+
+### 5) 다음 액션 (선택)
+
+1. `git push` 및 실기기에서 7개 차트·조합표 스크롤 UX 확인
+2. 기초 문자표 Firestore/CMS 연동 여부 기획 검토(현재 정적 데이터)
+3. 2순위 커뮤니티·채팅 정책 초안
+

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'language_setup_screen.dart';
 import 'target_language_setup_screen.dart';
 import '../l10n/app_localizations.dart';
+import '../services/daily_progress_sync.dart';
 
 class AdminToolsScreen extends StatefulWidget {
   const AdminToolsScreen({super.key});
@@ -232,6 +233,29 @@ class _AdminToolsScreenState extends State<AdminToolsScreen> {
                       ],
                     );
                   },
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 16),
+            _Section(
+              title: l10n.admin_tools_section_daily_progress,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: () async {
+                    final ok = await _confirm(
+                      l10n.home_reset_dialog_title,
+                      l10n.home_reset_dialog_content,
+                    );
+                    if (!ok) {
+                      return;
+                    }
+                    await _run(() async {
+                      await resetTodayDailyProgress(user);
+                    });
+                  },
+                  icon: const Icon(Icons.restart_alt),
+                  label: Text(l10n.home_reset_debug_button_label),
                 ),
               ],
             ),

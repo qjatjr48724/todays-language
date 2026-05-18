@@ -8,12 +8,14 @@ import 'dart:async';
 import '../services/daily_progress_sync.dart';
 import '../services/user_profile_sync.dart';
 import '../services/user_prefs.dart';
+import '../ui/bordered_linear_progress.dart';
 import '../ui/home_feature_card.dart';
 import '../ui/section_card.dart';
 import 'my_info_screen.dart';
 import 'today_sentences_screen.dart';
 import 'today_words_screen.dart';
 import 'today_wrap_up_screen.dart';
+import 'basic_character_chart_screen.dart';
 import '../utils/kst_date.dart';
 import '../l10n/app_localizations.dart';
 
@@ -31,7 +33,6 @@ class _HomeScreenState extends State<HomeScreen> {
   DailyProgressView? _todayProgress;
   UserPrefs _prefs = UserPrefs.fallback();
   bool _loadingProgress = true;
-  bool _resettingProgress = false;
   StreamSubscription? _profileSub;
 
   @override
@@ -125,74 +126,11 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<void> _resetTodayProgress() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
-    final l10n = AppLocalizations.of(context)!;
-    setState(() => _resettingProgress = true);
-    try {
-      final p = await resetTodayDailyProgress(user);
-      if (!mounted) return;
-      setState(() => _todayProgress = p);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.home_reset_success)),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.home_reset_failed(e.toString()))),
-      );
-    } finally {
-      if (mounted) setState(() => _resettingProgress = false);
-    }
-  }
-
-  Future<void> _confirmAndResetTodayProgress() async {
-    if (_resettingProgress) return;
-    final l10n = AppLocalizations.of(context)!;
-    final shouldReset = await showDialog<bool>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(l10n.home_reset_dialog_title),
-          content: Text(l10n.home_reset_dialog_content),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: Text(l10n.home_cancel),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: Text(l10n.home_reset),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (shouldReset == true) {
-      await _resetTodayProgress();
-    }
-  }
-
   int _computedProgressPercent(DailyProgressView p) {
     final totalGoal = p.wordGoal + p.sentenceGoal + p.quizGoal;
     if (totalGoal <= 0) return 0;
     final totalDone = p.wordDone + p.sentenceDone + p.quizDone;
     return ((totalDone / totalGoal) * 100).round().clamp(0, 100);
-  }
-
-  Color _progressColor(ColorScheme scheme, int percent) {
-    if (percent >= 80) return Colors.green;
-    if (percent >= 40) return Colors.orange;
-    return Colors.red;
-  }
-
-  double _progressValue01(int percent) {
-    // 0%일 때는 채움이 아예 없어 색이 안 보이므로,
-    // UI상 최소 표시값을 주되 텍스트는 0%로 유지합니다.
-    if (percent <= 0) return 0.02;
-    return (percent / 100).clamp(0.0, 1.0);
   }
 
   @override
@@ -212,6 +150,23 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text(l10n.launch_subtitle),
         actions: [
+          if (user?.email != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 4),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 160),
+                  child: Text(
+                    user!.email!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                        ),
+                  ),
+                ),
+              ),
+            ),
           if (widget.showMyInfoButton)
             IconButton(
               icon: const Icon(Icons.person_outline),
@@ -231,28 +186,27 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    l10n.home_home_tab_title,
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                ),
-                if (user?.email != null)
-                  Text(
-                    user!.email!,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodySmall
-                        ?.copyWith(color: scheme.onSurfaceVariant),
-                  ),
-              ],
-            ),
             if (_profileError != null) ...[
               const SizedBox(height: 8),
               Text(_profileError!, style: TextStyle(color: scheme.error)),
             ],
+            const SizedBox(height: 16),
+
+            HomeFeatureCard(
+              title: l10n.home_basic_characters_button,
+              subtitle: l10n.home_basic_characters_subtitle,
+              icon: Icons.grid_on_outlined,
+              compactRow: true,
+              onTap: () {
+                Navigator.of(context)
+                    .push(
+                  MaterialPageRoute(
+                    builder: (_) => const BasicCharacterChartScreen(),
+                  ),
+                )
+                    .then((_) => _refreshTodayProgress());
+              },
+            ),
             const SizedBox(height: 16),
 
             GridView.count(
@@ -331,7 +285,12 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 16),
             SectionCard(
               title: l10n.home_progress_section_title,
-              subtitle: l10n.home_progress_section_subtitle_prefix(todayKstYyyyMmDd()),
+              trailing: Text(
+                l10n.home_progress_section_subtitle_prefix(todayKstYyyyMmDd()),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
+              ),
               child: _loadingProgress
                   ? const LinearProgressIndicator()
                   : (percent == null)
@@ -342,56 +301,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             Row(
                               children: [
                                 Expanded(
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(999),
-                                    child: LinearProgressIndicator(
-                                      value: _progressValue01(percent),
-                                      minHeight: 12,
-                                      backgroundColor:
-                                          scheme.surfaceContainerHighest,
-                                      valueColor: AlwaysStoppedAnimation(
-                                        _progressColor(scheme, percent),
-                                      ),
-                                    ),
+                                  child: BorderedLinearProgress(
+                                    percent: percent,
                                   ),
                                 ),
                                 const SizedBox(width: 12),
-                              Text(l10n.common_percent(percent)),
+                                Text(l10n.common_percent(percent)),
                               ],
                             ),
-                            const SizedBox(height: 10),
-                            if (p != null)
-                              Text(
-                            // gen-l10n 인자 순서: quiz*, sentence*, word* (알파벳순)
-                            l10n.home_progress_counts(
-                              p.quizDone,
-                              p.quizGoal,
-                              p.sentenceDone,
-                              p.sentenceGoal,
-                              p.wordDone,
-                              p.wordGoal,
-                            ),
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium
-                                    ?.copyWith(color: scheme.onSurfaceVariant),
-                              ),
-                            if (kDebugMode) ...[
-                              const SizedBox(height: 12),
-                              OutlinedButton.icon(
-                                onPressed: _resettingProgress
-                                    ? null
-                                    : _confirmAndResetTodayProgress,
-                                icon: _resettingProgress
-                                    ? const SizedBox(
-                                        width: 18,
-                                        height: 18,
-                                        child: CircularProgressIndicator(strokeWidth: 2),
-                                      )
-                                    : const Icon(Icons.restart_alt),
-                                label: Text(l10n.home_reset_debug_button_label),
-                              ),
-                            ],
                           ],
                         ),
             ),

@@ -418,6 +418,150 @@ abstract class AppLocalizations {
   /// **'홈'**
   String get home_home_tab_title;
 
+  /// No description provided for @home_basic_characters_button.
+  ///
+  /// In ko, this message translates to:
+  /// **'기초 문자 공부하기'**
+  String get home_basic_characters_button;
+
+  /// No description provided for @home_basic_characters_subtitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'문자 · 발음 · 표기법 표로 보기'**
+  String get home_basic_characters_subtitle;
+
+  /// No description provided for @basic_characters_screen_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'기초문자 공부하기'**
+  String get basic_characters_screen_title;
+
+  /// No description provided for @basic_characters_option_kor_ganada.
+  ///
+  /// In ko, this message translates to:
+  /// **'한국어(가나다)'**
+  String get basic_characters_option_kor_ganada;
+
+  /// No description provided for @basic_characters_option_eng_alphabet.
+  ///
+  /// In ko, this message translates to:
+  /// **'영어(알파벳)'**
+  String get basic_characters_option_eng_alphabet;
+
+  /// No description provided for @basic_characters_option_jpn_hiragana.
+  ///
+  /// In ko, this message translates to:
+  /// **'일본어(히라가나)'**
+  String get basic_characters_option_jpn_hiragana;
+
+  /// No description provided for @basic_characters_option_jpn_katakana.
+  ///
+  /// In ko, this message translates to:
+  /// **'일본어(카타카나)'**
+  String get basic_characters_option_jpn_katakana;
+
+  /// No description provided for @basic_characters_option_fra.
+  ///
+  /// In ko, this message translates to:
+  /// **'프랑스어'**
+  String get basic_characters_option_fra;
+
+  /// No description provided for @basic_characters_option_deu.
+  ///
+  /// In ko, this message translates to:
+  /// **'독일어'**
+  String get basic_characters_option_deu;
+
+  /// No description provided for @basic_characters_option_esp.
+  ///
+  /// In ko, this message translates to:
+  /// **'스페인어'**
+  String get basic_characters_option_esp;
+
+  /// No description provided for @basic_characters_col_character.
+  ///
+  /// In ko, this message translates to:
+  /// **'문자'**
+  String get basic_characters_col_character;
+
+  /// No description provided for @basic_characters_col_pronunciation.
+  ///
+  /// In ko, this message translates to:
+  /// **'발음'**
+  String get basic_characters_col_pronunciation;
+
+  /// No description provided for @basic_characters_col_pronunciation_for_locale.
+  ///
+  /// In ko, this message translates to:
+  /// **'발음 ({language})'**
+  String basic_characters_col_pronunciation_for_locale(String language);
+
+  /// No description provided for @basic_characters_col_orthography.
+  ///
+  /// In ko, this message translates to:
+  /// **'표기법'**
+  String get basic_characters_col_orthography;
+
+  /// No description provided for @basic_characters_kor_tab_all.
+  ///
+  /// In ko, this message translates to:
+  /// **'전체'**
+  String get basic_characters_kor_tab_all;
+
+  /// No description provided for @basic_characters_kor_tab_consonants.
+  ///
+  /// In ko, this message translates to:
+  /// **'자음'**
+  String get basic_characters_kor_tab_consonants;
+
+  /// No description provided for @basic_characters_kor_tab_vowels.
+  ///
+  /// In ko, this message translates to:
+  /// **'모음'**
+  String get basic_characters_kor_tab_vowels;
+
+  /// No description provided for @basic_characters_kor_matrix_hint.
+  ///
+  /// In ko, this message translates to:
+  /// **'가로: 모음 · 세로: 자음'**
+  String get basic_characters_kor_matrix_hint;
+
+  /// No description provided for @basic_characters_kor_section_consonants.
+  ///
+  /// In ko, this message translates to:
+  /// **'자음'**
+  String get basic_characters_kor_section_consonants;
+
+  /// No description provided for @basic_characters_kor_section_vowels.
+  ///
+  /// In ko, this message translates to:
+  /// **'모음'**
+  String get basic_characters_kor_section_vowels;
+
+  /// No description provided for @basic_characters_kor_section_syllables.
+  ///
+  /// In ko, this message translates to:
+  /// **'자음 + 모음 (가나다 순)'**
+  String get basic_characters_kor_section_syllables;
+
+  /// No description provided for @basic_characters_ui_lang_ko.
+  ///
+  /// In ko, this message translates to:
+  /// **'한국어(앱 UI)'**
+  String get basic_characters_ui_lang_ko;
+
+  /// No description provided for @basic_characters_ui_lang_en.
+  ///
+  /// In ko, this message translates to:
+  /// **'English (app UI)'**
+  String get basic_characters_ui_lang_en;
+
+  /// No description provided for @basic_characters_ui_lang_ja.
+  ///
+  /// In ko, this message translates to:
+  /// **'日本語(UI)'**
+  String get basic_characters_ui_lang_ja;
+
   /// No description provided for @home_today_words_title.
   ///
   /// In ko, this message translates to:
@@ -1684,6 +1828,12 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'enabled={value}'**
   String admin_tools_enabled_label(Object value);
+
+  /// No description provided for @admin_tools_section_daily_progress.
+  ///
+  /// In ko, this message translates to:
+  /// **'오늘 진행률 (디버그)'**
+  String get admin_tools_section_daily_progress;
 
   /// No description provided for @admin_tools_section_learning_set.
   ///

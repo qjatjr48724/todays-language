@@ -62,6 +62,36 @@
 
   "home_my_info_tooltip": "マイ情報",
   "home_home_tab_title": "ホーム",
+  "home_basic_characters_button": "基礎文字を学ぶ",
+  "home_basic_characters_subtitle": "文字・発音・表記を表で",
+  "basic_characters_screen_title": "基礎文字",
+  "basic_characters_option_kor_ganada": "韓国語（ハングル・가나다順）",
+  "basic_characters_option_eng_alphabet": "英語（アルファベット）",
+  "basic_characters_option_jpn_hiragana": "日本語（ひらがな）",
+  "basic_characters_option_jpn_katakana": "日本語（カタカナ）",
+  "basic_characters_option_fra": "フランス語",
+  "basic_characters_option_deu": "ドイツ語",
+  "basic_characters_option_esp": "スペイン語",
+  "basic_characters_col_character": "文字",
+  "basic_characters_col_pronunciation": "発音",
+  "basic_characters_col_pronunciation_for_locale": "発音（{language}）",
+  "@basic_characters_col_pronunciation_for_locale": {
+    "placeholders": {
+      "language": { "type": "String" }
+    }
+  },
+  "basic_characters_col_orthography": "表記・メモ",
+  "basic_characters_kor_tab_all": "全体",
+  "basic_characters_kor_tab_consonants": "子音",
+  "basic_characters_kor_tab_vowels": "母音",
+  "basic_characters_kor_matrix_hint": "横：母音 · 縦：子音",
+  "basic_characters_kor_section_consonants": "子音",
+  "basic_characters_kor_section_vowels": "母音",
+  "basic_characters_kor_section_syllables": "子音＋母音（가나다順）",
+  "basic_characters_ui_lang_ko": "韓国語（アプリUI）",
+  "basic_characters_ui_lang_en": "英語（アプリUI）",
+  "basic_characters_ui_lang_ja": "日本語（アプリUI）",
+
   "home_today_words_title": "今日の単語",
   "home_today_words_subtitle": "毎日30個",
   "home_today_sentences_title": "今日の文",
@@ -363,6 +393,7 @@
   "admin_tools_cache_empty": "public_metadata/countries/items が空です。先に seedCountryCatalog を実行してください。",
   "admin_tools_enabled_label": "enabled={value}",
 
+  "admin_tools_section_daily_progress": "今日の進捗（デバッグ）",
   "admin_tools_section_learning_set": "学習セット",
   "admin_tools_ensure_learning_set": "ensureLearningSetForToday（現在のプロフィール）"
 }

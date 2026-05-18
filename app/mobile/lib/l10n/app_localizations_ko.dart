@@ -188,6 +188,80 @@ class AppLocalizationsKo extends AppLocalizations {
   String get home_home_tab_title => '홈';
 
   @override
+  String get home_basic_characters_button => '기초 문자 공부하기';
+
+  @override
+  String get home_basic_characters_subtitle => '문자 · 발음 · 표기법 표로 보기';
+
+  @override
+  String get basic_characters_screen_title => '기초문자 공부하기';
+
+  @override
+  String get basic_characters_option_kor_ganada => '한국어(가나다)';
+
+  @override
+  String get basic_characters_option_eng_alphabet => '영어(알파벳)';
+
+  @override
+  String get basic_characters_option_jpn_hiragana => '일본어(히라가나)';
+
+  @override
+  String get basic_characters_option_jpn_katakana => '일본어(카타카나)';
+
+  @override
+  String get basic_characters_option_fra => '프랑스어';
+
+  @override
+  String get basic_characters_option_deu => '독일어';
+
+  @override
+  String get basic_characters_option_esp => '스페인어';
+
+  @override
+  String get basic_characters_col_character => '문자';
+
+  @override
+  String get basic_characters_col_pronunciation => '발음';
+
+  @override
+  String basic_characters_col_pronunciation_for_locale(String language) {
+    return '발음 ($language)';
+  }
+
+  @override
+  String get basic_characters_col_orthography => '표기법';
+
+  @override
+  String get basic_characters_kor_tab_all => '전체';
+
+  @override
+  String get basic_characters_kor_tab_consonants => '자음';
+
+  @override
+  String get basic_characters_kor_tab_vowels => '모음';
+
+  @override
+  String get basic_characters_kor_matrix_hint => '가로: 모음 · 세로: 자음';
+
+  @override
+  String get basic_characters_kor_section_consonants => '자음';
+
+  @override
+  String get basic_characters_kor_section_vowels => '모음';
+
+  @override
+  String get basic_characters_kor_section_syllables => '자음 + 모음 (가나다 순)';
+
+  @override
+  String get basic_characters_ui_lang_ko => '한국어(앱 UI)';
+
+  @override
+  String get basic_characters_ui_lang_en => 'English (app UI)';
+
+  @override
+  String get basic_characters_ui_lang_ja => '日本語(UI)';
+
+  @override
   String get home_today_words_title => '오늘의 단어';
 
   @override
@@ -906,6 +980,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String admin_tools_enabled_label(Object value) {
     return 'enabled=$value';
   }
+
+  @override
+  String get admin_tools_section_daily_progress => '오늘 진행률 (디버그)';
 
   @override
   String get admin_tools_section_learning_set => '학습 세트';

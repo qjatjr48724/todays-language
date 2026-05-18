@@ -189,6 +189,80 @@ class AppLocalizationsJa extends AppLocalizations {
   String get home_home_tab_title => 'ホーム';
 
   @override
+  String get home_basic_characters_button => '基礎文字を学ぶ';
+
+  @override
+  String get home_basic_characters_subtitle => '文字・発音・表記を表で';
+
+  @override
+  String get basic_characters_screen_title => '基礎文字';
+
+  @override
+  String get basic_characters_option_kor_ganada => '韓国語（ハングル・가나다順）';
+
+  @override
+  String get basic_characters_option_eng_alphabet => '英語（アルファベット）';
+
+  @override
+  String get basic_characters_option_jpn_hiragana => '日本語（ひらがな）';
+
+  @override
+  String get basic_characters_option_jpn_katakana => '日本語（カタカナ）';
+
+  @override
+  String get basic_characters_option_fra => 'フランス語';
+
+  @override
+  String get basic_characters_option_deu => 'ドイツ語';
+
+  @override
+  String get basic_characters_option_esp => 'スペイン語';
+
+  @override
+  String get basic_characters_col_character => '文字';
+
+  @override
+  String get basic_characters_col_pronunciation => '発音';
+
+  @override
+  String basic_characters_col_pronunciation_for_locale(String language) {
+    return '発音（$language）';
+  }
+
+  @override
+  String get basic_characters_col_orthography => '表記・メモ';
+
+  @override
+  String get basic_characters_kor_tab_all => '全体';
+
+  @override
+  String get basic_characters_kor_tab_consonants => '子音';
+
+  @override
+  String get basic_characters_kor_tab_vowels => '母音';
+
+  @override
+  String get basic_characters_kor_matrix_hint => '横：母音 · 縦：子音';
+
+  @override
+  String get basic_characters_kor_section_consonants => '子音';
+
+  @override
+  String get basic_characters_kor_section_vowels => '母音';
+
+  @override
+  String get basic_characters_kor_section_syllables => '子音＋母音（가나다順）';
+
+  @override
+  String get basic_characters_ui_lang_ko => '韓国語（アプリUI）';
+
+  @override
+  String get basic_characters_ui_lang_en => '英語（アプリUI）';
+
+  @override
+  String get basic_characters_ui_lang_ja => '日本語（アプリUI）';
+
+  @override
   String get home_today_words_title => '今日の単語';
 
   @override
@@ -907,6 +981,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String admin_tools_enabled_label(Object value) {
     return 'enabled=$value';
   }
+
+  @override
+  String get admin_tools_section_daily_progress => '今日の進捗（デバッグ）';
 
   @override
   String get admin_tools_section_learning_set => '学習セット';
