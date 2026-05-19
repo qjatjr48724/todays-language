@@ -395,6 +395,19 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get my_info_language_restart_dialog_title => '언어 변경';
+
+  @override
+  String get my_info_language_restart_dialog_content =>
+      '변경한 언어를 적용하려면 앱을 다시 시작해야 합니다. 지금 다시 시작할까요?';
+
+  @override
+  String get my_info_language_restart_dialog_yes => '예';
+
+  @override
+  String get my_info_language_restart_dialog_no => '아니오';
+
+  @override
   String get my_info_difficulty_picker_title => '학습 난이도 선택';
 
   @override

@@ -1196,7 +1196,7 @@ unauthenticated: 로그인 상태 확인
 - **i18n:** `basic_characters_*` 키 ko/en/ja + `flutter gen-l10n`
 - **테스트:** `basic_character_chart_repository_test.dart`, `basic_character_kor_combine_test.dart`
 - **문서:** `docs/now_progress_2026-05-02.md` 기준일 **2026-05-18**, 기초 문자표 **구현** 반영
-- **Notion:** [Today's Language 진행상황](https://www.notion.so/35f72820750a81afa6dfd38c57ff1647) 제목·본문 **2026-05-18** 갱신
+- **Notion:** [Today's Language 진행상황 (2026-05-18)](https://www.notion.so/35f72820750a81afa6dfd38c57ff1647) — `plugin-notion-workspace-notion` MCP `replace_content` 반영 완료
 
 ### 2) 완료 기준 체크
 

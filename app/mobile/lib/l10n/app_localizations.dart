@@ -797,6 +797,30 @@ abstract class AppLocalizations {
   /// **'언어 저장은 됐지만 세트 준비에 실패했어요: {error}'**
   String my_info_language_save_failed_snackbar(Object error);
 
+  /// No description provided for @my_info_language_restart_dialog_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'언어 변경'**
+  String get my_info_language_restart_dialog_title;
+
+  /// No description provided for @my_info_language_restart_dialog_content.
+  ///
+  /// In ko, this message translates to:
+  /// **'변경한 언어를 적용하려면 앱을 다시 시작해야 합니다. 지금 다시 시작할까요?'**
+  String get my_info_language_restart_dialog_content;
+
+  /// No description provided for @my_info_language_restart_dialog_yes.
+  ///
+  /// In ko, this message translates to:
+  /// **'예'**
+  String get my_info_language_restart_dialog_yes;
+
+  /// No description provided for @my_info_language_restart_dialog_no.
+  ///
+  /// In ko, this message translates to:
+  /// **'아니오'**
+  String get my_info_language_restart_dialog_no;
+
   /// No description provided for @my_info_difficulty_picker_title.
   ///
   /// In ko, this message translates to:

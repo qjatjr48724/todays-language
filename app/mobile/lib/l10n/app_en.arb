@@ -146,6 +146,10 @@
   "my_info_language_picker_additional_disabled": "Coming soon (not selectable)",
   "my_info_language_saved_snackbar": "Language saved, and today’s problem set is ready.",
   "my_info_language_save_failed_snackbar": "Language saved, but preparing today’s set failed: {error}",
+  "my_info_language_restart_dialog_title": "Change language",
+  "my_info_language_restart_dialog_content": "The app needs to restart to apply the new language. Restart now?",
+  "my_info_language_restart_dialog_yes": "Yes",
+  "my_info_language_restart_dialog_no": "No",
 
   "my_info_difficulty_picker_title": "Select learning difficulty",
   "my_info_difficulty_tile_beginner_label": "Beginner (Kids/Intro)",

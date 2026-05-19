@@ -7,13 +7,41 @@ import 'firebase_options.dart';
 import 'screens/launch_screen.dart';
 import 'ui/app_theme.dart';
 import 'l10n/app_localizations.dart';
+import 'utils/app_restart.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp());
+  runApp(const AppRoot());
+}
+
+/// [AppRestart.restart] 시 [MyApp]을 새 Key로 다시 빌드합니다.
+class AppRoot extends StatefulWidget {
+  const AppRoot({super.key});
+
+  @override
+  State<AppRoot> createState() => _AppRootState();
+}
+
+class _AppRootState extends State<AppRoot> {
+  Key _appKey = UniqueKey();
+
+  @override
+  void initState() {
+    super.initState();
+    AppRestart.register(_restartApp);
+  }
+
+  void _restartApp() {
+    setState(() => _appKey = UniqueKey());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MyApp(key: _appKey);
+  }
 }
 
 class MyApp extends StatefulWidget {

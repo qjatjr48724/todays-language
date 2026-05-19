@@ -146,6 +146,10 @@
   "my_info_language_picker_additional_disabled": "追加予定（選択不可）",
   "my_info_language_saved_snackbar": "言語を保存しました。今日の問題セットを準備しました。",
   "my_info_language_save_failed_snackbar": "言語は保存されましたが、今日のセットの準備に失敗しました: {error}",
+  "my_info_language_restart_dialog_title": "言語の変更",
+  "my_info_language_restart_dialog_content": "変更した言語を反映するにはアプリの再起動が必要です。今すぐ再起動しますか？",
+  "my_info_language_restart_dialog_yes": "はい",
+  "my_info_language_restart_dialog_no": "いいえ",
 
   "my_info_difficulty_picker_title": "学習難易度を選択",
   "my_info_difficulty_tile_beginner_label": "初心者（子ども/入門）",

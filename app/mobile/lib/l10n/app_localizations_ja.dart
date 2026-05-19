@@ -396,6 +396,19 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get my_info_language_restart_dialog_title => '言語の変更';
+
+  @override
+  String get my_info_language_restart_dialog_content =>
+      '変更した言語を反映するにはアプリの再起動が必要です。今すぐ再起動しますか？';
+
+  @override
+  String get my_info_language_restart_dialog_yes => 'はい';
+
+  @override
+  String get my_info_language_restart_dialog_no => 'いいえ';
+
+  @override
   String get my_info_difficulty_picker_title => '学習難易度を選択';
 
   @override

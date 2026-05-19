@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import '../auth_gate.dart';
 import 'admin_tools_screen.dart';
 import '../l10n/app_localizations.dart';
+import '../services/daily_progress_sync.dart';
+import '../utils/app_restart.dart';
 
 class MyInfoScreen extends StatelessWidget {
   const MyInfoScreen({super.key, this.embedded = false});
@@ -529,6 +531,33 @@ Future<void> _openLanguagePicker(BuildContext context) async {
 
   if (confirmed != true) return;
 
+  final languageChanged = selected != current;
+
+  if (languageChanged) {
+    final agreeRestart = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(l10n.my_info_language_restart_dialog_title),
+          content: Text(l10n.my_info_language_restart_dialog_content),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(l10n.my_info_language_restart_dialog_no),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text(l10n.my_info_language_restart_dialog_yes),
+            ),
+          ],
+        );
+      },
+    );
+    if (!context.mounted) return;
+    if (agreeRestart != true) return;
+  }
+
   // 1) 유저 프로필 업데이트
   await docRef.set({'targetLanguage': selected}, SetOptions(merge: true));
   if (!context.mounted) return;
@@ -542,6 +571,14 @@ Future<void> _openLanguagePicker(BuildContext context) async {
       'targetLanguage': selected,
       'level': 'beginner',
     });
+    // 진도는 학습 시 Firestore에 즉시 반영되나, 재시작 전 당일 문서 존재를 보장합니다.
+    await ensureTodayDailyProgress(user);
+
+    if (languageChanged) {
+      AppRestart.restart();
+      return;
+    }
+
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(l10n.my_info_language_saved_snackbar)),

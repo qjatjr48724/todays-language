@@ -415,6 +415,19 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get my_info_language_restart_dialog_title => 'Change language';
+
+  @override
+  String get my_info_language_restart_dialog_content =>
+      'The app needs to restart to apply the new language. Restart now?';
+
+  @override
+  String get my_info_language_restart_dialog_yes => 'Yes';
+
+  @override
+  String get my_info_language_restart_dialog_no => 'No';
+
+  @override
   String get my_info_difficulty_picker_title => 'Select learning difficulty';
 
   @override
