@@ -1,6 +1,5 @@
-import 'dart:async';
-
-import 'package:cloud_functions/cloud_functions.dart';
+import '../config/firebase_functions_config.dart';
+import '../utils/callable_request.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -34,8 +33,6 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
   int _correctCount = 0;
   bool _sessionComplete = false;
 
-  static const Duration _loadTimeout = Duration(seconds: 45);
-
   @override
   void initState() {
     super.initState();
@@ -44,7 +41,7 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
     });
   }
 
-  Future<void> _loadWrapUp() async {
+  Future<void> _loadWrapUp({bool forceRefreshToken = false}) async {
     if (!mounted) return;
     setState(() {
       _loading = true;
@@ -58,26 +55,21 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
     });
 
     try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
+      if (FirebaseAuth.instance.currentUser == null) {
         throw Exception('not_signed_in');
       }
-      await user.getIdToken(true);
 
-      final callable = FirebaseFunctions.instanceFor(
-        region: 'asia-northeast3',
-      ).httpsCallable('getWrapUpDeck');
-
-      final result = await callable
-          .call<Map<String, dynamic>>({
-            'targetLanguage': widget.targetLanguage,
-            'level': widget.level,
-          })
-          .timeout(_loadTimeout);
+      final data = await invokeCallableMap(
+        callableGetWrapUpDeck(),
+        {
+          'targetLanguage': widget.targetLanguage,
+          'level': widget.level,
+        },
+        forceRefreshToken: forceRefreshToken,
+      );
 
       if (!mounted) return;
       final l10n = AppLocalizations.of(context)!;
-      final data = Map<String, dynamic>.from(result.data as Map);
       final deck = _parseDeckEntries(data);
 
       if (deck.isEmpty) {
@@ -110,7 +102,7 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
       if (!mounted) return;
       final l10n = AppLocalizations.of(context)!;
       setState(() {
-        _error = l10n.wrapup_load_failed(_formatLoadError(e));
+        _error = l10n.wrapup_load_failed(formatCallableLoadError(e));
         _loading = false;
       });
     }
@@ -131,20 +123,6 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
       }
     }
     return loaded;
-  }
-
-  String _formatLoadError(Object e) {
-    if (e is TimeoutException) {
-      return 'timeout (${_loadTimeout.inSeconds}s)';
-    }
-    if (e is FirebaseFunctionsException) {
-      final msg = e.message?.trim();
-      if (msg != null && msg.isNotEmpty) {
-        return '${e.code}: $msg';
-      }
-      return e.code;
-    }
-    return e.toString();
   }
 
   void _onChoiceTap(int index) {
@@ -208,14 +186,17 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
         child: _loading
             ? const Center(child: CircularProgressIndicator())
             : (_error != null)
-                ? _ErrorBody(error: _error!, onRetry: _loadWrapUp)
+                ? _ErrorBody(
+                    error: _error!,
+                    onRetry: () => _loadWrapUp(forceRefreshToken: true),
+                  )
                 : _sessionComplete
                     ? _CompleteBody(
                         correct: _correctCount,
                         total: _questions.length,
                         submitting: _submitting,
                         onFinish: _finishWrapUp,
-                        onReload: _loadWrapUp,
+                        onReload: () => _loadWrapUp(forceRefreshToken: true),
                       )
                     : _QuizBody(
                         question: _questions[_currentIndex],

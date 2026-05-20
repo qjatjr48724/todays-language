@@ -1,4 +1,5 @@
-import 'package:cloud_functions/cloud_functions.dart';
+import '../config/firebase_functions_config.dart';
+import '../utils/callable_request.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
@@ -81,7 +82,7 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
     );
   }
 
-  Future<void> _fetchSentenceSample() async {
+  Future<void> _fetchSentenceSample({bool forceRefreshToken = false}) async {
     setState(() {
       _aiLoading = true;
       _aiError = null;
@@ -95,20 +96,18 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
     });
 
     try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) throw Exception('로그인 상태가 아닙니다.');
-      await user.getIdToken(true);
+      if (FirebaseAuth.instance.currentUser == null) {
+        throw Exception('로그인 상태가 아닙니다.');
+      }
 
-      final callable = FirebaseFunctions.instanceFor(
-        region: 'asia-northeast3',
-      ).httpsCallable('generateSentence');
-
-      final result = await callable.call<Map<String, dynamic>>({
-        'targetLanguage': widget.targetLanguage,
-        'level': widget.level,
-      });
-
-      final data = Map<String, dynamic>.from(result.data as Map);
+      final data = await invokeCallableMap(
+        callableGenerateSentence(),
+        {
+          'targetLanguage': widget.targetLanguage,
+          'level': widget.level,
+        },
+        forceRefreshToken: forceRefreshToken,
+      );
       final sentence = data['sentence']?.toString() ?? '';
       final sentenceHira = data['sentenceHira']?.toString();
       final meaning = data['meaningKo']?.toString() ?? '';
@@ -139,7 +138,9 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
       if (!mounted) return;
       final l10n = AppLocalizations.of(context)!;
       setState(() {
-        _aiError = l10n.sentences_ai_sample_load_failed(e.toString());
+        _aiError = l10n.sentences_ai_sample_load_failed(
+          formatCallableLoadError(e),
+        );
         _aiLoading = false;
       });
     }
@@ -222,7 +223,7 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
               Text(_aiError!, style: TextStyle(color: scheme.error)),
               const SizedBox(height: 12),
               FilledButton(
-                onPressed: _fetchSentenceSample,
+                onPressed: () => _fetchSentenceSample(forceRefreshToken: true),
                 child: Text(l10n.sentences_sample_reload),
               ),
             ] else ...[

@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_functions/cloud_functions.dart';
+import '../config/firebase_functions_config.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -567,8 +567,7 @@ Future<void> _openLanguagePicker(BuildContext context) async {
   // 2) 선택된 언어의 "오늘 세트"가 없으면 즉시 생성(사용자 액션 기반)
   try {
     await user.getIdToken(true);
-    final callable = FirebaseFunctions.instanceFor(region: 'asia-northeast3')
-        .httpsCallable('ensureLearningSetForToday');
+    final callable = callableEnsureLearningSetForToday();
     await callable.call<Map<String, dynamic>>({
       'targetLanguage': selected,
       'level': levelForCall,
@@ -677,8 +676,7 @@ Future<void> _openLevelPicker(
   // 선택된 난이도의 "오늘 세트"가 없으면 즉시 생성(사용자 액션 기반)
   try {
     await user.getIdToken(true);
-    final callable = FirebaseFunctions.instanceFor(region: 'asia-northeast3')
-        .httpsCallable('ensureLearningSetForToday');
+    final callable = callableEnsureLearningSetForToday();
     await callable.call<Map<String, dynamic>>({
       'targetLanguage': targetLanguage,
       'level': selected,

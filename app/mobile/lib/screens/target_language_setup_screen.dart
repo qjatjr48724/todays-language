@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_functions/cloud_functions.dart';
+import '../config/firebase_functions_config.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -128,8 +128,7 @@ class _TargetLanguageSetupScreenState extends State<TargetLanguageSetupScreen> {
       );
 
       await user.getIdToken(true);
-      final callable = FirebaseFunctions.instanceFor(region: 'asia-northeast3')
-          .httpsCallable('ensureLearningSetForToday');
+      final callable = callableEnsureLearningSetForToday();
       await callable.call<Map<String, dynamic>>({
         'targetLanguage': targetChoice.alpha3,
         'level': normalizedLevel,

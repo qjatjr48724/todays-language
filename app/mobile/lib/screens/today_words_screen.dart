@@ -1,4 +1,5 @@
-import 'package:cloud_functions/cloud_functions.dart';
+import '../config/firebase_functions_config.dart';
+import '../utils/callable_request.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
@@ -88,7 +89,7 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
     );
   }
 
-  Future<void> _fetchWordSample() async {
+  Future<void> _fetchWordSample({bool forceRefreshToken = false}) async {
     setState(() {
       _aiLoading = true;
       _aiError = null;
@@ -103,23 +104,18 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
     });
 
     try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
+      if (FirebaseAuth.instance.currentUser == null) {
         throw Exception('로그인 상태가 아닙니다.');
       }
-      // callable에서 unauthenticated가 가끔 뜨는 경우를 방지
-      await user.getIdToken(true);
 
-      final callable = FirebaseFunctions.instanceFor(
-        region: 'asia-northeast3',
-      ).httpsCallable('generateWord');
-
-      final result = await callable.call<Map<String, dynamic>>({
-        'targetLanguage': widget.targetLanguage,
-        'level': widget.level,
-      });
-
-      final data = Map<String, dynamic>.from(result.data as Map);
+      final data = await invokeCallableMap(
+        callableGenerateWord(),
+        {
+          'targetLanguage': widget.targetLanguage,
+          'level': widget.level,
+        },
+        forceRefreshToken: forceRefreshToken,
+      );
       final word = data['word']?.toString() ?? '';
       final readingHira = data['readingHira']?.toString();
       final meaning = data['meaningKo']?.toString() ?? '';
@@ -141,7 +137,9 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
       if (!mounted) return;
       final l10n = AppLocalizations.of(context)!;
       setState(() {
-        _aiError = l10n.words_ai_sample_load_failed(e.toString());
+        _aiError = l10n.words_ai_sample_load_failed(
+          formatCallableLoadError(e),
+        );
         _aiLoading = false;
       });
     }
@@ -225,7 +223,7 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
               Text(_aiError!, style: TextStyle(color: scheme.error)),
               const SizedBox(height: 12),
               FilledButton(
-                onPressed: _fetchWordSample,
+                onPressed: () => _fetchWordSample(forceRefreshToken: true),
                 child: Text(l10n.words_sample_reload),
               ),
             ] else ...[

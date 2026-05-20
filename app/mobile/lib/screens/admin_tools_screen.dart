@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_functions/cloud_functions.dart';
+import '../config/firebase_functions_config.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -162,8 +162,7 @@ class _AdminToolsScreenState extends State<AdminToolsScreen> {
                 FilledButton.tonal(
                   onPressed: () => _run(() async {
                     await user.getIdToken(true);
-                    final callable = FirebaseFunctions.instanceFor(region: 'asia-northeast3')
-                        .httpsCallable('seedCountryCatalog');
+                    final callable = callableSeedCountryCatalog();
                     await callable.call<Map<String, dynamic>>({});
                   }),
                   child: Text(l10n.admin_tools_seed_catalog),
@@ -172,8 +171,7 @@ class _AdminToolsScreenState extends State<AdminToolsScreen> {
                 FilledButton.tonal(
                   onPressed: () => _run(() async {
                     await user.getIdToken(true);
-                    final callable = FirebaseFunctions.instanceFor(region: 'asia-northeast3')
-                        .httpsCallable('syncCountryFlags');
+                    final callable = callableSyncCountryFlags();
                     await callable.call<Map<String, dynamic>>({'force': true});
                   }),
                   child: Text(l10n.admin_tools_sync_flags_force),
@@ -271,8 +269,7 @@ class _AdminToolsScreenState extends State<AdminToolsScreen> {
                     final tl = (data['targetLanguage'] as String?)?.trim() ?? 'JPN';
                     final level = (data['level'] as String?)?.trim() ?? 'beginner';
                     await user.getIdToken(true);
-                    final callable = FirebaseFunctions.instanceFor(region: 'asia-northeast3')
-                        .httpsCallable('ensureLearningSetForToday');
+                    final callable = callableEnsureLearningSetForToday();
                     await callable.call<Map<String, dynamic>>({
                       'targetLanguage': tl,
                       'level': level,
