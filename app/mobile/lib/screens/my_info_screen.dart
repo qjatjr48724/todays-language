@@ -424,6 +424,8 @@ Future<void> _openLanguagePicker(BuildContext context) async {
   final data = snap.data() ?? <String, dynamic>{};
   final currentRaw = (data['targetLanguage'] as String?) ?? 'JPN';
   final current = _normalizeTargetLanguageAlpha3(currentRaw);
+  final currentLevelRaw = (data['level'] as String?) ?? 'beginner';
+  final levelForCall = _normalizeLevel(currentLevelRaw);
 
   String selected = current;
   final enabledCountries = await FirebaseFirestore.instance
@@ -569,7 +571,7 @@ Future<void> _openLanguagePicker(BuildContext context) async {
         .httpsCallable('ensureLearningSetForToday');
     await callable.call<Map<String, dynamic>>({
       'targetLanguage': selected,
-      'level': 'beginner',
+      'level': levelForCall,
     });
     // 진도는 학습 시 Firestore에 즉시 반영되나, 재시작 전 당일 문서 존재를 보장합니다.
     await ensureTodayDailyProgress(user);
