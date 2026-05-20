@@ -15,6 +15,8 @@ class MainNavScreen extends StatefulWidget {
 
 class _MainNavScreenState extends State<MainNavScreen> {
   int _index = 1;
+  final GlobalKey<ProgressScreenState> _progressKey =
+      GlobalKey<ProgressScreenState>();
 
   @override
   Widget build(BuildContext context) {
@@ -26,10 +28,10 @@ class _MainNavScreenState extends State<MainNavScreen> {
         '${l10n.my_info_screen_title}, ${l10n.home_home_tab_title}, ${l10n.progress_appbar_title}',
       );
     }
-    final pages = const [
-      MyInfoScreen(embedded: true),
-      HomeScreen(showMyInfoButton: false),
-      ProgressScreen(),
+    final pages = [
+      const MyInfoScreen(embedded: true),
+      const HomeScreen(showMyInfoButton: false),
+      ProgressScreen(key: _progressKey),
     ];
 
     return Scaffold(
@@ -39,7 +41,12 @@ class _MainNavScreenState extends State<MainNavScreen> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _index,
-        onTap: (i) => setState(() => _index = i),
+        onTap: (i) {
+          setState(() => _index = i);
+          if (i == 2) {
+            _progressKey.currentState?.refreshFromTab();
+          }
+        },
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),

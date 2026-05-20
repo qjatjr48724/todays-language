@@ -12,10 +12,10 @@ class ProgressScreen extends StatefulWidget {
   const ProgressScreen({super.key});
 
   @override
-  State<ProgressScreen> createState() => _ProgressScreenState();
+  State<ProgressScreen> createState() => ProgressScreenState();
 }
 
-class _ProgressScreenState extends State<ProgressScreen> {
+class ProgressScreenState extends State<ProgressScreen> {
   DailyProgressView? _progress;
   bool _loading = true;
   DateTime _focusedMonth = DateTime.now();
@@ -33,9 +33,18 @@ class _ProgressScreenState extends State<ProgressScreen> {
     _loadMonth();
   }
 
+  /// 하단 탭으로 Progress 화면이 다시 선택될 때 최신 데이터로 갱신합니다.
+  Future<void> refreshFromTab() async {
+    await _load();
+    await _loadMonth();
+  }
+
   Future<void> _load() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
+    if (mounted) {
+      setState(() => _loading = true);
+    }
     final p = await ensureTodayDailyProgress(user);
     if (!mounted) return;
     setState(() {
