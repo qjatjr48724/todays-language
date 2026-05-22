@@ -1231,3 +1231,112 @@ unauthenticated: 로그인 상태 확인
 2. 기초 문자표 Firestore/CMS 연동 여부 기획 검토(현재 정적 데이터)
 3. 2순위 커뮤니티·채팅 정책 초안
 
+---
+
+## [단계 28] 구조 점검 후속(P0·P1·P2) · AuthGate · Functions 중앙화 · 기초문자 data 분리
+
+### 1) 오늘 한 일
+
+- **Flutter 파일·코드 구조 점검 후속** ([Notion 구조 점검 2026-05-19](https://www.notion.so/36572820750a817782e2e4d37fc243c0) — 2026-05-20 갱신)
+  - **P0** 내 정보 언어 저장 시 `level: 'beginner'` 고정 → Firestore `users/{uid}.level` 읽어 `ensureLearningSetForToday`에 전달
+  - **P1** 진행률 탭: `MainNavScreen._index == 2` → `ProgressScreenState.refreshFromTab()` (당일·월별 재조회)
+  - **P1** AuthGate: `StatefulWidget` + uid당 프로필 `get()` 1회 캐시, `languageSetupDone`/`nativeLanguage`/`targetLanguage` 방어 분기 (실시간 스트림 없음)
+  - **P2-1** `firebase_functions_config.dart` — region·callable 헬퍼 중앙화
+  - **P2-1+** `callable_request.dart` — 학습 Callable 30초 타임아웃, 오프라인 무한 로딩 방지, 다시 불러오기 시 토큰 갱신
+  - **P2-2** 기초문자 정적 데이터 → `lib/data/basic_character/` 언어별 7파일, repository는 조립·조회만
+- **검증**
+  - `flutter analyze` · `flutter test` 12개 통과
+  - 수동: AuthGate(모국어만 설정→재로그인→목표어 화면), 오프라인 단어/문장 실패 문구·재연결 후 다시 불러오기
+- **Git:** `main` → `origin/main` 푸시 (`43a841f` … `d7eaa13`, 5커밋)
+- **Notion:** 구조 점검 페이지 상단 후속 반영 섹션·표·로드맵 상태 갱신 (`plugin-notion-workspace-notion`)
+
+### 2) 완료 기준 체크
+
+- [x] P0·P1(필수)·P2-1·P2-2 코드 반영 및 원격 푸시
+- [x] 구조 점검 Notion 페이지 2026-05-20 갱신
+- [ ] **P1 (선택)** 홈 탭(`_index == 1`) 선택 시 `HomeScreen` refresh — **보류(사용자 결정)**
+- [x] **정리** `app_spacing.dart` · i18n `words_example_prefix` — [단계 29]에서 완료
+
+### 3) 추가/변경한 코드·문서 포인트
+
+- 신규:
+  - `app/mobile/lib/config/firebase_functions_config.dart`
+  - `app/mobile/lib/utils/callable_request.dart`
+  - `app/mobile/lib/data/basic_character/basic_character_*_data.dart` (7파일)
+  - `docs/FLUTTER_STRUCTURE_REVIEW_UPDATE_2026-05-20.md` (레포 사본, 커밋 전)
+- 수정:
+  - `app/mobile/lib/auth_gate.dart`
+  - `app/mobile/lib/screens/main_nav_screen.dart`, `progress_screen.dart`
+  - `app/mobile/lib/screens/my_info_screen.dart`
+  - `app/mobile/lib/screens/today_words_screen.dart`, `today_sentences_screen.dart`, `today_wrap_up_screen.dart`
+  - `app/mobile/lib/screens/home_screen.dart`, `target_language_setup_screen.dart`, `admin_tools_screen.dart`
+  - `app/mobile/lib/services/basic_character_chart_repository.dart` (데이터 제거·조립만)
+
+### 4) 커밋 (한글, `main`)
+
+| 해시 | 메시지 |
+|------|--------|
+| `43a841f` | fix(mobile): AuthGate 프로필 조회 uid당 1회 캐시 및 온보딩 분기 보강 |
+| `d6f32da` | fix(mobile): 내 정보 언어 변경 시 Firestore level 유지해 학습 세트 준비 |
+| `c7056c4` | fix(mobile): 진행률 탭 선택 시 월별·당일 진도 재조회 |
+| `a2bb0f1` | chore(mobile): Functions callable 중앙화 및 오프라인 호출 처리 보강 |
+| `d7eaa13` | refactor(mobile): 기초 문자표 데이터 언어별 파일 분리(P2-2) |
+
+### 5) 이슈/막힌 점
+
+- 오프라인 시 단어/문장 **무한 로딩** → `getIdToken(true)` + Callable 타임아웃 없음이 원인 → `invokeCallableMap`으로 해결
+- Notion MCP는 최초 인증 스킵 후 재인증하여 페이지 갱신 완료
+
+### 6) 다음 액션 (선택)
+
+1. **P1 (선택)** 홈 탭 refresh — 필요 시 `fix/home-tab-refresh`
+2. `chore/remove-dead-code` — `app_spacing`, `words_example_prefix`
+3. 자격증 허브 · 기초문자 polish
+4. `docs/FLUTTER_STRUCTURE_REVIEW_UPDATE_2026-05-20.md` 커밋 여부 결정
+
+---
+
+## [단계 29] 미사용 코드·문서 정리 · Notion 진행상황 (2026-05-20) 신규 페이지
+
+### 1) 오늘 한 일
+
+- **미사용 코드 정리 (A안)**
+  - `app/mobile/lib/ui/app_spacing.dart` 삭제 (import 0건)
+  - i18n ARB에서 `words_example_prefix`, `words_example_meaning_line` 제거 (`words_example_section_title` 유지) → `flutter gen-l10n`
+  - **Git:** `c0c75d4` — `chore(mobile): 미사용 app_spacing 및 words_example i18n 키 정리` (로컬 `main`, `origin/main` 대비 +1, **미푸시**)
+- **문서 정리 (로컬 삭제, 미커밋)**
+  - `docs/dev-copy.md` (untracked) — 범용/프로젝트 규칙 분리 초안, 추후 재작성 예정
+  - `docs/FLUTTER_STRUCTURE_REVIEW_UPDATE_2026-05-20.md` (untracked)
+  - `docs/HANDOFF_STATUS_2026-04-25.md` (tracked, 삭제만 반영·커밋 전)
+- **Notion**
+  - [진행상황 (2026-05-18)](https://www.notion.so/35f72820750a81afa6dfd38c57ff1647) **수정 없음**
+  - **신규:** [Today's Language 진행상황 (2026-05-20)](https://www.notion.so/36872820750a819ebdc5d2f9431ac50b) — `오늘의 언어` 하위, 단계 28·이번 정리 반영
+- **검증:** `flutter analyze` · `flutter test` 12개 통과 (정리 커밋 기준)
+
+### 2) 완료 기준 체크
+
+- [x] `app_spacing` · 미사용 `words_example_*` i18n 정리 및 커밋 (`c0c75d4`)
+- [x] Notion 2026-05-20 진행상황 페이지 신규 생성 (05-18 페이지 비수정)
+- [x] `HANDOFF` 삭제 · `NOTION_PROGRESS_TEMPLATE` [단계 28·29] — 문서 커밋 반영
+- [ ] `c0c75d4` 및 문서 커밋 `git push`
+- [ ] **P1 (선택)** 홈 탭 refresh — **보류**
+- [ ] **P3** 대형 화면 분리·테스트 확대 — **보류**
+
+### 3) 추가/변경·삭제 포인트
+
+- 삭제(앱): `app/mobile/lib/ui/app_spacing.dart`
+- 수정(앱): `app/mobile/lib/l10n/app_{ko,en,ja}.arb`, `app_localizations*.dart`
+- 삭제(문서): `dev-copy.md`, `FLUTTER_STRUCTURE_REVIEW_UPDATE_2026-05-20.md`, `HANDOFF_STATUS_2026-04-25.md`
+- 수정(문서): `docs/NOTION_PROGRESS_TEMPLATE.md` — [단계 29] append, [단계 28] 정리 항목 완료 표시
+
+### 4) 이슈/막힌 점
+
+- 없음 (정리 작업은 analyze/test 통과)
+
+### 5) 다음 액션
+
+1. `git add` — `HANDOFF` 삭제 + `NOTION_PROGRESS_TEMPLATE.md` → `docs: 진행 기록 [단계 29] 반영` 등 커밋
+2. `git push` — `c0c75d4` 및 문서 커밋 원격 반영
+3. 미사용 정리 **5번** — `notification_permission_screen` 디버그 문구 i18n (선택)
+4. **2순위** 언어별 자격증 허브 · 기초문자 polish
+
