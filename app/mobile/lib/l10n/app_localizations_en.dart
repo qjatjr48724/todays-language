@@ -665,16 +665,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String words_example_prefix(Object example) {
-    return 'Example: $example';
-  }
-
-  @override
-  String words_example_meaning_line(Object meaning) {
-    return 'Example meaning: $meaning';
-  }
-
-  @override
   String get words_example_section_title => 'Example';
 
   @override

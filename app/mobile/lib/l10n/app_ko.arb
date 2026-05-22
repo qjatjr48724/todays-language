@@ -238,13 +238,6 @@
   "words_next_button_label": "다음 단어",
 
   "words_debug_source": "debugSource: {source}",
-  "words_example_prefix": "예문: {example}",
-  "words_example_meaning_line": "예문 뜻: {meaning}",
-  "@words_example_meaning_line": {
-    "placeholders": {
-      "meaning": {}
-    }
-  },
   "words_example_section_title": "예문",
 
   "sentences_appbar_title": "오늘의 문장",

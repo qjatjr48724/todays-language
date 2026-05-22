@@ -642,16 +642,6 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String words_example_prefix(Object example) {
-    return '例文: $example';
-  }
-
-  @override
-  String words_example_meaning_line(Object meaning) {
-    return '例文の意味: $meaning';
-  }
-
-  @override
   String get words_example_section_title => '例文';
 
   @override

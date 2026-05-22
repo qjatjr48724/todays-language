@@ -239,13 +239,6 @@
   "words_next_button_label": "Next word",
 
   "words_debug_source": "debugSource: {source}",
-  "words_example_prefix": "Example: {example}",
-  "words_example_meaning_line": "Example meaning: {meaning}",
-  "@words_example_meaning_line": {
-    "placeholders": {
-      "meaning": {}
-    }
-  },
   "words_example_section_title": "Example",
 
   "sentences_appbar_title": "Today's Sentences",

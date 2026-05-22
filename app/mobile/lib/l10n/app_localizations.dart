@@ -1229,18 +1229,6 @@ abstract class AppLocalizations {
   /// **'debugSource: {source}'**
   String words_debug_source(Object source);
 
-  /// No description provided for @words_example_prefix.
-  ///
-  /// In ko, this message translates to:
-  /// **'예문: {example}'**
-  String words_example_prefix(Object example);
-
-  /// No description provided for @words_example_meaning_line.
-  ///
-  /// In ko, this message translates to:
-  /// **'예문 뜻: {meaning}'**
-  String words_example_meaning_line(Object meaning);
-
   /// No description provided for @words_example_section_title.
   ///
   /// In ko, this message translates to:
