@@ -1,17 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import 'package:crypto/crypto.dart';
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
-import 'dart:math';
 
 import 'email_login_screen.dart';
-import '../config/apple_sign_in_config.dart';
-import '../services/user_profile_sync.dart';
 import 'main_nav_screen.dart';
 import '../l10n/app_localizations.dart';
 
@@ -47,155 +39,6 @@ class _LoginScreenState extends State<LoginScreen> {
   void dispose() {
     _authSub?.cancel();
     super.dispose();
-  }
-
-  String _randomNonce([int length = 32]) {
-    const charset = '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
-    final rand = Random.secure();
-    return List.generate(length, (_) => charset[rand.nextInt(charset.length)]).join();
-  }
-
-  String _sha256OfString(String input) {
-    final bytes = utf8.encode(input);
-    final digest = sha256.convert(bytes);
-    return digest.toString();
-  }
-
-  Future<void> _signInWithGoogle() async {
-    final l10n = AppLocalizations.of(context)!;
-    setState(() {
-      _loading = true;
-      _errorMessage = null;
-    });
-    try {
-      await GoogleSignIn.instance.initialize();
-      final account = await GoogleSignIn.instance.authenticate();
-      final idToken = account.authentication.idToken;
-      if (idToken == null || idToken.isEmpty) {
-        throw Exception('Google ID token is missing');
-      }
-      final credential = GoogleAuthProvider.credential(idToken: idToken);
-      final result = await FirebaseAuth.instance.signInWithCredential(credential);
-      if (result.user != null) {
-        await ensureUserProfileDocument(result.user!);
-      }
-    } on FirebaseAuthException catch (e) {
-      if (!mounted) return;
-      setState(() => _errorMessage = _messageForAuthException(e, context));
-    } catch (e) {
-      if (!mounted) return;
-      setState(() => _errorMessage = l10n.login_google_failed(e.toString()));
-    } finally {
-      if (mounted) setState(() => _loading = false);
-    }
-  }
-
-  Future<void> _applyAppleDisplayNameIfNeeded(
-    User user,
-    AuthorizationCredentialAppleID cred,
-  ) async {
-    final given = cred.givenName?.trim() ?? '';
-    final family = cred.familyName?.trim() ?? '';
-    if (given.isEmpty && family.isEmpty) {
-      return;
-    }
-    final combined = '$given $family'.trim();
-    if (combined.isEmpty) {
-      return;
-    }
-    if ((user.displayName ?? '').trim().isNotEmpty) {
-      return;
-    }
-    await user.updateDisplayName(combined);
-    await user.reload();
-  }
-
-  Future<void> _signInWithApple() async {
-    final l10n = AppLocalizations.of(context)!;
-
-    final webClientId = kAppleSignInServicesIdForWeb?.trim();
-    final useWebOnAndroid =
-        Platform.isAndroid && (webClientId != null && webClientId.isNotEmpty);
-
-    if (Platform.isWindows || Platform.isLinux) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.login_apple_not_supported)),
-      );
-      return;
-    }
-
-    if (Platform.isAndroid && !useWebOnAndroid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.login_apple_not_supported)),
-      );
-      return;
-    }
-
-    if (Platform.isIOS || Platform.isMacOS) {
-      final available = await SignInWithApple.isAvailable();
-      if (!available) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.login_apple_not_supported)),
-        );
-        return;
-      }
-    }
-
-    setState(() {
-      _loading = true;
-      _errorMessage = null;
-    });
-
-    try {
-      final rawNonce = _randomNonce();
-      final nonce = _sha256OfString(rawNonce);
-      WebAuthenticationOptions? webOptions;
-      if (useWebOnAndroid) {
-        webOptions = WebAuthenticationOptions(
-          clientId: webClientId,
-          redirectUri: appleSignInRedirectUri(),
-        );
-      }
-      final appleCredential = await SignInWithApple.getAppleIDCredential(
-        scopes: [
-          AppleIDAuthorizationScopes.email,
-          AppleIDAuthorizationScopes.fullName,
-        ],
-        nonce: nonce,
-        webAuthenticationOptions: webOptions,
-      );
-
-      final idToken = appleCredential.identityToken;
-      if (idToken == null || idToken.isEmpty) {
-        throw Exception('Apple identity token is missing');
-      }
-
-      final oauth = OAuthProvider('apple.com').credential(
-        idToken: idToken,
-        rawNonce: rawNonce,
-      );
-
-      final result = await FirebaseAuth.instance.signInWithCredential(oauth);
-      var user = result.user;
-      if (user != null) {
-        await _applyAppleDisplayNameIfNeeded(user, appleCredential);
-        user = FirebaseAuth.instance.currentUser ?? user;
-        await ensureUserProfileDocument(user);
-      }
-    } on SignInWithAppleAuthorizationException catch (e) {
-      if (e.code == AuthorizationErrorCode.canceled) return;
-      if (!mounted) return;
-      setState(() => _errorMessage = l10n.login_apple_failed(e.message));
-    } on FirebaseAuthException catch (e) {
-      if (!mounted) return;
-      setState(() => _errorMessage = _messageForAuthException(e, context));
-    } catch (e) {
-      if (!mounted) return;
-      setState(() => _errorMessage = l10n.login_apple_failed_generic(e.toString()));
-    } finally {
-      if (mounted) setState(() => _loading = false);
-    }
   }
 
   Future<void> _signInTestAccount() async {
@@ -265,16 +108,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                 child: Text(l10n.login_email_button),
               ),
-              const SizedBox(height: 8),
-              OutlinedButton(
-                onPressed: _loading ? null : _signInWithGoogle,
-                child: Text(l10n.login_google_button),
-              ),
-              const SizedBox(height: 8),
-              OutlinedButton(
-                onPressed: _loading ? null : _signInWithApple,
-                child: Text(l10n.login_apple_button),
-              ),
               if (_errorMessage != null) ...[
                 const SizedBox(height: 12),
                 Text(
@@ -290,11 +123,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   label: Text(l10n.login_debug_test_login),
                 ),
               ],
-              const SizedBox(height: 16),
-              Text(
-                l10n.login_pass_hint,
-                style: t.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-              ),
             ],
           ),
         ),

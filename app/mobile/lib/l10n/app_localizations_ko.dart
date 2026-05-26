@@ -43,9 +43,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get login_apple_button => '애플로 시작하기';
 
   @override
-  String get login_pass_hint => '휴대폰 인증(PASS) 연동은 다음 단계에서 추가됩니다.';
-
-  @override
   String get login_debug_test_login => '테스트 계정으로 자동 로그인';
 
   @override

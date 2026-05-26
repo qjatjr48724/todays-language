@@ -12,7 +12,6 @@
   "login_email_button": "이메일로 시작하기",
   "login_google_button": "구글로 시작하기",
   "login_apple_button": "애플로 시작하기",
-  "login_pass_hint": "휴대폰 인증(PASS) 연동은 다음 단계에서 추가됩니다.",
   "login_debug_test_login": "테스트 계정으로 자동 로그인",
 
   "login_apple_not_supported": "애플 로그인은 iOS에서만 지원합니다.",

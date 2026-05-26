@@ -43,9 +43,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get login_apple_button => 'Appleで開始';
 
   @override
-  String get login_pass_hint => '携帯認証（PASS）の連携は次のステップで追加されます。';
-
-  @override
   String get login_debug_test_login => 'テストアカウントで自動ログイン';
 
   @override

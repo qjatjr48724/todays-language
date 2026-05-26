@@ -44,10 +44,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get login_apple_button => 'Continue with Apple';
 
   @override
-  String get login_pass_hint =>
-      'Phone authentication (PASS) integration will be added in the next step.';
-
-  @override
   String get login_debug_test_login => 'Auto sign in with test account';
 
   @override

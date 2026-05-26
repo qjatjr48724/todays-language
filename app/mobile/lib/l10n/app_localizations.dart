@@ -166,12 +166,6 @@ abstract class AppLocalizations {
   /// **'애플로 시작하기'**
   String get login_apple_button;
 
-  /// No description provided for @login_pass_hint.
-  ///
-  /// In ko, this message translates to:
-  /// **'휴대폰 인증(PASS) 연동은 다음 단계에서 추가됩니다.'**
-  String get login_pass_hint;
-
   /// No description provided for @login_debug_test_login.
   ///
   /// In ko, this message translates to:

@@ -1340,3 +1340,44 @@ unauthenticated: 로그인 상태 확인
 3. 미사용 정리 **5번** — `notification_permission_screen` 디버그 문구 i18n (선택)
 4. **2순위** 언어별 자격증 허브 · 기초문자 polish
 
+---
+
+## [단계 30] 로그인: 이메일만 허용(소셜 비활성화) · 시작하기 PASS 문구 제거
+
+### 1) 오늘 한 일
+
+- **로그인 정책 변경:** 현재 버전은 **이메일 로그인만** 사용하도록 정리
+  - 시작하기 화면(`LoginScreen`)에서 **Google/Apple 버튼 제거**
+  - Google/Apple 로그인 구현 코드 및 사용하지 않는 import 제거
+- **시작하기 화면 문구 정리**
+  - “휴대폰 인증(PASS) 연동은 다음 단계에서 추가됩니다.” 문구 **UI에서 제거**
+  - i18n 키 `login_pass_hint`를 `ko/en/ja` ARB에서 제거 후 `flutter gen-l10n`
+- **약관 문구 정합**
+  - 회원가입 화면 약관 텍스트에서 “이메일 또는 소셜 로그인” → “이메일 로그인”으로 수정
+- **검증**
+  - `flutter analyze` / `flutter test` 12개 통과
+
+### 2) 완료 기준 체크
+
+- [x] 시작하기 화면에서 소셜 로그인 비활성화(이메일만 노출)
+- [x] `login_pass_hint` 키 제거 및 `gen-l10n` 반영
+- [x] `flutter analyze` / `flutter test` 통과
+- [ ] Firebase Console Authentication에서 Google/Apple provider 비활성화(선택, 운영 안전장치)
+
+### 3) 추가/변경한 코드 포인트
+
+- 수정:
+  - `app/mobile/lib/screens/login_screen.dart` (이메일만)
+  - `app/mobile/lib/screens/email_register_screen.dart` (약관 문구)
+  - `app/mobile/lib/l10n/app_{ko,en,ja}.arb` (`login_pass_hint` 삭제)
+  - `app/mobile/lib/l10n/app_localizations*.dart` (gen-l10n 결과)
+
+### 4) 이슈/막힌 점
+
+- 없음
+
+### 5) 다음 액션
+
+1. (선택) Firebase Console → Authentication → Sign-in method에서 Google/Apple 제공자 Disable
+2. `git push` (원격 반영)
+
