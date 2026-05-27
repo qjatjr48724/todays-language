@@ -1381,3 +1381,38 @@ unauthenticated: 로그인 상태 확인
 1. (선택) Firebase Console → Authentication → Sign-in method에서 Google/Apple 제공자 Disable
 2. `git push` (원격 반영)
 
+---
+
+## [단계 31] PROJECT_CONTEXT 구현 계획·현황 최신화
+
+### 1) 오늘 한 일
+
+- **`docs/PROJECT_CONTEXT.md`** — 구현 계획·현황 문서로 최신화
+  - **현재 인증:** 이메일만 (소셜은 보안 정책 정리 후)
+  - **홈 학습 메뉴:** 단어 30 / 문장 10 / 마무리 25(4지선다) / 기초 문자표(정적) / 속담(추후)
+  - **구현 우선순위(§12):** MVP 범위를 현재 코드 구조에 맞게 수정
+  - **§13 이후 추가할 기능(계획)** 신설
+    1. 사용자 간 채팅(언어 선택 → 해당 언어 채팅 서버/룸)
+    2. 언어별 기초 문자표 마무리(polish)
+    3. 상황·장소별 기본 회화 가이드 문서
+    4. 앱 스킨(꾸미기, 3순위)
+
+### 2) 완료 기준 체크
+
+- [x] PROJECT_CONTEXT에 현재 진행상황·로드맵 반영
+- [x] 이후 기능 4항목(채팅·기초문자표·회화가이드·스킨) 기록
+
+### 3) 추가/변경한 문서 포인트
+
+- `docs/PROJECT_CONTEXT.md`
+- `docs/NOTION_PROGRESS_TEMPLATE.md` — [단계 31]
+
+### 4) 이슈/막힌 점
+
+- 없음
+
+### 5) 다음 액션
+
+1. `docs/PROJECT_CONTEXT.md` 커밋 · `git push`
+2. (선택) `docs/now_progress_2026-05-02.md`와 중복 로드맵 정리·동기화
+
