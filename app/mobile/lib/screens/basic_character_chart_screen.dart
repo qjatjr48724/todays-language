@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../models/basic_character_entry.dart';
 import '../services/basic_character_chart_repository.dart';
+import '../services/basic_character_eng_example.dart';
+import '../services/basic_character_eng_pronunciation.dart';
 import '../services/basic_character_kor_combine.dart';
 import '../services/basic_character_kor_pronunciation.dart';
 
@@ -30,6 +32,9 @@ class _BasicCharacterChartScreenState extends State<BasicCharacterChartScreen> {
   bool get _isKoreanChart =>
       _selected.id == BasicCharacterChartRepository.chartKorGanada;
 
+  bool get _isEnglishChart =>
+      _selected.id == BasicCharacterChartRepository.chartEngAlphabet;
+
   String _optionLabel(AppLocalizations l10n, String id) {
     switch (id) {
       case BasicCharacterChartRepository.chartKorGanada:
@@ -48,21 +53,6 @@ class _BasicCharacterChartScreenState extends State<BasicCharacterChartScreen> {
         return l10n.basic_characters_option_esp;
       default:
         return id;
-    }
-  }
-
-  /// 발음 열 헤더 꼬리말 — UI 언어(`ko`/`ja`/그 외→`en`).
-  String _uiLanguageLabel(AppLocalizations l10n, Locale locale) {
-    final ui = BasicCharacterKorPronunciation.normalizeUiLanguage(
-      locale.languageCode,
-    );
-    switch (ui) {
-      case 'ko':
-        return l10n.basic_characters_ui_lang_ko;
-      case 'ja':
-        return l10n.basic_characters_ui_lang_ja;
-      default:
-        return l10n.basic_characters_ui_lang_en;
     }
   }
 
@@ -138,23 +128,35 @@ class _BasicCharacterChartScreenState extends State<BasicCharacterChartScreen> {
                           uiLanguageCode: uiLanguageCode,
                           characterHeader: l10n.basic_characters_col_character,
                           pronunciationHeader:
-                              l10n.basic_characters_col_pronunciation_for_locale(
-                            _uiLanguageLabel(l10n, locale),
-                          ),
+                              l10n.basic_characters_col_pronunciation,
                           matrixHint: l10n.basic_characters_kor_matrix_hint,
                           consonantsTitle:
                               l10n.basic_characters_kor_section_consonants,
                           vowelsTitle: l10n.basic_characters_kor_section_vowels,
                         )
-                      : _CharacterTable(
-                          characterHeader: l10n.basic_characters_col_character,
-                          pronunciationHeader:
-                              l10n.basic_characters_col_pronunciation,
-                          orthographyHeader:
-                              l10n.basic_characters_col_orthography,
-                          entries: _selected.entries,
-                          scheme: scheme,
-                        ),
+                      : _isEnglishChart
+                          ? _EnglishCharacterTable(
+                              characterHeader:
+                                  l10n.basic_characters_col_character,
+                              pronunciationHeader:
+                                  l10n.basic_characters_col_pronunciation,
+                              exampleHeader:
+                                  l10n.basic_characters_col_example,
+                              entries: _selected.entries,
+                              uiLanguageCode: uiLanguageCode,
+                              l10n: l10n,
+                              scheme: scheme,
+                            )
+                          : _CharacterTable(
+                              characterHeader:
+                                  l10n.basic_characters_col_character,
+                              pronunciationHeader:
+                                  l10n.basic_characters_col_pronunciation,
+                              orthographyHeader:
+                                  l10n.basic_characters_col_orthography,
+                              entries: _selected.entries,
+                              scheme: scheme,
+                            ),
                 ),
               ),
             ),
@@ -515,6 +517,87 @@ class _ChartTypeDropdown extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+}
+
+/// 영어 알파벳 — 문자 · 로컬 발음 · 예시(단어+뜻).
+class _EnglishCharacterTable extends StatelessWidget {
+  const _EnglishCharacterTable({
+    required this.characterHeader,
+    required this.pronunciationHeader,
+    required this.exampleHeader,
+    required this.entries,
+    required this.uiLanguageCode,
+    required this.l10n,
+    required this.scheme,
+  });
+
+  final String characterHeader;
+  final String pronunciationHeader;
+  final String exampleHeader;
+  final List<BasicCharacterEntry> entries;
+  final String uiLanguageCode;
+  final AppLocalizations l10n;
+  final ColorScheme scheme;
+
+  @override
+  Widget build(BuildContext context) {
+    final headerStyle = Theme.of(context).textTheme.titleSmall?.copyWith(
+          fontWeight: FontWeight.w600,
+        );
+    final cellStyle = Theme.of(context).textTheme.bodyLarge;
+
+    return Table(
+      columnWidths: const {
+        0: FlexColumnWidth(0.75),
+        1: FlexColumnWidth(1.1),
+        2: FlexColumnWidth(1.5),
+      },
+      border: TableBorder(
+        horizontalInside: BorderSide(color: scheme.outlineVariant),
+      ),
+      children: [
+        TableRow(
+          decoration: BoxDecoration(color: scheme.surfaceContainerHigh),
+          children: [
+            _headerCell(characterHeader, headerStyle),
+            _headerCell(pronunciationHeader, headerStyle),
+            _headerCell(exampleHeader, headerStyle),
+          ],
+        ),
+        for (final entry in entries)
+          TableRow(
+            children: [
+              _bodyCell(entry.character, cellStyle?.copyWith(fontSize: 22)),
+              _bodyCell(
+                BasicCharacterEngPronunciation.forLetter(
+                  entry.character,
+                  uiLanguageCode,
+                ),
+                cellStyle,
+              ),
+              _bodyCell(
+                BasicCharacterEngExample.forLetter(l10n, entry.character),
+                cellStyle,
+              ),
+            ],
+          ),
+      ],
+    );
+  }
+
+  Widget _headerCell(String text, TextStyle? style) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+      child: Text(text, style: style, maxLines: 2),
+    );
+  }
+
+  Widget _bodyCell(String text, TextStyle? style) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      child: Text(text, style: style),
     );
   }
 }

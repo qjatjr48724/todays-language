@@ -10,13 +10,15 @@ void main() {
     expect(ids.first, BasicCharacterChartRepository.chartKorGanada);
   });
 
-  test('entries have character, pronunciation, orthography', () {
+  test('English alphabet chart has A–Z characters only in data', () {
     final eng = BasicCharacterChartRepository.optionById(
       BasicCharacterChartRepository.chartEngAlphabet,
     );
     expect(eng, isNotNull);
-    expect(eng!.entries.first.character, 'A');
-    expect(eng.entries.first.pronunciation, isNotEmpty);
+    expect(eng!.entries.length, 26);
+    expect(eng.entries.first.character, 'A');
+    expect(eng.entries.last.character, 'Z');
+    expect(eng.entries.first.pronunciation, isEmpty);
   });
 
   test('Korean chart uses three sections: consonants, vowels, syllables', () {

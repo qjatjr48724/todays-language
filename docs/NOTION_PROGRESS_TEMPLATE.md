@@ -1416,3 +1416,58 @@ unauthenticated: 로그인 상태 확인
 1. `docs/PROJECT_CONTEXT.md` 커밋 · `git push`
 2. (선택) `docs/now_progress_2026-05-02.md`와 중복 로드맵 정리·동기화
 
+---
+
+## [단계 32] 기초 문자표 — 영어(알파벳) 1차 polish
+
+### 1) 오늘 한 일
+
+- **영어 알파벳 차트 UX·데이터 정리** (`eng_alphabet`)
+  - 열 구성: **문자 · 발음 · 예시** (표기법 열 제거)
+  - **발음:** 앱 UI 로케일(`ko`/`en`/`ja`) 기준 — `BasicCharacterEngPronunciation` (예: ko `에이`, en `ay`, ja `エイ`)
+  - **예시:** i18n `basic_characters_eng_example_*` — `단어 + 뜻` 형식
+    - ko: `Apple 사과`
+    - ja: `Apple りんご`
+    - en: `Apple (fruit)` (동어 반복 `Apple apple` 제거)
+  - 데이터: A–Z만 정적 보관, 발음·예시는 런타임 조회
+- **화면:** `_EnglishCharacterTable` 분리, 한국어·기타 언어 표와 분기
+- **발음 열 괄호 제거**
+  - 헤더: `발음 (한국어(앱 UI))` → **`발음`**
+  - 한국어 표 발음 셀: `( )`·`[ ]` → **` · `** 구분 (예: `기역 · g/k`, `가 · ga`)
+  - 일본어 UI 발음: `（）` → **` · `**
+- **모델:** `BasicCharacterEntry.pronunciation` 선택 필드(기본 `''`)
+- **테스트:** `basic_character_eng_pronunciation_test.dart` 추가, repository 테스트 영어 차트 기대값 갱신
+
+### 2) 완료 기준 체크
+
+- [x] 영어 차트 3열(문자/발음/예시) 동작
+- [x] UI 로케일별 발음·예시 표시
+- [x] en 예시 문구 중복 단어 제거
+- [x] 발음 열·셀 괄호 제거
+- [x] `flutter gen-l10n` · `flutter analyze` · `flutter test` 통과
+
+### 3) 추가/변경한 파일(주요)
+
+- `app/mobile/lib/data/basic_character/basic_character_eng_alphabet_data.dart`
+- `app/mobile/lib/services/basic_character_eng_pronunciation.dart` (신규)
+- `app/mobile/lib/services/basic_character_eng_example.dart` (신규)
+- `app/mobile/lib/services/basic_character_kor_pronunciation.dart`
+- `app/mobile/lib/screens/basic_character_chart_screen.dart`
+- `app/mobile/lib/l10n/app_{ko,en,ja}.arb` — `basic_characters_col_example`, `basic_characters_eng_example_*`
+- `app/mobile/test/basic_character_eng_pronunciation_test.dart` (신규)
+
+### 4) 이전 세션 포함(이미 커밋 `c5fe7b8`, 참고)
+
+- 커뮤니티 탭·`CommunityScreen`·하단 `NavigationBar` 4탭
+- 언어 변경: 저장 비활성(미변경), 재시동 **준비 오버레이**(로딩 + `재시동 준비중...`), `pageBuilder` 무한 로딩 수정
+
+### 5) 이슈/막힌 점
+
+- 없음
+
+### 6) 다음 액션 (우선순위)
+
+1. **기초 문자표 마무리** — 영어 외 일본어(히라가나·가타카나)·프랑스어·독일어·스페인어 등 동일 원칙(문자/발음/예시)으로 polish
+2. **채팅 기능 추가** — `PROJECT_CONTEXT` §13: 언어 선택 → 해당 언어 채팅 룸, 커뮤니티 탭 메뉴(채팅)와 연동 설계
+3. (선택) `git push` · 홈 카드 부제 `문자 · 발음 · 표기법` 문구를 언어별 표 구성에 맞게 정리
+

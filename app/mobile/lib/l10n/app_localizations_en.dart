@@ -264,6 +264,87 @@ class AppLocalizationsEn extends AppLocalizations {
   String get basic_characters_col_orthography => 'Spelling / notes';
 
   @override
+  String get basic_characters_col_example => 'Example';
+
+  @override
+  String get basic_characters_eng_example_a => 'Apple (fruit)';
+
+  @override
+  String get basic_characters_eng_example_b => 'Ball (toy)';
+
+  @override
+  String get basic_characters_eng_example_c => 'Cat (animal)';
+
+  @override
+  String get basic_characters_eng_example_d => 'Dog (animal)';
+
+  @override
+  String get basic_characters_eng_example_e => 'Egg (food)';
+
+  @override
+  String get basic_characters_eng_example_f => 'Fish (animal)';
+
+  @override
+  String get basic_characters_eng_example_g => 'Grape (fruit)';
+
+  @override
+  String get basic_characters_eng_example_h => 'Hat (clothing)';
+
+  @override
+  String get basic_characters_eng_example_i => 'Ice (frozen water)';
+
+  @override
+  String get basic_characters_eng_example_j => 'Juice (drink)';
+
+  @override
+  String get basic_characters_eng_example_k => 'King (ruler)';
+
+  @override
+  String get basic_characters_eng_example_l => 'Lion (animal)';
+
+  @override
+  String get basic_characters_eng_example_m => 'Moon (night sky)';
+
+  @override
+  String get basic_characters_eng_example_n => 'Nest (bird home)';
+
+  @override
+  String get basic_characters_eng_example_o => 'Orange (fruit)';
+
+  @override
+  String get basic_characters_eng_example_p => 'Pen (writing tool)';
+
+  @override
+  String get basic_characters_eng_example_q => 'Queen (ruler)';
+
+  @override
+  String get basic_characters_eng_example_r => 'Rabbit (animal)';
+
+  @override
+  String get basic_characters_eng_example_s => 'Sun (daytime)';
+
+  @override
+  String get basic_characters_eng_example_t => 'Tree (plant)';
+
+  @override
+  String get basic_characters_eng_example_u => 'Umbrella (rain gear)';
+
+  @override
+  String get basic_characters_eng_example_v => 'Violin (instrument)';
+
+  @override
+  String get basic_characters_eng_example_w => 'Water (drink)';
+
+  @override
+  String get basic_characters_eng_example_x => 'X-ray (medical scan)';
+
+  @override
+  String get basic_characters_eng_example_y => 'Yellow (color)';
+
+  @override
+  String get basic_characters_eng_example_z => 'Zoo (animals)';
+
+  @override
   String get basic_characters_kor_tab_all => 'All';
 
   @override

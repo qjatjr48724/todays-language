@@ -251,6 +251,87 @@ class AppLocalizationsJa extends AppLocalizations {
   String get basic_characters_col_orthography => '表記・メモ';
 
   @override
+  String get basic_characters_col_example => '例';
+
+  @override
+  String get basic_characters_eng_example_a => 'Apple りんご';
+
+  @override
+  String get basic_characters_eng_example_b => 'Ball ボール';
+
+  @override
+  String get basic_characters_eng_example_c => 'Cat ねこ';
+
+  @override
+  String get basic_characters_eng_example_d => 'Dog いぬ';
+
+  @override
+  String get basic_characters_eng_example_e => 'Egg たまご';
+
+  @override
+  String get basic_characters_eng_example_f => 'Fish さかな';
+
+  @override
+  String get basic_characters_eng_example_g => 'Grape ぶどう';
+
+  @override
+  String get basic_characters_eng_example_h => 'Hat ぼうし';
+
+  @override
+  String get basic_characters_eng_example_i => 'Ice こおり';
+
+  @override
+  String get basic_characters_eng_example_j => 'Juice ジュース';
+
+  @override
+  String get basic_characters_eng_example_k => 'King おう';
+
+  @override
+  String get basic_characters_eng_example_l => 'Lion ライオン';
+
+  @override
+  String get basic_characters_eng_example_m => 'Moon つき';
+
+  @override
+  String get basic_characters_eng_example_n => 'Nest す';
+
+  @override
+  String get basic_characters_eng_example_o => 'Orange オレンジ';
+
+  @override
+  String get basic_characters_eng_example_p => 'Pen ペン';
+
+  @override
+  String get basic_characters_eng_example_q => 'Queen じょおう';
+
+  @override
+  String get basic_characters_eng_example_r => 'Rabbit うさぎ';
+
+  @override
+  String get basic_characters_eng_example_s => 'Sun たいよう';
+
+  @override
+  String get basic_characters_eng_example_t => 'Tree き';
+
+  @override
+  String get basic_characters_eng_example_u => 'Umbrella かさ';
+
+  @override
+  String get basic_characters_eng_example_v => 'Violin バイオリン';
+
+  @override
+  String get basic_characters_eng_example_w => 'Water みず';
+
+  @override
+  String get basic_characters_eng_example_x => 'X-ray レントゲン';
+
+  @override
+  String get basic_characters_eng_example_y => 'Yellow きいろ';
+
+  @override
+  String get basic_characters_eng_example_z => 'Zoo どうぶつえん';
+
+  @override
   String get basic_characters_kor_tab_all => '全体';
 
   @override

@@ -20,7 +20,7 @@ class BasicCharacterChartRepository {
   static const String chartEsp = kBasicCharacterChartIdEspBasic;
 
   /// 화면 드롭다운 순서 — [한국어(가나다), 영어, 일본어 히라가나·가타카나, 프랑스어, 독일어, 스페인어]
-  static const List<BasicCharacterChartOption> allChartsOrdered = [
+  static final List<BasicCharacterChartOption> allChartsOrdered = [
     kBasicCharacterKorGanadaChart,
     kBasicCharacterEngAlphabetChart,
     kBasicCharacterJpnHiraganaChart,

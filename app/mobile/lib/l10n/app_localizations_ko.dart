@@ -252,6 +252,87 @@ class AppLocalizationsKo extends AppLocalizations {
   String get basic_characters_col_orthography => '표기법';
 
   @override
+  String get basic_characters_col_example => '예시';
+
+  @override
+  String get basic_characters_eng_example_a => 'Apple 사과';
+
+  @override
+  String get basic_characters_eng_example_b => 'Ball 공';
+
+  @override
+  String get basic_characters_eng_example_c => 'Cat 고양이';
+
+  @override
+  String get basic_characters_eng_example_d => 'Dog 개';
+
+  @override
+  String get basic_characters_eng_example_e => 'Egg 달걀';
+
+  @override
+  String get basic_characters_eng_example_f => 'Fish 물고기';
+
+  @override
+  String get basic_characters_eng_example_g => 'Grape 포도';
+
+  @override
+  String get basic_characters_eng_example_h => 'Hat 모자';
+
+  @override
+  String get basic_characters_eng_example_i => 'Ice 얼음';
+
+  @override
+  String get basic_characters_eng_example_j => 'Juice 주스';
+
+  @override
+  String get basic_characters_eng_example_k => 'King 왕';
+
+  @override
+  String get basic_characters_eng_example_l => 'Lion 사자';
+
+  @override
+  String get basic_characters_eng_example_m => 'Moon 달';
+
+  @override
+  String get basic_characters_eng_example_n => 'Nest 둥지';
+
+  @override
+  String get basic_characters_eng_example_o => 'Orange 오렌지';
+
+  @override
+  String get basic_characters_eng_example_p => 'Pen 펜';
+
+  @override
+  String get basic_characters_eng_example_q => 'Queen 여왕';
+
+  @override
+  String get basic_characters_eng_example_r => 'Rabbit 토끼';
+
+  @override
+  String get basic_characters_eng_example_s => 'Sun 해';
+
+  @override
+  String get basic_characters_eng_example_t => 'Tree 나무';
+
+  @override
+  String get basic_characters_eng_example_u => 'Umbrella 우산';
+
+  @override
+  String get basic_characters_eng_example_v => 'Violin 바이올린';
+
+  @override
+  String get basic_characters_eng_example_w => 'Water 물';
+
+  @override
+  String get basic_characters_eng_example_x => 'X-ray 엑스레이';
+
+  @override
+  String get basic_characters_eng_example_y => 'Yellow 노란색';
+
+  @override
+  String get basic_characters_eng_example_z => 'Zoo 동물원';
+
+  @override
   String get basic_characters_kor_tab_all => '전체';
 
   @override

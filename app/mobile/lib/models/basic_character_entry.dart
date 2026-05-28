@@ -1,8 +1,8 @@
-/// 기초 문자표 한 행 — 문자 · 발음 · 표기법(한국어 표는 표기법 열 없음).
+/// 기초 문자표 한 행 — 문자 · 발음 · 표기법(영어·한국어 표는 일부 열 미사용).
 class BasicCharacterEntry {
   const BasicCharacterEntry({
     required this.character,
-    required this.pronunciation,
+    this.pronunciation = '',
     this.orthography = '',
   });
 
