@@ -516,7 +516,9 @@ Future<void> _openLanguagePicker(BuildContext context) async {
                     const SizedBox(width: 8),
                     Expanded(
                       child: FilledButton(
-                        onPressed: () => Navigator.of(context).pop(true),
+                        onPressed: selected == current
+                            ? null
+                            : () => Navigator.of(context).pop(true),
                         child: Text(l10n.common_save),
                       ),
                     ),
@@ -560,12 +562,9 @@ Future<void> _openLanguagePicker(BuildContext context) async {
     if (agreeRestart != true) return;
   }
 
-  // 1) 유저 프로필 업데이트
-  await docRef.set({'targetLanguage': selected}, SetOptions(merge: true));
-  if (!context.mounted) return;
-
-  // 2) 선택된 언어의 "오늘 세트"가 없으면 즉시 생성(사용자 액션 기반)
-  try {
+  // 언어 저장: 프로필 → 토큰 갱신 → 오늘 세트 → 당일 진도
+  Future<void> persistLanguageChange() async {
+    await docRef.set({'targetLanguage': selected}, SetOptions(merge: true));
     await user.getIdToken(true);
     final callable = callableEnsureLearningSetForToday();
     await callable.call<Map<String, dynamic>>({
@@ -574,12 +573,22 @@ Future<void> _openLanguagePicker(BuildContext context) async {
     });
     // 진도는 학습 시 Firestore에 즉시 반영되나, 재시작 전 당일 문서 존재를 보장합니다.
     await ensureTodayDailyProgress(user);
+  }
 
+  try {
     if (languageChanged) {
+      if (!context.mounted) return;
+      await _showRestartPreparingOverlay(
+        context,
+        l10n,
+        persistLanguageChange,
+      );
+      if (!context.mounted) return;
       AppRestart.restart();
       return;
     }
 
+    await persistLanguageChange();
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(l10n.my_info_language_saved_snackbar)),
@@ -590,6 +599,93 @@ Future<void> _openLanguagePicker(BuildContext context) async {
       SnackBar(
         content: Text(
           l10n.my_info_language_save_failed_snackbar(e.toString()),
+        ),
+      ),
+    );
+  }
+}
+
+// 재시동 전 저장·동기화 동안 로딩과 안내 문구를 표시합니다.
+Future<void> _showRestartPreparingOverlay(
+  BuildContext context,
+  AppLocalizations l10n,
+  Future<void> Function() prepareTask,
+) async {
+  final error = await showGeneralDialog<Object?>(
+    context: context,
+    barrierDismissible: false,
+    barrierLabel: 'restart_preparing',
+    barrierColor: Colors.black38,
+    transitionDuration: const Duration(milliseconds: 120),
+    pageBuilder: (dialogContext, animation, secondaryAnimation) {
+      return _RestartPreparingOverlay(
+        l10n: l10n,
+        prepareTask: prepareTask,
+      );
+    },
+  );
+
+  if (error != null) {
+    throw error;
+  }
+}
+
+/// showGeneralDialog의 pageBuilder는 애니메이션 등으로 여러 번 호출될 수 있어,
+/// 비동기 작업은 initState에서 1회만 실행합니다.
+class _RestartPreparingOverlay extends StatefulWidget {
+  const _RestartPreparingOverlay({
+    required this.l10n,
+    required this.prepareTask,
+  });
+
+  final AppLocalizations l10n;
+  final Future<void> Function() prepareTask;
+
+  @override
+  State<_RestartPreparingOverlay> createState() => _RestartPreparingOverlayState();
+}
+
+class _RestartPreparingOverlayState extends State<_RestartPreparingOverlay> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _runPrepareTask());
+  }
+
+  Future<void> _runPrepareTask() async {
+    try {
+      await widget.prepareTask();
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop();
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop(e);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final messageStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
+          color: Colors.white,
+        );
+
+    return PopScope(
+      canPop: false,
+      child: Material(
+        type: MaterialType.transparency,
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(color: Colors.white),
+              const SizedBox(height: 16),
+              Text(
+                widget.l10n.my_info_language_restart_preparing,
+                textAlign: TextAlign.center,
+                style: messageStyle,
+              ),
+            ],
+          ),
         ),
       ),
     );

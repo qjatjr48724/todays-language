@@ -186,6 +186,27 @@ class AppLocalizationsJa extends AppLocalizations {
   String get home_home_tab_title => 'ホーム';
 
   @override
+  String get community_tab_title => 'コミュニティ';
+
+  @override
+  String get community_menu_chat => 'チャット';
+
+  @override
+  String get community_menu_chat_subtitle => '他の学習者と直接会話して、会話力を伸ばしましょう。';
+
+  @override
+  String get community_menu_certificates => '言語別の資格';
+
+  @override
+  String get community_menu_certificates_subtitle => '言語を学ぶと、こんな資格を取得できます！';
+
+  @override
+  String get community_menu_phrase_guide => '基本会話ガイド';
+
+  @override
+  String get community_menu_phrase_guide_subtitle => 'まだ不慣れでも、旅行先で気後れしないでね！';
+
+  @override
   String get home_basic_characters_button => '基礎文字を学ぶ';
 
   @override
@@ -404,6 +425,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get my_info_language_restart_dialog_no => 'いいえ';
+
+  @override
+  String get my_info_language_restart_preparing => '再起動の準備中...';
 
   @override
   String get my_info_difficulty_picker_title => '学習難易度を選択';

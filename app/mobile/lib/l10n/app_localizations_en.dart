@@ -194,6 +194,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get home_home_tab_title => 'Home';
 
   @override
+  String get community_tab_title => 'Community';
+
+  @override
+  String get community_menu_chat => 'Chat';
+
+  @override
+  String get community_menu_chat_subtitle =>
+      'Talk directly with other learners and build your speaking skills.';
+
+  @override
+  String get community_menu_certificates => 'Language certificates';
+
+  @override
+  String get community_menu_certificates_subtitle =>
+      'Here are certificates you can earn as you learn a language!';
+
+  @override
+  String get community_menu_phrase_guide => 'Phrase guide';
+
+  @override
+  String get community_menu_phrase_guide_subtitle =>
+      'Even if you\'re not fluent yet, don\'t feel shy when you travel!';
+
+  @override
   String get home_basic_characters_button => 'Study basic characters';
 
   @override
@@ -422,6 +446,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get my_info_language_restart_dialog_no => 'No';
+
+  @override
+  String get my_info_language_restart_preparing => 'Preparing to restart...';
 
   @override
   String get my_info_difficulty_picker_title => 'Select learning difficulty';

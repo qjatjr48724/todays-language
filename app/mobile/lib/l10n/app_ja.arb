@@ -61,6 +61,13 @@
 
   "home_my_info_tooltip": "マイ情報",
   "home_home_tab_title": "ホーム",
+  "community_tab_title": "コミュニティ",
+  "community_menu_chat": "チャット",
+  "community_menu_chat_subtitle": "他の学習者と直接会話して、会話力を伸ばしましょう。",
+  "community_menu_certificates": "言語別の資格",
+  "community_menu_certificates_subtitle": "言語を学ぶと、こんな資格を取得できます！",
+  "community_menu_phrase_guide": "基本会話ガイド",
+  "community_menu_phrase_guide_subtitle": "まだ不慣れでも、旅行先で気後れしないでね！",
   "home_basic_characters_button": "基礎文字を学ぶ",
   "home_basic_characters_subtitle": "文字・発音・表記を表で",
   "basic_characters_screen_title": "基礎文字",
@@ -149,6 +156,7 @@
   "my_info_language_restart_dialog_content": "変更した言語を反映するにはアプリの再起動が必要です。今すぐ再起動しますか？",
   "my_info_language_restart_dialog_yes": "はい",
   "my_info_language_restart_dialog_no": "いいえ",
+  "my_info_language_restart_preparing": "再起動の準備中...",
 
   "my_info_difficulty_picker_title": "学習難易度を選択",
   "my_info_difficulty_tile_beginner_label": "初心者（子ども/入門）",

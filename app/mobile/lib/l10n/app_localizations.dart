@@ -412,6 +412,48 @@ abstract class AppLocalizations {
   /// **'홈'**
   String get home_home_tab_title;
 
+  /// No description provided for @community_tab_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'커뮤니티'**
+  String get community_tab_title;
+
+  /// No description provided for @community_menu_chat.
+  ///
+  /// In ko, this message translates to:
+  /// **'채팅'**
+  String get community_menu_chat;
+
+  /// No description provided for @community_menu_chat_subtitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'다른 사용자와 직접 대화하며 회화 능력을 길러보세요'**
+  String get community_menu_chat_subtitle;
+
+  /// No description provided for @community_menu_certificates.
+  ///
+  /// In ko, this message translates to:
+  /// **'언어별 자격증'**
+  String get community_menu_certificates;
+
+  /// No description provided for @community_menu_certificates_subtitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'언어를 공부하면 이런 자격증을 취득할 수 있어요!'**
+  String get community_menu_certificates_subtitle;
+
+  /// No description provided for @community_menu_phrase_guide.
+  ///
+  /// In ko, this message translates to:
+  /// **'기본 회화 가이드'**
+  String get community_menu_phrase_guide;
+
+  /// No description provided for @community_menu_phrase_guide_subtitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'공부한게 조금 서툴러도 여행가서 주눅들지 말아요!'**
+  String get community_menu_phrase_guide_subtitle;
+
   /// No description provided for @home_basic_characters_button.
   ///
   /// In ko, this message translates to:
@@ -814,6 +856,12 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'아니오'**
   String get my_info_language_restart_dialog_no;
+
+  /// No description provided for @my_info_language_restart_preparing.
+  ///
+  /// In ko, this message translates to:
+  /// **'재시동 준비중...'**
+  String get my_info_language_restart_preparing;
 
   /// No description provided for @my_info_difficulty_picker_title.
   ///

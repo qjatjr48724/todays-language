@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'home_screen.dart';
 import 'my_info_screen.dart';
 import 'progress_screen.dart';
+import 'community_screen.dart';
 import '../l10n/app_localizations.dart';
 
 class MainNavScreen extends StatefulWidget {
@@ -31,6 +32,7 @@ class _MainNavScreenState extends State<MainNavScreen> {
     final pages = [
       const MyInfoScreen(embedded: true),
       const HomeScreen(showMyInfoButton: false),
+      const CommunityScreen(),
       ProgressScreen(key: _progressKey),
     ];
 
@@ -39,24 +41,29 @@ class _MainNavScreenState extends State<MainNavScreen> {
         index: _index,
         children: pages,
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _index,
-        onTap: (i) {
+      // Material 3 테마(useMaterial3: true)에서는 NavigationBar가 더 안정적으로 표시됩니다.
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _index,
+        onDestinationSelected: (i) {
           setState(() => _index = i);
-          if (i == 2) {
+          if (i == 3) {
             _progressKey.currentState?.refreshFromTab();
           }
         },
-        items: [
-          BottomNavigationBarItem(
+        destinations: [
+          NavigationDestination(
             icon: Icon(Icons.person_outline),
             label: l10n.my_info_screen_title,
           ),
-          BottomNavigationBarItem(
+          NavigationDestination(
             icon: Icon(Icons.home_outlined),
             label: l10n.home_home_tab_title,
           ),
-          BottomNavigationBarItem(
+          NavigationDestination(
+            icon: Icon(Icons.forum_outlined),
+            label: l10n.community_tab_title,
+          ),
+          NavigationDestination(
             icon: Icon(Icons.bar_chart_outlined),
             label: l10n.progress_appbar_title,
           ),

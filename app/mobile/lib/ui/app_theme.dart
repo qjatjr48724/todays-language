@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 /// MVP 단계에서 일관된 UI를 위한 최소 테마.
 class AppTheme {
   static const seedColor = Color(0xFF5B5BD6);
+  static const double bottomNavHeight = 60;
 
   static ThemeData light() {
     final scheme = ColorScheme.fromSeed(
@@ -33,6 +34,9 @@ class AppTheme {
           minimumSize: const Size.fromHeight(48),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         ),
+      ),
+      navigationBarTheme: const NavigationBarThemeData(
+        height: bottomNavHeight,
       ),
       cardTheme: CardThemeData(
         elevation: 0,

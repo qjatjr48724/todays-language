@@ -61,6 +61,13 @@
 
   "home_my_info_tooltip": "My Info",
   "home_home_tab_title": "Home",
+  "community_tab_title": "Community",
+  "community_menu_chat": "Chat",
+  "community_menu_chat_subtitle": "Talk directly with other learners and build your speaking skills.",
+  "community_menu_certificates": "Language certificates",
+  "community_menu_certificates_subtitle": "Here are certificates you can earn as you learn a language!",
+  "community_menu_phrase_guide": "Phrase guide",
+  "community_menu_phrase_guide_subtitle": "Even if you're not fluent yet, don't feel shy when you travel!",
   "home_basic_characters_button": "Study basic characters",
   "home_basic_characters_subtitle": "Table: character · sound · spelling",
   "basic_characters_screen_title": "Basic characters",
@@ -149,6 +156,7 @@
   "my_info_language_restart_dialog_content": "The app needs to restart to apply the new language. Restart now?",
   "my_info_language_restart_dialog_yes": "Yes",
   "my_info_language_restart_dialog_no": "No",
+  "my_info_language_restart_preparing": "Preparing to restart...",
 
   "my_info_difficulty_picker_title": "Select learning difficulty",
   "my_info_difficulty_tile_beginner_label": "Beginner (Kids/Intro)",

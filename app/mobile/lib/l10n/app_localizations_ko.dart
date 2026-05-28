@@ -185,6 +185,29 @@ class AppLocalizationsKo extends AppLocalizations {
   String get home_home_tab_title => '홈';
 
   @override
+  String get community_tab_title => '커뮤니티';
+
+  @override
+  String get community_menu_chat => '채팅';
+
+  @override
+  String get community_menu_chat_subtitle => '다른 사용자와 직접 대화하며 회화 능력을 길러보세요';
+
+  @override
+  String get community_menu_certificates => '언어별 자격증';
+
+  @override
+  String get community_menu_certificates_subtitle =>
+      '언어를 공부하면 이런 자격증을 취득할 수 있어요!';
+
+  @override
+  String get community_menu_phrase_guide => '기본 회화 가이드';
+
+  @override
+  String get community_menu_phrase_guide_subtitle =>
+      '공부한게 조금 서툴러도 여행가서 주눅들지 말아요!';
+
+  @override
   String get home_basic_characters_button => '기초 문자 공부하기';
 
   @override
@@ -403,6 +426,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get my_info_language_restart_dialog_no => '아니오';
+
+  @override
+  String get my_info_language_restart_preparing => '재시동 준비중...';
 
   @override
   String get my_info_difficulty_picker_title => '학습 난이도 선택';
