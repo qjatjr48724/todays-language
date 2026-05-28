@@ -1418,7 +1418,57 @@ unauthenticated: 로그인 상태 확인
 
 ---
 
-## [단계 32] 기초 문자표 — 영어(알파벳) 1차 polish
+## [단계 32] 커뮤니티 탭 추가 및 언어 변경 재시동 UX
+
+> **커밋:** `c5fe7b8` — `feat(mobile): 커뮤니티 탭 추가 및 언어 변경 재시동 UX 개선`
+
+### 1) 오늘 한 일
+
+- **하단 네비 4탭** (`MainNavScreen`)
+  - 순서: **내 정보 / 홈 / 커뮤니티 / 진행률**
+  - `BottomNavigationBar` → Material 3 **`NavigationBar`** (미표시 이슈 대응)
+  - `AppTheme.navigationBarTheme` 높이 60 (`bottomNavHeight`)
+  - 진행률 탭 인덱스 `2` → **`3`** (`refreshFromTab` 유지)
+- **`CommunityScreen` 신규** (플레이스홀더)
+  - 메뉴 3개: 채팅 · 언어별 자격증 · 기본 회화 가이드 (카드 + title/subtitle, `onTap: null`)
+  - i18n: `community_tab_title`, `community_menu_*`, `community_menu_*_subtitle` (ko/en/ja)
+- **내 정보 — 목표 언어 변경** (`my_info_screen.dart`)
+  - 바텀시트: 선택값이 현재와 같으면 **저장 버튼 비활성**
+  - 언어 변경 + 재시동 **예** 시:
+    - 예전: 저장·Functions·진도 완료 **후** `n초전` 카운트다운 → 재시동 (그 사이 빈 텀)
+    - 변경: **즉시** `재시동 준비중...` 오버레이 + 로딩 → 그동안 Firestore 저장·토큰 갱신·`ensureLearningSetForToday`·`ensureTodayDailyProgress` → `AppRestart.restart()`
+  - i18n: `my_info_language_restart_preparing` (카운트다운 키는 제거)
+  - **버그 수정:** `showGeneralDialog` `pageBuilder`가 여러 번 호출되며 `Navigator.pop`이 안 되던 **무한 로딩** → `_RestartPreparingOverlay` StatefulWidget에서 **1회만** 작업 실행
+
+### 2) 완료 기준 체크
+
+- [x] 하단 4탭·커뮤니티 화면 진입
+- [x] 언어 미변경 시 저장 비활성
+- [x] 재시동 동의 후 준비 오버레이 → 저장 → 재시동
+- [x] 무한 로딩 재현 불가(수정 후)
+- [x] `flutter analyze` · `flutter test` 통과
+
+### 3) 추가/변경한 파일(주요)
+
+- `app/mobile/lib/screens/community_screen.dart` (신규)
+- `app/mobile/lib/screens/main_nav_screen.dart`
+- `app/mobile/lib/screens/my_info_screen.dart`
+- `app/mobile/lib/ui/app_theme.dart`
+- `app/mobile/lib/l10n/app_{ko,en,ja}.arb` — community·restart preparing 키
+
+### 4) 이슈/막힌 점
+
+- 없음
+
+### 5) 다음 액션
+
+1. 기초 문자표 영어 polish · `git push`
+
+---
+
+## [단계 33] 기초 문자표 — 영어(알파벳) 1차 polish
+
+> **커밋:** `4edf068` — `feat(mobile): 영어 기초문자표 polish 및 발음 열 괄호 제거`
 
 ### 1) 오늘 한 일
 
@@ -1455,17 +1505,13 @@ unauthenticated: 로그인 상태 확인
 - `app/mobile/lib/screens/basic_character_chart_screen.dart`
 - `app/mobile/lib/l10n/app_{ko,en,ja}.arb` — `basic_characters_col_example`, `basic_characters_eng_example_*`
 - `app/mobile/test/basic_character_eng_pronunciation_test.dart` (신규)
+- `docs/NOTION_PROGRESS_TEMPLATE.md` — [단계 33]
 
-### 4) 이전 세션 포함(이미 커밋 `c5fe7b8`, 참고)
-
-- 커뮤니티 탭·`CommunityScreen`·하단 `NavigationBar` 4탭
-- 언어 변경: 저장 비활성(미변경), 재시동 **준비 오버레이**(로딩 + `재시동 준비중...`), `pageBuilder` 무한 로딩 수정
-
-### 5) 이슈/막힌 점
+### 4) 이슈/막힌 점
 
 - 없음
 
-### 6) 다음 액션 (우선순위)
+### 5) 다음 액션 (우선순위)
 
 1. **기초 문자표 마무리** — 영어 외 일본어(히라가나·가타카나)·프랑스어·독일어·스페인어 등 동일 원칙(문자/발음/예시)으로 polish
 2. **채팅 기능 추가** — `PROJECT_CONTEXT` §13: 언어 선택 → 해당 언어 채팅 룸, 커뮤니티 탭 메뉴(채팅)와 연동 설계
