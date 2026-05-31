@@ -1,57 +1,11 @@
 import '../../models/basic_character_entry.dart';
+import 'basic_character_kana_rows.dart';
 
 const String kBasicCharacterChartIdJpnHiragana = 'jpn_hiragana';
 
-/// 일본어 히라가나 기초 문자표.
-const BasicCharacterChartOption kBasicCharacterJpnHiraganaChart =
+/// 일본어 히라가나 — あ행·か行… 구역별 3열 표.
+final BasicCharacterChartOption kBasicCharacterJpnHiraganaChart =
     BasicCharacterChartOption(
   id: kBasicCharacterChartIdJpnHiragana,
-  entries: [
-    BasicCharacterEntry(character: 'あ', pronunciation: 'a', orthography: '対: ア'),
-    BasicCharacterEntry(character: 'い', pronunciation: 'i', orthography: '対: イ'),
-    BasicCharacterEntry(character: 'う', pronunciation: 'u', orthography: '対: ウ'),
-    BasicCharacterEntry(character: 'え', pronunciation: 'e', orthography: '対: エ'),
-    BasicCharacterEntry(character: 'お', pronunciation: 'o', orthography: '対: オ'),
-    BasicCharacterEntry(character: 'か', pronunciation: 'ka', orthography: '対: カ'),
-    BasicCharacterEntry(character: 'き', pronunciation: 'ki', orthography: '対: キ'),
-    BasicCharacterEntry(character: 'く', pronunciation: 'ku', orthography: '対: ク'),
-    BasicCharacterEntry(character: 'け', pronunciation: 'ke', orthography: '対: ケ'),
-    BasicCharacterEntry(character: 'こ', pronunciation: 'ko', orthography: '対: コ'),
-    BasicCharacterEntry(character: 'さ', pronunciation: 'sa', orthography: '対: サ'),
-    BasicCharacterEntry(character: 'し', pronunciation: 'shi', orthography: '対: シ'),
-    BasicCharacterEntry(character: 'す', pronunciation: 'su', orthography: '対: ス'),
-    BasicCharacterEntry(character: 'せ', pronunciation: 'se', orthography: '対: セ'),
-    BasicCharacterEntry(character: 'そ', pronunciation: 'so', orthography: '対: ソ'),
-    BasicCharacterEntry(character: 'た', pronunciation: 'ta', orthography: '対: タ'),
-    BasicCharacterEntry(character: 'ち', pronunciation: 'chi', orthography: '対: チ'),
-    BasicCharacterEntry(character: 'つ', pronunciation: 'tsu', orthography: '対: ツ'),
-    BasicCharacterEntry(character: 'て', pronunciation: 'te', orthography: '対: テ'),
-    BasicCharacterEntry(character: 'と', pronunciation: 'to', orthography: '対: ト'),
-    BasicCharacterEntry(character: 'な', pronunciation: 'na', orthography: '対: ナ'),
-    BasicCharacterEntry(character: 'に', pronunciation: 'ni', orthography: '対: ニ'),
-    BasicCharacterEntry(character: 'ぬ', pronunciation: 'nu', orthography: '対: ヌ'),
-    BasicCharacterEntry(character: 'ね', pronunciation: 'ne', orthography: '対: ネ'),
-    BasicCharacterEntry(character: 'の', pronunciation: 'no', orthography: '対: ノ'),
-    BasicCharacterEntry(character: 'は', pronunciation: 'ha', orthography: '対: ハ'),
-    BasicCharacterEntry(character: 'ひ', pronunciation: 'hi', orthography: '対: ヒ'),
-    BasicCharacterEntry(character: 'ふ', pronunciation: 'fu', orthography: '対: フ'),
-    BasicCharacterEntry(character: 'へ', pronunciation: 'he', orthography: '対: ヘ'),
-    BasicCharacterEntry(character: 'ほ', pronunciation: 'ho', orthography: '対: ホ'),
-    BasicCharacterEntry(character: 'ま', pronunciation: 'ma', orthography: '対: マ'),
-    BasicCharacterEntry(character: 'み', pronunciation: 'mi', orthography: '対: ミ'),
-    BasicCharacterEntry(character: 'む', pronunciation: 'mu', orthography: '対: ム'),
-    BasicCharacterEntry(character: 'め', pronunciation: 'me', orthography: '対: メ'),
-    BasicCharacterEntry(character: 'も', pronunciation: 'mo', orthography: '対: モ'),
-    BasicCharacterEntry(character: 'や', pronunciation: 'ya', orthography: '対: ヤ'),
-    BasicCharacterEntry(character: 'ゆ', pronunciation: 'yu', orthography: '対: ユ'),
-    BasicCharacterEntry(character: 'よ', pronunciation: 'yo', orthography: '対: ヨ'),
-    BasicCharacterEntry(character: 'ら', pronunciation: 'ra', orthography: '対: ラ'),
-    BasicCharacterEntry(character: 'り', pronunciation: 'ri', orthography: '対: リ'),
-    BasicCharacterEntry(character: 'る', pronunciation: 'ru', orthography: '対: ル'),
-    BasicCharacterEntry(character: 'れ', pronunciation: 're', orthography: '対: レ'),
-    BasicCharacterEntry(character: 'ろ', pronunciation: 'ro', orthography: '対: ロ'),
-    BasicCharacterEntry(character: 'わ', pronunciation: 'wa', orthography: '対: ワ'),
-    BasicCharacterEntry(character: 'を', pronunciation: 'wo', orthography: '対: ヲ'),
-    BasicCharacterEntry(character: 'ん', pronunciation: 'n', orthography: '撥音 · 対: ン'),
-  ],
+  localizedSections: buildHiraganaLocalizedSections(),
 );

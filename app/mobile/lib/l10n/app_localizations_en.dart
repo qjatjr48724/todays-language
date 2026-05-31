@@ -194,6 +194,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get home_home_tab_title => 'Home';
 
   @override
+  String get home_appbar_title => 'Today\'s Language';
+
+  @override
   String get community_tab_title => 'Community';
 
   @override
@@ -222,7 +225,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get home_basic_characters_subtitle =>
-      'Table: character · sound · spelling';
+      'Table: character · sound · example';
 
   @override
   String get basic_characters_screen_title => 'Basic characters';
@@ -267,82 +270,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get basic_characters_col_example => 'Example';
 
   @override
-  String get basic_characters_eng_example_a => 'Apple (fruit)';
+  String get basic_characters_jpn_row_a => 'a row · あいうえお';
 
   @override
-  String get basic_characters_eng_example_b => 'Ball (toy)';
+  String get basic_characters_jpn_row_ka => 'ka row · かきくけこ';
 
   @override
-  String get basic_characters_eng_example_c => 'Cat (animal)';
+  String get basic_characters_jpn_row_sa => 'sa row · さしすせそ';
 
   @override
-  String get basic_characters_eng_example_d => 'Dog (animal)';
+  String get basic_characters_jpn_row_ta => 'ta row · たちつてと';
 
   @override
-  String get basic_characters_eng_example_e => 'Egg (food)';
+  String get basic_characters_jpn_row_na => 'na row · なにぬねの';
 
   @override
-  String get basic_characters_eng_example_f => 'Fish (animal)';
+  String get basic_characters_jpn_row_ha => 'ha row · はひふへほ';
 
   @override
-  String get basic_characters_eng_example_g => 'Grape (fruit)';
+  String get basic_characters_jpn_row_ma => 'ma row · まみむめも';
 
   @override
-  String get basic_characters_eng_example_h => 'Hat (clothing)';
+  String get basic_characters_jpn_row_ya => 'ya row · やゆよ';
 
   @override
-  String get basic_characters_eng_example_i => 'Ice (frozen water)';
+  String get basic_characters_jpn_row_ra => 'ra row · らりるれろ';
 
   @override
-  String get basic_characters_eng_example_j => 'Juice (drink)';
+  String get basic_characters_jpn_row_wa => 'wa row · わを';
 
   @override
-  String get basic_characters_eng_example_k => 'King (ruler)';
-
-  @override
-  String get basic_characters_eng_example_l => 'Lion (animal)';
-
-  @override
-  String get basic_characters_eng_example_m => 'Moon (night sky)';
-
-  @override
-  String get basic_characters_eng_example_n => 'Nest (bird home)';
-
-  @override
-  String get basic_characters_eng_example_o => 'Orange (fruit)';
-
-  @override
-  String get basic_characters_eng_example_p => 'Pen (writing tool)';
-
-  @override
-  String get basic_characters_eng_example_q => 'Queen (ruler)';
-
-  @override
-  String get basic_characters_eng_example_r => 'Rabbit (animal)';
-
-  @override
-  String get basic_characters_eng_example_s => 'Sun (daytime)';
-
-  @override
-  String get basic_characters_eng_example_t => 'Tree (plant)';
-
-  @override
-  String get basic_characters_eng_example_u => 'Umbrella (rain gear)';
-
-  @override
-  String get basic_characters_eng_example_v => 'Violin (instrument)';
-
-  @override
-  String get basic_characters_eng_example_w => 'Water (drink)';
-
-  @override
-  String get basic_characters_eng_example_x => 'X-ray (medical scan)';
-
-  @override
-  String get basic_characters_eng_example_y => 'Yellow (color)';
-
-  @override
-  String get basic_characters_eng_example_z => 'Zoo (animals)';
+  String get basic_characters_jpn_row_n => 'n · ん';
 
   @override
   String get basic_characters_kor_tab_all => 'All';

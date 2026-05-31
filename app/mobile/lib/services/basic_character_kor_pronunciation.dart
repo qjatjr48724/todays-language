@@ -1,4 +1,6 @@
-/// 한국어 자모·음절 발음 표기 — **앱 UI 로케일**(디바이스 기준 `ko`/`en`/`ja`)에 따라 달라짐.
+import '../models/basic_character_entry.dart';
+
+/// 기초 문자표 UI 로케일 처리 — 한글 자모·3열(문자/발음/예시) 공통.
 class BasicCharacterKorPronunciation {
   BasicCharacterKorPronunciation._();
 
@@ -20,6 +22,36 @@ class BasicCharacterKorPronunciation {
         return _japanese[ch] ?? _english[ch] ?? ch;
       default:
         return _english[ch] ?? ch;
+    }
+  }
+
+
+  static String localizedPronunciationFor(
+    BasicCharacterLocalizedRow row,
+    String languageCode,
+  ) {
+    switch (normalizeUiLanguage(languageCode)) {
+      case 'ko':
+        return row.pronunciationKo;
+      case 'ja':
+        return row.pronunciationJa;
+      default:
+        return row.pronunciationEn;
+    }
+  }
+
+
+  static String localizedExampleFor(
+    BasicCharacterLocalizedRow row,
+    String languageCode,
+  ) {
+    switch (normalizeUiLanguage(languageCode)) {
+      case 'ko':
+        return '${row.exampleWord} ${row.exampleGlossKo}';
+      case 'ja':
+        return '${row.exampleWord} ${row.exampleGlossJa}';
+      default:
+        return '${row.exampleWord} (${row.exampleGlossEn})';
     }
   }
 

@@ -16,8 +16,8 @@ import 'today_sentences_screen.dart';
 import 'today_words_screen.dart';
 import 'today_wrap_up_screen.dart';
 import 'basic_character_chart_screen.dart';
-import '../utils/kst_date.dart';
 import '../l10n/app_localizations.dart';
+import '../utils/kst_date.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, this.showMyInfoButton = true});
@@ -146,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.launch_subtitle),
+        title: Text(homeAppBarTitle(context)),
         actions: [
           if (user?.email != null)
             Padding(
@@ -315,4 +315,35 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+}
+
+
+/// 홈 AppBar 제목 — 디바이스 로케일 기준.
+///
+/// ko/en/ja는 [AppLocalizations.home_appbar_title], zh는 앱 UI 미지원이므로
+/// 고정 중국어 문구, 그 외 언어는 영어 l10n으로 fallback.
+String resolveHomeAppBarTitle(
+  Locale deviceLocale,
+  AppLocalizations l10n, {
+  AppLocalizations? englishL10n,
+}) {
+  final lang = deviceLocale.languageCode.toLowerCase();
+
+  if (lang == 'zh') {
+    return deviceLocale.scriptCode == 'Hant' ? '今日語言' : '今日的语言';
+  }
+
+  if (lang == 'ko' || lang == 'ja' || lang == 'en') {
+    return l10n.home_appbar_title;
+  }
+
+  final en = englishL10n ?? lookupAppLocalizations(const Locale('en'));
+  return en.home_appbar_title;
+}
+
+
+String homeAppBarTitle(BuildContext context) {
+  final deviceLocale = View.of(context).platformDispatcher.locale;
+  final l10n = AppLocalizations.of(context)!;
+  return resolveHomeAppBarTitle(deviceLocale, l10n);
 }

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../config/firebase_functions_config.dart';
+import '../services/user_profile_sync.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -442,12 +443,25 @@ Future<void> _openLanguagePicker(BuildContext context) async {
       .get();
   if (!context.mounted) return;
 
-  final enabled = enabledCountries.docs
+  final enabledRaw = enabledCountries.docs
       .map((d) => d.data())
       .toList(growable: false);
-  final disabled = allCountries.docs
+  final allRaw = allCountries.docs
       .map((d) => d.data())
-      .where((m) => (m['enabled'] as bool?) != true)
+      .toList(growable: false);
+
+  String alpha3Of(Map<String, dynamic> m) =>
+      (m['alpha3'] as String?)?.trim().toUpperCase() ?? '';
+
+  final enabled = enabledRaw
+      .where((m) => isTargetLanguageSelectable(alpha3Of(m)))
+      .toList(growable: false);
+  final disabled = allRaw
+      .where((m) {
+        final alpha3 = alpha3Of(m);
+        final firestoreEnabled = (m['enabled'] as bool?) == true;
+        return !firestoreEnabled || !isTargetLanguageSelectable(alpha3);
+      })
       .toList(growable: false);
 
   final confirmed = await showModalBottomSheet<bool>(

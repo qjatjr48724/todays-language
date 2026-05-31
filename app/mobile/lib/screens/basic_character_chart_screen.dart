@@ -3,10 +3,8 @@ import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../models/basic_character_entry.dart';
 import '../services/basic_character_chart_repository.dart';
-import '../services/basic_character_eng_example.dart';
-import '../services/basic_character_eng_pronunciation.dart';
-import '../services/basic_character_kor_combine.dart';
 import '../services/basic_character_kor_pronunciation.dart';
+import '../services/basic_character_kor_combine.dart';
 
 enum _KorChartTab { all, consonants, vowels }
 
@@ -31,9 +29,6 @@ class _BasicCharacterChartScreenState extends State<BasicCharacterChartScreen> {
 
   bool get _isKoreanChart =>
       _selected.id == BasicCharacterChartRepository.chartKorGanada;
-
-  bool get _isEnglishChart =>
-      _selected.id == BasicCharacterChartRepository.chartEngAlphabet;
 
   String _optionLabel(AppLocalizations l10n, String id) {
     switch (id) {
@@ -134,29 +129,18 @@ class _BasicCharacterChartScreenState extends State<BasicCharacterChartScreen> {
                               l10n.basic_characters_kor_section_consonants,
                           vowelsTitle: l10n.basic_characters_kor_section_vowels,
                         )
-                      : _isEnglishChart
-                          ? _EnglishCharacterTable(
-                              characterHeader:
-                                  l10n.basic_characters_col_character,
-                              pronunciationHeader:
-                                  l10n.basic_characters_col_pronunciation,
-                              exampleHeader:
-                                  l10n.basic_characters_col_example,
-                              entries: _selected.entries,
-                              uiLanguageCode: uiLanguageCode,
-                              l10n: l10n,
-                              scheme: scheme,
-                            )
-                          : _CharacterTable(
-                              characterHeader:
-                                  l10n.basic_characters_col_character,
-                              pronunciationHeader:
-                                  l10n.basic_characters_col_pronunciation,
-                              orthographyHeader:
-                                  l10n.basic_characters_col_orthography,
-                              entries: _selected.entries,
-                              scheme: scheme,
-                            ),
+                      : _LocalizedCharacterTable(
+                          characterHeader:
+                              l10n.basic_characters_col_character,
+                          pronunciationHeader:
+                              l10n.basic_characters_col_pronunciation,
+                          exampleHeader: l10n.basic_characters_col_example,
+                          rows: _selected.localizedRows,
+                          sections: _selected.localizedSections,
+                          uiLanguageCode: uiLanguageCode,
+                          l10n: l10n,
+                          scheme: scheme,
+                        ),
                 ),
               ),
             ),
@@ -521,13 +505,14 @@ class _ChartTypeDropdown extends StatelessWidget {
   }
 }
 
-/// 영어 알파벳 — 문자 · 로컬 발음 · 예시(단어+뜻).
-class _EnglishCharacterTable extends StatelessWidget {
-  const _EnglishCharacterTable({
+/// 문자 · 로컬 발음 · 예시(단어+뜻) 3열 표.
+class _LocalizedCharacterTable extends StatelessWidget {
+  const _LocalizedCharacterTable({
     required this.characterHeader,
     required this.pronunciationHeader,
     required this.exampleHeader,
-    required this.entries,
+    required this.rows,
+    required this.sections,
     required this.uiLanguageCode,
     required this.l10n,
     required this.scheme,
@@ -536,10 +521,115 @@ class _EnglishCharacterTable extends StatelessWidget {
   final String characterHeader;
   final String pronunciationHeader;
   final String exampleHeader;
-  final List<BasicCharacterEntry> entries;
+  final List<BasicCharacterLocalizedRow> rows;
+  final List<BasicCharacterLocalizedSection> sections;
   final String uiLanguageCode;
   final AppLocalizations l10n;
   final ColorScheme scheme;
+
+  @override
+  Widget build(BuildContext context) {
+    if (sections.isNotEmpty) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (var i = 0; i < sections.length; i++)
+            _LocalizedSectionBlock(
+              scheme: scheme,
+              title: _jpnKanaRowLabel(
+                l10n,
+                sections[i].sectionId,
+              ),
+              showColumnHeader: i == 0,
+              characterHeader: characterHeader,
+              pronunciationHeader: pronunciationHeader,
+              exampleHeader: exampleHeader,
+              rows: sections[i].rows,
+              uiLanguageCode: uiLanguageCode,
+            ),
+        ],
+      );
+    }
+
+    return _LocalizedDataTable(
+      scheme: scheme,
+      showColumnHeader: true,
+      characterHeader: characterHeader,
+      pronunciationHeader: pronunciationHeader,
+      exampleHeader: exampleHeader,
+      rows: rows,
+      uiLanguageCode: uiLanguageCode,
+    );
+  }
+}
+
+class _LocalizedSectionBlock extends StatelessWidget {
+  const _LocalizedSectionBlock({
+    required this.scheme,
+    required this.title,
+    required this.showColumnHeader,
+    required this.characterHeader,
+    required this.pronunciationHeader,
+    required this.exampleHeader,
+    required this.rows,
+    required this.uiLanguageCode,
+  });
+
+  final ColorScheme scheme;
+  final String title;
+  final bool showColumnHeader;
+  final String characterHeader;
+  final String pronunciationHeader;
+  final String exampleHeader;
+  final List<BasicCharacterLocalizedRow> rows;
+  final String uiLanguageCode;
+
+  @override
+  Widget build(BuildContext context) {
+    final titleStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
+          fontWeight: FontWeight.w600,
+        );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: EdgeInsets.fromLTRB(16, showColumnHeader ? 4 : 16, 16, 8),
+          child: Text(title, style: titleStyle),
+        ),
+        _LocalizedDataTable(
+          scheme: scheme,
+          showColumnHeader: showColumnHeader,
+          characterHeader: characterHeader,
+          pronunciationHeader: pronunciationHeader,
+          exampleHeader: exampleHeader,
+          rows: rows,
+          uiLanguageCode: uiLanguageCode,
+        ),
+        const SizedBox(height: 4),
+      ],
+    );
+  }
+}
+
+class _LocalizedDataTable extends StatelessWidget {
+  const _LocalizedDataTable({
+    required this.scheme,
+    required this.showColumnHeader,
+    required this.characterHeader,
+    required this.pronunciationHeader,
+    required this.exampleHeader,
+    required this.rows,
+    required this.uiLanguageCode,
+  });
+
+  final ColorScheme scheme;
+  final bool showColumnHeader;
+  final String characterHeader;
+  final String pronunciationHeader;
+  final String exampleHeader;
+  final List<BasicCharacterLocalizedRow> rows;
+  final String uiLanguageCode;
 
   @override
   Widget build(BuildContext context) {
@@ -558,27 +648,31 @@ class _EnglishCharacterTable extends StatelessWidget {
         horizontalInside: BorderSide(color: scheme.outlineVariant),
       ),
       children: [
-        TableRow(
-          decoration: BoxDecoration(color: scheme.surfaceContainerHigh),
-          children: [
-            _headerCell(characterHeader, headerStyle),
-            _headerCell(pronunciationHeader, headerStyle),
-            _headerCell(exampleHeader, headerStyle),
-          ],
-        ),
-        for (final entry in entries)
+        if (showColumnHeader)
+          TableRow(
+            decoration: BoxDecoration(color: scheme.surfaceContainerHigh),
+            children: [
+              _headerCell(characterHeader, headerStyle),
+              _headerCell(pronunciationHeader, headerStyle),
+              _headerCell(exampleHeader, headerStyle),
+            ],
+          ),
+        for (final row in rows)
           TableRow(
             children: [
-              _bodyCell(entry.character, cellStyle?.copyWith(fontSize: 22)),
-              _bodyCell(
-                BasicCharacterEngPronunciation.forLetter(
-                  entry.character,
+              _cell(row.character, cellStyle?.copyWith(fontSize: 22)),
+              _cell(
+                BasicCharacterKorPronunciation.localizedPronunciationFor(
+                  row,
                   uiLanguageCode,
                 ),
                 cellStyle,
               ),
-              _bodyCell(
-                BasicCharacterEngExample.forLetter(l10n, entry.character),
+              _cell(
+                BasicCharacterKorPronunciation.localizedExampleFor(
+                  row,
+                  uiLanguageCode,
+                ),
                 cellStyle,
               ),
             ],
@@ -594,7 +688,7 @@ class _EnglishCharacterTable extends StatelessWidget {
     );
   }
 
-  Widget _bodyCell(String text, TextStyle? style) {
+  Widget _cell(String text, TextStyle? style) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       child: Text(text, style: style),
@@ -602,69 +696,33 @@ class _EnglishCharacterTable extends StatelessWidget {
   }
 }
 
-class _CharacterTable extends StatelessWidget {
-  const _CharacterTable({
-    required this.characterHeader,
-    required this.pronunciationHeader,
-    required this.orthographyHeader,
-    required this.entries,
-    required this.scheme,
-  });
 
-  final String characterHeader;
-  final String pronunciationHeader;
-  final String orthographyHeader;
-  final List<BasicCharacterEntry> entries;
-  final ColorScheme scheme;
-
-  @override
-  Widget build(BuildContext context) {
-    final headerStyle = Theme.of(context).textTheme.titleSmall?.copyWith(
-          fontWeight: FontWeight.w600,
-        );
-    final cellStyle = Theme.of(context).textTheme.bodyLarge;
-
-    return Table(
-      columnWidths: const {
-        0: FlexColumnWidth(0.85),
-        1: FlexColumnWidth(1.1),
-        2: FlexColumnWidth(1.35),
-      },
-      border: TableBorder(
-        horizontalInside: BorderSide(color: scheme.outlineVariant),
-      ),
-      children: [
-        TableRow(
-          decoration: BoxDecoration(color: scheme.surfaceContainerHigh),
-          children: [
-            _headerCell(characterHeader, headerStyle),
-            _headerCell(pronunciationHeader, headerStyle),
-            _headerCell(orthographyHeader, headerStyle),
-          ],
-        ),
-        for (final entry in entries)
-          TableRow(
-            children: [
-              _bodyCell(entry.character, cellStyle?.copyWith(fontSize: 20)),
-              _bodyCell(entry.pronunciation, cellStyle),
-              _bodyCell(entry.orthography, cellStyle),
-            ],
-          ),
-      ],
-    );
-  }
-
-  Widget _headerCell(String text, TextStyle? style) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-      child: Text(text, style: style, maxLines: 2),
-    );
-  }
-
-  Widget _bodyCell(String text, TextStyle? style) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      child: Text(text, style: style),
-    );
+/// 일본어 가나 행(あ·か·さ…) 구역 제목.
+String _jpnKanaRowLabel(AppLocalizations l10n, String sectionId) {
+  switch (sectionId) {
+    case 'a':
+      return l10n.basic_characters_jpn_row_a;
+    case 'ka':
+      return l10n.basic_characters_jpn_row_ka;
+    case 'sa':
+      return l10n.basic_characters_jpn_row_sa;
+    case 'ta':
+      return l10n.basic_characters_jpn_row_ta;
+    case 'na':
+      return l10n.basic_characters_jpn_row_na;
+    case 'ha':
+      return l10n.basic_characters_jpn_row_ha;
+    case 'ma':
+      return l10n.basic_characters_jpn_row_ma;
+    case 'ya':
+      return l10n.basic_characters_jpn_row_ya;
+    case 'ra':
+      return l10n.basic_characters_jpn_row_ra;
+    case 'wa':
+      return l10n.basic_characters_jpn_row_wa;
+    case 'n':
+      return l10n.basic_characters_jpn_row_n;
+    default:
+      return sectionId;
   }
 }

@@ -185,6 +185,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get home_home_tab_title => '홈';
 
   @override
+  String get home_appbar_title => '오늘의 언어';
+
+  @override
   String get community_tab_title => '커뮤니티';
 
   @override
@@ -211,7 +214,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get home_basic_characters_button => '기초 문자 공부하기';
 
   @override
-  String get home_basic_characters_subtitle => '문자 · 발음 · 표기법 표로 보기';
+  String get home_basic_characters_subtitle => '문자 · 발음 · 예시 표로 보기';
 
   @override
   String get basic_characters_screen_title => '기초문자 공부하기';
@@ -255,82 +258,37 @@ class AppLocalizationsKo extends AppLocalizations {
   String get basic_characters_col_example => '예시';
 
   @override
-  String get basic_characters_eng_example_a => 'Apple 사과';
+  String get basic_characters_jpn_row_a => '아행 · あいうえお';
 
   @override
-  String get basic_characters_eng_example_b => 'Ball 공';
+  String get basic_characters_jpn_row_ka => '카행 · かきくけこ';
 
   @override
-  String get basic_characters_eng_example_c => 'Cat 고양이';
+  String get basic_characters_jpn_row_sa => '사행 · さしすせそ';
 
   @override
-  String get basic_characters_eng_example_d => 'Dog 개';
+  String get basic_characters_jpn_row_ta => '타행 · たちつてと';
 
   @override
-  String get basic_characters_eng_example_e => 'Egg 달걀';
+  String get basic_characters_jpn_row_na => '나행 · なにぬねの';
 
   @override
-  String get basic_characters_eng_example_f => 'Fish 물고기';
+  String get basic_characters_jpn_row_ha => '하행 · はひふへほ';
 
   @override
-  String get basic_characters_eng_example_g => 'Grape 포도';
+  String get basic_characters_jpn_row_ma => '마행 · まみむめも';
 
   @override
-  String get basic_characters_eng_example_h => 'Hat 모자';
+  String get basic_characters_jpn_row_ya => '야행 · やゆよ';
 
   @override
-  String get basic_characters_eng_example_i => 'Ice 얼음';
+  String get basic_characters_jpn_row_ra => '라행 · らりるれろ';
 
   @override
-  String get basic_characters_eng_example_j => 'Juice 주스';
+  String get basic_characters_jpn_row_wa => '와행 · わを';
 
   @override
-  String get basic_characters_eng_example_k => 'King 왕';
-
-  @override
-  String get basic_characters_eng_example_l => 'Lion 사자';
-
-  @override
-  String get basic_characters_eng_example_m => 'Moon 달';
-
-  @override
-  String get basic_characters_eng_example_n => 'Nest 둥지';
-
-  @override
-  String get basic_characters_eng_example_o => 'Orange 오렌지';
-
-  @override
-  String get basic_characters_eng_example_p => 'Pen 펜';
-
-  @override
-  String get basic_characters_eng_example_q => 'Queen 여왕';
-
-  @override
-  String get basic_characters_eng_example_r => 'Rabbit 토끼';
-
-  @override
-  String get basic_characters_eng_example_s => 'Sun 해';
-
-  @override
-  String get basic_characters_eng_example_t => 'Tree 나무';
-
-  @override
-  String get basic_characters_eng_example_u => 'Umbrella 우산';
-
-  @override
-  String get basic_characters_eng_example_v => 'Violin 바이올린';
-
-  @override
-  String get basic_characters_eng_example_w => 'Water 물';
-
-  @override
-  String get basic_characters_eng_example_x => 'X-ray 엑스레이';
-
-  @override
-  String get basic_characters_eng_example_y => 'Yellow 노란색';
-
-  @override
-  String get basic_characters_eng_example_z => 'Zoo 동물원';
+  String get basic_characters_jpn_row_n => 'ん';
 
   @override
   String get basic_characters_kor_tab_all => '전체';

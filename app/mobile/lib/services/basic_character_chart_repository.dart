@@ -19,15 +19,22 @@ class BasicCharacterChartRepository {
   static const String chartDeu = kBasicCharacterChartIdDeuBasic;
   static const String chartEsp = kBasicCharacterChartIdEspBasic;
 
-  /// 화면 드롭다운 순서 — [한국어(가나다), 영어, 일본어 히라가나·가타카나, 프랑스어, 독일어, 스페인어]
+  /// 프랑스어·독일어·스페인어 기초문자표 — 콘텐츠 검수 후 `true`로 전환.
+  static const bool kEuropeanBasicCharacterChartsEnabled = false;
+
+  static final List<BasicCharacterChartOption> _disabledEuropeanCharts = [
+    kBasicCharacterFraBasicChart,
+    kBasicCharacterDeuBasicChart,
+    kBasicCharacterEspBasicChart,
+  ];
+
+  /// 화면 드롭다운 순서 — [한국어(가나다), 영어, 일본어 히라가나·가타카나] (+ 유럽 3개는 플래그로 제어)
   static final List<BasicCharacterChartOption> allChartsOrdered = [
     kBasicCharacterKorGanadaChart,
     kBasicCharacterEngAlphabetChart,
     kBasicCharacterJpnHiraganaChart,
     kBasicCharacterJpnKatakanaChart,
-    kBasicCharacterFraBasicChart,
-    kBasicCharacterDeuBasicChart,
-    kBasicCharacterEspBasicChart,
+    if (kEuropeanBasicCharacterChartsEnabled) ..._disabledEuropeanCharts,
   ];
 
   static BasicCharacterChartOption? optionById(String id) {

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'main_nav_screen.dart';
 import '../l10n/app_localizations.dart';
+import '../services/user_profile_sync.dart';
 
 class TargetLanguageSetupScreen extends StatefulWidget {
   const TargetLanguageSetupScreen({super.key});
@@ -378,35 +379,17 @@ class _TargetChoice {
     label: '일본어(카타카나)',
     flagUrl: 'https://flagcdn.com/w80/jp.png',
   );
+  static const ko = _TargetChoice(
+    alpha3: 'KOR',
+    variant: null,
+    label: '한국어',
+    flagUrl: 'https://flagcdn.com/w80/kr.png',
+  );
   static const en = _TargetChoice(
     alpha3: 'USA',
     variant: null,
     label: '영어',
     flagUrl: 'https://flagcdn.com/w80/us.png',
-  );
-  static const fr = _TargetChoice(
-    alpha3: 'FRA',
-    variant: null,
-    label: '프랑스어',
-    flagUrl: 'https://flagcdn.com/w80/fr.png',
-  );
-  static const de = _TargetChoice(
-    alpha3: 'DEU',
-    variant: null,
-    label: '독일어',
-    flagUrl: 'https://flagcdn.com/w80/de.png',
-  );
-  static const zh = _TargetChoice(
-    alpha3: 'CHN',
-    variant: null,
-    label: '중국어',
-    flagUrl: 'https://flagcdn.com/w80/cn.png',
-  );
-  static const es = _TargetChoice(
-    alpha3: 'ESP',
-    variant: null,
-    label: '스페인어',
-    flagUrl: 'https://flagcdn.com/w80/es.png',
   );
 
   static _CountryItem? _find(List<_CountryItem> list, String alpha3) {
@@ -416,31 +399,31 @@ class _TargetChoice {
     return null;
   }
 
+  static const _activeChoicesFallback = [ko, en, jpHiragana, jpKatakana, jpMixed];
+
   static List<_TargetChoice> buildSelectableChoices(List<_CountryItem>? countries) {
     final list = countries;
     if (list == null || list.isEmpty) {
-      return const [en, jpHiragana, jpKatakana, jpMixed, fr, de, zh, es];
+      return _activeChoicesFallback;
     }
 
+    final kr = _find(list, 'KOR');
     final us = _find(list, 'USA');
     final jp = _find(list, 'JPN');
-    final fr0 = _find(list, 'FRA');
-    final de0 = _find(list, 'DEU');
-    final cn = _find(list, 'CHN');
-    final es0 = _find(list, 'ESP');
 
     final out = <_TargetChoice>[];
-    if (us != null && us.selectable) out.add(en.copyWith(flagUrl: us.flagUrl ?? en.flagUrl));
-    if (jp != null && jp.selectable) {
+    if (kr != null && kr.selectable && isTargetLanguageSelectable(kr.alpha3)) {
+      out.add(ko.copyWith(flagUrl: kr.flagUrl ?? ko.flagUrl));
+    }
+    if (us != null && us.selectable && isTargetLanguageSelectable(us.alpha3)) {
+      out.add(en.copyWith(flagUrl: us.flagUrl ?? en.flagUrl));
+    }
+    if (jp != null && jp.selectable && isTargetLanguageSelectable(jp.alpha3)) {
       out.add(jpHiragana.copyWith(flagUrl: jp.flagUrl ?? jpHiragana.flagUrl));
       out.add(jpKatakana.copyWith(flagUrl: jp.flagUrl ?? jpKatakana.flagUrl));
       out.add(jpMixed.copyWith(flagUrl: jp.flagUrl ?? jpMixed.flagUrl));
     }
-    if (fr0 != null && fr0.selectable) out.add(fr.copyWith(flagUrl: fr0.flagUrl ?? fr.flagUrl));
-    if (de0 != null && de0.selectable) out.add(de.copyWith(flagUrl: de0.flagUrl ?? de.flagUrl));
-    if (cn != null && cn.selectable) out.add(zh.copyWith(flagUrl: cn.flagUrl ?? zh.flagUrl));
-    if (es0 != null && es0.selectable) out.add(es.copyWith(flagUrl: es0.flagUrl ?? es.flagUrl));
-    return out.isEmpty ? const [en, jpHiragana, jpKatakana, jpMixed, fr, de, zh, es] : out;
+    return out.isEmpty ? _activeChoicesFallback : out;
   }
 
   static _TargetChoice? fromStored(String alpha3, String? variant) {
@@ -449,9 +432,10 @@ class _TargetChoice {
       if (variant == 'jpn_katakana') return jpKatakana;
       return jpMixed;
     }
-    const fallback = <_TargetChoice>[en, jpHiragana, jpKatakana, jpMixed, fr, de, zh, es];
-    for (final c in fallback) {
-      if (c.alpha3.toUpperCase() == alpha3.toUpperCase() && c.variant == variant) return c;
+    for (final c in _activeChoicesFallback) {
+      if (c.alpha3.toUpperCase() == alpha3.toUpperCase() && c.variant == variant) {
+        return c;
+      }
     }
     return null;
   }

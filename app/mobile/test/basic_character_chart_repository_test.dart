@@ -1,24 +1,42 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mobile/models/basic_character_entry.dart';
 import 'package:mobile/services/basic_character_chart_repository.dart';
 import 'package:mobile/services/basic_character_kor_pronunciation.dart';
+import 'package:mobile/services/user_profile_sync.dart';
 
 void main() {
-  test('allChartsOrdered has seven options in fixed order', () {
+  test('allChartsOrdered has four active options (European charts disabled)', () {
     final ids =
         BasicCharacterChartRepository.allChartsOrdered.map((e) => e.id).toList();
-    expect(ids.length, 7);
-    expect(ids.first, BasicCharacterChartRepository.chartKorGanada);
+    expect(
+      BasicCharacterChartRepository.kEuropeanBasicCharacterChartsEnabled,
+      isFalse,
+    );
+    expect(ids.length, 4);
+    expect(ids, [
+      BasicCharacterChartRepository.chartKorGanada,
+      BasicCharacterChartRepository.chartEngAlphabet,
+      BasicCharacterChartRepository.chartJpnHiragana,
+      BasicCharacterChartRepository.chartJpnKatakana,
+    ]);
   });
 
-  test('English alphabet chart has A–Z characters only in data', () {
+  test('non-Korean charts use localized 3-column rows', () {
     final eng = BasicCharacterChartRepository.optionById(
       BasicCharacterChartRepository.chartEngAlphabet,
     );
     expect(eng, isNotNull);
-    expect(eng!.entries.length, 26);
-    expect(eng.entries.first.character, 'A');
-    expect(eng.entries.last.character, 'Z');
-    expect(eng.entries.first.pronunciation, isEmpty);
+    expect(eng!.usesLocalizedTable, isTrue);
+    expect(eng.localizedRows.length, 26);
+    expect(eng.localizedRows.first.character, 'A');
+
+    final hira = BasicCharacterChartRepository.optionById(
+      BasicCharacterChartRepository.chartJpnHiragana,
+    );
+    expect(hira!.localizedSections.length, 11);
+    expect(hira.localizedSections.first.sectionId, 'a');
+    expect(hira.localizedSections.first.rows.length, 5);
+    expect(hira.localizedSections.last.sectionId, 'n');
   });
 
   test('Korean chart uses three sections: consonants, vowels, syllables', () {
@@ -26,6 +44,7 @@ void main() {
       BasicCharacterChartRepository.chartKorGanada,
     );
     expect(kor?.koreanSections?.length, 3);
+    expect(kor?.usesLocalizedTable, isFalse);
     expect(kor?.koreanSections?.first.characters.first, 'ㄱ');
     expect(kor?.koreanSections?[2].characters.first, '가');
   });
@@ -63,5 +82,35 @@ void main() {
   test('normalizeUiLanguage maps unsupported to en', () {
     expect(BasicCharacterKorPronunciation.normalizeUiLanguage('fr'), 'en');
     expect(BasicCharacterKorPronunciation.normalizeUiLanguage('ko-KR'), 'ko');
+  });
+
+  test('localized 3-column row formats pronunciation and example by UI locale', () {
+    const row = BasicCharacterLocalizedRow(
+      character: 'é',
+      pronunciationKo: '에',
+      pronunciationEn: 'ay',
+      pronunciationJa: 'エ',
+      exampleWord: 'été',
+      exampleGlossKo: '여름',
+      exampleGlossEn: 'summer',
+      exampleGlossJa: '夏',
+    );
+
+    expect(BasicCharacterKorPronunciation.localizedPronunciationFor(row, 'ko'), '에');
+    expect(BasicCharacterKorPronunciation.localizedPronunciationFor(row, 'en'), 'ay');
+    expect(BasicCharacterKorPronunciation.localizedExampleFor(row, 'ko'), 'été 여름');
+    expect(BasicCharacterKorPronunciation.localizedExampleFor(row, 'en'), 'été (summer)');
+    expect(BasicCharacterKorPronunciation.localizedExampleFor(row, 'fr'), 'été (summer)');
+  });
+
+  test('isTargetLanguageSelectable allows KOR USA JPN only', () {
+    expect(isTargetLanguageSelectable('KOR'), isTrue);
+    expect(isTargetLanguageSelectable('usa'), isTrue);
+    expect(isTargetLanguageSelectable('JPN'), isTrue);
+    expect(isTargetLanguageSelectable('FRA'), isFalse);
+    expect(isTargetLanguageSelectable('DEU'), isFalse);
+    expect(isTargetLanguageSelectable('CHN'), isFalse);
+    expect(isTargetLanguageSelectable('ESP'), isFalse);
+    expect(isTargetLanguageSelectable(null), isFalse);
   });
 }

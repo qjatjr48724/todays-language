@@ -412,6 +412,12 @@ abstract class AppLocalizations {
   /// **'홈'**
   String get home_home_tab_title;
 
+  /// No description provided for @home_appbar_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'오늘의 언어'**
+  String get home_appbar_title;
+
   /// No description provided for @community_tab_title.
   ///
   /// In ko, this message translates to:
@@ -463,7 +469,7 @@ abstract class AppLocalizations {
   /// No description provided for @home_basic_characters_subtitle.
   ///
   /// In ko, this message translates to:
-  /// **'문자 · 발음 · 표기법 표로 보기'**
+  /// **'문자 · 발음 · 예시 표로 보기'**
   String get home_basic_characters_subtitle;
 
   /// No description provided for @basic_characters_screen_title.
@@ -544,161 +550,71 @@ abstract class AppLocalizations {
   /// **'예시'**
   String get basic_characters_col_example;
 
-  /// No description provided for @basic_characters_eng_example_a.
+  /// No description provided for @basic_characters_jpn_row_a.
   ///
   /// In ko, this message translates to:
-  /// **'Apple 사과'**
-  String get basic_characters_eng_example_a;
+  /// **'아행 · あいうえお'**
+  String get basic_characters_jpn_row_a;
 
-  /// No description provided for @basic_characters_eng_example_b.
+  /// No description provided for @basic_characters_jpn_row_ka.
   ///
   /// In ko, this message translates to:
-  /// **'Ball 공'**
-  String get basic_characters_eng_example_b;
+  /// **'카행 · かきくけこ'**
+  String get basic_characters_jpn_row_ka;
 
-  /// No description provided for @basic_characters_eng_example_c.
+  /// No description provided for @basic_characters_jpn_row_sa.
   ///
   /// In ko, this message translates to:
-  /// **'Cat 고양이'**
-  String get basic_characters_eng_example_c;
+  /// **'사행 · さしすせそ'**
+  String get basic_characters_jpn_row_sa;
 
-  /// No description provided for @basic_characters_eng_example_d.
+  /// No description provided for @basic_characters_jpn_row_ta.
   ///
   /// In ko, this message translates to:
-  /// **'Dog 개'**
-  String get basic_characters_eng_example_d;
+  /// **'타행 · たちつてと'**
+  String get basic_characters_jpn_row_ta;
 
-  /// No description provided for @basic_characters_eng_example_e.
+  /// No description provided for @basic_characters_jpn_row_na.
   ///
   /// In ko, this message translates to:
-  /// **'Egg 달걀'**
-  String get basic_characters_eng_example_e;
+  /// **'나행 · なにぬねの'**
+  String get basic_characters_jpn_row_na;
 
-  /// No description provided for @basic_characters_eng_example_f.
+  /// No description provided for @basic_characters_jpn_row_ha.
   ///
   /// In ko, this message translates to:
-  /// **'Fish 물고기'**
-  String get basic_characters_eng_example_f;
+  /// **'하행 · はひふへほ'**
+  String get basic_characters_jpn_row_ha;
 
-  /// No description provided for @basic_characters_eng_example_g.
+  /// No description provided for @basic_characters_jpn_row_ma.
   ///
   /// In ko, this message translates to:
-  /// **'Grape 포도'**
-  String get basic_characters_eng_example_g;
+  /// **'마행 · まみむめも'**
+  String get basic_characters_jpn_row_ma;
 
-  /// No description provided for @basic_characters_eng_example_h.
+  /// No description provided for @basic_characters_jpn_row_ya.
   ///
   /// In ko, this message translates to:
-  /// **'Hat 모자'**
-  String get basic_characters_eng_example_h;
+  /// **'야행 · やゆよ'**
+  String get basic_characters_jpn_row_ya;
 
-  /// No description provided for @basic_characters_eng_example_i.
+  /// No description provided for @basic_characters_jpn_row_ra.
   ///
   /// In ko, this message translates to:
-  /// **'Ice 얼음'**
-  String get basic_characters_eng_example_i;
+  /// **'라행 · らりるれろ'**
+  String get basic_characters_jpn_row_ra;
 
-  /// No description provided for @basic_characters_eng_example_j.
+  /// No description provided for @basic_characters_jpn_row_wa.
   ///
   /// In ko, this message translates to:
-  /// **'Juice 주스'**
-  String get basic_characters_eng_example_j;
+  /// **'와행 · わを'**
+  String get basic_characters_jpn_row_wa;
 
-  /// No description provided for @basic_characters_eng_example_k.
+  /// No description provided for @basic_characters_jpn_row_n.
   ///
   /// In ko, this message translates to:
-  /// **'King 왕'**
-  String get basic_characters_eng_example_k;
-
-  /// No description provided for @basic_characters_eng_example_l.
-  ///
-  /// In ko, this message translates to:
-  /// **'Lion 사자'**
-  String get basic_characters_eng_example_l;
-
-  /// No description provided for @basic_characters_eng_example_m.
-  ///
-  /// In ko, this message translates to:
-  /// **'Moon 달'**
-  String get basic_characters_eng_example_m;
-
-  /// No description provided for @basic_characters_eng_example_n.
-  ///
-  /// In ko, this message translates to:
-  /// **'Nest 둥지'**
-  String get basic_characters_eng_example_n;
-
-  /// No description provided for @basic_characters_eng_example_o.
-  ///
-  /// In ko, this message translates to:
-  /// **'Orange 오렌지'**
-  String get basic_characters_eng_example_o;
-
-  /// No description provided for @basic_characters_eng_example_p.
-  ///
-  /// In ko, this message translates to:
-  /// **'Pen 펜'**
-  String get basic_characters_eng_example_p;
-
-  /// No description provided for @basic_characters_eng_example_q.
-  ///
-  /// In ko, this message translates to:
-  /// **'Queen 여왕'**
-  String get basic_characters_eng_example_q;
-
-  /// No description provided for @basic_characters_eng_example_r.
-  ///
-  /// In ko, this message translates to:
-  /// **'Rabbit 토끼'**
-  String get basic_characters_eng_example_r;
-
-  /// No description provided for @basic_characters_eng_example_s.
-  ///
-  /// In ko, this message translates to:
-  /// **'Sun 해'**
-  String get basic_characters_eng_example_s;
-
-  /// No description provided for @basic_characters_eng_example_t.
-  ///
-  /// In ko, this message translates to:
-  /// **'Tree 나무'**
-  String get basic_characters_eng_example_t;
-
-  /// No description provided for @basic_characters_eng_example_u.
-  ///
-  /// In ko, this message translates to:
-  /// **'Umbrella 우산'**
-  String get basic_characters_eng_example_u;
-
-  /// No description provided for @basic_characters_eng_example_v.
-  ///
-  /// In ko, this message translates to:
-  /// **'Violin 바이올린'**
-  String get basic_characters_eng_example_v;
-
-  /// No description provided for @basic_characters_eng_example_w.
-  ///
-  /// In ko, this message translates to:
-  /// **'Water 물'**
-  String get basic_characters_eng_example_w;
-
-  /// No description provided for @basic_characters_eng_example_x.
-  ///
-  /// In ko, this message translates to:
-  /// **'X-ray 엑스레이'**
-  String get basic_characters_eng_example_x;
-
-  /// No description provided for @basic_characters_eng_example_y.
-  ///
-  /// In ko, this message translates to:
-  /// **'Yellow 노란색'**
-  String get basic_characters_eng_example_y;
-
-  /// No description provided for @basic_characters_eng_example_z.
-  ///
-  /// In ko, this message translates to:
-  /// **'Zoo 동물원'**
-  String get basic_characters_eng_example_z;
+  /// **'ん'**
+  String get basic_characters_jpn_row_n;
 
   /// No description provided for @basic_characters_kor_tab_all.
   ///
