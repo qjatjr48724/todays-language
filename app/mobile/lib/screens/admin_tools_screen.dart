@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'language_setup_screen.dart';
+import 'notification_permission_screen.dart';
 import 'target_language_setup_screen.dart';
 import '../l10n/app_localizations.dart';
 import '../services/daily_progress_sync.dart';
@@ -231,6 +232,37 @@ class _AdminToolsScreenState extends State<AdminToolsScreen> {
                       ],
                     );
                   },
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 16),
+            _Section(
+              title: l10n.admin_tools_section_notification_permission,
+              children: [
+                FilledButton.tonal(
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const NotificationPermissionScreen(),
+                    ),
+                  ),
+                  child: Text(l10n.admin_tools_open_notification_permission),
+                ),
+                const SizedBox(height: 8),
+                OutlinedButton(
+                  onPressed: () async {
+                    final ok = await _confirm(
+                      l10n.admin_tools_reset_notification_permission_title,
+                      l10n.admin_tools_reset_notification_permission_message,
+                    );
+                    if (!ok) {
+                      return;
+                    }
+                    await _run(NotificationPermissionScreen.resetAskedPref);
+                  },
+                  child: Text(
+                    l10n.admin_tools_reset_notification_permission_button,
+                  ),
                 ),
               ],
             ),

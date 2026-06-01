@@ -1046,6 +1046,22 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get admin_tools_section_notification_permission => '通知権限';
+
+  @override
+  String get admin_tools_reset_notification_permission_button => '通知案内をリセット';
+
+  @override
+  String get admin_tools_reset_notification_permission_title => '通知案内をリセット';
+
+  @override
+  String get admin_tools_reset_notification_permission_message =>
+      '次回のアプリ起動時に通知権限の案内画面が再表示されます。';
+
+  @override
+  String get admin_tools_open_notification_permission => '通知権限画面を開く';
+
+  @override
   String get admin_tools_section_daily_progress => '今日の進捗（デバッグ）';
 
   @override

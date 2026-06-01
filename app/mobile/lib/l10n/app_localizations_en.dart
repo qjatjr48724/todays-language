@@ -1089,6 +1089,26 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get admin_tools_section_notification_permission =>
+      'Notification permission';
+
+  @override
+  String get admin_tools_reset_notification_permission_button =>
+      'Reset notification prompt';
+
+  @override
+  String get admin_tools_reset_notification_permission_title =>
+      'Reset notification prompt';
+
+  @override
+  String get admin_tools_reset_notification_permission_message =>
+      'The notification permission screen will show again on the next app entry.';
+
+  @override
+  String get admin_tools_open_notification_permission =>
+      'Open notification permission screen';
+
+  @override
   String get admin_tools_section_daily_progress => 'Today\'s progress (debug)';
 
   @override

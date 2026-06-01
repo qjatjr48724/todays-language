@@ -1961,6 +1961,36 @@ abstract class AppLocalizations {
   /// **'enabled={value}'**
   String admin_tools_enabled_label(Object value);
 
+  /// No description provided for @admin_tools_section_notification_permission.
+  ///
+  /// In ko, this message translates to:
+  /// **'알림 권한'**
+  String get admin_tools_section_notification_permission;
+
+  /// No description provided for @admin_tools_reset_notification_permission_button.
+  ///
+  /// In ko, this message translates to:
+  /// **'알림 권한 안내 초기화'**
+  String get admin_tools_reset_notification_permission_button;
+
+  /// No description provided for @admin_tools_reset_notification_permission_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'알림 권한 안내 초기화'**
+  String get admin_tools_reset_notification_permission_title;
+
+  /// No description provided for @admin_tools_reset_notification_permission_message.
+  ///
+  /// In ko, this message translates to:
+  /// **'앱 진입 시 알림 권한 안내 화면이 다시 표시됩니다.'**
+  String get admin_tools_reset_notification_permission_message;
+
+  /// No description provided for @admin_tools_open_notification_permission.
+  ///
+  /// In ko, this message translates to:
+  /// **'알림 권한 화면 열기'**
+  String get admin_tools_open_notification_permission;
+
   /// No description provided for @admin_tools_section_daily_progress.
   ///
   /// In ko, this message translates to:

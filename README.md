@@ -39,61 +39,84 @@
 
 ![아키텍처](docs/images/architecture.png)
 
-## 데이터/스키마 구조
-
-- 저장소: **Cloud Firestore**
-- 일일 기준: **Asia/Seoul (KST)** — 문서 ID·조회 키는 `yyyy-MM-dd` 형식의 `dateKst` 사용
-- 상세 스키마: [`docs/FIRESTORE_MIN_SCHEMA.md`](docs/FIRESTORE_MIN_SCHEMA.md)
-
-### 사용자 (`users/{uid}`)
-
-| 필드(주요) | 설명 |
-|---|---|
-| `email`, `displayName`, `provider` | 프로필·로그인 방식 (`email` 등) |
-| `nativeLanguage`, `targetLanguage` | ISO-3166-1 alpha-3 (예: `KOR`, `JPN`) |
-| `level` | 학습 난이도 (`beginner` / `intermediate` / `advanced`) |
-| `languageSetupDone` | 첫 진입 언어 설정 완료 여부 |
-| `timezone` | `Asia/Seoul` |
-| `createdAt`, `lastLoginAt` | 가입·최근 로그인 시각 |
-
-### 일일 진도 (`users/{uid}/daily_progress/{dateKst}`)
-
-| 필드(주요) | 설명 |
-|---|---|
-| `wordGoal` / `wordDone` | 오늘의 단어 목표·완료 (기본 30) |
-| `sentenceGoal` / `sentenceDone` | 오늘의 문장 목표·완료 (기본 10) |
-| `quizGoal` / `quizDone` | 오늘의 마무리 목표·완료 (기본 25) |
-| `progressPercent` | 0~100 (완료 수 기반 재계산) |
-| `updatedAt` | 마지막 갱신 시각 |
-
-- 앱에서 진도 +1은 **Firestore 트랜잭션**으로 처리하며, `goal` 초과는 **clamp** 합니다.
-
-### 글로벌 일일 학습 세트 (`users/global_learning_set_owner/...`)
-
-- AI로 생성한 **당일 단어·문장 풀**을 공유 저장 (언어·난이도·날짜 조합별)
-- 문서 ID 예: `{dateKst}_{targetLanguage}_{level}` (예: `2026-05-27_JPN_beginner`)
-- 경로
-  - `.../daily_word_sets/{docId}` — 일일 단어 세트(약 30개)
-  - `.../daily_sentence_sets/{docId}` — 일일 문장 세트(약 10개)
-- **Cloud Functions**가 생성·갱신, 클라이언트는 **읽기 위주** (`firestore.rules`에서 write 차단)
-
-### 사용자별 학습 커서 (`users/{uid}/...`)
-
-- `daily_word_cursor`, `daily_sentence_cursor`, `daily_quiz_cursor` — 글로벌 세트 내에서 **개인별 진행 위치** 저장
-
-### 공개 메타데이터 (`public_metadata/countries/items`)
-
-- 국가·국기 URL 등 (Functions에서 동기화·캐시, 로그인 사용자 **read-only**)
-
-### 보안 규칙 요약
-
-- `users/{uid}` 및 하위 컬렉션: **본인 `uid`만** read/write
-- `users/global_learning_set_owner/**`, `public_metadata/**`: 로그인 사용자 **read-only**, 클라이언트 write 불가
 
 ## 화면 구성 및 상세 구현
-|  |
-|---|
-|  |
+
+스크린샷은 `docs/images/screens/`에 저장되어 있으며, 아래 표의 **파일명과 동일**해야 README에 표시됩니다.
+
+| 파일명 | 화면 |
+|---|---|
+| `첫화면.PNG` | 앱 실행 첫 화면 |
+| `알림권한.PNG` / `알림권한2.PNG` | 알림 권한 안내 |
+| `로그인방식선택.PNG` | 로그인 방식 선택 |
+| `이메일로그인화면.PNG` | 이메일·비밀번호 로그인 |
+| `첫실행-로컬언어선택.PNG` | 온보딩 1단계 — 모국어 |
+| `첫실행-대상언어선택.PNG` | 온보딩 2단계 — 학습 언어·난이도 |
+| `홈화면.PNG` | 홈 탭 |
+| `내정보.PNG` | 내 정보 탭 |
+| `내정보-언어선택.PNG` | 내 정보 — 학습 언어 변경 |
+| `내정보-학습난이도.PNG` | 내 정보 — 학습 난이도 변경 |
+| `커뮤니티.PNG` | 커뮤니티 탭 |
+| `진행률.PNG` | 진행률 탭 |
+| `진행률-날짜클릭.PNG` | 진행률 — 날짜별 상세 |
+| `오늘의단어.PNG` | 오늘의 단어 |
+| `오늘의문장.PNG` | 오늘의 문장 |
+| `오늘의마무리.PNG` | 오늘의 마무리 |
+| `기초문자표-영어.PNG` / `기초문자표-한국어.PNG` / `기초문자표-일본어(히라).PNG` | 기초 문자표 (언어별) |
+
+### 1) 앱 진입
+
+| 화면 | 설명 | 스크린샷 |
+|---|---|---|
+| 첫 화면 | 앱 실행 첫 화면, 터치/자동 전환 후 로그인·홈으로 이동 | ![첫 화면](docs/images/screens/첫화면.PNG) |
+| 알림 권한 | 최초 실행 시 알림 허용 안내 | ![알림 권한](docs/images/screens/알림권한.PNG) |
+| 알림 권한 (거부 후 안내) | 권한 거부·설정 안내 흐름 | ![알림 권한 2](docs/images/screens/알림권한2.PNG) |
+
+### 2) 로그인·회원가입
+
+| 화면 | 설명 | 스크린샷 |
+|---|---|---|
+| 로그인 방식 선택 | 이메일 로그인 진입 (현재 활성) | ![로그인](docs/images/screens/로그인방식선택.PNG) |
+| 이메일 로그인 | 이메일·비밀번호 입력 | ![이메일 로그인](docs/images/screens/이메일로그인화면.PNG) |
+
+> Google·Apple 소셜 로그인은 보안 검토 후 추가 예정 (현재 UI 비활성)
+
+### 3) 온보딩 (첫 진입)
+
+| 화면 | 설명 | 스크린샷 |
+|---|---|---|
+| 로컬 언어 선택 | 1단계: 모국어 선택 | ![로컬 언어](docs/images/screens/첫실행-로컬언어선택.PNG) |
+| 학습 언어·난이도 | 2단계: 대상 언어·난이도 선택 | ![학습 언어](docs/images/screens/첫실행-대상언어선택.PNG) |
+
+### 4) 메인 (하단 탭)
+
+| 화면 | 설명 | 스크린샷 |
+|---|---|---|
+| 홈 | 오늘의 단어·문장·마무리·기초 문자표 진입, 일일 진행률 요약 | ![홈](docs/images/screens/홈화면.PNG) |
+| 내 정보 | 학습 언어·난이도 변경, 로그아웃 | ![내 정보](docs/images/screens/내정보.PNG) |
+| 내 정보 — 언어 선택 | 학습 대상 언어 변경 | ![내 정보 언어](docs/images/screens/내정보-언어선택.PNG) |
+| 내 정보 — 학습 난이도 | 난이도 변경 | ![내 정보 난이도](docs/images/screens/내정보-학습난이도.PNG) |
+| 커뮤니티 | 커뮤니티 탭 (기능 확장 예정) | ![커뮤니티](docs/images/screens/커뮤니티.PNG) |
+| 진행률 | 오늘 진행률·월간 캘린더 | ![진행률](docs/images/screens/진행률.PNG) |
+| 진행률 — 날짜 상세 | 캘린더 날짜 선택 시 상세 | ![진행률 날짜](docs/images/screens/진행률-날짜클릭.PNG) |
+
+### 5) 학습·참고
+
+| 화면 | 설명 | 스크린샷 |
+|---|---|---|
+| 오늘의 단어 | 일일 단어 30개 학습·예문 | ![오늘의 단어](docs/images/screens/오늘의단어.PNG) |
+| 오늘의 문장 | 일일 문장 10개 학습 | ![오늘의 문장](docs/images/screens/오늘의문장.PNG) |
+| 오늘의 마무리 | 단어·문장 완료 후 4지선다 점검 | ![오늘의 마무리](docs/images/screens/오늘의마무리.PNG) |
+| 기초 문자표 (영어) | 알파벳 참고 차트 | ![기초 문자표 영어](docs/images/screens/기초문자표-영어.PNG) |
+| 기초 문자표 (한국어) | 한글 참고 차트 | ![기초 문자표 한국어](docs/images/screens/기초문자표-한국어.PNG) |
+| 기초 문자표 (일본어) | 히라가나 참고 차트 | ![기초 문자표 일본어](docs/images/screens/기초문자표-일본어%28히라%29.PNG) |
+
+### (미구현) 추후 추가 예정
+
+| 화면 | 설명 | 스크린샷 |
+|---|---|---|
+| 오늘의 속담 | 한국어 학습 시 속담 학습 | *(스크린샷 미추가)* |
+| 이메일 회원가입 | 약관 동의 후 가입 | *(스크린샷 미추가)* |
 
 ## 향후 개발 계획
 

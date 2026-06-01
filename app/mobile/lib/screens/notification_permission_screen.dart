@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../l10n/app_localizations.dart';
 
@@ -11,6 +11,12 @@ class NotificationPermissionScreen extends StatefulWidget {
   const NotificationPermissionScreen({super.key});
 
   static const prefsKeyAsked = 'notificationPermissionAsked';
+
+  /// 앱 진입 시 알림 권한 안내를 다시 보이게 합니다 (관리자 도구 등).
+  static Future<void> resetAskedPref() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(prefsKeyAsked);
+  }
 
   @override
   State<NotificationPermissionScreen> createState() =>
@@ -20,37 +26,9 @@ class NotificationPermissionScreen extends StatefulWidget {
 class _NotificationPermissionScreenState
     extends State<NotificationPermissionScreen> {
   bool _requesting = false;
-  String? _debugStatus;
 
   final FlutterLocalNotificationsPlugin _localNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
-
-  @override
-  void initState() {
-    super.initState();
-    _refreshStatus();
-  }
-
-  Future<void> _refreshStatus() async {
-    try {
-      final status = await Permission.notification.status;
-      final ios = Platform.isIOS
-          ? _localNotificationsPlugin
-              .resolvePlatformSpecificImplementation<
-                  IOSFlutterLocalNotificationsPlugin>()
-          : null;
-      if (!mounted) return;
-      setState(() {
-        _debugStatus =
-            'permission_handler.status=$status, iosImplementation=${ios == null ? 'null' : 'ok'}';
-      });
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _debugStatus = 'status check failed: $e';
-      });
-    }
-  }
 
   Future<void> _allow() async {
     if (_requesting) return;
@@ -75,7 +53,6 @@ class _NotificationPermissionScreenState
           } else {
             // 플러그인 등록이 꼬였거나, iOS 구현체를 찾지 못하는 경우 폴백 요청.
             status = await Permission.notification.request();
-            await _refreshStatus();
             granted = status.isGranted;
           }
 
@@ -87,7 +64,6 @@ class _NotificationPermissionScreenState
         }
 
         if (!mounted) return;
-        await _refreshStatus();
 
         if (status.isDenied ||
             status.isRestricted ||
@@ -160,20 +136,6 @@ class _NotificationPermissionScreenState
                     .bodyMedium
                     ?.copyWith(color: scheme.onSurfaceVariant),
               ),
-              if (kDebugMode && _debugStatus != null) ...[
-                const SizedBox(height: 10),
-                Text(
-                  _debugStatus!,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
-                ),
-                const SizedBox(height: 6),
-                OutlinedButton(
-                  onPressed: _requesting ? null : _refreshStatus,
-                  child: const Text('Refresh status (debug)'),
-                ),
-              ],
               const Spacer(),
               Row(
                 children: [
@@ -205,4 +167,3 @@ class _NotificationPermissionScreenState
     );
   }
 }
-

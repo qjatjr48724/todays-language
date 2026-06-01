@@ -408,6 +408,12 @@
   "admin_tools_cache_empty": "public_metadata/countries/items 가 비어있습니다. seedCountryCatalog를 먼저 실행하세요.",
   "admin_tools_enabled_label": "enabled={value}",
 
+  "admin_tools_section_notification_permission": "알림 권한",
+  "admin_tools_reset_notification_permission_button": "알림 권한 안내 초기화",
+  "admin_tools_reset_notification_permission_title": "알림 권한 안내 초기화",
+  "admin_tools_reset_notification_permission_message": "앱 진입 시 알림 권한 안내 화면이 다시 표시됩니다.",
+  "admin_tools_open_notification_permission": "알림 권한 화면 열기",
+
   "admin_tools_section_daily_progress": "오늘 진행률 (디버그)",
   "admin_tools_section_learning_set": "학습 세트",
   "admin_tools_ensure_learning_set": "ensureLearningSetForToday(현재 프로필)"

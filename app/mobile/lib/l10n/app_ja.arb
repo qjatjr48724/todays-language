@@ -410,6 +410,12 @@
   "admin_tools_cache_empty": "public_metadata/countries/items が空です。先に seedCountryCatalog を実行してください。",
   "admin_tools_enabled_label": "enabled={value}",
 
+  "admin_tools_section_notification_permission": "通知権限",
+  "admin_tools_reset_notification_permission_button": "通知案内をリセット",
+  "admin_tools_reset_notification_permission_title": "通知案内をリセット",
+  "admin_tools_reset_notification_permission_message": "次回のアプリ起動時に通知権限の案内画面が再表示されます。",
+  "admin_tools_open_notification_permission": "通知権限画面を開く",
+
   "admin_tools_section_daily_progress": "今日の進捗（デバッグ）",
   "admin_tools_section_learning_set": "学習セット",
   "admin_tools_ensure_learning_set": "ensureLearningSetForToday（現在のプロフィール）"

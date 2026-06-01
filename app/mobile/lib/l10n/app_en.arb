@@ -410,6 +410,12 @@
   "admin_tools_cache_empty": "public_metadata/countries/items is empty. Run seedCountryCatalog first.",
   "admin_tools_enabled_label": "enabled={value}",
 
+  "admin_tools_section_notification_permission": "Notification permission",
+  "admin_tools_reset_notification_permission_button": "Reset notification prompt",
+  "admin_tools_reset_notification_permission_title": "Reset notification prompt",
+  "admin_tools_reset_notification_permission_message": "The notification permission screen will show again on the next app entry.",
+  "admin_tools_open_notification_permission": "Open notification permission screen",
+
   "admin_tools_section_daily_progress": "Today's progress (debug)",
   "admin_tools_section_learning_set": "Learning set",
   "admin_tools_ensure_learning_set": "ensureLearningSetForToday (current profile)"

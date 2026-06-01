@@ -1047,6 +1047,22 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get admin_tools_section_notification_permission => '알림 권한';
+
+  @override
+  String get admin_tools_reset_notification_permission_button => '알림 권한 안내 초기화';
+
+  @override
+  String get admin_tools_reset_notification_permission_title => '알림 권한 안내 초기화';
+
+  @override
+  String get admin_tools_reset_notification_permission_message =>
+      '앱 진입 시 알림 권한 안내 화면이 다시 표시됩니다.';
+
+  @override
+  String get admin_tools_open_notification_permission => '알림 권한 화면 열기';
+
+  @override
   String get admin_tools_section_daily_progress => '오늘 진행률 (디버그)';
 
   @override
