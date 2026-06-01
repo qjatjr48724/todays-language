@@ -37,7 +37,58 @@
 
 ## 아키텍쳐
 
+![아키텍처](docs/images/architecture.png)
+
 ## 데이터/스키마 구조
+
+- 저장소: **Cloud Firestore**
+- 일일 기준: **Asia/Seoul (KST)** — 문서 ID·조회 키는 `yyyy-MM-dd` 형식의 `dateKst` 사용
+- 상세 스키마: [`docs/FIRESTORE_MIN_SCHEMA.md`](docs/FIRESTORE_MIN_SCHEMA.md)
+
+### 사용자 (`users/{uid}`)
+
+| 필드(주요) | 설명 |
+|---|---|
+| `email`, `displayName`, `provider` | 프로필·로그인 방식 (`email` 등) |
+| `nativeLanguage`, `targetLanguage` | ISO-3166-1 alpha-3 (예: `KOR`, `JPN`) |
+| `level` | 학습 난이도 (`beginner` / `intermediate` / `advanced`) |
+| `languageSetupDone` | 첫 진입 언어 설정 완료 여부 |
+| `timezone` | `Asia/Seoul` |
+| `createdAt`, `lastLoginAt` | 가입·최근 로그인 시각 |
+
+### 일일 진도 (`users/{uid}/daily_progress/{dateKst}`)
+
+| 필드(주요) | 설명 |
+|---|---|
+| `wordGoal` / `wordDone` | 오늘의 단어 목표·완료 (기본 30) |
+| `sentenceGoal` / `sentenceDone` | 오늘의 문장 목표·완료 (기본 10) |
+| `quizGoal` / `quizDone` | 오늘의 마무리 목표·완료 (기본 25) |
+| `progressPercent` | 0~100 (완료 수 기반 재계산) |
+| `updatedAt` | 마지막 갱신 시각 |
+
+- 앱에서 진도 +1은 **Firestore 트랜잭션**으로 처리하며, `goal` 초과는 **clamp** 합니다.
+
+### 글로벌 일일 학습 세트 (`users/global_learning_set_owner/...`)
+
+- AI로 생성한 **당일 단어·문장 풀**을 공유 저장 (언어·난이도·날짜 조합별)
+- 문서 ID 예: `{dateKst}_{targetLanguage}_{level}` (예: `2026-05-27_JPN_beginner`)
+- 경로
+  - `.../daily_word_sets/{docId}` — 일일 단어 세트(약 30개)
+  - `.../daily_sentence_sets/{docId}` — 일일 문장 세트(약 10개)
+- **Cloud Functions**가 생성·갱신, 클라이언트는 **읽기 위주** (`firestore.rules`에서 write 차단)
+
+### 사용자별 학습 커서 (`users/{uid}/...`)
+
+- `daily_word_cursor`, `daily_sentence_cursor`, `daily_quiz_cursor` — 글로벌 세트 내에서 **개인별 진행 위치** 저장
+
+### 공개 메타데이터 (`public_metadata/countries/items`)
+
+- 국가·국기 URL 등 (Functions에서 동기화·캐시, 로그인 사용자 **read-only**)
+
+### 보안 규칙 요약
+
+- `users/{uid}` 및 하위 컬렉션: **본인 `uid`만** read/write
+- `users/global_learning_set_owner/**`, `public_metadata/**`: 로그인 사용자 **read-only**, 클라이언트 write 불가
 
 ## 화면 구성 및 상세 구현
 |  |
