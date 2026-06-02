@@ -42,159 +42,82 @@
 
 ## 화면 구성 및 상세 구현
 
-스크린샷 원본: `docs/images/screens/` · 화면마다 **1열 표(화면명 → 사진 → 설명)** 로 정리합니다. (모든 표는 README 본문 **가로 100%** 통일, 사진 가운데 정렬)
+스크린샷 원본: `docs/images/screens/`
 
-### 1) 앱 진입
+> **GitHub README 표 너비에 대해**  
+> GitHub는 README HTML에서 `width: 100%`, `table-layout: fixed` 등 **대부분의 너비 지정을 무시**하고, **표마다 내용(사진) 너비에 맞춰** 따로 그립니다. 그래서 화면마다 표를 나누면 **너비가 통일되지 않습니다.**  
+> 아래는 그 한계 안에서 **모든 화면을 하나의 표**로 묶어, **행마다 같은 열 너비**가 되도록 한 구성입니다.  
+> README 본문 전체(양쪽 끝)까지 표를 **강제로 꽉 채우는 것은 GitHub만으로는 보장할 수 없습니다.** (커스텀 CSS가 있는 GitHub Pages·Notion·PDF 등에서는 가능)
 
-<table width="100%" style="table-layout: fixed; width: 100%;">
-  <colgroup><col width="100%" /></colgroup>
-  <thead><tr><th align="center">첫 화면</th></tr></thead>
+<table>
   <tbody>
+    <tr><td align="center"><strong>1) 앱 진입</strong></td></tr>
+    <tr><th align="center">첫 화면</th></tr>
     <tr><td align="center"><img src="docs/images/screens/첫화면.PNG" width="240" alt="첫 화면" /></td></tr>
     <tr><td>앱 실행 첫 화면. 터치 또는 자동 전환 후 로그인·홈으로 이동합니다.</td></tr>
-  </tbody>
-</table>
-
-<table width="100%" style="table-layout: fixed; width: 100%;">
-  <colgroup><col width="100%" /></colgroup>
-  <thead><tr><th align="center">알림 권한</th></tr></thead>
-  <tbody>
+    <tr><td align="center"><br /></td></tr>
+    <tr><th align="center">알림 권한</th></tr>
     <tr><td align="center"><img src="docs/images/screens/알림권한.PNG" width="240" alt="알림 권한" /> <img src="docs/images/screens/알림권한2.PNG" width="240" alt="알림 권한 거부 후 안내" /></td></tr>
     <tr><td>최초 실행 시 알림 허용 안내. 거부 시 설정 앱으로 안내하는 흐름을 포함합니다.</td></tr>
-  </tbody>
-</table>
-
-### 2) 로그인·회원가입
-
-<table width="100%" style="table-layout: fixed; width: 100%;">
-  <colgroup><col width="100%" /></colgroup>
-  <thead><tr><th align="center">로그인 방식 선택</th></tr></thead>
-  <tbody>
+    <tr><td align="center"><br /></td></tr>
+    <tr><td align="center"><strong>2) 로그인·회원가입</strong></td></tr>
+    <tr><th align="center">로그인 방식 선택</th></tr>
     <tr><td align="center"><img src="docs/images/screens/로그인방식선택.PNG" width="240" alt="로그인 방식 선택" /></td></tr>
     <tr><td>이메일 로그인 진입 화면입니다. (Google·Apple 소셜 로그인은 보안 검토 후 추가 예정, 현재 UI 비활성)</td></tr>
-  </tbody>
-</table>
-
-<table width="100%" style="table-layout: fixed; width: 100%;">
-  <colgroup><col width="100%" /></colgroup>
-  <thead><tr><th align="center">이메일 로그인</th></tr></thead>
-  <tbody>
+    <tr><td align="center"><br /></td></tr>
+    <tr><th align="center">이메일 로그인</th></tr>
     <tr><td align="center"><img src="docs/images/screens/이메일로그인화면.PNG" width="240" alt="이메일 로그인" /></td></tr>
     <tr><td>이메일·비밀번호로 로그인합니다.</td></tr>
-  </tbody>
-</table>
-
-### 3) 온보딩 (첫 진입)
-
-<table width="100%" style="table-layout: fixed; width: 100%;">
-  <colgroup><col width="100%" /></colgroup>
-  <thead><tr><th align="center">로컬 언어 선택</th></tr></thead>
-  <tbody>
+    <tr><td align="center"><br /></td></tr>
+    <tr><td align="center"><strong>3) 온보딩 (첫 진입)</strong></td></tr>
+    <tr><th align="center">로컬 언어 선택</th></tr>
     <tr><td align="center"><img src="docs/images/screens/첫실행-로컬언어선택.PNG" width="240" alt="로컬 언어 선택" /></td></tr>
     <tr><td>온보딩 1단계: 모국어(로컬 언어)를 선택합니다.</td></tr>
-  </tbody>
-</table>
-
-<table width="100%" style="table-layout: fixed; width: 100%;">
-  <colgroup><col width="100%" /></colgroup>
-  <thead><tr><th align="center">학습 언어·난이도</th></tr></thead>
-  <tbody>
+    <tr><td align="center"><br /></td></tr>
+    <tr><th align="center">학습 언어·난이도</th></tr>
     <tr><td align="center"><img src="docs/images/screens/첫실행-대상언어선택.PNG" width="240" alt="학습 언어·난이도" /></td></tr>
     <tr><td>온보딩 2단계: 학습할 대상 언어와 난이도를 선택합니다.</td></tr>
-  </tbody>
-</table>
-
-### 4) 메인 (하단 탭)
-
-<table width="100%" style="table-layout: fixed; width: 100%;">
-  <colgroup><col width="100%" /></colgroup>
-  <thead><tr><th align="center">홈</th></tr></thead>
-  <tbody>
+    <tr><td align="center"><br /></td></tr>
+    <tr><td align="center"><strong>4) 메인 (하단 탭)</strong></td></tr>
+    <tr><th align="center">홈</th></tr>
     <tr><td align="center"><img src="docs/images/screens/홈화면.PNG" width="240" alt="홈" /></td></tr>
     <tr><td>오늘의 단어·문장·마무리·기초 문자표로 진입하고, 일일 진행률을 한눈에 확인합니다.</td></tr>
-  </tbody>
-</table>
-
-<table width="100%" style="table-layout: fixed; width: 100%;">
-  <colgroup><col width="100%" /></colgroup>
-  <thead><tr><th align="center">내 정보</th></tr></thead>
-  <tbody>
+    <tr><td align="center"><br /></td></tr>
+    <tr><th align="center">내 정보</th></tr>
     <tr><td align="center"><img src="docs/images/screens/내정보.PNG" width="240" alt="내 정보" /> <img src="docs/images/screens/내정보-언어선택.PNG" width="240" alt="내 정보 언어 선택" /> <img src="docs/images/screens/내정보-학습난이도.PNG" width="240" alt="내 정보 학습 난이도" /></td></tr>
     <tr><td>학습 언어·난이도 변경 및 로그아웃. 언어 선택·난이도 변경 화면으로 이동할 수 있습니다.</td></tr>
-  </tbody>
-</table>
-
-<table width="100%" style="table-layout: fixed; width: 100%;">
-  <colgroup><col width="100%" /></colgroup>
-  <thead><tr><th align="center">커뮤니티</th></tr></thead>
-  <tbody>
+    <tr><td align="center"><br /></td></tr>
+    <tr><th align="center">커뮤니티</th></tr>
     <tr><td align="center"><img src="docs/images/screens/커뮤니티.PNG" width="240" alt="커뮤니티" /></td></tr>
     <tr><td>커뮤니티 탭입니다. (기능 확장 예정)</td></tr>
-  </tbody>
-</table>
-
-<table width="100%" style="table-layout: fixed; width: 100%;">
-  <colgroup><col width="100%" /></colgroup>
-  <thead><tr><th align="center">진행률</th></tr></thead>
-  <tbody>
+    <tr><td align="center"><br /></td></tr>
+    <tr><th align="center">진행률</th></tr>
     <tr><td align="center"><img src="docs/images/screens/진행률.PNG" width="240" alt="진행률" /> <img src="docs/images/screens/진행률-날짜클릭.PNG" width="240" alt="진행률 날짜 상세" /></td></tr>
     <tr><td>오늘 진행률과 월간 캘린더. 날짜를 선택하면 해당 일의 학습 상세를 확인합니다.</td></tr>
-  </tbody>
-</table>
-
-### 5) 학습·참고
-
-<table width="100%" style="table-layout: fixed; width: 100%;">
-  <colgroup><col width="100%" /></colgroup>
-  <thead><tr><th align="center">오늘의 단어</th></tr></thead>
-  <tbody>
+    <tr><td align="center"><br /></td></tr>
+    <tr><td align="center"><strong>5) 학습·참고</strong></td></tr>
+    <tr><th align="center">오늘의 단어</th></tr>
     <tr><td align="center"><img src="docs/images/screens/오늘의단어.PNG" width="240" alt="오늘의 단어" /></td></tr>
     <tr><td>일일 단어 30개를 학습하고 예문을 확인합니다.</td></tr>
-  </tbody>
-</table>
-
-<table width="100%" style="table-layout: fixed; width: 100%;">
-  <colgroup><col width="100%" /></colgroup>
-  <thead><tr><th align="center">오늘의 문장</th></tr></thead>
-  <tbody>
+    <tr><td align="center"><br /></td></tr>
+    <tr><th align="center">오늘의 문장</th></tr>
     <tr><td align="center"><img src="docs/images/screens/오늘의문장.PNG" width="240" alt="오늘의 문장" /></td></tr>
     <tr><td>일일 문장 10개를 학습합니다.</td></tr>
-  </tbody>
-</table>
-
-<table width="100%" style="table-layout: fixed; width: 100%;">
-  <colgroup><col width="100%" /></colgroup>
-  <thead><tr><th align="center">오늘의 마무리</th></tr></thead>
-  <tbody>
+    <tr><td align="center"><br /></td></tr>
+    <tr><th align="center">오늘의 마무리</th></tr>
     <tr><td align="center"><img src="docs/images/screens/오늘의마무리.PNG" width="240" alt="오늘의 마무리" /></td></tr>
     <tr><td>단어·문장 학습 완료 후 4지선다로 오늘 학습을 점검합니다.</td></tr>
-  </tbody>
-</table>
-
-<table width="100%" style="table-layout: fixed; width: 100%;">
-  <colgroup><col width="100%" /></colgroup>
-  <thead><tr><th align="center">기초 문자표</th></tr></thead>
-  <tbody>
+    <tr><td align="center"><br /></td></tr>
+    <tr><th align="center">기초 문자표</th></tr>
     <tr><td align="center"><img src="docs/images/screens/기초문자표-영어.PNG" width="240" alt="기초 문자표 영어" /> <img src="docs/images/screens/기초문자표-한국어.PNG" width="240" alt="기초 문자표 한국어" /> <img src="docs/images/screens/기초문자표-일본어%28히라%29.PNG" width="240" alt="기초 문자표 일본어" /></td></tr>
     <tr><td>학습 언어에 맞는 알파벳·한글·히라가나 등 참고 차트를 제공합니다.</td></tr>
-  </tbody>
-</table>
-
-### (미구현) 추후 추가 예정
-
-<table width="100%" style="table-layout: fixed; width: 100%;">
-  <colgroup><col width="100%" /></colgroup>
-  <thead><tr><th align="center">오늘의 속담</th></tr></thead>
-  <tbody>
+    <tr><td align="center"><br /></td></tr>
+    <tr><td align="center"><strong>(미구현) 추후 추가 예정</strong></td></tr>
+    <tr><th align="center">오늘의 속담</th></tr>
     <tr><td align="center"><em>(스크린샷 미추가)</em></td></tr>
     <tr><td>한국어 학습 시 속담 학습</td></tr>
-  </tbody>
-</table>
-
-<table width="100%" style="table-layout: fixed; width: 100%;">
-  <colgroup><col width="100%" /></colgroup>
-  <thead><tr><th align="center">이메일 회원가입</th></tr></thead>
-  <tbody>
+    <tr><td align="center"><br /></td></tr>
+    <tr><th align="center">이메일 회원가입</th></tr>
     <tr><td align="center"><em>(스크린샷 미추가)</em></td></tr>
     <tr><td>약관 동의 후 가입</td></tr>
   </tbody>
