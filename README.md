@@ -24,9 +24,9 @@
 
 ## ⚙ 기술 스택
 - 모바일 앱<br>
-  <img src="https://img.shields.io/badge/flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white"> <img src="https://img.shields.io/badge/dart-#0175C2?style=for-the-badge&logo=Dart&logoColor=white">
+  <img src="https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white"> <img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white">
 - 백엔드<br>
-  <img src="https://img.shields.io/badge/firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=white"> <img src="https://img.shields.io/badge/node.js-339933?style=for-the-badge&logo=Node.js&logoColor=white">
+  <img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=white"> <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white">
 - AI - OpenAI Responses API
 
 ## 핵심 기능
@@ -215,11 +215,6 @@
 #### 오늘의 속담
 
 - 한국어 학습 시 속담 학습
-- 스크린샷 미추가
-
-#### 이메일 회원가입
-
-- 약관 동의 후 가입
 - 스크린샷 미추가
 
 ## 향후 개발 계획
