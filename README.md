@@ -27,7 +27,8 @@
   <img src="https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white"> <img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white">
 - 백엔드<br>
   <img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=white"> <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white">
-- AI - OpenAI Responses API
+- AI<br>
+  <img src="https://img.shields.io/badge/OpenAI-000000?style=for-the-badge&logo=openai&logoColor=white"> <img src="https://img.shields.io/badge/Responses%20API-000000?style=for-the-badge&logo=openai&logoColor=white">
 
 ## 핵심 기능
 - 기초 문자표 : 언어를 공부하기 위해 필요한 가나다, 알파벳, 히라가나, 카타가나 등 기초 문자표를 학습할 수 있다.
@@ -218,6 +219,12 @@
 - 스크린샷 미추가
 
 ## 향후 개발 계획
+
+- **오늘의 속담**: 한국어 학습 시 속담 학습 기능
+- **채팅**: 같은 언어를 선택한 사용자끼리 대화하며 회화 능력을 기를 수 있는 기능
+- **언어별 자격증**: 언어별 자격증 정보/후기/공부 팁 공유 커뮤니티 기능
+- **기본 회화 가이드**: 해외에서 참고할 수 있는 기본 회화 표현 모음 기능
+- **소셜 로그인**: Google / Apple 로그인 (보안 검토 후 추가)
 
 
 
