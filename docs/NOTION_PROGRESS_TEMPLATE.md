@@ -1517,3 +1517,39 @@ unauthenticated: 로그인 상태 확인
 2. **채팅 기능 추가** — `PROJECT_CONTEXT` §13: 언어 선택 → 해당 언어 채팅 룸, 커뮤니티 탭 메뉴(채팅)와 연동 설계
 3. (선택) `git push` · 홈 카드 부제 `문자 · 발음 · 표기법` 문구를 언어별 표 구성에 맞게 정리
 
+---
+
+## [단계 34] core_v1 50일 커리큘럼 정의 및 2안 로드맵 정리 (2026-06-05)
+
+### 1) 오늘 한 일
+
+- `functions/src/curriculum/core_v1_rotation.ts` 신규 추가·커밋 (`21eee41`)
+  - 50개 topicId 카탈로그, 1~50일차 로테이션, 프롬프트 헬퍼
+- FD-01·HL-01·WT-01을 `daily_life`로 분류, DL-03 직후(4~6일차) 배치, 말일 FD/HL/WT 제거로 50일 유지
+- 2안 제품 방향(온보딩 난이도·1/2단계 사이클·선택 점검·자유학습·초·중 세트) 구현 로드맵 정리
+- Notion 진행 페이지 작성 (2026-06-05)
+
+### 2) 완료 기준 체크
+
+- [x] `functions` `npm run build` 통과
+- [x] Git 커밋 (`21eee41`)
+- [ ] `prompts.ts` / `index.ts` 커리큘럼 연동
+- [ ] 50일 topicId 상세 순서 확정(사용자)
+
+### 3) 추가/변경한 코드 포인트
+
+- 파일: `functions/src/curriculum/core_v1_rotation.ts` (신규)
+- 미연동: `functions/src/prompts.ts`, `functions/src/index.ts`
+- 당일 학습은 기존 KST + `global_learning_set_owner` 글로벌 세트
+
+### 4) 이슈/막힌 점
+
+- Notion URL 해시(`#32b72820…`)는 빈 하위 페이지(블록) — 진행 문서는 신규 자식 페이지로 생성
+
+### 5) 다음 액션
+
+1. 사용자: 50일 topicId 상세 순서표 전달
+2. Phase A Firestore 스키마 (`learningDay`, `curriculumPhase`, review, `learningMode`)
+3. Phase B 온보딩(언어 + 난이도 초/중/고)
+4. `git push origin main`
+
