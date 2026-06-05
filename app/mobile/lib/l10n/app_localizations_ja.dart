@@ -113,10 +113,11 @@ class AppLocalizationsJa extends AppLocalizations {
   String get target_language_setup_appbar_title => '対象言語の選択';
 
   @override
-  String get target_language_setup_welcome_title => '学習言語を選んでください。';
+  String get target_language_setup_welcome_title => '学習言語と難易度を選んでください。';
 
   @override
-  String get target_language_setup_welcome_subtitle => '単語／文／ラップアップに使用します。';
+  String get target_language_setup_welcome_subtitle =>
+      '選んだ言語と難易度で50日カリキュラムが始まります。';
 
   @override
   String get target_language_setup_card_title => '対象言語';
@@ -126,6 +127,22 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get target_language_setup_save_and_start_button => '保存して開始';
+
+  @override
+  String get onboarding_difficulty_card_title => '学習難易度';
+
+  @override
+  String get onboarding_difficulty_card_subtitle =>
+      '自分に合うレベルを選んでください。あとからマイ情報で変更できます。';
+
+  @override
+  String get onboarding_level_beginner_desc => '初めて学ぶ、または基礎表現から丁寧に学びたいとき';
+
+  @override
+  String get onboarding_level_intermediate_desc => '基本会話に慣れて、もう少し文を広げたいとき';
+
+  @override
+  String get onboarding_level_advanced_desc => '長い文や豊かな表現で実力を伸ばしたいとき';
 
   @override
   String get notification_permission_title => '通知設定';

@@ -283,13 +283,13 @@ abstract class AppLocalizations {
   /// No description provided for @target_language_setup_welcome_title.
   ///
   /// In ko, this message translates to:
-  /// **'학습 언어를 선택해주세요.'**
+  /// **'학습 언어와 난이도를 선택해주세요.'**
   String get target_language_setup_welcome_title;
 
   /// No description provided for @target_language_setup_welcome_subtitle.
   ///
   /// In ko, this message translates to:
-  /// **'단어/문장/마무리에 사용됩니다.'**
+  /// **'선택한 언어와 난이도로 50일 커리큘럼 학습이 시작됩니다.'**
   String get target_language_setup_welcome_subtitle;
 
   /// No description provided for @target_language_setup_card_title.
@@ -309,6 +309,36 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'저장하고 시작하기'**
   String get target_language_setup_save_and_start_button;
+
+  /// No description provided for @onboarding_difficulty_card_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'학습 난이도'**
+  String get onboarding_difficulty_card_title;
+
+  /// No description provided for @onboarding_difficulty_card_subtitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'본인에게 맞는 수준을 선택하세요. 나중에 내 정보에서 변경할 수 있어요.'**
+  String get onboarding_difficulty_card_subtitle;
+
+  /// No description provided for @onboarding_level_beginner_desc.
+  ///
+  /// In ko, this message translates to:
+  /// **'처음 배우거나 기초 표현부터 차근차근 학습하고 싶을 때'**
+  String get onboarding_level_beginner_desc;
+
+  /// No description provided for @onboarding_level_intermediate_desc.
+  ///
+  /// In ko, this message translates to:
+  /// **'기본 회화에 익숙하고 문장을 조금 더 확장하고 싶을 때'**
+  String get onboarding_level_intermediate_desc;
+
+  /// No description provided for @onboarding_level_advanced_desc.
+  ///
+  /// In ko, this message translates to:
+  /// **'긴 문장과 다양한 표현으로 실력을 다지고 싶을 때'**
+  String get onboarding_level_advanced_desc;
 
   /// No description provided for @notification_permission_title.
   ///

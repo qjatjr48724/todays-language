@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 
 import 'main_nav_screen.dart';
 import '../l10n/app_localizations.dart';
+import '../models/curriculum_state.dart';
 import '../services/user_profile_sync.dart';
+import '../ui/learning_level_selector.dart';
 
 class TargetLanguageSetupScreen extends StatefulWidget {
   const TargetLanguageSetupScreen({super.key});
@@ -20,6 +22,7 @@ class _TargetLanguageSetupScreenState extends State<TargetLanguageSetupScreen> {
   static const _fieldTargetVariant = 'targetLanguageVariant';
 
   _TargetChoice? _targetChoice;
+  String _selectedLevel = 'beginner';
   bool _saving = false;
   String? _error;
   List<_CountryItem>? _countries;
@@ -51,8 +54,13 @@ class _TargetLanguageSetupScreenState extends State<TargetLanguageSetupScreen> {
             _TargetChoice.fromStored(normalized, null);
       }
 
+      final level = CurriculumState.normalizeLearningLevel(data['level'] as String?);
+
       if (!mounted) return;
-      setState(() => _targetChoice = targetChoice);
+      setState(() {
+        _targetChoice = targetChoice;
+        _selectedLevel = level;
+      });
     } catch (e) {
       if (!mounted) return;
       final l10n = AppLocalizations.of(context)!;
@@ -116,13 +124,14 @@ class _TargetLanguageSetupScreenState extends State<TargetLanguageSetupScreen> {
       final docRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
       final current = await docRef.get();
       final data = current.data() ?? <String, dynamic>{};
-      final level = (data['level'] as String?)?.trim();
-      final normalizedLevel = (level == null || level.isEmpty) ? 'beginner' : level;
+      final normalizedLevel = CurriculumState.normalizeLearningLevel(_selectedLevel);
 
       await docRef.set(
         {
           _fieldTarget: targetChoice.alpha3,
           _fieldTargetVariant: targetChoice.variant,
+          ...CurriculumState.backfillPatch(data),
+          'level': normalizedLevel,
           _fieldSetupDone: true,
         },
         SetOptions(merge: true),
@@ -193,6 +202,15 @@ class _TargetLanguageSetupScreenState extends State<TargetLanguageSetupScreen> {
                             selected: _targetChoice,
                             onSelect: (choice) => setState(() => _targetChoice = choice),
                           ),
+                  ),
+                  const SizedBox(height: 16),
+                  _PickerCard(
+                    title: l10n.onboarding_difficulty_card_title,
+                    subtitle: l10n.onboarding_difficulty_card_subtitle,
+                    child: LearningLevelSelector(
+                      selectedLevel: _selectedLevel,
+                      onSelect: (level) => setState(() => _selectedLevel = level),
+                    ),
                   ),
                 ],
               ),

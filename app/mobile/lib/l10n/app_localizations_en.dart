@@ -119,11 +119,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get target_language_setup_welcome_title =>
-      'Please select a learning language.';
+      'Choose your learning language and difficulty.';
 
   @override
   String get target_language_setup_welcome_subtitle =>
-      'Used for words/sentences/wrap-up.';
+      'Your 50-day curriculum starts with these choices.';
 
   @override
   String get target_language_setup_card_title => 'Target Language';
@@ -134,6 +134,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get target_language_setup_save_and_start_button => 'Save and start';
+
+  @override
+  String get onboarding_difficulty_card_title => 'Learning difficulty';
+
+  @override
+  String get onboarding_difficulty_card_subtitle =>
+      'Pick a level that fits you. You can change it later in My Info.';
+
+  @override
+  String get onboarding_level_beginner_desc =>
+      'For first-time learners or building from basic expressions';
+
+  @override
+  String get onboarding_level_intermediate_desc =>
+      'For those comfortable with basics who want longer sentences';
+
+  @override
+  String get onboarding_level_advanced_desc =>
+      'For learners who want richer vocabulary and longer expressions';
 
   @override
   String get notification_permission_title => 'Notifications';

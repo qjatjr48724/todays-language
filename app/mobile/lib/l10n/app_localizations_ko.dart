@@ -112,10 +112,11 @@ class AppLocalizationsKo extends AppLocalizations {
   String get target_language_setup_appbar_title => '대상 언어 선택';
 
   @override
-  String get target_language_setup_welcome_title => '학습 언어를 선택해주세요.';
+  String get target_language_setup_welcome_title => '학습 언어와 난이도를 선택해주세요.';
 
   @override
-  String get target_language_setup_welcome_subtitle => '단어/문장/마무리에 사용됩니다.';
+  String get target_language_setup_welcome_subtitle =>
+      '선택한 언어와 난이도로 50일 커리큘럼 학습이 시작됩니다.';
 
   @override
   String get target_language_setup_card_title => '대상 언어';
@@ -125,6 +126,23 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get target_language_setup_save_and_start_button => '저장하고 시작하기';
+
+  @override
+  String get onboarding_difficulty_card_title => '학습 난이도';
+
+  @override
+  String get onboarding_difficulty_card_subtitle =>
+      '본인에게 맞는 수준을 선택하세요. 나중에 내 정보에서 변경할 수 있어요.';
+
+  @override
+  String get onboarding_level_beginner_desc => '처음 배우거나 기초 표현부터 차근차근 학습하고 싶을 때';
+
+  @override
+  String get onboarding_level_intermediate_desc =>
+      '기본 회화에 익숙하고 문장을 조금 더 확장하고 싶을 때';
+
+  @override
+  String get onboarding_level_advanced_desc => '긴 문장과 다양한 표현으로 실력을 다지고 싶을 때';
 
   @override
   String get notification_permission_title => '알림 설정';

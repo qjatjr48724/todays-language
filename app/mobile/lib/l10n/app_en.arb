@@ -36,11 +36,16 @@
   "setup_save_failed": "Save failed: {error}",
 
   "target_language_setup_appbar_title": "Target Language Selection",
-  "target_language_setup_welcome_title": "Please select a learning language.",
-  "target_language_setup_welcome_subtitle": "Used for words/sentences/wrap-up.",
+  "target_language_setup_welcome_title": "Choose your learning language and difficulty.",
+  "target_language_setup_welcome_subtitle": "Your 50-day curriculum starts with these choices.",
   "target_language_setup_card_title": "Target Language",
   "target_language_setup_card_subtitle": "Used for learning (words/sentences/wrap-up).",
   "target_language_setup_save_and_start_button": "Save and start",
+  "onboarding_difficulty_card_title": "Learning difficulty",
+  "onboarding_difficulty_card_subtitle": "Pick a level that fits you. You can change it later in My Info.",
+  "onboarding_level_beginner_desc": "For first-time learners or building from basic expressions",
+  "onboarding_level_intermediate_desc": "For those comfortable with basics who want longer sentences",
+  "onboarding_level_advanced_desc": "For learners who want richer vocabulary and longer expressions",
 
   "notification_permission_title": "Notifications",
   "notification_permission_heading": "Allow notifications?",
