@@ -7,6 +7,7 @@ import 'dart:async';
 
 import '../services/daily_progress_sync.dart';
 import '../services/user_profile_sync.dart';
+import '../models/curriculum_state.dart';
 import '../services/user_prefs.dart';
 import '../ui/bordered_linear_progress.dart';
 import '../ui/home_feature_card.dart';
@@ -74,6 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _prefs = UserPrefs(
             targetLanguage: (tl == null || tl.isEmpty) ? _prefs.targetLanguage : tl,
             level: (lv == null || lv.isEmpty) ? _prefs.level : lv,
+            curriculum: CurriculumState.fromUserData(data),
           );
         });
       }, onError: (_) {

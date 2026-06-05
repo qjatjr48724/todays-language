@@ -1,6 +1,11 @@
 import * as admin from "firebase-admin";
 
 import { db } from "../shared/firebase";
+import {
+  CURRICULUM_SENTENCE_SETS_SUBCOLLECTION,
+  CURRICULUM_WORD_SETS_SUBCOLLECTION,
+  curriculumSetDocId,
+} from "./curriculum_set_keys";
 
 const GLOBAL_LEARNING_SET_OWNER = "global_learning_set_owner";
 
@@ -67,6 +72,38 @@ export function globalTodaySentenceSetRef(
     .collection("users")
     .doc(GLOBAL_LEARNING_SET_OWNER)
     .collection("daily_sentence_sets")
+    .doc(docId);
+}
+
+/** 커리큘럼 단어 세트 — Phase C에서 materialize 대상 */
+export function globalCurriculumWordSetRef(
+  targetLanguage: string,
+  level: string,
+  phase: number,
+  learningDay: number
+): admin.firestore.DocumentReference {
+  const tl = normalizeTargetLanguage(targetLanguage);
+  const docId = curriculumSetDocId(tl.external, level, phase, learningDay);
+  return db
+    .collection("users")
+    .doc(GLOBAL_LEARNING_SET_OWNER)
+    .collection(CURRICULUM_WORD_SETS_SUBCOLLECTION)
+    .doc(docId);
+}
+
+/** 커리큘럼 문장 세트 — Phase C에서 materialize 대상 */
+export function globalCurriculumSentenceSetRef(
+  targetLanguage: string,
+  level: string,
+  phase: number,
+  learningDay: number
+): admin.firestore.DocumentReference {
+  const tl = normalizeTargetLanguage(targetLanguage);
+  const docId = curriculumSetDocId(tl.external, level, phase, learningDay);
+  return db
+    .collection("users")
+    .doc(GLOBAL_LEARNING_SET_OWNER)
+    .collection(CURRICULUM_SENTENCE_SETS_SUBCOLLECTION)
     .doc(docId);
 }
 

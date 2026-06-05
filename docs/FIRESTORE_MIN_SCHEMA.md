@@ -13,13 +13,29 @@
   "displayName": "홍길동",
   "email": "user@example.com",
   "provider": "email",
-  "nativeLanguage": "ko",
-  "targetLanguage": "ja",
+  "nativeLanguage": "KOR",
+  "targetLanguage": "JPN",
+  "level": "beginner",
+  "languageSetupDone": true,
+  "curriculumId": "core_v1",
+  "curriculumPhase": 1,
+  "learningDay": 1,
+  "learningMode": "curriculum",
+  "cycleReviewStatus": "none",
   "createdAt": "serverTimestamp",
   "lastLoginAt": "serverTimestamp",
   "timezone": "Asia/Seoul"
 }
 ```
+
+| 필드 | 설명 |
+|------|------|
+| `level` | `beginner` \| `intermediate` \| `advanced` |
+| `curriculumId` | 커리큘럼 정본 ID (`core_v1`) |
+| `curriculumPhase` | `1` \| `2` (동일 topicId, 2단계는 새 어휘) |
+| `learningDay` | `1..50` (KST 캘린더와 별도 진행 일차) |
+| `learningMode` | `curriculum` \| `review` \| `free_study` |
+| `cycleReviewStatus` | `none` \| `available` \| `in_progress` \| `completed` \| `skipped` |
 
 ### `users/{uid}/daily_progress/{dateKst}`
 
@@ -65,8 +81,25 @@
 
 ---
 
-## 5) 다음 확장 포인트
+## 5) 커리큘럼 학습 세트 (Phase C 연동 예정)
 
-- `daily_content`(오늘 제공 단어/문장 캐시) 분리
+레거시 **KST 날짜** 글로벌 세트와 병행한다. Functions 정본 키: `curriculumSetDocId`.
+
+### `users/global_learning_set_owner/curriculum_word_sets/{docId}`
+
+### `users/global_learning_set_owner/curriculum_sentence_sets/{docId}`
+
+`docId` 예: `JPN_beginner_1_7` → `targetLanguage` × `level` × `phase` × `learningDay`
+
+레거시(운영 중):
+
+- `daily_word_sets/{yyyy-MM-dd}_{lang}_{level}`
+- `daily_sentence_sets/{yyyy-MM-dd}_{lang}_{level}`
+
+---
+
+## 6) 다음 확장 포인트
+
+- Phase C: 커리큘럼 세트 생성·소비로 전환 (`prompts` + `core_v1_rotation`)
 - `quiz_history`(정오답 로그) 분리
 - 주간/월간 통계 집계 컬렉션 추가

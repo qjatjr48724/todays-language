@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../models/curriculum_state.dart';
+
 /// 대상언어(학습 언어) — 한·영·일만 선택 가능, 나머지는 추후 오픈.
 const Set<String> kSelectableTargetLanguageAlpha3 = {'KOR', 'USA', 'JPN'};
 
@@ -51,6 +53,9 @@ Future<void> ensureUserProfileDocument(User user) async {
     'targetLanguage': targetLanguage,
     'timezone': 'Asia/Seoul',
     'lastLoginAt': FieldValue.serverTimestamp(),
+
+    // 커리큘럼 학습 상태 백필(누락 필드만 — 기존 진행은 유지)
+    ...CurriculumState.backfillPatch(current),
 
     // 레거시 필드 정리(구버전 가입 폼/실험용 필드 제거)
     'birthDate': FieldValue.delete(),
