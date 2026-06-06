@@ -1553,3 +1553,74 @@ unauthenticated: 로그인 상태 확인
 3. Phase B 온보딩(언어 + 난이도 초/중/고)
 4. `git push origin main`
 
+---
+
+## [단계 35] Phase C 커리큘럼 연동·일일 15/5·DL 번호 정리·일본어 가나 탭 확장 (2026-05-28)
+
+### 1) 오늘 한 일
+
+**Phase C (Functions + 앱) — 커밋·배포 완료**
+- `generateWord` / `generateSentence`: 초·중은 `curriculum_word_sets` / `curriculum_sentence_sets` pop (`debugSource: curriculum_set`)
+- `getWrapUpDeck`: 커리큘럼 세트 연동 (초·중), 고급은 레거시 `daily_*_sets`
+- `seedCurriculumPhase1Sets` (dev allowlist), `pregenerateDailyLearningSets` (KST 23:55, 50일 갭 보충)
+- `ensureLearningSetForToday`: 현재 `learningDay` 세트 폴백 materialize
+- `prompts.ts` 커리큘럼 scope 프롬프트 연동
+- 홈 `n/50일차` 라벨 (커리큘럼 모드)
+- Functions `todays-language-dev` 배포 완료
+
+**DL topicId 순번 정리 (`6629238`)**
+- `core_v1_rotation.ts`: 목록 순서 유지, ID만 DL-01~DL-20 연속
+- FD-01·WT-01·HL-01 → DL-04·DL-14·DL-15로 통합
+- 1~20일차 로테이션 `DL-01`~`DL-20` 순서 정렬
+
+**일일 학습량 축소 (`d88fc31`)**
+- 단어 30→**15**, 문장 10→**5**, 마무리 25→**13** (9단어+4문장, 70/30 비율)
+- Functions `DAILY_WORD_COUNT` / `DAILY_SENTENCE_COUNT`, 앱 `daily_progress_sync` 기본값·i18n 동기화
+- 사용자 수동 확인: 15/5 생성 정상
+
+**기초 문자표 — 일본어 가나 탭 확장 (미커밋 → 이번 커밋)**
+- 히라가나·가타카나: 상단 탭 6종 (청음·탁음·반탁음·요음·촉음·장음)
+- `basic_character_kana_extended_data.dart` 신규, 한국어 표와 동일 `SegmentedButton` 패턴
+
+**Git 커밋 분리 (기능별 4커밋)**
+- `6629238` refactor(curriculum): DL topicId
+- `3d2b49d` feat(functions): Phase C
+- `d88fc31` feat: 일일 15/5
+- `0b0f977` feat(mobile): 홈 일차 표시
+
+### 2) 완료 기준 체크
+
+- [x] `functions` `npm run build` / `npm run test` (13) 통과
+- [x] `flutter analyze` / `flutter test` (22) 통과
+- [x] Functions `todays-language-dev` 배포
+- [x] 사용자 확인: 일일 15단어·5문장 생성
+- [x] 사용자 확인: 일본어 가나 탭 6종
+- [ ] Firestore 커리큘럼 세트 재시드 (구 ID·구 개수 30/10 잔존 시)
+- [ ] `learningDay +1` (KST 자정) 미구현
+
+### 3) 추가/변경한 코드 포인트
+
+| 영역 | 파일 |
+|------|------|
+| 커리큘럼 정본 | `functions/src/curriculum/core_v1_rotation.ts` |
+| Phase C | `functions/src/index.ts`, `curriculum_pregen.ts`, `prompt_bridge.ts`, `wrap_up/callables.ts` |
+| 일일 목표 | `daily_progress_sync.dart`, `app_*.arb` |
+| 가나 탭 | `basic_character_kana_extended_data.dart`, `basic_character_chart_screen.dart` |
+
+**Firestore 경로**
+- 학습(초·중): `users/global_learning_set_owner/curriculum_{word,sentence}_sets/{LANG}_{level}_1_{day}`
+- 레거시(고급): `daily_word_sets` / `daily_sentence_sets` — 초·중만 쓸 때 삭제 가능
+
+### 4) 이슈/막힌 점
+
+- 기존 `daily_progress` 문서는 당일 생성분이면 goal 30/10/25 유지 → KST 익일 또는 초기화 후 15/5/13
+- AI 생성 scope 이탈 가능 → 세트 재시드 권장
+- `daily_*_sets` 삭제 시 **advanced** 계정은 fallback만 노출
+
+### 5) 다음 액션
+
+1. `seedCurriculumPhase1Sets` 재실행 (DL-01~20·15/5 반영)
+2. (선택) `daily_word_sets` / `daily_sentence_sets` 정리 (초·중만 운영 시)
+3. `learningDay +1` (D 단계) 구현
+4. Phase 2 / 점검 / `free_study` 로드맵 착수
+
