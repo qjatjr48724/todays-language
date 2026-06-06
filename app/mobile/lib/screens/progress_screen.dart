@@ -215,11 +215,11 @@ class ProgressScreenState extends State<ProgressScreen> {
                   }
 
                   final percent = iv('progressPercent', 0).clamp(0, 100);
-                  final wordGoal = iv('wordGoal', 30);
+                  final wordGoal = iv('wordGoal', kDailyWordGoalDefault);
                   final wordDone = iv('wordDone', 0);
-                  final sentenceGoal = iv('sentenceGoal', 10);
+                  final sentenceGoal = iv('sentenceGoal', kDailySentenceGoalDefault);
                   final sentenceDone = iv('sentenceDone', 0);
-                  final quizGoal = iv('quizGoal', 25);
+                  final quizGoal = iv('quizGoal', kDailyQuizGoalDefault);
                   final quizDone = iv('quizDone', 0);
 
                   final hasAny =

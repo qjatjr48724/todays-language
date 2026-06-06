@@ -117,12 +117,12 @@
   "basic_characters_ui_lang_ja": "日本語（アプリUI）",
 
   "home_today_words_title": "今日の単語",
-  "home_today_words_subtitle": "毎日30個",
+  "home_today_words_subtitle": "毎日15個",
   "home_today_sentences_title": "今日の文",
-  "home_today_sentences_subtitle": "毎日10個",
+  "home_today_sentences_subtitle": "毎日5個",
   "home_today_wrap_up_title": "今日のまとめ",
-  "home_today_wrap_up_subtitle_ready": "25問（単語70%／文30%）",
-  "home_today_wrap_up_subtitle_locked": "単語30 + 文10の達成で開放",
+  "home_today_wrap_up_subtitle_ready": "13問（単語70%／文30%）",
+  "home_today_wrap_up_subtitle_locked": "単語15 + 文5の達成で開放",
   "home_progress_section_title": "今日の進捗",
   "home_progress_section_subtitle_prefix": "KST · {date}",
   "home_no_data": "データがありません。",
@@ -299,7 +299,7 @@
   "sentences_debug_source": "debugSource: {source}",
 
   "wrapup_appbar_title": "今日のまとめ",
-  "wrapup_summary_title": "当日の学習最終チェック: 25問（単語 70% / 文 30%）",
+  "wrapup_summary_title": "当日の学習最終チェック: 13問（単語 70% / 文 30%）",
 
   "wrapup_load_failed": "まとめ問題を読み込めませんでした: {error}",
   "wrapup_empty_deck": "今日の学習セットにまとめ用の単語・文がありません。単語・文の学習を先に進めてから、もう一度お試しください。",

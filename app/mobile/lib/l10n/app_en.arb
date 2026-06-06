@@ -117,12 +117,12 @@
   "basic_characters_ui_lang_ja": "Japanese (app UI)",
 
   "home_today_words_title": "Today's Words",
-  "home_today_words_subtitle": "30 per day",
+  "home_today_words_subtitle": "15 per day",
   "home_today_sentences_title": "Today's Sentences",
-  "home_today_sentences_subtitle": "10 per day",
+  "home_today_sentences_subtitle": "5 per day",
   "home_today_wrap_up_title": "Today's Wrap-up",
-  "home_today_wrap_up_subtitle_ready": "25 questions (words 70% / sentences 30%)",
-  "home_today_wrap_up_subtitle_locked": "Unlock after completing 30 words + 10 sentences",
+  "home_today_wrap_up_subtitle_ready": "13 questions (words 70% / sentences 30%)",
+  "home_today_wrap_up_subtitle_locked": "Unlock after completing 15 words + 5 sentences",
   "home_progress_section_title": "Today's Progress",
   "home_progress_section_subtitle_prefix": "KST · {date}",
   "home_no_data": "No data available.",
@@ -299,7 +299,7 @@
   "sentences_debug_source": "debugSource: {source}",
 
   "wrapup_appbar_title": "Today's Wrap-up",
-  "wrapup_summary_title": "Today's final learning check: 25 questions (Words 70% / Sentences 30%)",
+  "wrapup_summary_title": "Today's final learning check: 13 questions (Words 70% / Sentences 30%)",
 
   "wrapup_load_failed": "Failed to load wrap-up questions: {error}",
   "wrapup_empty_deck": "Today's learning set has no words or sentences for wrap-up. Complete word and sentence practice first, then try again.",

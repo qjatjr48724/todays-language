@@ -37,7 +37,7 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
   String? _error;
 
   DailyProgressView? _todayProgress;
-  /// 오늘 단어 목표(30) 달성 후 「다음 단어」를 다시 쓰려면 true.
+  /// 오늘 단어 목표 달성 후 「다음 단어」를 다시 쓰려면 true.
   bool _relearnActive = false;
 
   bool get _wordCapReached =>
@@ -195,7 +195,7 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
             if (_wordCapReached && !_relearnActive) ...[
               Text(
                 l10n.words_description_goal_reached(
-                  _todayProgress?.wordGoal ?? 30,
+                  _todayProgress?.wordGoal ?? kDailyWordGoalDefault,
                 ),
                 style: Theme.of(context)
                     .textTheme

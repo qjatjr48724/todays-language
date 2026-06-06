@@ -357,24 +357,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get home_today_words_title => 'Today\'s Words';
 
   @override
-  String get home_today_words_subtitle => '30 per day';
+  String get home_today_words_subtitle => '15 per day';
 
   @override
   String get home_today_sentences_title => 'Today\'s Sentences';
 
   @override
-  String get home_today_sentences_subtitle => '10 per day';
+  String get home_today_sentences_subtitle => '5 per day';
 
   @override
   String get home_today_wrap_up_title => 'Today\'s Wrap-up';
 
   @override
   String get home_today_wrap_up_subtitle_ready =>
-      '25 questions (words 70% / sentences 30%)';
+      '13 questions (words 70% / sentences 30%)';
 
   @override
   String get home_today_wrap_up_subtitle_locked =>
-      'Unlock after completing 30 words + 10 sentences';
+      'Unlock after completing 15 words + 5 sentences';
 
   @override
   String get home_progress_section_title => 'Today\'s Progress';
@@ -825,7 +825,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get wrapup_summary_title =>
-      'Today\'s final learning check: 25 questions (Words 70% / Sentences 30%)';
+      'Today\'s final learning check: 13 questions (Words 70% / Sentences 30%)';
 
   @override
   String wrapup_load_failed(Object error) {

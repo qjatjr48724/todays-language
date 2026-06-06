@@ -197,7 +197,7 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
             if (_sentenceCapReached && !_relearnActive) ...[
               Text(
                 l10n.sentences_description_goal_reached(
-                  _todayProgress?.sentenceGoal ?? 10,
+                  _todayProgress?.sentenceGoal ?? kDailySentenceGoalDefault,
                 ),
                 style: textTheme.bodyMedium?.copyWith(
                   color: scheme.onSurfaceVariant,

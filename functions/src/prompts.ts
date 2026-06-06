@@ -118,7 +118,7 @@ export function buildSentenceUserPromptJson(
   });
 }
 
-/** 일일 단어 세트: 한 번에 N개 (보통 15개씩 끊어 30개 구성) */
+/** 일일 단어 세트: 한 번에 N개 (일일 목표 15개) */
 export function buildDailyWordBatchSystemPrompt(
   targetLanguage: string,
   level: string,

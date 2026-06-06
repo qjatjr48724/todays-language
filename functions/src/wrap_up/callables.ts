@@ -98,9 +98,9 @@ export const getWrapUpDeck = onCall(
     const words = Array.isArray(wdata?.words) ? wdata!.words : [];
     const sentences = Array.isArray(sdata?.sentences) ? sdata!.sentences : [];
 
-    // 마무리 출제 정책: 총 25문제, 단어 70% / 문장 30% (18 / 7)
-    const wrapUpWordCount = 18;
-    const wrapUpSentenceCount = 7;
+    /** 일일 풀(15/5) 대비 약 60%/80% 샘플 — 합계 13문제(단어 70% / 문장 30%) */
+    const wrapUpWordCount = 9;
+    const wrapUpSentenceCount = 4;
     const pickW = shuffle([...words]).slice(0, Math.min(wrapUpWordCount, words.length));
     const pickS = shuffle([...sentences]).slice(
       0,

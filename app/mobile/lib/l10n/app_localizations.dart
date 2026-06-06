@@ -715,7 +715,7 @@ abstract class AppLocalizations {
   /// No description provided for @home_today_words_subtitle.
   ///
   /// In ko, this message translates to:
-  /// **'매일 30개'**
+  /// **'매일 15개'**
   String get home_today_words_subtitle;
 
   /// No description provided for @home_today_sentences_title.
@@ -727,7 +727,7 @@ abstract class AppLocalizations {
   /// No description provided for @home_today_sentences_subtitle.
   ///
   /// In ko, this message translates to:
-  /// **'매일 10개'**
+  /// **'매일 5개'**
   String get home_today_sentences_subtitle;
 
   /// No description provided for @home_today_wrap_up_title.
@@ -739,13 +739,13 @@ abstract class AppLocalizations {
   /// No description provided for @home_today_wrap_up_subtitle_ready.
   ///
   /// In ko, this message translates to:
-  /// **'25문제(단어 70% / 문장 30%)'**
+  /// **'13문제(단어 70% / 문장 30%)'**
   String get home_today_wrap_up_subtitle_ready;
 
   /// No description provided for @home_today_wrap_up_subtitle_locked.
   ///
   /// In ko, this message translates to:
-  /// **'단어 30 + 문장 10 완료 후 열림'**
+  /// **'단어 15 + 문장 5 완료 후 열림'**
   String get home_today_wrap_up_subtitle_locked;
 
   /// No description provided for @home_progress_section_title.
@@ -1508,7 +1508,7 @@ abstract class AppLocalizations {
   /// No description provided for @wrapup_summary_title.
   ///
   /// In ko, this message translates to:
-  /// **'당일 학습 최종 점검: 25문제(단어 70% / 문장 30%)'**
+  /// **'당일 학습 최종 점검: 13문제(단어 70% / 문장 30%)'**
   String get wrapup_summary_title;
 
   /// No description provided for @wrapup_load_failed.

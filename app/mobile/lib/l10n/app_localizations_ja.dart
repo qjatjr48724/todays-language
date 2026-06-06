@@ -340,22 +340,22 @@ class AppLocalizationsJa extends AppLocalizations {
   String get home_today_words_title => '今日の単語';
 
   @override
-  String get home_today_words_subtitle => '毎日30個';
+  String get home_today_words_subtitle => '毎日15個';
 
   @override
   String get home_today_sentences_title => '今日の文';
 
   @override
-  String get home_today_sentences_subtitle => '毎日10個';
+  String get home_today_sentences_subtitle => '毎日5個';
 
   @override
   String get home_today_wrap_up_title => '今日のまとめ';
 
   @override
-  String get home_today_wrap_up_subtitle_ready => '25問（単語70%／文30%）';
+  String get home_today_wrap_up_subtitle_ready => '13問（単語70%／文30%）';
 
   @override
-  String get home_today_wrap_up_subtitle_locked => '単語30 + 文10の達成で開放';
+  String get home_today_wrap_up_subtitle_locked => '単語15 + 文5の達成で開放';
 
   @override
   String get home_progress_section_title => '今日の進捗';
@@ -795,7 +795,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get wrapup_appbar_title => '今日のまとめ';
 
   @override
-  String get wrapup_summary_title => '当日の学習最終チェック: 25問（単語 70% / 文 30%）';
+  String get wrapup_summary_title => '当日の学習最終チェック: 13問（単語 70% / 文 30%）';
 
   @override
   String wrapup_load_failed(Object error) {

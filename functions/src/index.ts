@@ -127,15 +127,15 @@ type CurriculumSentenceSet = {
 const OPENAI_API_URL = "https://api.openai.com/v1/responses";
 const OPENAI_MODEL = process.env.OPENAI_MODEL ?? "gpt-4.1-mini";
 /** 오늘의 단어 화면 일일 목표와 동일하게 유지 */
-const DAILY_WORD_COUNT = 30;
+const DAILY_WORD_COUNT = 15;
 /** 오늘의 문장 화면 일일 목표와 동일하게 유지 */
-const DAILY_SENTENCE_COUNT = 10;
+const DAILY_SENTENCE_COUNT = 5;
 /** 문장별 vocabularyHints 최대 개수 (과다 저장·응답 크기 방지) */
 const MAX_SENTENCE_VOCAB_HINTS = 6;
 /** 단어 배치 한 번에 요청할 개수 (두 배치 병렬 호출 → 문장 1회와 비슷한 체감에 가깝게) */
 const DAILY_WORD_BATCH_SIZE = 15;
 const DEFAULT_RETENTION_DAYS = 7;
-/** 일일 단어·문장 세트 공유 소유자 (모든 유저가 동일 30/10 풀 사용, 커서만 사용자별). */
+/** 일일 단어·문장 세트 공유 소유자 (모든 유저가 동일 15/5 풀 사용, 커서만 사용자별). */
 const GLOBAL_LEARNING_SET_OWNER = "global_learning_set_owner";
 
 /** 1단계(phase 1) 커리큘럼 50일치 선생성 대상 (초·중 × KOR/USA/JPN) */
@@ -794,7 +794,7 @@ async function buildDailyWordItems(
   const used = new Set<string>();
   const t0 = Date.now();
 
-  // 15 + 15 를 동시에 호출해 순차 3회(10개) 대비 대기 시간을 크게 줄임.
+  // 15개 목표: 배치 1회(+필요 시 top-up)로 생성.
   const parallelSeeds = [
     `words-p0-${t0}-${Math.random().toString(36).slice(2)}`,
     `words-p1-${t0}-${Math.random().toString(36).slice(2)}`,
@@ -825,7 +825,7 @@ async function buildDailyWordItems(
     }
   }
 
-  // 중복·실패로 30개 미만이면 한 번 더 (순차)
+  // 중복·실패로 목표 미만이면 한 번 더 (순차)
   if (out.length < DAILY_WORD_COUNT) {
     const need = Math.min(DAILY_WORD_BATCH_SIZE, DAILY_WORD_COUNT - out.length);
     try {

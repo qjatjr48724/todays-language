@@ -6,6 +6,11 @@ import '../utils/kst_date.dart';
 // `quiz`는 현재 "오늘의 마무리" 점검 진행도를 의미합니다.
 enum DailyProgressKind { word, sentence, quiz }
 
+/// Functions `DAILY_WORD_COUNT` / `DAILY_SENTENCE_COUNT` / wrap-up deck과 동기화
+const int kDailyWordGoalDefault = 15;
+const int kDailySentenceGoalDefault = 5;
+const int kDailyQuizGoalDefault = 13;
+
 /// [docs/FIRESTORE_MIN_SCHEMA.md] — `users/{uid}/daily_progress/{dateKst}`
 class DailyProgressView {
   const DailyProgressView({
@@ -38,11 +43,11 @@ class DailyProgressView {
 
     return DailyProgressView(
       dateKst: m['dateKst'] as String? ?? dateKst,
-      wordGoal: iv('wordGoal', 30),
+      wordGoal: iv('wordGoal', kDailyWordGoalDefault),
       wordDone: iv('wordDone', 0),
-      sentenceGoal: iv('sentenceGoal', 10),
+      sentenceGoal: iv('sentenceGoal', kDailySentenceGoalDefault),
       sentenceDone: iv('sentenceDone', 0),
-      quizGoal: iv('quizGoal', 25),
+      quizGoal: iv('quizGoal', kDailyQuizGoalDefault),
       quizDone: iv('quizDone', 0),
       progressPercent: iv('progressPercent', 0).clamp(0, 100),
     );
@@ -62,11 +67,11 @@ Future<DailyProgressView> ensureTodayDailyProgress(User user) async {
   if (!snap.exists) {
     await ref.set({
       'dateKst': dateKst,
-      'wordGoal': 30,
+      'wordGoal': kDailyWordGoalDefault,
       'wordDone': 0,
-      'sentenceGoal': 10,
+      'sentenceGoal': kDailySentenceGoalDefault,
       'sentenceDone': 0,
-      'quizGoal': 25,
+      'quizGoal': kDailyQuizGoalDefault,
       'quizDone': 0,
       'progressPercent': 0,
       'updatedAt': FieldValue.serverTimestamp(),
@@ -109,9 +114,9 @@ Future<DailyProgressView> incrementTodayDailyProgress(
       return def;
     }
 
-    final wordGoal = iv('wordGoal', 30);
-    final sentenceGoal = iv('sentenceGoal', 10);
-    final quizGoal = iv('quizGoal', 25);
+    final wordGoal = iv('wordGoal', kDailyWordGoalDefault);
+    final sentenceGoal = iv('sentenceGoal', kDailySentenceGoalDefault);
+    final quizGoal = iv('quizGoal', kDailyQuizGoalDefault);
 
     var wordDone = iv('wordDone', 0);
     var sentenceDone = iv('sentenceDone', 0);
@@ -184,9 +189,9 @@ Future<DailyProgressView> resetTodayDailyProgress(User user) async {
       return def;
     }
 
-    final wordGoal = iv('wordGoal', 30);
-    final sentenceGoal = iv('sentenceGoal', 10);
-    final quizGoal = iv('quizGoal', 25);
+    final wordGoal = iv('wordGoal', kDailyWordGoalDefault);
+    final sentenceGoal = iv('sentenceGoal', kDailySentenceGoalDefault);
+    final quizGoal = iv('quizGoal', kDailyQuizGoalDefault);
 
     tx.set(
       ref,

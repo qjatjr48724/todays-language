@@ -342,22 +342,22 @@ class AppLocalizationsKo extends AppLocalizations {
   String get home_today_words_title => '오늘의 단어';
 
   @override
-  String get home_today_words_subtitle => '매일 30개';
+  String get home_today_words_subtitle => '매일 15개';
 
   @override
   String get home_today_sentences_title => '오늘의 문장';
 
   @override
-  String get home_today_sentences_subtitle => '매일 10개';
+  String get home_today_sentences_subtitle => '매일 5개';
 
   @override
   String get home_today_wrap_up_title => '오늘의 마무리';
 
   @override
-  String get home_today_wrap_up_subtitle_ready => '25문제(단어 70% / 문장 30%)';
+  String get home_today_wrap_up_subtitle_ready => '13문제(단어 70% / 문장 30%)';
 
   @override
-  String get home_today_wrap_up_subtitle_locked => '단어 30 + 문장 10 완료 후 열림';
+  String get home_today_wrap_up_subtitle_locked => '단어 15 + 문장 5 완료 후 열림';
 
   @override
   String get home_progress_section_title => '오늘의 진행률';
@@ -797,7 +797,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get wrapup_appbar_title => '오늘의 마무리';
 
   @override
-  String get wrapup_summary_title => '당일 학습 최종 점검: 25문제(단어 70% / 문장 30%)';
+  String get wrapup_summary_title => '당일 학습 최종 점검: 13문제(단어 70% / 문장 30%)';
 
   @override
   String wrapup_load_failed(Object error) {
