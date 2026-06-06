@@ -47,8 +47,8 @@ export const CURRICULUM_TOPIC_CATALOG: Record<string, CurriculumTopicMeta> = {
     promptScopeEn:
       "greetings: meeting, parting, first meeting, meeting after a long time, long farewell",
   },
-  "DL-16": {
-    topicId: "DL-16",
+  "DL-02": {
+    topicId: "DL-02",
     category: "daily_life",
     labelKo: "인삿말 - 외출·귀가",
     promptScopeEn: "going out and coming home phrases (leaving home, returning, see you later)",
@@ -59,104 +59,104 @@ export const CURRICULUM_TOPIC_CATALOG: Record<string, CurriculumTopicMeta> = {
     labelKo: "인삿말 - 감사·사과",
     promptScopeEn: "thanks, apologies, excuse me, forgiveness",
   },
-  "FD-01": {
-    topicId: "FD-01",
+  "DL-04": {
+    topicId: "DL-04",
     category: "daily_life",
     labelKo: "인삿말 - 식사·끼니",
     promptScopeEn: "meals, breakfast/lunch/dinner, hungry, eating schedule",
   },
-  "DL-10": {
-    topicId: "DL-10",
+  "DL-05": {
+    topicId: "DL-05",
     category: "daily_life",
     labelKo: "숫자표현 - 개수·수량",
     promptScopeEn: "counting, quantities, units (items, people, cups), many/few",
   },
-  "DL-02": {
-    topicId: "DL-02",
+  "DL-06": {
+    topicId: "DL-06",
     category: "daily_life",
     labelKo: "감정 표현",
     promptScopeEn: "expressing emotions (happy, sad, worried, surprised, agreement/disagreement)",
   },
-  "DL-17": {
-    topicId: "DL-17",
+  "DL-07": {
+    topicId: "DL-07",
     category: "daily_life",
     labelKo: "인칭대명사",
     promptScopeEn: "personal pronouns (I, you, he, she, we, they, polite forms)",
   },
-  "DL-18": {
-    topicId: "DL-18",
+  "DL-08": {
+    topicId: "DL-08",
     category: "daily_life",
     labelKo: "명사의 긍정/의문/부정표현",
     promptScopeEn: "noun affirmative, interrogative, and negative expressions (is/are, do/does, not)",
   },
-  "DL-04": {
-    topicId: "DL-04",
+  "DL-09": {
+    topicId: "DL-09",
     category: "daily_life",
     labelKo: "부탁·요청",
     promptScopeEn: "polite requests, asking favors, accepting/refusing",
   },
-  "DL-19": {
-    topicId: "DL-19",
+  "DL-10": {
+    topicId: "DL-10",
     category: "daily_life",
     labelKo: "출발점과 도달점을 나타내는 표현",
     promptScopeEn: "origin and destination (from, to, depart, arrive, starting point, endpoint)",
   },
-  "DL-08": {
-    topicId: "DL-08",
+  "DL-11": {
+    topicId: "DL-11",
     category: "daily_life",
     labelKo: "시간",
     promptScopeEn: "telling time, hours, morning/afternoon/evening, waiting, soon/later",
   },
-  "DL-09": {
-    topicId: "DL-09",
+  "DL-12": {
+    topicId: "DL-12",
     category: "daily_life",
     labelKo: "요일·날짜",
     promptScopeEn: "days of the week, today/tomorrow/yesterday, dates",
   },
-  "DL-11": {
-    topicId: "DL-11",
+  "DL-13": {
+    topicId: "DL-13",
     category: "daily_life",
     labelKo: "가족·호칭",
     promptScopeEn: "family members, kinship terms, addressing family",
   },
-  "WT-01": {
-    topicId: "WT-01",
+  "DL-14": {
+    topicId: "DL-14",
     category: "daily_life",
     labelKo: "날씨·기온",
     promptScopeEn: "weather and temperature (sunny, rainy, hot, cold)",
   },
-  "HL-01": {
-    topicId: "HL-01",
+  "DL-15": {
+    topicId: "DL-15",
     category: "daily_life",
     labelKo: "몸 상태·증상",
     promptScopeEn: "body conditions, symptoms (headache, fever, hurt)",
   },
-  "DL-12": {
-    topicId: "DL-12",
+  "DL-16": {
+    topicId: "DL-16",
     category: "daily_life",
     labelKo: "화폐·가격",
     promptScopeEn: "money, prices, cheap/expensive, paying, change, receipts",
   },
-  "DL-07": {
-    topicId: "DL-07",
+  "DL-17": {
+    topicId: "DL-17",
     category: "daily_life",
     labelKo: "축하·위로",
     promptScopeEn: "congratulations, celebrations, condolences, encouragement",
   },
-  "DL-13": {
-    topicId: "DL-13",
+  "DL-18": {
+    topicId: "DL-18",
     category: "daily_life",
     labelKo: "욕구·희망",
     promptScopeEn: "wants, hopes, wishes, plans, I want to / I would like to",
   },
-  "DL-14": {
-    topicId: "DL-14",
+  "DL-19": {
+    topicId: "DL-19",
     category: "daily_life",
     labelKo: "이유·원인·근거",
     promptScopeEn: "reasons and causes (because, so, therefore, why)",
   },
-  "DL-15": {
-    topicId: "DL-15",
+  "DL-20": {
+    topicId: "DL-20",
     category: "daily_life",
     labelKo: "경험·일화",
     promptScopeEn: "sharing experiences (have done before, first time, recently, memories)",
@@ -346,25 +346,25 @@ export const CURRICULUM_TOPIC_CATALOG: Record<string, CurriculumTopicMeta> = {
 /** 50일 로테이션 — learningDay 1..50 (기획 확정 순서) */
 export const CURRICULUM_CORE_V1_DAYS: readonly CurriculumDaySpec[] = [
   day(1, "daily_life", ["DL-01"]),
-  day(2, "daily_life", ["DL-16"]),
+  day(2, "daily_life", ["DL-02"]),
   day(3, "daily_life", ["DL-03"]),
-  day(4, "daily_life", ["FD-01"]),
-  day(5, "daily_life", ["DL-10"]),
-  day(6, "daily_life", ["DL-02"]),
-  day(7, "daily_life", ["DL-17"]),
-  day(8, "daily_life", ["DL-18"]),
-  day(9, "daily_life", ["DL-04"]),
-  day(10, "daily_life", ["DL-19"]),
-  day(11, "daily_life", ["DL-08"]),
-  day(12, "daily_life", ["DL-09"]),
-  day(13, "daily_life", ["DL-11"]),
-  day(14, "daily_life", ["WT-01"]),
-  day(15, "daily_life", ["HL-01"]),
-  day(16, "daily_life", ["DL-12"]),
-  day(17, "daily_life", ["DL-07"]),
-  day(18, "daily_life", ["DL-13"]),
-  day(19, "daily_life", ["DL-14"]),
-  day(20, "daily_life", ["DL-15"]),
+  day(4, "daily_life", ["DL-04"]),
+  day(5, "daily_life", ["DL-05"]),
+  day(6, "daily_life", ["DL-06"]),
+  day(7, "daily_life", ["DL-07"]),
+  day(8, "daily_life", ["DL-08"]),
+  day(9, "daily_life", ["DL-09"]),
+  day(10, "daily_life", ["DL-10"]),
+  day(11, "daily_life", ["DL-11"]),
+  day(12, "daily_life", ["DL-12"]),
+  day(13, "daily_life", ["DL-13"]),
+  day(14, "daily_life", ["DL-14"]),
+  day(15, "daily_life", ["DL-15"]),
+  day(16, "daily_life", ["DL-16"]),
+  day(17, "daily_life", ["DL-17"]),
+  day(18, "daily_life", ["DL-18"]),
+  day(19, "daily_life", ["DL-19"]),
+  day(20, "daily_life", ["DL-20"]),
   day(21, "transport", ["TM-01"]),
   day(22, "transport", ["TM-11"]),
   day(23, "transport", ["TM-03"]),
