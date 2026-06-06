@@ -125,6 +125,17 @@
   "home_today_wrap_up_subtitle_locked": "単語15 + 文5の達成で開放",
   "home_progress_section_title": "今日の進捗",
   "home_progress_section_subtitle_prefix": "KST · {date}",
+  "home_curriculum_day_label": "{day}/{total}日目",
+  "@home_curriculum_day_label": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "home_no_data": "データがありません。",
   "home_progress_counts": "単語 {wordDone}/{wordGoal} · 文 {sentenceDone}/{sentenceGoal} · まとめ {quizDone}/{quizGoal}",
   "home_reset_debug_button_label": "進捗のリセット（デバッグ）",

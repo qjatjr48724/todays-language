@@ -125,6 +125,17 @@
   "home_today_wrap_up_subtitle_locked": "Unlock after completing 15 words + 5 sentences",
   "home_progress_section_title": "Today's Progress",
   "home_progress_section_subtitle_prefix": "KST · {date}",
+  "home_curriculum_day_label": "Day {day}/{total}",
+  "@home_curriculum_day_label": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "home_no_data": "No data available.",
   "home_progress_counts": "Words {wordDone}/{wordGoal} · Sentences {sentenceDone}/{sentenceGoal} · Wrap-up {quizDone}/{quizGoal}",
   "home_reset_debug_button_label": "Reset Progress (Debug)",

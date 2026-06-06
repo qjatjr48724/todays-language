@@ -1,4 +1,6 @@
 /// 사용자 커리큘럼 학습 상태 — `users/{uid}` 필드 (Functions `curriculum_state.ts`와 동기).
+///
+/// learningDay: KST 하루 1일차 분량. 당일 1일차 완료만으로 2일차로 넘어가지 않음.
 class CurriculumState {
   const CurriculumState({
     required this.curriculumId,

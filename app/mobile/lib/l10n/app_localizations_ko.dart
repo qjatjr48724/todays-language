@@ -368,6 +368,11 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String home_curriculum_day_label(int day, int total) {
+    return '$day/$total일차';
+  }
+
+  @override
   String get home_no_data => '데이터가 없습니다.';
 
   @override

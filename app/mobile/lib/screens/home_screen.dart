@@ -285,11 +285,27 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 16),
             SectionCard(
               title: l10n.home_progress_section_title,
-              trailing: Text(
-                l10n.home_progress_section_subtitle_prefix(todayKstYyyyMmDd()),
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: scheme.onSurfaceVariant,
+              trailing: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    l10n.home_progress_section_subtitle_prefix(todayKstYyyyMmDd()),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                        ),
+                  ),
+                  if (_prefs.curriculum.learningMode == 'curriculum')
+                    Text(
+                      l10n.home_curriculum_day_label(
+                        _prefs.curriculum.learningDay,
+                        CurriculumState.totalDays,
+                      ),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: scheme.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
                     ),
+                ],
               ),
               child: _loadingProgress
                   ? const LinearProgressIndicator()

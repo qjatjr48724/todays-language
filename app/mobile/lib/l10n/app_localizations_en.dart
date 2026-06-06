@@ -385,6 +385,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String home_curriculum_day_label(int day, int total) {
+    return 'Day $day/$total';
+  }
+
+  @override
   String get home_no_data => 'No data available.';
 
   @override

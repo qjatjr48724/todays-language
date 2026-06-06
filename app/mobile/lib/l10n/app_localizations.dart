@@ -760,6 +760,12 @@ abstract class AppLocalizations {
   /// **'KST · {date}'**
   String home_progress_section_subtitle_prefix(Object date);
 
+  /// No description provided for @home_curriculum_day_label.
+  ///
+  /// In ko, this message translates to:
+  /// **'{day}/{total}일차'**
+  String home_curriculum_day_label(int day, int total);
+
   /// No description provided for @home_no_data.
   ///
   /// In ko, this message translates to:
