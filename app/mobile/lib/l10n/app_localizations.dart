@@ -646,6 +646,150 @@ abstract class AppLocalizations {
   /// **'ん'**
   String get basic_characters_jpn_row_n;
 
+  /// No description provided for @basic_characters_jpn_tab_seion.
+  ///
+  /// In ko, this message translates to:
+  /// **'청음'**
+  String get basic_characters_jpn_tab_seion;
+
+  /// No description provided for @basic_characters_jpn_tab_dakuon.
+  ///
+  /// In ko, this message translates to:
+  /// **'탁음'**
+  String get basic_characters_jpn_tab_dakuon;
+
+  /// No description provided for @basic_characters_jpn_tab_handakuon.
+  ///
+  /// In ko, this message translates to:
+  /// **'반탁음'**
+  String get basic_characters_jpn_tab_handakuon;
+
+  /// No description provided for @basic_characters_jpn_tab_youon.
+  ///
+  /// In ko, this message translates to:
+  /// **'요음'**
+  String get basic_characters_jpn_tab_youon;
+
+  /// No description provided for @basic_characters_jpn_tab_sokuon.
+  ///
+  /// In ko, this message translates to:
+  /// **'촉음'**
+  String get basic_characters_jpn_tab_sokuon;
+
+  /// No description provided for @basic_characters_jpn_tab_chouon.
+  ///
+  /// In ko, this message translates to:
+  /// **'장음'**
+  String get basic_characters_jpn_tab_chouon;
+
+  /// No description provided for @basic_characters_jpn_row_ga.
+  ///
+  /// In ko, this message translates to:
+  /// **'가행 · がぎぐげご'**
+  String get basic_characters_jpn_row_ga;
+
+  /// No description provided for @basic_characters_jpn_row_za.
+  ///
+  /// In ko, this message translates to:
+  /// **'자행 · ざじずぜぞ'**
+  String get basic_characters_jpn_row_za;
+
+  /// No description provided for @basic_characters_jpn_row_da.
+  ///
+  /// In ko, this message translates to:
+  /// **'다행 · だぢづでど'**
+  String get basic_characters_jpn_row_da;
+
+  /// No description provided for @basic_characters_jpn_row_ba.
+  ///
+  /// In ko, this message translates to:
+  /// **'바행 · ばびぶべぼ'**
+  String get basic_characters_jpn_row_ba;
+
+  /// No description provided for @basic_characters_jpn_row_pa.
+  ///
+  /// In ko, this message translates to:
+  /// **'파행 · ぱぴぷぺぽ'**
+  String get basic_characters_jpn_row_pa;
+
+  /// No description provided for @basic_characters_jpn_row_kya.
+  ///
+  /// In ko, this message translates to:
+  /// **'캬행 · きゃきゅきょ'**
+  String get basic_characters_jpn_row_kya;
+
+  /// No description provided for @basic_characters_jpn_row_gya.
+  ///
+  /// In ko, this message translates to:
+  /// **'갸행 · ぎゃぎゅぎょ'**
+  String get basic_characters_jpn_row_gya;
+
+  /// No description provided for @basic_characters_jpn_row_sha.
+  ///
+  /// In ko, this message translates to:
+  /// **'샤행 · しゃしゅしょ'**
+  String get basic_characters_jpn_row_sha;
+
+  /// No description provided for @basic_characters_jpn_row_ja.
+  ///
+  /// In ko, this message translates to:
+  /// **'자행 · じゃじゅじょ'**
+  String get basic_characters_jpn_row_ja;
+
+  /// No description provided for @basic_characters_jpn_row_cha.
+  ///
+  /// In ko, this message translates to:
+  /// **'챠행 · ちゃちゅちょ'**
+  String get basic_characters_jpn_row_cha;
+
+  /// No description provided for @basic_characters_jpn_row_nya.
+  ///
+  /// In ko, this message translates to:
+  /// **'냐행 · にゃにゅにょ'**
+  String get basic_characters_jpn_row_nya;
+
+  /// No description provided for @basic_characters_jpn_row_hya.
+  ///
+  /// In ko, this message translates to:
+  /// **'햐행 · ひゃひゅひょ'**
+  String get basic_characters_jpn_row_hya;
+
+  /// No description provided for @basic_characters_jpn_row_bya.
+  ///
+  /// In ko, this message translates to:
+  /// **'뱌행 · びゃびゅびょ'**
+  String get basic_characters_jpn_row_bya;
+
+  /// No description provided for @basic_characters_jpn_row_pya.
+  ///
+  /// In ko, this message translates to:
+  /// **'표행 · ぴゃぴゅぴょ'**
+  String get basic_characters_jpn_row_pya;
+
+  /// No description provided for @basic_characters_jpn_row_mya.
+  ///
+  /// In ko, this message translates to:
+  /// **'먀행 · みゃみゅみょ'**
+  String get basic_characters_jpn_row_mya;
+
+  /// No description provided for @basic_characters_jpn_row_rya.
+  ///
+  /// In ko, this message translates to:
+  /// **'랴행 · りゃりゅりょ'**
+  String get basic_characters_jpn_row_rya;
+
+  /// No description provided for @basic_characters_jpn_row_sokuon.
+  ///
+  /// In ko, this message translates to:
+  /// **'촉음 · っ(ッ)'**
+  String get basic_characters_jpn_row_sokuon;
+
+  /// No description provided for @basic_characters_jpn_row_chouon.
+  ///
+  /// In ko, this message translates to:
+  /// **'장음 · ー·모음 연장'**
+  String get basic_characters_jpn_row_chouon;
+
   /// No description provided for @basic_characters_kor_tab_all.
   ///
   /// In ko, this message translates to:

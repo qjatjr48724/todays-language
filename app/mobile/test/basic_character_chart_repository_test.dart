@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mobile/data/basic_character/basic_character_kana_rows.dart';
 import 'package:mobile/models/basic_character_entry.dart';
 import 'package:mobile/services/basic_character_chart_repository.dart';
 import 'package:mobile/services/basic_character_kor_pronunciation.dart';
@@ -37,6 +38,31 @@ void main() {
     expect(hira.localizedSections.first.sectionId, 'a');
     expect(hira.localizedSections.first.rows.length, 5);
     expect(hira.localizedSections.last.sectionId, 'n');
+    expect(hira.usesJpnKanaTabs, isTrue);
+    expect(hira.jpnKanaSectionsByTab.keys, contains('seion'));
+    expect(
+      hira.jpnKanaSectionsByTab[jpnKanaTabKey(JpnKanaPronunciationTab.dakuon)]
+          ?.length,
+      4,
+    );
+    expect(
+      hira.jpnKanaSectionsByTab[jpnKanaTabKey(JpnKanaPronunciationTab.handakuon)]
+          ?.first
+          .sectionId,
+      'pa',
+    );
+    expect(
+      hira.jpnKanaSectionsByTab[jpnKanaTabKey(JpnKanaPronunciationTab.youon)]
+          ?.length,
+      11,
+    );
+    expect(
+      hira.jpnKanaSectionsByTab[jpnKanaTabKey(JpnKanaPronunciationTab.sokuon)]
+          ?.first
+          .rows
+          .length,
+      3,
+    );
   });
 
   test('Korean chart uses three sections: consonants, vowels, syllables', () {

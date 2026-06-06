@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../data/basic_character/basic_character_kana_rows.dart';
 import '../l10n/app_localizations.dart';
 import '../models/basic_character_entry.dart';
 import '../services/basic_character_chart_repository.dart';
@@ -20,6 +21,7 @@ class BasicCharacterChartScreen extends StatefulWidget {
 class _BasicCharacterChartScreenState extends State<BasicCharacterChartScreen> {
   late BasicCharacterChartOption _selected;
   _KorChartTab _korTab = _KorChartTab.all;
+  JpnKanaPronunciationTab _jpnTab = JpnKanaPronunciationTab.seion;
 
   @override
   void initState() {
@@ -29,6 +31,8 @@ class _BasicCharacterChartScreenState extends State<BasicCharacterChartScreen> {
 
   bool get _isKoreanChart =>
       _selected.id == BasicCharacterChartRepository.chartKorGanada;
+
+  bool get _isJapaneseChart => _selected.usesJpnKanaTabs;
 
   String _optionLabel(AppLocalizations l10n, String id) {
     switch (id) {
@@ -81,6 +85,9 @@ class _BasicCharacterChartScreenState extends State<BasicCharacterChartScreen> {
                         BasicCharacterChartRepository.chartKorGanada) {
                       _korTab = _KorChartTab.all;
                     }
+                    if (option.usesJpnKanaTabs) {
+                      _jpnTab = JpnKanaPronunciationTab.seion;
+                    }
                   });
                 },
               ),
@@ -106,6 +113,45 @@ class _BasicCharacterChartScreenState extends State<BasicCharacterChartScreen> {
                 onSelectionChanged: (selected) {
                   setState(() => _korTab = selected.first);
                 },
+              ),
+            ],
+            if (_isJapaneseChart) ...[
+              const SizedBox(height: 12),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: SegmentedButton<JpnKanaPronunciationTab>(
+                  showSelectedIcon: false,
+                  segments: [
+                    ButtonSegment(
+                      value: JpnKanaPronunciationTab.seion,
+                      label: Text(l10n.basic_characters_jpn_tab_seion),
+                    ),
+                    ButtonSegment(
+                      value: JpnKanaPronunciationTab.dakuon,
+                      label: Text(l10n.basic_characters_jpn_tab_dakuon),
+                    ),
+                    ButtonSegment(
+                      value: JpnKanaPronunciationTab.handakuon,
+                      label: Text(l10n.basic_characters_jpn_tab_handakuon),
+                    ),
+                    ButtonSegment(
+                      value: JpnKanaPronunciationTab.youon,
+                      label: Text(l10n.basic_characters_jpn_tab_youon),
+                    ),
+                    ButtonSegment(
+                      value: JpnKanaPronunciationTab.sokuon,
+                      label: Text(l10n.basic_characters_jpn_tab_sokuon),
+                    ),
+                    ButtonSegment(
+                      value: JpnKanaPronunciationTab.chouon,
+                      label: Text(l10n.basic_characters_jpn_tab_chouon),
+                    ),
+                  ],
+                  selected: {_jpnTab},
+                  onSelectionChanged: (selected) {
+                    setState(() => _jpnTab = selected.first);
+                  },
+                ),
               ),
             ],
             const SizedBox(height: 16),
@@ -136,7 +182,11 @@ class _BasicCharacterChartScreenState extends State<BasicCharacterChartScreen> {
                               l10n.basic_characters_col_pronunciation,
                           exampleHeader: l10n.basic_characters_col_example,
                           rows: _selected.localizedRows,
-                          sections: _selected.localizedSections,
+                          sections: _isJapaneseChart
+                              ? (_selected.jpnKanaSectionsByTab[
+                                      jpnKanaTabKey(_jpnTab)] ??
+                                  const [])
+                              : _selected.localizedSections,
                           uiLanguageCode: uiLanguageCode,
                           l10n: l10n,
                           scheme: scheme,
@@ -722,6 +772,42 @@ String _jpnKanaRowLabel(AppLocalizations l10n, String sectionId) {
       return l10n.basic_characters_jpn_row_wa;
     case 'n':
       return l10n.basic_characters_jpn_row_n;
+    case 'ga':
+      return l10n.basic_characters_jpn_row_ga;
+    case 'za':
+      return l10n.basic_characters_jpn_row_za;
+    case 'da':
+      return l10n.basic_characters_jpn_row_da;
+    case 'ba':
+      return l10n.basic_characters_jpn_row_ba;
+    case 'pa':
+      return l10n.basic_characters_jpn_row_pa;
+    case 'kya':
+      return l10n.basic_characters_jpn_row_kya;
+    case 'gya':
+      return l10n.basic_characters_jpn_row_gya;
+    case 'sha':
+      return l10n.basic_characters_jpn_row_sha;
+    case 'ja':
+      return l10n.basic_characters_jpn_row_ja;
+    case 'cha':
+      return l10n.basic_characters_jpn_row_cha;
+    case 'nya':
+      return l10n.basic_characters_jpn_row_nya;
+    case 'hya':
+      return l10n.basic_characters_jpn_row_hya;
+    case 'bya':
+      return l10n.basic_characters_jpn_row_bya;
+    case 'pya':
+      return l10n.basic_characters_jpn_row_pya;
+    case 'mya':
+      return l10n.basic_characters_jpn_row_mya;
+    case 'rya':
+      return l10n.basic_characters_jpn_row_rya;
+    case 'sokuon':
+      return l10n.basic_characters_jpn_row_sokuon;
+    case 'chouon':
+      return l10n.basic_characters_jpn_row_chouon;
     default:
       return sectionId;
   }

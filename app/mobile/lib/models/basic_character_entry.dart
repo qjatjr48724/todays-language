@@ -70,6 +70,7 @@ class BasicCharacterChartOption {
     this.koreanSections,
     this.localizedRows = const [],
     this.localizedSections = const [],
+    this.jpnKanaSectionsByTab = const {},
   });
 
   final String id;
@@ -81,9 +82,16 @@ class BasicCharacterChartOption {
   /// 문자 · 발음 · 예시 3열 표(영어·유럽어 등 — 단일 표).
   final List<BasicCharacterLocalizedRow> localizedRows;
 
-  /// 일본어 가나 등 행 단위 구역이 있는 3열 표.
+  /// 일본어 가나 등 행 단위 구역이 있는 3열 표(청음 기본).
   final List<BasicCharacterLocalizedSection> localizedSections;
 
+  /// 일본어 가나 — 발음 종류별 탭(청음·탁음·반탁음·요음·촉음·장음). 키: seion|dakuon|…
+  final Map<String, List<BasicCharacterLocalizedSection>> jpnKanaSectionsByTab;
+
   bool get usesLocalizedTable =>
-      localizedRows.isNotEmpty || localizedSections.isNotEmpty;
+      localizedRows.isNotEmpty ||
+      localizedSections.isNotEmpty ||
+      jpnKanaSectionsByTab.isNotEmpty;
+
+  bool get usesJpnKanaTabs => jpnKanaSectionsByTab.isNotEmpty;
 }

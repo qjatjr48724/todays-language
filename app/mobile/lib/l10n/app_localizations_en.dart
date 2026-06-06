@@ -322,6 +322,78 @@ class AppLocalizationsEn extends AppLocalizations {
   String get basic_characters_jpn_row_n => 'n · ん';
 
   @override
+  String get basic_characters_jpn_tab_seion => 'Seion';
+
+  @override
+  String get basic_characters_jpn_tab_dakuon => 'Dakuon';
+
+  @override
+  String get basic_characters_jpn_tab_handakuon => 'Handakuon';
+
+  @override
+  String get basic_characters_jpn_tab_youon => 'Youon';
+
+  @override
+  String get basic_characters_jpn_tab_sokuon => 'Sokuon';
+
+  @override
+  String get basic_characters_jpn_tab_chouon => 'Chouon';
+
+  @override
+  String get basic_characters_jpn_row_ga => 'ga row · がぎぐげご';
+
+  @override
+  String get basic_characters_jpn_row_za => 'za row · ざじずぜぞ';
+
+  @override
+  String get basic_characters_jpn_row_da => 'da row · だぢづでど';
+
+  @override
+  String get basic_characters_jpn_row_ba => 'ba row · ばびぶべぼ';
+
+  @override
+  String get basic_characters_jpn_row_pa => 'pa row · ぱぴぷぺぽ';
+
+  @override
+  String get basic_characters_jpn_row_kya => 'kya row · きゃきゅきょ';
+
+  @override
+  String get basic_characters_jpn_row_gya => 'gya row · ぎゃぎゅぎょ';
+
+  @override
+  String get basic_characters_jpn_row_sha => 'sha row · しゃしゅしょ';
+
+  @override
+  String get basic_characters_jpn_row_ja => 'ja row · じゃじゅじょ';
+
+  @override
+  String get basic_characters_jpn_row_cha => 'cha row · ちゃちゅちょ';
+
+  @override
+  String get basic_characters_jpn_row_nya => 'nya row · にゃにゅにょ';
+
+  @override
+  String get basic_characters_jpn_row_hya => 'hya row · ひゃひゅひょ';
+
+  @override
+  String get basic_characters_jpn_row_bya => 'bya row · びゃびゅびょ';
+
+  @override
+  String get basic_characters_jpn_row_pya => 'pya row · ぴゃぴゅぴょ';
+
+  @override
+  String get basic_characters_jpn_row_mya => 'mya row · みゃみゅみょ';
+
+  @override
+  String get basic_characters_jpn_row_rya => 'rya row · りゃりゅりょ';
+
+  @override
+  String get basic_characters_jpn_row_sokuon => 'Sokuon · っ(ッ)';
+
+  @override
+  String get basic_characters_jpn_row_chouon => 'Long vowel · ー';
+
+  @override
   String get basic_characters_kor_tab_all => 'All';
 
   @override

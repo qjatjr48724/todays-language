@@ -307,6 +307,78 @@ class AppLocalizationsJa extends AppLocalizations {
   String get basic_characters_jpn_row_n => 'ん';
 
   @override
+  String get basic_characters_jpn_tab_seion => '清音';
+
+  @override
+  String get basic_characters_jpn_tab_dakuon => '濁音';
+
+  @override
+  String get basic_characters_jpn_tab_handakuon => '半濁音';
+
+  @override
+  String get basic_characters_jpn_tab_youon => '拗音';
+
+  @override
+  String get basic_characters_jpn_tab_sokuon => '促音';
+
+  @override
+  String get basic_characters_jpn_tab_chouon => '長音';
+
+  @override
+  String get basic_characters_jpn_row_ga => 'が行';
+
+  @override
+  String get basic_characters_jpn_row_za => 'ざ行';
+
+  @override
+  String get basic_characters_jpn_row_da => 'だ行';
+
+  @override
+  String get basic_characters_jpn_row_ba => 'ば行';
+
+  @override
+  String get basic_characters_jpn_row_pa => 'ぱ行';
+
+  @override
+  String get basic_characters_jpn_row_kya => 'きゃ行';
+
+  @override
+  String get basic_characters_jpn_row_gya => 'ぎゃ行';
+
+  @override
+  String get basic_characters_jpn_row_sha => 'しゃ行';
+
+  @override
+  String get basic_characters_jpn_row_ja => 'じゃ行';
+
+  @override
+  String get basic_characters_jpn_row_cha => 'ちゃ行';
+
+  @override
+  String get basic_characters_jpn_row_nya => 'にゃ行';
+
+  @override
+  String get basic_characters_jpn_row_hya => 'ひゃ行';
+
+  @override
+  String get basic_characters_jpn_row_bya => 'びゃ行';
+
+  @override
+  String get basic_characters_jpn_row_pya => 'ぴゃ行';
+
+  @override
+  String get basic_characters_jpn_row_mya => 'みゃ行';
+
+  @override
+  String get basic_characters_jpn_row_rya => 'りゃ行';
+
+  @override
+  String get basic_characters_jpn_row_sokuon => '促音 · っ(ッ)';
+
+  @override
+  String get basic_characters_jpn_row_chouon => '長音 · ー';
+
+  @override
   String get basic_characters_kor_tab_all => '全体';
 
   @override

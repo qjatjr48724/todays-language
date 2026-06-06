@@ -1,5 +1,17 @@
 import '../../models/basic_character_entry.dart';
 
+import 'basic_character_kana_extended_data.dart';
+
+/// 일본어 가나 발음 종류 탭 — 청음·탁음·반탁음·요음·촉음·장음.
+enum JpnKanaPronunciationTab {
+  seion,
+  dakuon,
+  handakuon,
+  youon,
+  sokuon,
+  chouon,
+}
+
 /// 가나 공통 원본 — 히라가나·가타카나 표를 함께 생성합니다.
 class BasicCharacterKanaSourceRow {
   const BasicCharacterKanaSourceRow({
@@ -291,21 +303,49 @@ const List<String> kKanaRowGroupOrder = [
 const List<int> kKanaRowGroupSizes = [5, 5, 5, 5, 5, 5, 5, 3, 5, 2, 1];
 
 List<BasicCharacterLocalizedSection> groupKanaRowsIntoSections(
-  List<BasicCharacterLocalizedRow> rows,
-) {
+  List<BasicCharacterLocalizedRow> rows, {
+  List<String> groupOrder = kKanaRowGroupOrder,
+  List<int> groupSizes = kKanaRowGroupSizes,
+}) {
   final sections = <BasicCharacterLocalizedSection>[];
   var offset = 0;
-  for (var i = 0; i < kKanaRowGroupOrder.length; i++) {
-    final size = kKanaRowGroupSizes[i];
+  for (var i = 0; i < groupOrder.length; i++) {
+    final size = groupSizes[i];
     sections.add(
       BasicCharacterLocalizedSection(
-        sectionId: kKanaRowGroupOrder[i],
+        sectionId: groupOrder[i],
         rows: rows.sublist(offset, offset + size),
       ),
     );
     offset += size;
   }
   return sections;
+}
+
+List<BasicCharacterLocalizedSection> _sectionsFromSourceRows(
+  List<BasicCharacterKanaSourceRow> sources,
+  BasicCharacterLocalizedRow Function(BasicCharacterKanaSourceRow) mapper, {
+  required List<String> groupOrder,
+  required List<int> groupSizes,
+}) {
+  return groupKanaRowsIntoSections(
+    [for (final row in sources) mapper(row)],
+    groupOrder: groupOrder,
+    groupSizes: groupSizes,
+  );
+}
+
+List<BasicCharacterLocalizedSection> _singleSection(
+  String sectionId,
+  List<BasicCharacterKanaSourceRow> sources,
+  BasicCharacterLocalizedRow Function(BasicCharacterKanaSourceRow) mapper,
+) {
+  return [
+    BasicCharacterLocalizedSection(
+      sectionId: sectionId,
+      rows: [for (final row in sources) mapper(row)],
+    ),
+  ];
 }
 
 List<BasicCharacterLocalizedRow> buildHiraganaLocalizedRows() {
@@ -320,10 +360,84 @@ List<BasicCharacterLocalizedRow> buildKatakanaLocalizedRows() {
   ];
 }
 
+String jpnKanaTabKey(JpnKanaPronunciationTab tab) => tab.name;
+
 List<BasicCharacterLocalizedSection> buildHiraganaLocalizedSections() {
-  return groupKanaRowsIntoSections(buildHiraganaLocalizedRows());
+  return buildHiraganaSectionsByTab()[jpnKanaTabKey(JpnKanaPronunciationTab.seion)]!;
 }
 
 List<BasicCharacterLocalizedSection> buildKatakanaLocalizedSections() {
-  return groupKanaRowsIntoSections(buildKatakanaLocalizedRows());
+  return buildKatakanaSectionsByTab()[jpnKanaTabKey(JpnKanaPronunciationTab.seion)]!;
+}
+
+Map<String, List<BasicCharacterLocalizedSection>> buildHiraganaSectionsByTab() {
+  return {
+    jpnKanaTabKey(JpnKanaPronunciationTab.seion): groupKanaRowsIntoSections(
+      buildHiraganaLocalizedRows(),
+    ),
+    jpnKanaTabKey(JpnKanaPronunciationTab.dakuon): _sectionsFromSourceRows(
+      kBasicCharacterKanaDakuonRows,
+      kanaRowToHiragana,
+      groupOrder: kKanaDakuonGroupOrder,
+      groupSizes: kKanaDakuonGroupSizes,
+    ),
+    jpnKanaTabKey(JpnKanaPronunciationTab.handakuon): _sectionsFromSourceRows(
+      kBasicCharacterKanaHandakuonRows,
+      kanaRowToHiragana,
+      groupOrder: kKanaHandakuonGroupOrder,
+      groupSizes: kKanaHandakuonGroupSizes,
+    ),
+    jpnKanaTabKey(JpnKanaPronunciationTab.youon): _sectionsFromSourceRows(
+      kBasicCharacterKanaYouonRows,
+      kanaRowToHiragana,
+      groupOrder: kKanaYouonGroupOrder,
+      groupSizes: kKanaYouonGroupSizes,
+    ),
+    jpnKanaTabKey(JpnKanaPronunciationTab.sokuon): _singleSection(
+      'sokuon',
+      kBasicCharacterKanaSokuonRows,
+      kanaRowToHiragana,
+    ),
+    jpnKanaTabKey(JpnKanaPronunciationTab.chouon): _singleSection(
+      'chouon',
+      kBasicCharacterKanaChouonRows,
+      kanaRowToHiragana,
+    ),
+  };
+}
+
+Map<String, List<BasicCharacterLocalizedSection>> buildKatakanaSectionsByTab() {
+  return {
+    jpnKanaTabKey(JpnKanaPronunciationTab.seion): groupKanaRowsIntoSections(
+      buildKatakanaLocalizedRows(),
+    ),
+    jpnKanaTabKey(JpnKanaPronunciationTab.dakuon): _sectionsFromSourceRows(
+      kBasicCharacterKanaDakuonRows,
+      kanaRowToKatakana,
+      groupOrder: kKanaDakuonGroupOrder,
+      groupSizes: kKanaDakuonGroupSizes,
+    ),
+    jpnKanaTabKey(JpnKanaPronunciationTab.handakuon): _sectionsFromSourceRows(
+      kBasicCharacterKanaHandakuonRows,
+      kanaRowToKatakana,
+      groupOrder: kKanaHandakuonGroupOrder,
+      groupSizes: kKanaHandakuonGroupSizes,
+    ),
+    jpnKanaTabKey(JpnKanaPronunciationTab.youon): _sectionsFromSourceRows(
+      kBasicCharacterKanaYouonRows,
+      kanaRowToKatakana,
+      groupOrder: kKanaYouonGroupOrder,
+      groupSizes: kKanaYouonGroupSizes,
+    ),
+    jpnKanaTabKey(JpnKanaPronunciationTab.sokuon): _singleSection(
+      'sokuon',
+      kBasicCharacterKanaSokuonRows,
+      kanaRowToKatakana,
+    ),
+    jpnKanaTabKey(JpnKanaPronunciationTab.chouon): _singleSection(
+      'chouon',
+      kBasicCharacterKanaChouonRows,
+      kanaRowToKatakana,
+    ),
+  };
 }

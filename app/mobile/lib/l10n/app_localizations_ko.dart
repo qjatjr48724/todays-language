@@ -309,6 +309,78 @@ class AppLocalizationsKo extends AppLocalizations {
   String get basic_characters_jpn_row_n => 'ん';
 
   @override
+  String get basic_characters_jpn_tab_seion => '청음';
+
+  @override
+  String get basic_characters_jpn_tab_dakuon => '탁음';
+
+  @override
+  String get basic_characters_jpn_tab_handakuon => '반탁음';
+
+  @override
+  String get basic_characters_jpn_tab_youon => '요음';
+
+  @override
+  String get basic_characters_jpn_tab_sokuon => '촉음';
+
+  @override
+  String get basic_characters_jpn_tab_chouon => '장음';
+
+  @override
+  String get basic_characters_jpn_row_ga => '가행 · がぎぐげご';
+
+  @override
+  String get basic_characters_jpn_row_za => '자행 · ざじずぜぞ';
+
+  @override
+  String get basic_characters_jpn_row_da => '다행 · だぢづでど';
+
+  @override
+  String get basic_characters_jpn_row_ba => '바행 · ばびぶべぼ';
+
+  @override
+  String get basic_characters_jpn_row_pa => '파행 · ぱぴぷぺぽ';
+
+  @override
+  String get basic_characters_jpn_row_kya => '캬행 · きゃきゅきょ';
+
+  @override
+  String get basic_characters_jpn_row_gya => '갸행 · ぎゃぎゅぎょ';
+
+  @override
+  String get basic_characters_jpn_row_sha => '샤행 · しゃしゅしょ';
+
+  @override
+  String get basic_characters_jpn_row_ja => '자행 · じゃじゅじょ';
+
+  @override
+  String get basic_characters_jpn_row_cha => '챠행 · ちゃちゅちょ';
+
+  @override
+  String get basic_characters_jpn_row_nya => '냐행 · にゃにゅにょ';
+
+  @override
+  String get basic_characters_jpn_row_hya => '햐행 · ひゃひゅひょ';
+
+  @override
+  String get basic_characters_jpn_row_bya => '뱌행 · びゃびゅびょ';
+
+  @override
+  String get basic_characters_jpn_row_pya => '표행 · ぴゃぴゅぴょ';
+
+  @override
+  String get basic_characters_jpn_row_mya => '먀행 · みゃみゅみょ';
+
+  @override
+  String get basic_characters_jpn_row_rya => '랴행 · りゃりゅりょ';
+
+  @override
+  String get basic_characters_jpn_row_sokuon => '촉음 · っ(ッ)';
+
+  @override
+  String get basic_characters_jpn_row_chouon => '장음 · ー·모음 연장';
+
+  @override
   String get basic_characters_kor_tab_all => '전체';
 
   @override
