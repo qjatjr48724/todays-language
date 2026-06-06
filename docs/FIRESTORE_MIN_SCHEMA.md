@@ -33,7 +33,7 @@
 | `level` | `beginner` \| `intermediate` \| `advanced` |
 | `curriculumId` | 커리큘럼 정본 ID (`core_v1`) |
 | `curriculumPhase` | `1` \| `2` (동일 topicId, 2단계는 새 어휘) |
-| `learningDay` | `1..50` (KST 캘린더와 별도 진행 일차) |
+| `learningDay` | `1..50` (KST 캘린더와 별도 진행 일차; **당일 완료만으로 +1 하지 않음**) |
 | `learningMode` | `curriculum` \| `review` \| `free_study` |
 | `cycleReviewStatus` | `none` \| `available` \| `in_progress` \| `completed` \| `skipped` |
 
@@ -81,9 +81,12 @@
 
 ---
 
-## 5) 커리큘럼 학습 세트 (Phase C 연동 예정)
+## 5) 커리큘럼 학습 세트 (Phase C)
 
-레거시 **KST 날짜** 글로벌 세트와 병행한다. Functions 정본 키: `curriculumSetDocId`.
+1단계(phase 1) **50일치** 커리큘럼 세트를 글로벌로 **미리 생성**한다 (`seedCurriculumPhase1Sets` 일괄 시드, `pregenerateDailyLearningSets`는 빈 일차 갭 보충).
+앱 학습 시에는 이미 만들어 둔 세트를 읽기만 한다. 레거시 **KST 날짜** 세트와 병행한다.
+
+Functions 정본 키: `curriculumSetDocId`.
 
 ### `users/global_learning_set_owner/curriculum_word_sets/{docId}`
 

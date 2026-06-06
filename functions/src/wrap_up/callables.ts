@@ -1,6 +1,16 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 
-import { globalTodaySentenceSetRef, globalTodayWordSetRef } from "../learning_sets/refs";
+import {
+  globalCurriculumSentenceSetRef,
+  globalCurriculumWordSetRef,
+  globalTodaySentenceSetRef,
+  globalTodayWordSetRef,
+} from "../learning_sets/refs";
+import {
+  isCurriculumSetLevel,
+  loadUserLearningProfile,
+} from "../learning_sets/user_learning_profile";
+import { db } from "../shared/firebase";
 
 type WrapUpDeckItem = {
   kind: "word" | "sentence";
@@ -8,13 +18,34 @@ type WrapUpDeckItem = {
   answer: string;
 };
 
-type DailyWordSet = {
+type WordSetLike = {
   words: { word: string; meaningKo: string }[];
 };
 
-type DailySentenceSet = {
+type SentenceSetLike = {
   sentences: { sentence: string; meaningKo: string }[];
 };
+
+function normalizeTargetLanguage(code: string): { external: string; internal: string } {
+  const raw = (code ?? "").trim();
+  const upper = raw.toUpperCase();
+  if (upper === "JPN") return { external: "JPN", internal: "ja" };
+  if (upper === "ESP") return { external: "ESP", internal: "es" };
+  if (upper === "USA") return { external: "USA", internal: "en" };
+  if (upper === "FRA") return { external: "FRA", internal: "fr" };
+  if (upper === "DEU") return { external: "DEU", internal: "de" };
+  if (upper === "CHN") return { external: "CHN", internal: "zh" };
+  if (upper === "KOR") return { external: "KOR", internal: "ko" };
+  const lower = raw.toLowerCase();
+  if (lower === "ja") return { external: "JPN", internal: "ja" };
+  if (lower === "es") return { external: "ESP", internal: "es" };
+  if (lower === "en") return { external: "USA", internal: "en" };
+  if (lower === "fr") return { external: "FRA", internal: "fr" };
+  if (lower === "de") return { external: "DEU", internal: "de" };
+  if (lower === "zh") return { external: "CHN", internal: "zh" };
+  if (lower === "ko") return { external: "KOR", internal: "ko" };
+  return { external: upper.length === 3 ? upper : raw, internal: lower };
+}
 
 function shuffle<T>(arr: T[]): T[] {
   const out = [...arr];
@@ -33,20 +64,41 @@ export const getWrapUpDeck = onCall(
       throw new HttpsError("unauthenticated", "로그인이 필요합니다.");
     }
 
-    const targetLanguage = (request.data?.targetLanguage ?? "JPN") as string;
-    const level = (request.data?.level ?? "beginner") as string;
+    const profile = await loadUserLearningProfile(
+      db,
+      request.auth.uid,
+      normalizeTargetLanguage
+    );
+    const targetLanguage =
+      (request.data?.targetLanguage as string | undefined) ?? profile.targetLanguage;
+    const level = (request.data?.level as string | undefined) ?? profile.level;
 
-    const wordSnap = await globalTodayWordSetRef(targetLanguage, level).get();
-    const sentenceSnap = await globalTodaySentenceSetRef(targetLanguage, level).get();
+    let wordSnap;
+    let sentenceSnap;
+    if (isCurriculumSetLevel(level)) {
+      wordSnap = await globalCurriculumWordSetRef(
+        targetLanguage,
+        level,
+        profile.curriculumPhase,
+        profile.learningDay
+      ).get();
+      sentenceSnap = await globalCurriculumSentenceSetRef(
+        targetLanguage,
+        level,
+        profile.curriculumPhase,
+        profile.learningDay
+      ).get();
+    } else {
+      wordSnap = await globalTodayWordSetRef(targetLanguage, level).get();
+      sentenceSnap = await globalTodaySentenceSetRef(targetLanguage, level).get();
+    }
 
-    const wdata = wordSnap.data() as Partial<DailyWordSet> | undefined;
-    const sdata = sentenceSnap.data() as Partial<DailySentenceSet> | undefined;
+    const wdata = wordSnap.data() as Partial<WordSetLike> | undefined;
+    const sdata = sentenceSnap.data() as Partial<SentenceSetLike> | undefined;
     const words = Array.isArray(wdata?.words) ? wdata!.words : [];
     const sentences = Array.isArray(sdata?.sentences) ? sdata!.sentences : [];
 
-    // 마무리 출제 정책:
-    // - 총 25문제
-    // - 단어 70% / 문장 30% (18 / 7)
+    // 마무리 출제 정책: 총 25문제, 단어 70% / 문장 30% (18 / 7)
     const wrapUpWordCount = 18;
     const wrapUpSentenceCount = 7;
     const pickW = shuffle([...words]).slice(0, Math.min(wrapUpWordCount, words.length));
@@ -70,4 +122,3 @@ export const getWrapUpDeck = onCall(
     return { items: shuffle(items) };
   }
 );
-

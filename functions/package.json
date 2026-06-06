@@ -7,7 +7,7 @@
   "main": "lib/index.js",
   "scripts": {
     "build": "tsc",
-    "test": "npm run build && node --test lib/curriculum/curriculum_state.test.js lib/learning_sets/curriculum_set_keys.test.js",
+    "test": "npm run build && node --test lib/curriculum/curriculum_state.test.js lib/learning_sets/curriculum_set_keys.test.js lib/learning_sets/curriculum_pregen.test.js lib/phase_c_verify.test.js",
     "serve": "npm run build && firebase emulators:start --only functions"
   },
   "dependencies": {

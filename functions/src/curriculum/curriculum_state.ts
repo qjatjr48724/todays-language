@@ -1,6 +1,11 @@
 /**
  * 사용자 커리큘럼 학습 상태 — `users/{uid}` 필드 정본.
  * 캘린더(KST dateKst)와 분리된 learningDay / phase 기준.
+ *
+ * learningDay 진행 규칙(기획):
+ * - 하루(KST)에 한 커리큘럼 일차 분량만 학습한다.
+ * - 당일 1일차 목표를 모두 완료해도 같은 날 2일차로 넘어가지 않는다.
+ * - learningDay +1 은 KST 날짜 전환(또는 별도 advance 로직)에서만 수행한다.
  */
 
 import {

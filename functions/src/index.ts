@@ -12,11 +12,33 @@ import {
   buildSentenceUserPromptJson,
   buildWordSystemPrompt,
   buildWordUserPromptJson,
+  type CurriculumPromptContext,
 } from "./prompts";
+import { curriculumPromptContextForDay } from "./curriculum/prompt_bridge";
+import {
+  CURRICULUM_CORE_V1_ID,
+  getCurriculumDaySpec,
+} from "./curriculum/core_v1_rotation";
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as admin from "firebase-admin";
-import { globalTodaySentenceSetRef, globalTodayWordSetRef } from "./learning_sets/refs";
+import { curriculumSetDocId } from "./learning_sets/curriculum_set_keys";
+import {
+  globalCurriculumSentenceSetRef,
+  globalCurriculumWordSetRef,
+  globalTodaySentenceSetRef,
+  globalTodayWordSetRef,
+} from "./learning_sets/refs";
+import {
+  pregenerateCurriculumPhase1Days,
+  type CurriculumPregenPair,
+} from "./learning_sets/curriculum_pregen";
+import {
+  isCurriculumSetLevel,
+  loadUserLearningProfile,
+  type UserLearningProfile,
+} from "./learning_sets/user_learning_profile";
+import { normalizeLearningLevel } from "./curriculum/curriculum_state";
 
 type GenerateWordResponse = {
   word: string;
@@ -26,7 +48,7 @@ type GenerateWordResponse = {
   example?: string;
   /** 예문(example)의 한국어 해석·뜻 */
   exampleMeaningKo?: string;
-  debugSource?: "openai" | "fallback" | "daily_set";
+  debugSource?: "openai" | "fallback" | "daily_set" | "curriculum_set";
 };
 
 type SentenceVocabHint = {
@@ -43,7 +65,7 @@ type GenerateSentenceResponse = {
   meaningKo: string;
   /** 문장에 나온 표현·단어와 한국어 뜻 (생성 시점에 선별) */
   vocabularyHints?: SentenceVocabHint[];
-  debugSource?: "openai" | "fallback" | "daily_set";
+  debugSource?: "openai" | "fallback" | "daily_set" | "curriculum_set";
 };
 
 type StoredWordItem = {
@@ -79,6 +101,28 @@ type DailySentenceSet = {
   updatedAtMs: number;
 };
 
+type CurriculumWordSet = {
+  curriculumId: string;
+  targetLanguage: string;
+  level: string;
+  curriculumPhase: number;
+  learningDay: number;
+  topicIds: string[];
+  words: StoredWordItem[];
+  updatedAtMs: number;
+};
+
+type CurriculumSentenceSet = {
+  curriculumId: string;
+  targetLanguage: string;
+  level: string;
+  curriculumPhase: number;
+  learningDay: number;
+  topicIds: string[];
+  sentences: StoredSentenceItem[];
+  updatedAtMs: number;
+};
+
 
 const OPENAI_API_URL = "https://api.openai.com/v1/responses";
 const OPENAI_MODEL = process.env.OPENAI_MODEL ?? "gpt-4.1-mini";
@@ -94,11 +138,16 @@ const DEFAULT_RETENTION_DAYS = 7;
 /** 일일 단어·문장 세트 공유 소유자 (모든 유저가 동일 30/10 풀 사용, 커서만 사용자별). */
 const GLOBAL_LEARNING_SET_OWNER = "global_learning_set_owner";
 
-/** 스케줄러가 자정 전후에 미리 생성할 (targetLanguage, level) 목록 */
-const PREGEN_LANGUAGE_LEVEL_PAIRS: { targetLanguage: string; level: string }[] = [
-  // ISO-3166-1 alpha-3 표기(외부/Firestore/API 입력 기준)
+/** 1단계(phase 1) 커리큘럼 50일치 선생성 대상 (초·중 × KOR/USA/JPN) */
+const PREGEN_CURRICULUM_PAIRS: CurriculumPregenPair[] = [
+  { targetLanguage: "KOR", level: "beginner" },
+  { targetLanguage: "KOR", level: "intermediate" },
+  { targetLanguage: "USA", level: "beginner" },
+  { targetLanguage: "USA", level: "intermediate" },
   { targetLanguage: "JPN", level: "beginner" },
+  { targetLanguage: "JPN", level: "intermediate" },
 ];
+const PREGEN_CURRICULUM_PHASE = 1;
 admin.initializeApp();
 const db = admin.firestore();
 
@@ -120,13 +169,38 @@ function normalizeTargetLanguage(code: string): { external: string; internal: st
   // external (ISO-3166-1 alpha-3)
   if (upper === "JPN") return { external: "JPN", internal: "ja" };
   if (upper === "ESP") return { external: "ESP", internal: "es" };
-  // accept legacy language codes from old clients
+  if (upper === "USA") return { external: "USA", internal: "en" };
+  if (upper === "FRA") return { external: "FRA", internal: "fr" };
+  if (upper === "DEU") return { external: "DEU", internal: "de" };
+  if (upper === "CHN") return { external: "CHN", internal: "zh" };
+  if (upper === "KOR") return { external: "KOR", internal: "ko" };
   const lower = raw.toLowerCase();
   if (lower === "ja") return { external: "JPN", internal: "ja" };
   if (lower === "es") return { external: "ESP", internal: "es" };
   if (lower === "en") return { external: "USA", internal: "en" };
-  // default passthrough
+  if (lower === "fr") return { external: "FRA", internal: "fr" };
+  if (lower === "de") return { external: "DEU", internal: "de" };
+  if (lower === "zh") return { external: "CHN", internal: "zh" };
+  if (lower === "ko") return { external: "KOR", internal: "ko" };
   return { external: upper.length === 3 ? upper : raw, internal: lower };
+}
+
+/** Callable 요청 + users/{uid} 프로필 병합 */
+async function resolveUserLearningProfile(
+  uid: string,
+  requestData: Record<string, unknown> | undefined
+): Promise<UserLearningProfile> {
+  const base = await loadUserLearningProfile(db, uid, normalizeTargetLanguage);
+  const tl = normalizeTargetLanguage(
+    (requestData?.targetLanguage ?? base.targetLanguage) as string
+  );
+  const level = normalizeLearningLevel((requestData?.level ?? base.level) as string);
+  return {
+    targetLanguage: tl.external,
+    level,
+    curriculumPhase: base.curriculumPhase,
+    learningDay: base.learningDay,
+  };
 }
 
 async function ensureGlobalLearningOwnerDoc(nowMs = Date.now()): Promise<void> {
@@ -532,7 +606,8 @@ async function generateDailyWordChunkWithOpenAI(
   targetLanguage: string,
   level: string,
   count: number,
-  diversitySeed: string
+  diversitySeed: string,
+  curriculum?: CurriculumPromptContext
 ): Promise<StoredWordItem[]> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
@@ -543,12 +618,18 @@ async function generateDailyWordChunkWithOpenAI(
   const timeout = setTimeout(() => controller.abort(), 25000);
 
   try {
-    const systemPrompt = buildDailyWordBatchSystemPrompt(targetLanguage, level, count);
+    const systemPrompt = buildDailyWordBatchSystemPrompt(
+      targetLanguage,
+      level,
+      count,
+      curriculum
+    );
     const userPrompt = buildDailyWordBatchUserPromptJson(
       targetLanguage,
       level,
       count,
-      diversitySeed
+      diversitySeed,
+      curriculum
     );
 
     const response = await fetch(OPENAI_API_URL, {
@@ -608,7 +689,8 @@ async function generateDailySentenceBatchWithOpenAI(
   level: string,
   count: number,
   diversitySeed: string,
-  requiredVocabulary?: string[]
+  requiredVocabulary?: string[],
+  curriculum?: CurriculumPromptContext
 ): Promise<StoredSentenceItem[]> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
@@ -623,15 +705,16 @@ async function generateDailySentenceBatchWithOpenAI(
       targetLanguage,
       level,
       count,
-      requiredVocabulary
+      requiredVocabulary,
+      curriculum
     );
     const userPrompt = buildDailySentenceBatchUserPromptJson(
       targetLanguage,
       level,
       count,
-      diversitySeed
-      ,
-      requiredVocabulary
+      diversitySeed,
+      requiredVocabulary,
+      curriculum
     );
 
     const response = await fetch(OPENAI_API_URL, {
@@ -701,7 +784,11 @@ function mergeWordBatchInto(
   }
 }
 
-async function buildDailyWordItems(targetLanguage: string, level: string): Promise<StoredWordItem[]> {
+async function buildDailyWordItems(
+  targetLanguage: string,
+  level: string,
+  curriculum?: CurriculumPromptContext
+): Promise<StoredWordItem[]> {
   const internalLang = normalizeTargetLanguage(targetLanguage).internal;
   const out: StoredWordItem[] = [];
   const used = new Set<string>();
@@ -713,8 +800,20 @@ async function buildDailyWordItems(targetLanguage: string, level: string): Promi
     `words-p1-${t0}-${Math.random().toString(36).slice(2)}`,
   ];
   const parallelResults = await Promise.allSettled([
-    generateDailyWordChunkWithOpenAI(internalLang, level, DAILY_WORD_BATCH_SIZE, parallelSeeds[0]),
-    generateDailyWordChunkWithOpenAI(internalLang, level, DAILY_WORD_BATCH_SIZE, parallelSeeds[1]),
+    generateDailyWordChunkWithOpenAI(
+      internalLang,
+      level,
+      DAILY_WORD_BATCH_SIZE,
+      parallelSeeds[0],
+      curriculum
+    ),
+    generateDailyWordChunkWithOpenAI(
+      internalLang,
+      level,
+      DAILY_WORD_BATCH_SIZE,
+      parallelSeeds[1],
+      curriculum
+    ),
   ]);
 
   for (let i = 0; i < parallelResults.length; i++) {
@@ -734,7 +833,8 @@ async function buildDailyWordItems(targetLanguage: string, level: string): Promi
         internalLang,
         level,
         need,
-        `words-topup-${Date.now()}-${Math.random().toString(36).slice(2)}`
+        `words-topup-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        curriculum
       );
       mergeWordBatchInto(batch, out, used);
     } catch (e) {
@@ -777,7 +877,8 @@ async function buildDailyWordItems(targetLanguage: string, level: string): Promi
 async function buildDailySentenceItems(
   targetLanguage: string,
   level: string,
-  requiredVocabulary?: string[]
+  requiredVocabulary?: string[],
+  curriculum?: CurriculumPromptContext
 ): Promise<StoredSentenceItem[]> {
   const internalLang = normalizeTargetLanguage(targetLanguage).internal;
   try {
@@ -786,7 +887,8 @@ async function buildDailySentenceItems(
       level,
       DAILY_SENTENCE_COUNT,
       `s-${Date.now()}-${Math.random().toString(36).slice(2)}`,
-      requiredVocabulary
+      requiredVocabulary,
+      curriculum
     );
     const out: StoredSentenceItem[] = [];
     const used = new Set<string>();
@@ -960,6 +1062,300 @@ async function materializeGlobalTodaySentenceSetIfAbsent(
   return ref;
 }
 
+/** 커리큘럼 일차 단어 세트 — 없으면 AI 생성 (초·중만) */
+async function materializeGlobalCurriculumWordSetIfAbsent(
+  targetLanguage: string,
+  level: string,
+  phase: number,
+  learningDay: number
+): Promise<FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>> {
+  if (!isCurriculumSetLevel(level)) {
+    throw new HttpsError(
+      "failed-precondition",
+      "curriculum word sets are only available for beginner and intermediate"
+    );
+  }
+  await ensureGlobalLearningOwnerDoc();
+  const tl = normalizeTargetLanguage(targetLanguage);
+  const canonicalLang = tl.external;
+  const ref = globalCurriculumWordSetRef(canonicalLang, level, phase, learningDay);
+  const snap = await ref.get();
+  if (snap.exists) {
+    const data = snap.data() as Partial<CurriculumWordSet>;
+    if (
+      data.targetLanguage === canonicalLang &&
+      data.level === level &&
+      data.curriculumPhase === phase &&
+      data.learningDay === learningDay &&
+      Array.isArray(data.words) &&
+      data.words.length > 0
+    ) {
+      return ref;
+    }
+  }
+
+  const curriculum = curriculumPromptContextForDay(learningDay, phase);
+  const spec = getCurriculumDaySpec(learningDay);
+  const words = await buildDailyWordItems(canonicalLang, level, curriculum);
+  const payload: CurriculumWordSet = {
+    curriculumId: CURRICULUM_CORE_V1_ID,
+    targetLanguage: canonicalLang,
+    level,
+    curriculumPhase: phase,
+    learningDay,
+    topicIds: [...(spec?.topicIds ?? [])],
+    words,
+    updatedAtMs: Date.now(),
+  };
+  await ref.set(payload);
+  return ref;
+}
+
+/** 커리큘럼 일차 문장 세트 — 해당 일차 단어를 참고해 AI 생성 */
+async function materializeGlobalCurriculumSentenceSetIfAbsent(
+  targetLanguage: string,
+  level: string,
+  phase: number,
+  learningDay: number
+): Promise<FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>> {
+  if (!isCurriculumSetLevel(level)) {
+    throw new HttpsError(
+      "failed-precondition",
+      "curriculum sentence sets are only available for beginner and intermediate"
+    );
+  }
+  await ensureGlobalLearningOwnerDoc();
+  const tl = normalizeTargetLanguage(targetLanguage);
+  const canonicalLang = tl.external;
+  const ref = globalCurriculumSentenceSetRef(canonicalLang, level, phase, learningDay);
+  const snap = await ref.get();
+  if (snap.exists) {
+    const data = snap.data() as Partial<CurriculumSentenceSet>;
+    if (
+      data.targetLanguage === canonicalLang &&
+      data.level === level &&
+      data.curriculumPhase === phase &&
+      data.learningDay === learningDay &&
+      Array.isArray(data.sentences) &&
+      data.sentences.length > 0
+    ) {
+      return ref;
+    }
+  }
+
+  const curriculum = curriculumPromptContextForDay(learningDay, phase);
+  const spec = getCurriculumDaySpec(learningDay);
+
+  await materializeGlobalCurriculumWordSetIfAbsent(
+    canonicalLang,
+    level,
+    phase,
+    learningDay
+  );
+  const wordSnap = await globalCurriculumWordSetRef(
+    canonicalLang,
+    level,
+    phase,
+    learningDay
+  ).get();
+  const wdata = wordSnap.data() as Partial<CurriculumWordSet> | undefined;
+  const words = Array.isArray(wdata?.words) ? wdata!.words : [];
+  const vocab = shuffle(words)
+    .map((w) => (w?.word ? String(w.word) : ""))
+    .filter((w) => w.trim().length > 0)
+    .slice(0, Math.min(DAILY_SENTENCE_COUNT, words.length));
+
+  const sentences = await buildDailySentenceItems(
+    canonicalLang,
+    level,
+    vocab.length > 0 ? vocab : undefined,
+    curriculum
+  );
+  const payload: CurriculumSentenceSet = {
+    curriculumId: CURRICULUM_CORE_V1_ID,
+    targetLanguage: canonicalLang,
+    level,
+    curriculumPhase: phase,
+    learningDay,
+    topicIds: [...(spec?.topicIds ?? [])],
+    sentences,
+    updatedAtMs: Date.now(),
+  };
+  await ref.set(payload);
+  return ref;
+}
+
+/** phase 1 특정 일차 단어·문장 세트 1쌍 생성(이미 있으면 skip) */
+async function materializeCurriculumPhase1Day(
+  targetLanguage: string,
+  level: string,
+  learningDay: number
+): Promise<void> {
+  await materializeGlobalCurriculumWordSetIfAbsent(
+    targetLanguage,
+    level,
+    PREGEN_CURRICULUM_PHASE,
+    learningDay
+  );
+  await materializeGlobalCurriculumSentenceSetIfAbsent(
+    targetLanguage,
+    level,
+    PREGEN_CURRICULUM_PHASE,
+    learningDay
+  );
+}
+
+function assertDevWarmupUidAllowed(uid: string): void {
+  const isEmulator = process.env.FUNCTIONS_EMULATOR === "true";
+  if (isEmulator) {
+    return;
+  }
+  const allowRaw = (process.env.DEV_WARMUP_UID_ALLOWLIST ?? "").trim();
+  const allowed = new Set(
+    allowRaw
+      .split(",")
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0)
+  );
+  if (allowed.size === 0) {
+    throw new HttpsError("failed-precondition", "DEV_WARMUP_UID_ALLOWLIST is missing");
+  }
+  if (!allowed.has(uid)) {
+    throw new HttpsError("permission-denied", "not allowed");
+  }
+}
+
+function resolvePregenPairs(
+  targetLanguage?: string,
+  level?: string
+): CurriculumPregenPair[] {
+  if (!targetLanguage && !level) {
+    return PREGEN_CURRICULUM_PAIRS;
+  }
+  const tl = targetLanguage?.trim().toUpperCase();
+  const lv = level?.trim().toLowerCase();
+  return PREGEN_CURRICULUM_PAIRS.filter((p) => {
+    if (tl && p.targetLanguage !== tl) return false;
+    if (lv && p.level !== lv) return false;
+    return true;
+  });
+}
+
+async function popWordFromCurriculumSet(
+  uid: string,
+  profile: UserLearningProfile
+): Promise<GenerateWordResponse> {
+  const { targetLanguage, level, curriculumPhase, learningDay } = profile;
+  const setRef = globalCurriculumWordSetRef(
+    targetLanguage,
+    level,
+    curriculumPhase,
+    learningDay
+  );
+  const cursorId = curriculumSetDocId(targetLanguage, level, curriculumPhase, learningDay);
+  const cursorRef = db
+    .collection("users")
+    .doc(uid)
+    .collection("curriculum_word_cursor")
+    .doc(cursorId);
+
+  return db.runTransaction(async (tx) => {
+    const setSnap = await tx.get(setRef);
+    const data = (setSnap.data() ?? {}) as Partial<CurriculumWordSet>;
+    const words = Array.isArray(data.words) ? data.words : [];
+    if (words.length === 0) {
+      return { ...fallbackWord(targetLanguage, level), debugSource: "fallback" };
+    }
+    const cursorSnap = await tx.get(cursorRef);
+    const cursorData = cursorSnap.data() ?? {};
+    const cursor = Number(cursorData.cursor ?? 0);
+    const index = ((cursor % words.length) + words.length) % words.length;
+    const picked = words[index];
+    if (!picked?.word || !picked?.meaningKo) {
+      return { ...fallbackWord(targetLanguage, level), debugSource: "fallback" };
+    }
+    tx.set(
+      cursorRef,
+      {
+        curriculumId: CURRICULUM_CORE_V1_ID,
+        targetLanguage,
+        level,
+        curriculumPhase,
+        learningDay,
+        cursor: cursor + 1,
+        updatedAtMs: Date.now(),
+      },
+      { merge: true }
+    );
+    return {
+      word: picked.word,
+      meaningKo: picked.meaningKo,
+      ...(picked.readingHira ? { readingHira: picked.readingHira } : {}),
+      ...(picked.example ? { example: picked.example } : {}),
+      ...(picked.exampleMeaningKo ? { exampleMeaningKo: picked.exampleMeaningKo } : {}),
+      debugSource: "curriculum_set",
+    };
+  });
+}
+
+async function popSentenceFromCurriculumSet(
+  uid: string,
+  profile: UserLearningProfile
+): Promise<GenerateSentenceResponse> {
+  const { targetLanguage, level, curriculumPhase, learningDay } = profile;
+  const setRef = globalCurriculumSentenceSetRef(
+    targetLanguage,
+    level,
+    curriculumPhase,
+    learningDay
+  );
+  const cursorId = curriculumSetDocId(targetLanguage, level, curriculumPhase, learningDay);
+  const cursorRef = db
+    .collection("users")
+    .doc(uid)
+    .collection("curriculum_sentence_cursor")
+    .doc(cursorId);
+
+  return db.runTransaction(async (tx) => {
+    const setSnap = await tx.get(setRef);
+    const data = (setSnap.data() ?? {}) as Partial<CurriculumSentenceSet>;
+    const sentences = Array.isArray(data.sentences) ? data.sentences : [];
+    if (sentences.length === 0) {
+      return { ...fallbackSentence(targetLanguage, level), debugSource: "fallback" };
+    }
+    const cursorSnap = await tx.get(cursorRef);
+    const cursorData = cursorSnap.data() ?? {};
+    const cursor = Number(cursorData.cursor ?? 0);
+    const index = ((cursor % sentences.length) + sentences.length) % sentences.length;
+    const picked = sentences[index];
+    if (!picked?.sentence || !picked?.meaningKo) {
+      return { ...fallbackSentence(targetLanguage, level), debugSource: "fallback" };
+    }
+    tx.set(
+      cursorRef,
+      {
+        curriculumId: CURRICULUM_CORE_V1_ID,
+        targetLanguage,
+        level,
+        curriculumPhase,
+        learningDay,
+        cursor: cursor + 1,
+        updatedAtMs: Date.now(),
+      },
+      { merge: true }
+    );
+    return {
+      sentence: picked.sentence,
+      meaningKo: picked.meaningKo,
+      ...(picked.sentenceHira ? { sentenceHira: picked.sentenceHira } : {}),
+      ...(picked.vocabularyHints && picked.vocabularyHints.length > 0
+          ? { vocabularyHints: picked.vocabularyHints }
+          : {}),
+      debugSource: "curriculum_set",
+    };
+  });
+}
+
 async function popWordFromTodaySet(
   uid: string,
   targetLanguage: string,
@@ -1068,15 +1464,18 @@ export const generateWord = onCall({ region: "asia-northeast3" }, async (request
   }
 
   const uid = request.auth.uid;
-  const tl = normalizeTargetLanguage((request.data?.targetLanguage ?? "JPN") as string);
-  const targetLanguage = tl.external;
-  const level = (request.data?.level ?? "beginner") as string;
+  const profile = await resolveUserLearningProfile(uid, request.data as Record<string, unknown>);
+  const { targetLanguage, level } = profile;
 
-  console.error(`[generateWord] invoked targetLanguage=${targetLanguage}, level=${level}`);
+  console.error(
+    `[generateWord] invoked targetLanguage=${targetLanguage}, level=${level}, day=${profile.learningDay}`
+  );
   try {
-    const res = await popWordFromTodaySet(uid, targetLanguage, level);
+    const res = isCurriculumSetLevel(level)
+      ? await popWordFromCurriculumSet(uid, profile)
+      : await popWordFromTodaySet(uid, targetLanguage, level);
     console.log(
-      `[generateWord] source=${res.debugSource} targetLanguage=${targetLanguage}, level=${level}`
+      `[generateWord] source=${res.debugSource} targetLanguage=${targetLanguage}, level=${level}, day=${profile.learningDay}`
     );
     return res;
   } catch (e) {
@@ -1093,15 +1492,18 @@ export const generateSentence = onCall({ region: "asia-northeast3" }, async (req
   }
 
   const uid = request.auth.uid;
-  const tl = normalizeTargetLanguage((request.data?.targetLanguage ?? "JPN") as string);
-  const targetLanguage = tl.external;
-  const level = (request.data?.level ?? "beginner") as string;
+  const profile = await resolveUserLearningProfile(uid, request.data as Record<string, unknown>);
+  const { targetLanguage, level } = profile;
 
-  console.error(`[generateSentence] invoked targetLanguage=${targetLanguage}, level=${level}`);
+  console.error(
+    `[generateSentence] invoked targetLanguage=${targetLanguage}, level=${level}, day=${profile.learningDay}`
+  );
   try {
-    const res = await popSentenceFromTodaySet(uid, targetLanguage, level);
+    const res = isCurriculumSetLevel(level)
+      ? await popSentenceFromCurriculumSet(uid, profile)
+      : await popSentenceFromTodaySet(uid, targetLanguage, level);
     console.log(
-      `[generateSentence] source=${res.debugSource} targetLanguage=${targetLanguage}, level=${level}`
+      `[generateSentence] source=${res.debugSource} targetLanguage=${targetLanguage}, level=${level}, day=${profile.learningDay}`
     );
     return res;
   } catch (e) {
@@ -1134,28 +1536,13 @@ export const ensureTodayLearningSets = onCall(
     }
 
     // 운영에서 비용 폭증 방지: allowlist에 포함된 UID만 실행 (에뮬레이터는 예외)
-    const isEmulator = process.env.FUNCTIONS_EMULATOR === "true";
-    if (!isEmulator) {
-      const allowRaw = (process.env.DEV_WARMUP_UID_ALLOWLIST ?? "").trim();
-      const allowed = new Set(
-        allowRaw
-          .split(",")
-          .map((s) => s.trim())
-          .filter((s) => s.length > 0)
-      );
-      if (allowed.size === 0) {
-        throw new HttpsError(
-          "failed-precondition",
-          "DEV_WARMUP_UID_ALLOWLIST is missing"
-        );
-      }
-      if (!allowed.has(request.auth.uid)) {
-        throw new HttpsError("permission-denied", "not allowed");
-      }
-    }
+    assertDevWarmupUidAllowed(request.auth.uid);
 
-    const targetLanguage = (request.data?.targetLanguage ?? "JPN") as string;
-    const level = (request.data?.level ?? "beginner") as string;
+    const profile = await resolveUserLearningProfile(
+      request.auth.uid,
+      request.data as Record<string, unknown>
+    );
+    const { targetLanguage, level, curriculumPhase, learningDay } = profile;
     const todayKst = todayKstYyyyMmDd();
 
     console.log("[ensureTodayLearningSets] start", {
@@ -1163,14 +1550,33 @@ export const ensureTodayLearningSets = onCall(
       todayKst,
       targetLanguage,
       level,
+      curriculumPhase,
+      learningDay,
     });
     const t0 = Date.now();
-    await materializeGlobalTodayWordSetIfAbsent(targetLanguage, level, todayKst);
-    await materializeGlobalTodaySentenceSetIfAbsent(targetLanguage, level, todayKst);
+    if (isCurriculumSetLevel(level)) {
+      await materializeGlobalCurriculumWordSetIfAbsent(
+        targetLanguage,
+        level,
+        curriculumPhase,
+        learningDay
+      );
+      await materializeGlobalCurriculumSentenceSetIfAbsent(
+        targetLanguage,
+        level,
+        curriculumPhase,
+        learningDay
+      );
+    } else {
+      await materializeGlobalTodayWordSetIfAbsent(targetLanguage, level, todayKst);
+      await materializeGlobalTodaySentenceSetIfAbsent(targetLanguage, level, todayKst);
+    }
     console.log("[ensureTodayLearningSets] done", {
       todayKst,
       targetLanguage,
       level,
+      curriculumPhase,
+      learningDay,
       elapsedMs: Date.now() - t0,
     });
 
@@ -1179,36 +1585,121 @@ export const ensureTodayLearningSets = onCall(
 );
 
 /**
- * 언어/레벨 선택 시 즉시 세트 생성(당일 KST).
- * - 스케줄은 ja/beginner만 미리 생성하므로, 기타 조합은 사용자가 선택하는 순간 생성한다.
+ * 언어/레벨 선택 시 현재 learningDay 세트 존재 확인 (초·중).
+ * - 1단계 50일치는 `seedCurriculumPhase1Sets`로 미리 생성해 둔다. 없을 때만 materialize(폴백).
+ * - 당일 완료로 learningDay가 올라가지는 않는다.
  */
 export const ensureLearningSetForToday = onCall(
   { region: "asia-northeast3", secrets: ["OPENAI_API_KEY"], timeoutSeconds: 300, memory: "512MiB" },
-  async (request): Promise<{ ok: true; dateKst: string; targetLanguage: string; level: string }> => {
+  async (
+    request
+  ): Promise<{
+    ok: true;
+    targetLanguage: string;
+    level: string;
+    curriculumPhase: number;
+    learningDay: number;
+  }> => {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "로그인이 필요합니다.");
     }
-    const targetLanguage = (request.data?.targetLanguage ?? "JPN") as string;
-    const level = (request.data?.level ?? "beginner") as string;
-    const todayKst = todayKstYyyyMmDd();
-    console.log("[ensureLearningSetForToday] start", { uid: request.auth.uid, todayKst, targetLanguage, level });
+    const profile = await resolveUserLearningProfile(
+      request.auth.uid,
+      request.data as Record<string, unknown>
+    );
+    const { targetLanguage, level, curriculumPhase, learningDay } = profile;
+    if (!isCurriculumSetLevel(level)) {
+      throw new HttpsError(
+        "failed-precondition",
+        "curriculum learning sets are only available for beginner and intermediate levels"
+      );
+    }
+    console.log("[ensureLearningSetForToday] start", {
+      uid: request.auth.uid,
+      targetLanguage,
+      level,
+      curriculumPhase,
+      learningDay,
+    });
     const t0 = Date.now();
-    await materializeGlobalTodayWordSetIfAbsent(targetLanguage, level, todayKst);
-    await materializeGlobalTodaySentenceSetIfAbsent(targetLanguage, level, todayKst);
-    console.log("[ensureLearningSetForToday] done", { todayKst, targetLanguage, level, elapsedMs: Date.now() - t0 });
-    return { ok: true, dateKst: todayKst, targetLanguage, level };
+    await materializeGlobalCurriculumWordSetIfAbsent(
+      targetLanguage,
+      level,
+      curriculumPhase,
+      learningDay
+    );
+    await materializeGlobalCurriculumSentenceSetIfAbsent(
+      targetLanguage,
+      level,
+      curriculumPhase,
+      learningDay
+    );
+    console.log("[ensureLearningSetForToday] done", {
+      targetLanguage,
+      level,
+      curriculumPhase,
+      learningDay,
+      elapsedMs: Date.now() - t0,
+    });
+    return { ok: true, targetLanguage, level, curriculumPhase, learningDay };
   }
 );
 
 // NOTE: 단어 퀴즈(generateQuiz)는 현재 앱 기능에서 제거되어, Functions에서도 노출하지 않습니다.
 
 /**
- * 매일 KST 자정 — (언어, 레벨)별 글로벌 단어 30·문장 10 세트를 AI로 생성·저장.
- * Blaze + Cloud Scheduler 필요. 앱 callable은 이 문서만 읽음.
+ * 1단계(phase 1) 커리큘럼 50일치 일괄 선생성 (초기 시드·갭 보충).
+ * - dev 플래그 + DEV_WARMUP_UID_ALLOWLIST 필요
+ * - targetLanguage/level 생략 시 6조합 전체 × 1~50일, 있으면 해당 조합만
+ */
+export const seedCurriculumPhase1Sets = onCall(
+  {
+    region: "asia-northeast3",
+    secrets: ["OPENAI_API_KEY", "DEV_WARMUP_UID_ALLOWLIST"],
+    timeoutSeconds: 3600,
+    memory: "512MiB",
+  },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "로그인이 필요합니다.");
+    }
+    const dev = Boolean(request.data?.dev);
+    if (!dev) {
+      throw new HttpsError("failed-precondition", "dev flag is required");
+    }
+    assertDevWarmupUidAllowed(request.auth.uid);
+
+    const targetLanguage = (request.data?.targetLanguage as string | undefined)?.trim();
+    const level = (request.data?.level as string | undefined)?.trim();
+    const pairs = resolvePregenPairs(targetLanguage, level);
+    if (pairs.length === 0) {
+      throw new HttpsError("invalid-argument", "no matching language/level pair");
+    }
+
+    console.log("[seedCurriculumPhase1Sets] start", {
+      uid: request.auth.uid,
+      pairs,
+      phase: PREGEN_CURRICULUM_PHASE,
+    });
+    const t0 = Date.now();
+    const summary = await pregenerateCurriculumPhase1Days(
+      pairs,
+      materializeCurriculumPhase1Day
+    );
+    console.log("[seedCurriculumPhase1Sets] done", {
+      elapsedMs: Date.now() - t0,
+      ...summary,
+    });
+    return { ok: true as const, ...summary };
+  }
+);
+
+/**
+ * 매일 KST 23:55 — 1단계 50일치 중 **아직 없는 일차**를 모두 채움(이미 있으면 skip).
+ * 일괄 시드 후 남은 갭 보충용. Blaze + Cloud Scheduler 필요.
  */
 export const pregenerateDailyLearningSets = onSchedule(
   {
-    // KST 23:55에 "내일 자정부터 사용할" 세트를 미리 생성
     schedule: "55 23 * * *",
     timeZone: "Asia/Seoul",
     region: "asia-northeast3",
@@ -1218,18 +1709,16 @@ export const pregenerateDailyLearningSets = onSchedule(
   },
   async () => {
     const todayKst = todayKstYyyyMmDd();
-    const tomorrowKst = addDaysYyyyMmDd(todayKst, 1);
-    console.log("[pregenerateDailyLearningSets] start", { todayKst, tomorrowKst });
-    for (const { targetLanguage, level } of PREGEN_LANGUAGE_LEVEL_PAIRS) {
-      try {
-        await materializeGlobalTodayWordSetIfAbsent(targetLanguage, level, tomorrowKst);
-        await materializeGlobalTodaySentenceSetIfAbsent(targetLanguage, level, tomorrowKst);
-        console.log("[pregenerateDailyLearningSets] ok", { targetLanguage, level, tomorrowKst });
-      } catch (e) {
-        console.error("[pregenerateDailyLearningSets] failed", { targetLanguage, level, e });
-      }
-    }
-    console.log("[pregenerateDailyLearningSets] done", { todayKst, tomorrowKst });
+    console.log("[pregenerateDailyLearningSets] start", {
+      todayKst,
+      phase: PREGEN_CURRICULUM_PHASE,
+      pairs: PREGEN_CURRICULUM_PAIRS.length,
+    });
+    const summary = await pregenerateCurriculumPhase1Days(
+      PREGEN_CURRICULUM_PAIRS,
+      materializeCurriculumPhase1Day
+    );
+    console.log("[pregenerateDailyLearningSets] done", { todayKst, ...summary });
   }
 );
 

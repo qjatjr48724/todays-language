@@ -3,6 +3,19 @@
  * 운영 변경 시 Functions 배포로 반영 (Remote Config 미사용).
  */
 
+/** 커리큘럼 일차 컨텍스트 — core_v1_rotation + curriculumContextForPrompt */
+export type CurriculumPromptContext = {
+  curriculumId: string;
+  learningDay: number;
+  totalDays: number;
+  curriculumPhase: number;
+  category: string;
+  topicIds: string[];
+  topicLabelsKo: string[];
+  promptScopeEn: string;
+  scopeLine: string;
+};
+
 function languageLabel(code: string): string {
   switch (code) {
     case "ja":
@@ -105,14 +118,15 @@ export function buildSentenceUserPromptJson(
   });
 }
 
-/** 일일 단어 세트: 한 번에 N개 (보통 10개씩 끊어 30개 구성) */
+/** 일일 단어 세트: 한 번에 N개 (보통 15개씩 끊어 30개 구성) */
 export function buildDailyWordBatchSystemPrompt(
   targetLanguage: string,
   level: string,
-  count: number
+  count: number,
+  curriculum?: CurriculumPromptContext
 ): string {
   const lang = languageLabel(targetLanguage);
-  return [
+  const lines = [
     `You create exactly ${count} distinct practical vocabulary items in ${lang} for a Korean native speaker learning that language.`,
     `Learner level: ${level}.`,
     "Every item must use a different headword (no duplicates, no near-duplicates).",
@@ -122,14 +136,23 @@ export function buildDailyWordBatchSystemPrompt(
     "Whenever you include example for an item, you MUST also include exampleMeaningKo (Korean meaning of that example sentence).",
     "If targetLanguage is ja and level is beginner, prefer hiragana for word and example; avoid kanji unless necessary.",
     "If targetLanguage is ja and a word includes kanji, include readingHira for that item (hiragana only).",
-  ].join(" ");
+  ];
+  if (curriculum) {
+    lines.push(
+      `Curriculum day ${curriculum.learningDay}/${curriculum.totalDays}, phase ${curriculum.curriculumPhase}.`,
+      `Today's topic scope ONLY: ${curriculum.scopeLine}`,
+      "All vocabulary must fit this topic scope."
+    );
+  }
+  return lines.join(" ");
 }
 
 export function buildDailyWordBatchUserPromptJson(
   targetLanguage: string,
   level: string,
   count: number,
-  diversitySeed: string
+  diversitySeed: string,
+  curriculum?: CurriculumPromptContext
 ): string {
   return JSON.stringify({
     targetLanguage,
@@ -137,6 +160,7 @@ export function buildDailyWordBatchUserPromptJson(
     learnerNativeLanguage: "ko",
     batchSize: count,
     diversitySeed,
+    ...(curriculum ? { curriculum } : {}),
   });
 }
 
@@ -145,14 +169,15 @@ export function buildDailySentenceBatchSystemPrompt(
   targetLanguage: string,
   level: string,
   count: number,
-  requiredVocabulary?: string[]
+  requiredVocabulary?: string[],
+  curriculum?: CurriculumPromptContext
 ): string {
   const lang = languageLabel(targetLanguage);
   const vocabLine =
     requiredVocabulary && requiredVocabulary.length > 0
         ? `You MUST use the provided vocabulary list. Each sentence must include exactly one of the provided words/expressions, and do not reuse the same vocabulary across sentences.`
         : "";
-  return [
+  const lines = [
     `You create exactly ${count} distinct short sentences in ${lang} for a Korean native speaker at level ${level}.`,
     "Each sentence must be unique and useful for daily study.",
     vocabLine,
@@ -162,7 +187,15 @@ export function buildDailySentenceBatchSystemPrompt(
     "For each sentence, vocabularyHints MUST have 3 to 6 items; each word must appear as a substring in that sentence; meaningKo is Korean.",
     "If targetLanguage is ja and level is beginner, use hiragana only where possible; avoid kanji and katakana except proper nouns if unavoidable.",
     "If targetLanguage is ja and a sentence includes kanji, include sentenceHira for that item (hiragana only).",
-  ].join(" ");
+  ];
+  if (curriculum) {
+    lines.push(
+      `Curriculum day ${curriculum.learningDay}/${curriculum.totalDays}, phase ${curriculum.curriculumPhase}.`,
+      `Today's topic scope ONLY: ${curriculum.scopeLine}`,
+      "All sentences must fit this topic scope."
+    );
+  }
+  return lines.filter((l) => l.length > 0).join(" ");
 }
 
 export function buildDailySentenceBatchUserPromptJson(
@@ -170,7 +203,8 @@ export function buildDailySentenceBatchUserPromptJson(
   level: string,
   count: number,
   diversitySeed: string,
-  requiredVocabulary?: string[]
+  requiredVocabulary?: string[],
+  curriculum?: CurriculumPromptContext
 ): string {
   return JSON.stringify({
     targetLanguage,
@@ -181,5 +215,6 @@ export function buildDailySentenceBatchUserPromptJson(
     ...(requiredVocabulary && requiredVocabulary.length > 0
         ? { requiredVocabulary }
         : {}),
+    ...(curriculum ? { curriculum } : {}),
   });
 }
