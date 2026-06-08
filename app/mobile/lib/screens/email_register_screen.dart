@@ -2,8 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../services/user_profile_sync.dart';
+import '../data/legal/privacy_policy_content.dart';
+import '../data/legal/terms_of_service_content.dart';
 import '../l10n/app_localizations.dart';
+import '../services/user_profile_sync.dart';
+import 'privacy_policy_screen.dart';
+import 'terms_of_service_screen.dart';
 
 class EmailRegisterScreen extends StatefulWidget {
   const EmailRegisterScreen({super.key});
@@ -19,11 +23,10 @@ class _EmailRegisterScreenState extends State<EmailRegisterScreen> {
   final _nameController = TextEditingController();
   bool _agreeTerms = false;
   bool _agreePrivacy = false;
+  bool _termsAgreedLocked = false;
+  bool _privacyAgreedLocked = false;
   bool _loading = false;
   String? _errorMessage;
-
-  static const _termsVersion = '2026-04-10';
-  static const _privacyVersion = '2026-04-10';
 
   @override
   void dispose() {
@@ -32,6 +35,34 @@ class _EmailRegisterScreenState extends State<EmailRegisterScreen> {
     _nameController.dispose();
     super.dispose();
   }
+
+  Future<void> _openTermsOfService({bool readOnly = false}) async {
+    final agreed = await TermsOfServiceScreen.open(
+      context,
+      readOnly: readOnly,
+    );
+    if (agreed == true && mounted) {
+      setState(() {
+        _agreeTerms = true;
+        _termsAgreedLocked = true;
+      });
+    }
+  }
+
+
+  Future<void> _openPrivacyPolicy({bool readOnly = false}) async {
+    final agreed = await PrivacyPolicyScreen.open(
+      context,
+      readOnly: readOnly,
+    );
+    if (agreed == true && mounted) {
+      setState(() {
+        _agreePrivacy = true;
+        _privacyAgreedLocked = true;
+      });
+    }
+  }
+
 
   Future<void> _register() async {
     if (!_formKey.currentState!.validate()) return;
@@ -56,11 +87,11 @@ class _EmailRegisterScreenState extends State<EmailRegisterScreen> {
           'displayName': _nameController.text.trim(),
           // 이용동의/개인정보 동의 포맷(버전+시각) 확정
           'terms': {
-            'version': _termsVersion,
+            'version': TermsOfServiceContent.version,
             'agreedAt': FieldValue.serverTimestamp(),
           },
           'privacy': {
-            'version': _privacyVersion,
+            'version': PrivacyPolicyContent.version,
             'agreedAt': FieldValue.serverTimestamp(),
           },
           'updatedAt': FieldValue.serverTimestamp(),
@@ -136,30 +167,28 @@ class _EmailRegisterScreenState extends State<EmailRegisterScreen> {
                 const SizedBox(height: 8),
                 CheckboxListTile(
                   value: _agreeTerms,
-                  onChanged: (v) => setState(() => _agreeTerms = v ?? false),
+                  onChanged: _termsAgreedLocked
+                      ? null
+                      : (_) => _openTermsOfService(),
                   contentPadding: EdgeInsets.zero,
                   title: Text(l10n.email_register_terms_agree_title),
                   secondary: TextButton(
-                    onPressed: () => _showConsentText(
-                      context,
-                      title: l10n.email_register_terms_agree_title,
-                      version: _termsVersion,
-                      body: _termsText,
+                    onPressed: () => _openTermsOfService(
+                      readOnly: _termsAgreedLocked,
                     ),
                     child: Text(l10n.email_register_view_button),
                   ),
                 ),
                 CheckboxListTile(
                   value: _agreePrivacy,
-                  onChanged: (v) => setState(() => _agreePrivacy = v ?? false),
+                  onChanged: _privacyAgreedLocked
+                      ? null
+                      : (_) => _openPrivacyPolicy(),
                   contentPadding: EdgeInsets.zero,
                   title: Text(l10n.email_register_privacy_agree_title),
                   secondary: TextButton(
-                    onPressed: () => _showConsentText(
-                      context,
-                      title: l10n.email_register_privacy_agree_title,
-                      version: _privacyVersion,
-                      body: _privacyText,
+                    onPressed: () => _openPrivacyPolicy(
+                      readOnly: _privacyAgreedLocked,
                     ),
                     child: Text(l10n.email_register_view_button),
                   ),
@@ -187,60 +216,6 @@ class _EmailRegisterScreenState extends State<EmailRegisterScreen> {
     );
   }
 }
-
-Future<void> _showConsentText(
-  BuildContext context, {
-  required String title,
-  required String version,
-  required String body,
-}) async {
-  final l10n = AppLocalizations.of(context)!;
-  await showDialog<void>(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: Text(l10n.email_register_consent_dialog_title(title, version)),
-        content: SingleChildScrollView(child: Text(body)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(l10n.email_register_close_button),
-          ),
-        ],
-      );
-    },
-  );
-}
-
-const String _termsText = '''
-[서비스 이용약관]
-
-1. 목적
-본 약관은 Today's Language(이하 “서비스”) 이용과 관련한 권리·의무 및 책임사항을 규정합니다.
-
-2. 계정
-- 사용자는 이메일 로그인을 통해 계정을 생성할 수 있습니다.
-- 계정 정보는 서비스 제공 및 보안, 고객지원 목적에 사용됩니다.
-
-3. 서비스 제공 및 변경
-- 서비스는 기능 개선을 위해 일부 내용을 변경할 수 있습니다.
-
-4. 금지행위
-- 부정 사용, 자동화된 접근, 서비스 운영을 방해하는 행위는 금지됩니다.
-''';
-
-const String _privacyText = '''
-[개인정보 처리방침]
-
-1. 수집 항목
-- 필수: 계정 식별자(uid), 이메일, 표시 이름(선택), 로그인 제공자, 언어 설정, 타임존, 학습 진도 데이터
-
-2. 이용 목적
-- 로그인/계정관리, 학습 콘텐츠 제공, 진행률 저장 및 동기화, 고객지원, 서비스 품질 개선
-
-3. 제3자 제공
-- 원칙적으로 제3자에게 제공하지 않습니다. 단, 법령에 의한 요청이 있는 경우 예외가 있을 수 있습니다.
-''';
 
 String _messageForAuthException(FirebaseAuthException e, BuildContext context) {
   final l10n = AppLocalizations.of(context)!;
