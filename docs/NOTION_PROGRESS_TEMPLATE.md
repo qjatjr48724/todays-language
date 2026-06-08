@@ -1624,3 +1624,114 @@ unauthenticated: 로그인 상태 확인
 3. `learningDay +1` (D 단계) 구현
 4. Phase 2 / 점검 / `free_study` 로드맵 착수
 
+---
+
+## [단계 36] 회원가입 동의·설정 화면·Notion 갱신·D-1 규칙·C′~ 백로그 (2026-06-08)
+
+> **커밋:** `840884f` 이용약관·개인정보 스크롤 동의 · `20886fd` 설정·앱 알림 토글
+
+### 1) 오늘 한 일
+
+**회원가입 — 이용약관·개인정보 스크롤 동의 (`840884f`)**
+- `ConsentScrollAgreeScreen`: 전문 스크롤 끝 도달 시에만 **동의합니다** 버튼 표시, 우측 스크롤바 8px
+- `PrivacyPolicyScreen` / `TermsOfServiceScreen` + `data/legal/*_content.dart` (전문 placeholder, 추후 교체)
+- `EmailRegisterScreen`: 체크 탭 → 전문 화면 → 동의 후 체크·**해제 불가**; **보기**는 동의 후 열람만
+- i18n: `consent_*`, `privacy_policy_screen_title`, `terms_of_service_screen_title`
+- 테스트: `consent_scroll_agree_test.dart`
+
+**설정 화면·앱 알림 (`20886fd`)**
+- 내 정보 앱바 **언어 아이콘 → 설정(⚙)** (`SettingsScreen`)
+- 메뉴: 언어 변경 · 알림 설정 · 개인정보 처리방침 · 이용약관 · 관리자(관리자 UID만)
+- `target_language_picker.dart` — 대상 언어 변경·재시동 로직 공유
+- `NotificationSettingsScreen` — **앱 내부 토글** on/off (`AppNotificationPreferences` + SharedPreferences); OFF 시 즉시 반영·예약 알림 취소, ON 시 시스템 권한 요청
+- 최초 알림 안내 화면: 허용→앱 ON, 나중에→앱 OFF
+- `FlagThumb` 위젯 분리, 내 정보 앱바 관리자 버튼 → 설정으로 통합
+
+**Notion**
+- [Today's Language 진행상황 (2026-06-08)](https://app.notion.com/p/37572820750a81e4bd6adca58b62563c) — Phase A~C·15/5·가나 탭 등 전체 갱신 (기준일 2026-06-08)
+
+**기획·문서**
+- `learningDay` 진행: **당일 15/5/13 완료 시 +1** (KST 자정 +1 폐기) 합의
+- Phase **C′ 보류** (50일 학습 후 phase2 세트 검증 가능 시점까지)
+- C′~E 백로그 표 기록 (본 단계 §3)
+
+### 2) 합의·결정
+
+**`learningDay` 진행 규칙 (Phase D-1, KST 자정 +1 폐기)**
+- **다음 일차:** 당일 **단어 15 + 문장 5 + 마무리 13** 전부 완료 시 `learningDay +1` (즉시, 자정 대기 없음)
+- **미완료:** KST 날짜가 바뀌어도 **같은 `learningDay`** 유지 (`daily_progress/{dateKst}`만 0부터 리셋)
+- **상한:** 1~50 clamp, 중복 +1 방지(트랜잭션 우선)
+
+**Phase C′ — 보류**
+- 2단계(phase 2) 50일 세트는 **50일치를 다 학습한 뒤** 생성·검증이 가능하므로 **추후**로 미룸
+- D-1·1단계 사이클이 안정된 후 착수
+
+**검증 예정 (사용자)**
+- 당일 학습(15/5/13) 완료 후, **익일** 앱에서 다음 일차 세트·`n/50일차` 표시 확인
+- ⚠️ **D-1 코드 미구현 시** 익일에도 `learningDay` 동일·같은 일차 세트가 나오는 것이 정상(현재 동작)
+
+### 3) 추후 작업 백로그 (C′ ~ E · 기록용)
+
+> **정본:** 이 절 + [단계 34] 2안 로드맵. 구현 시 이 순서·의존성을 따른다.
+
+#### Phase C′ (보류) — 2단계 커리큘럼 세트
+| # | 작업 | 비고 |
+|---|------|------|
+| C′-1 | `seedCurriculumPhase2Sets` (또는 phase 파라미터 확장) | `curriculum_*_sets` `{LANG}_{level}_**2**_{day}` |
+| C′-2 | 1단계 단어 exclude 후 동일 topicId·새 어휘 생성 | `prompts`·생성 파이프 |
+| C′-3 | `pregenerateDailyLearningSets` phase 2 갭 보충 | KST 23:55 |
+| C′-4 | 초·중 phase2 시드·검증 (50일 학습 후 수동 확인) | 고급은 레거시 유지 |
+
+#### Phase D — 진행·사이클·점검·자유학습
+| # | 작업 | 상태 | 비고 |
+|---|------|------|------|
+| **D-1** | 완료 시 `learningDay +1` (15/5/13) | **다음 착수** | 앱 트랜잭션 + (권장) Functions 검증; 홈·세트·커서 갱신 |
+| D-2 | 1단계 50일차 완료 → `cycleReviewStatus: available` | 대기 | |
+| D-3 | 선택 점검 UI·로직 | 대기 | 문항 수·단어/문장 비율 스펙 **미확정** |
+| D-4 | 점검 완료/스킵 → `curriculumPhase: 2`, `learningDay: 1` | 대기 | C′ 선행 또는 동시 |
+| D-5 | 2단계 50일 완료 → `learningMode: free_study` | 대기 | 자유학습 상세 기획 추가 필요 |
+
+**권장 구현 순서:** D-1 → (1단계 운영·검증) → C′ → D-2~D-4 → D-5
+
+#### Phase E — 운영·품질·배포
+| # | 작업 |
+|---|------|
+| E-1 | `pregenerateDailyLearningSets` 안정화·실패 재시도 |
+| E-2 | D/C′ 핵심 플로우 테스트 (완료→+1, 50일→점검→phase2) |
+| E-3 | Functions **prod** 배포, Firestore 규칙·인덱스 |
+| E-4 | `seedCurriculumPhase1Sets` 재시드, 레거시 `daily_*_sets` 정리(선택) |
+| E-5 | `FIRESTORE_MIN_SCHEMA.md`·`curriculum_state.ts` 주석을 D-1 규칙으로 갱신 |
+
+#### 로드맵 밖 (병행·추후)
+- 실력 체크 온보딩 (2′)
+- 커뮤니티 채팅
+- 기초문자표 다국어 polish
+- 약관·개인정보 전문 확정 (UI·설정 화면은 완료)
+- 백업·스토어·법무 URL
+
+### 4) 완료 기준 체크 (이번 세션)
+- [x] 이용약관·개인정보 스크롤 동의 UI·회원가입 연동 (`840884f`)
+- [x] 설정 화면·앱 알림 토글·내 정보 연동 (`20886fd`)
+- [x] `flutter gen-l10n` · `flutter analyze` · 관련 테스트 통과
+- [x] Notion 진행 페이지 (2026-06-08) 갱신
+- [x] D-1 규칙 합의·C′~E 백로그 문서화
+- [ ] 약관·개인정보 **전문 본문** 사용자 제공 후 placeholder 교체
+- [ ] D-1 `learningDay +1` 구현
+- [ ] 익일 다음 일차 세트 검증 (D-1 구현 후)
+
+### 5) 추가/변경 파일(주요)
+
+| 영역 | 파일 |
+|------|------|
+| 동의 UI | `consent_scroll_agree_screen.dart`, `privacy_policy_screen.dart`, `terms_of_service_screen.dart` |
+| 전문 | `data/legal/privacy_policy_content.dart`, `terms_of_service_content.dart` |
+| 설정 | `settings_screen.dart`, `notification_settings_screen.dart`, `app_notification_preferences.dart` |
+| 연동 | `email_register_screen.dart`, `my_info_screen.dart`, `notification_permission_screen.dart` |
+| 공유 | `target_language_picker.dart`, `widgets/flag_thumb.dart` |
+| 테스트 | `consent_scroll_agree_test.dart`, `app_notification_preferences_test.dart` |
+
+### 6) 다음 액션
+1. **D-1** `learningDay +1` 구현 (완료 판정·트랜잭션·홈 refresh)
+2. 익일 수동 검증: 완료 계정 → `learningDay` +1·다음 세트 / 미완료 계정 → 동일 일차
+3. C′는 1단계 50일 학습·검증 여유 후 착수
+
