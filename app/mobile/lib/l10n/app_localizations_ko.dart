@@ -1062,6 +1062,77 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get settings_screen_title => '설정';
+
+  @override
+  String get settings_tooltip => '설정';
+
+  @override
+  String get settings_language_change_tile => '언어 변경';
+
+  @override
+  String get settings_language_change_subtitle => '학습할 대상 언어를 변경합니다';
+
+  @override
+  String get settings_notification_tile => '알림 설정';
+
+  @override
+  String get settings_notification_subtitle => '앱 알림 수신 on/off';
+
+  @override
+  String get settings_notification_toggle_description =>
+      '앱에서 보내는 알림을 켜거나 끕니다. 켤 때 기기 알림 권한이 필요할 수 있습니다.';
+
+  @override
+  String get settings_notification_status_app_on => '앱 알림이 켜져 있습니다';
+
+  @override
+  String get settings_notification_status_app_off => '앱 알림이 꺼져 있습니다';
+
+  @override
+  String get settings_notification_status_system_needed =>
+      '앱 알림은 켜져 있으나 기기 권한이 필요합니다';
+
+  @override
+  String get settings_notification_status_granted => '알림이 허용되어 있습니다';
+
+  @override
+  String get settings_notification_status_denied => '알림이 허용되지 않았습니다';
+
+  @override
+  String get settings_notification_status_denied_permanent =>
+      '알림이 차단되어 있습니다. 시스템 설정에서 변경해 주세요';
+
+  @override
+  String get settings_notification_request_button => '알림 허용 요청';
+
+  @override
+  String get settings_notification_open_settings_button => '시스템 설정 열기';
+
+  @override
+  String get settings_admin_tile => '관리자 도구';
+
+  @override
+  String get settings_admin_subtitle => '테스트·운영 도구 (관리자 전용)';
+
+  @override
+  String get terms_of_service_screen_title => '서비스 이용약관';
+
+  @override
+  String get privacy_policy_screen_title => '개인정보 처리방침';
+
+  @override
+  String consent_document_version_label(Object version) {
+    return '시행일: $version';
+  }
+
+  @override
+  String get consent_scroll_to_enable_hint => '전문을 끝까지 확인하면 동의할 수 있습니다.';
+
+  @override
+  String get consent_scroll_agree_button => '동의합니다';
+
+  @override
   String get email_register_error_unknown => '알 수 없는 오류가 발생했습니다.';
 
   @override

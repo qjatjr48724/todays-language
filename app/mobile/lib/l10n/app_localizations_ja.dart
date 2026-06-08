@@ -1060,6 +1060,77 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get settings_screen_title => '設定';
+
+  @override
+  String get settings_tooltip => '設定';
+
+  @override
+  String get settings_language_change_tile => '言語変更';
+
+  @override
+  String get settings_language_change_subtitle => '学習する対象言語を変更します';
+
+  @override
+  String get settings_notification_tile => '通知設定';
+
+  @override
+  String get settings_notification_subtitle => 'アプリ通知の on/off';
+
+  @override
+  String get settings_notification_toggle_description =>
+      'アプリからの通知をオンまたはオフにします。オンにする際は端末の通知権限が必要な場合があります。';
+
+  @override
+  String get settings_notification_status_app_on => 'アプリ通知はオンです';
+
+  @override
+  String get settings_notification_status_app_off => 'アプリ通知はオフです';
+
+  @override
+  String get settings_notification_status_system_needed =>
+      'アプリ通知はオンですが、端末の権限が必要です';
+
+  @override
+  String get settings_notification_status_granted => '通知が許可されています';
+
+  @override
+  String get settings_notification_status_denied => '通知が許可されていません';
+
+  @override
+  String get settings_notification_status_denied_permanent =>
+      '通知がブロックされています。システム設定で変更してください';
+
+  @override
+  String get settings_notification_request_button => '通知を許可する';
+
+  @override
+  String get settings_notification_open_settings_button => 'システム設定を開く';
+
+  @override
+  String get settings_admin_tile => '管理者ツール';
+
+  @override
+  String get settings_admin_subtitle => 'テスト・運用ツール（管理者のみ）';
+
+  @override
+  String get terms_of_service_screen_title => '利用規約';
+
+  @override
+  String get privacy_policy_screen_title => 'プライバシーポリシー';
+
+  @override
+  String consent_document_version_label(Object version) {
+    return '施行日: $version';
+  }
+
+  @override
+  String get consent_scroll_to_enable_hint => '全文を最後まで確認すると同意できます。';
+
+  @override
+  String get consent_scroll_agree_button => '同意する';
+
+  @override
   String get email_register_error_unknown => '不明なエラーが発生しました。';
 
   @override

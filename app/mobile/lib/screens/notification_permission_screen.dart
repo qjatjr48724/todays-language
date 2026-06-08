@@ -6,6 +6,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../l10n/app_localizations.dart';
+import '../services/app_notification_preferences.dart';
 
 class NotificationPermissionScreen extends StatefulWidget {
   const NotificationPermissionScreen({super.key});
@@ -33,6 +34,7 @@ class _NotificationPermissionScreenState
   Future<void> _allow() async {
     if (_requesting) return;
     setState(() => _requesting = true);
+    await AppNotificationPreferences.setEnabled(true);
     try {
       // iOS / Android 13+ 에서만 의미 있는 권한 요청입니다.
       // 그 외 버전에서는 granted로 떨어질 수 있으며, 그 경우도 정상 처리합니다.
@@ -104,7 +106,9 @@ class _NotificationPermissionScreenState
     }
   }
 
-  void _deny() {
+  Future<void> _deny() async {
+    await AppNotificationPreferences.setEnabled(false);
+    if (!mounted) return;
     Navigator.of(context).pop(false);
   }
 
@@ -141,7 +145,7 @@ class _NotificationPermissionScreenState
                 children: [
                   Expanded(
                     child: OutlinedButton(
-                      onPressed: _requesting ? null : _deny,
+                      onPressed: _requesting ? null : () => _deny(),
                       child: Text(l10n.notification_permission_deny_button),
                     ),
                   ),

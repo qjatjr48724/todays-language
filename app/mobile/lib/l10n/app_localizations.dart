@@ -1997,6 +1997,138 @@ abstract class AppLocalizations {
   /// **'{title} (v{version})'**
   String email_register_consent_dialog_title(Object title, Object version);
 
+  /// No description provided for @settings_screen_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'설정'**
+  String get settings_screen_title;
+
+  /// No description provided for @settings_tooltip.
+  ///
+  /// In ko, this message translates to:
+  /// **'설정'**
+  String get settings_tooltip;
+
+  /// No description provided for @settings_language_change_tile.
+  ///
+  /// In ko, this message translates to:
+  /// **'언어 변경'**
+  String get settings_language_change_tile;
+
+  /// No description provided for @settings_language_change_subtitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'학습할 대상 언어를 변경합니다'**
+  String get settings_language_change_subtitle;
+
+  /// No description provided for @settings_notification_tile.
+  ///
+  /// In ko, this message translates to:
+  /// **'알림 설정'**
+  String get settings_notification_tile;
+
+  /// No description provided for @settings_notification_subtitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'앱 알림 수신 on/off'**
+  String get settings_notification_subtitle;
+
+  /// No description provided for @settings_notification_toggle_description.
+  ///
+  /// In ko, this message translates to:
+  /// **'앱에서 보내는 알림을 켜거나 끕니다. 켤 때 기기 알림 권한이 필요할 수 있습니다.'**
+  String get settings_notification_toggle_description;
+
+  /// No description provided for @settings_notification_status_app_on.
+  ///
+  /// In ko, this message translates to:
+  /// **'앱 알림이 켜져 있습니다'**
+  String get settings_notification_status_app_on;
+
+  /// No description provided for @settings_notification_status_app_off.
+  ///
+  /// In ko, this message translates to:
+  /// **'앱 알림이 꺼져 있습니다'**
+  String get settings_notification_status_app_off;
+
+  /// No description provided for @settings_notification_status_system_needed.
+  ///
+  /// In ko, this message translates to:
+  /// **'앱 알림은 켜져 있으나 기기 권한이 필요합니다'**
+  String get settings_notification_status_system_needed;
+
+  /// No description provided for @settings_notification_status_granted.
+  ///
+  /// In ko, this message translates to:
+  /// **'알림이 허용되어 있습니다'**
+  String get settings_notification_status_granted;
+
+  /// No description provided for @settings_notification_status_denied.
+  ///
+  /// In ko, this message translates to:
+  /// **'알림이 허용되지 않았습니다'**
+  String get settings_notification_status_denied;
+
+  /// No description provided for @settings_notification_status_denied_permanent.
+  ///
+  /// In ko, this message translates to:
+  /// **'알림이 차단되어 있습니다. 시스템 설정에서 변경해 주세요'**
+  String get settings_notification_status_denied_permanent;
+
+  /// No description provided for @settings_notification_request_button.
+  ///
+  /// In ko, this message translates to:
+  /// **'알림 허용 요청'**
+  String get settings_notification_request_button;
+
+  /// No description provided for @settings_notification_open_settings_button.
+  ///
+  /// In ko, this message translates to:
+  /// **'시스템 설정 열기'**
+  String get settings_notification_open_settings_button;
+
+  /// No description provided for @settings_admin_tile.
+  ///
+  /// In ko, this message translates to:
+  /// **'관리자 도구'**
+  String get settings_admin_tile;
+
+  /// No description provided for @settings_admin_subtitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'테스트·운영 도구 (관리자 전용)'**
+  String get settings_admin_subtitle;
+
+  /// No description provided for @terms_of_service_screen_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'서비스 이용약관'**
+  String get terms_of_service_screen_title;
+
+  /// No description provided for @privacy_policy_screen_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'개인정보 처리방침'**
+  String get privacy_policy_screen_title;
+
+  /// No description provided for @consent_document_version_label.
+  ///
+  /// In ko, this message translates to:
+  /// **'시행일: {version}'**
+  String consent_document_version_label(Object version);
+
+  /// No description provided for @consent_scroll_to_enable_hint.
+  ///
+  /// In ko, this message translates to:
+  /// **'전문을 끝까지 확인하면 동의할 수 있습니다.'**
+  String get consent_scroll_to_enable_hint;
+
+  /// No description provided for @consent_scroll_agree_button.
+  ///
+  /// In ko, this message translates to:
+  /// **'동의합니다'**
+  String get consent_scroll_agree_button;
+
   /// No description provided for @email_register_error_unknown.
   ///
   /// In ko, this message translates to:

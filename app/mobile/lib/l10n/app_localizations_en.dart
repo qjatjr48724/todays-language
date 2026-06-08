@@ -1102,6 +1102,83 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get settings_screen_title => 'Settings';
+
+  @override
+  String get settings_tooltip => 'Settings';
+
+  @override
+  String get settings_language_change_tile => 'Language';
+
+  @override
+  String get settings_language_change_subtitle =>
+      'Change your target learning language';
+
+  @override
+  String get settings_notification_tile => 'Notifications';
+
+  @override
+  String get settings_notification_subtitle => 'App notification on/off';
+
+  @override
+  String get settings_notification_toggle_description =>
+      'Turn app notifications on or off. Turning on may require device notification permission.';
+
+  @override
+  String get settings_notification_status_app_on => 'App notifications are on';
+
+  @override
+  String get settings_notification_status_app_off =>
+      'App notifications are off';
+
+  @override
+  String get settings_notification_status_system_needed =>
+      'App notifications are on; device permission is required';
+
+  @override
+  String get settings_notification_status_granted =>
+      'Notifications are enabled';
+
+  @override
+  String get settings_notification_status_denied =>
+      'Notifications are not enabled';
+
+  @override
+  String get settings_notification_status_denied_permanent =>
+      'Notifications are blocked. Change this in system settings';
+
+  @override
+  String get settings_notification_request_button => 'Request permission';
+
+  @override
+  String get settings_notification_open_settings_button =>
+      'Open system settings';
+
+  @override
+  String get settings_admin_tile => 'Admin tools';
+
+  @override
+  String get settings_admin_subtitle =>
+      'Test and operations tools (admin only)';
+
+  @override
+  String get terms_of_service_screen_title => 'Terms of Service';
+
+  @override
+  String get privacy_policy_screen_title => 'Privacy Policy';
+
+  @override
+  String consent_document_version_label(Object version) {
+    return 'Effective: $version';
+  }
+
+  @override
+  String get consent_scroll_to_enable_hint => 'Scroll to the end to agree.';
+
+  @override
+  String get consent_scroll_agree_button => 'I Agree';
+
+  @override
   String get email_register_error_unknown => 'An unknown error occurred.';
 
   @override

@@ -420,6 +420,35 @@
   "email_register_close_button": "Close",
   "email_register_consent_dialog_title": "{title} (v{version})",
 
+  "settings_screen_title": "Settings",
+  "settings_tooltip": "Settings",
+  "settings_language_change_tile": "Language",
+  "settings_language_change_subtitle": "Change your target learning language",
+  "settings_notification_tile": "Notifications",
+  "settings_notification_subtitle": "App notification on/off",
+  "settings_notification_toggle_description": "Turn app notifications on or off. Turning on may require device notification permission.",
+  "settings_notification_status_app_on": "App notifications are on",
+  "settings_notification_status_app_off": "App notifications are off",
+  "settings_notification_status_system_needed": "App notifications are on; device permission is required",
+  "settings_notification_status_granted": "Notifications are enabled",
+  "settings_notification_status_denied": "Notifications are not enabled",
+  "settings_notification_status_denied_permanent": "Notifications are blocked. Change this in system settings",
+  "settings_notification_request_button": "Request permission",
+  "settings_notification_open_settings_button": "Open system settings",
+  "settings_admin_tile": "Admin tools",
+  "settings_admin_subtitle": "Test and operations tools (admin only)",
+
+  "terms_of_service_screen_title": "Terms of Service",
+  "privacy_policy_screen_title": "Privacy Policy",
+  "consent_document_version_label": "Effective: {version}",
+  "@consent_document_version_label": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "consent_scroll_to_enable_hint": "Scroll to the end to agree.",
+  "consent_scroll_agree_button": "I Agree",
+
   "email_register_error_unknown": "An unknown error occurred.",
   "email_register_error_invalid_email": "The email address format is invalid.",
   "email_register_error_email_in_use": "This email is already in use.",

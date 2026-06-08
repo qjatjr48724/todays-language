@@ -420,6 +420,35 @@
   "email_register_close_button": "閉じる",
   "email_register_consent_dialog_title": "{title} (v{version})",
 
+  "settings_screen_title": "設定",
+  "settings_tooltip": "設定",
+  "settings_language_change_tile": "言語変更",
+  "settings_language_change_subtitle": "学習する対象言語を変更します",
+  "settings_notification_tile": "通知設定",
+  "settings_notification_subtitle": "アプリ通知の on/off",
+  "settings_notification_toggle_description": "アプリからの通知をオンまたはオフにします。オンにする際は端末の通知権限が必要な場合があります。",
+  "settings_notification_status_app_on": "アプリ通知はオンです",
+  "settings_notification_status_app_off": "アプリ通知はオフです",
+  "settings_notification_status_system_needed": "アプリ通知はオンですが、端末の権限が必要です",
+  "settings_notification_status_granted": "通知が許可されています",
+  "settings_notification_status_denied": "通知が許可されていません",
+  "settings_notification_status_denied_permanent": "通知がブロックされています。システム設定で変更してください",
+  "settings_notification_request_button": "通知を許可する",
+  "settings_notification_open_settings_button": "システム設定を開く",
+  "settings_admin_tile": "管理者ツール",
+  "settings_admin_subtitle": "テスト・運用ツール（管理者のみ）",
+
+  "terms_of_service_screen_title": "利用規約",
+  "privacy_policy_screen_title": "プライバシーポリシー",
+  "consent_document_version_label": "施行日: {version}",
+  "@consent_document_version_label": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "consent_scroll_to_enable_hint": "全文を最後まで確認すると同意できます。",
+  "consent_scroll_agree_button": "同意する",
+
   "email_register_error_unknown": "不明なエラーが発生しました。",
   "email_register_error_invalid_email": "メール形式が正しくありません。",
   "email_register_error_email_in_use": "このメールはすでに使用されています。",
