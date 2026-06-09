@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../config/feature_flags.dart';
 import '../config/firebase_functions_config.dart';
 import '../l10n/app_localizations.dart';
 import '../services/daily_progress_sync.dart';
@@ -22,8 +23,7 @@ Future<void> openTargetLanguagePicker(BuildContext context) async {
     final data = snap.data() ?? <String, dynamic>{};
     final currentRaw = (data['targetLanguage'] as String?) ?? 'JPN';
     final current = _normalizeTargetLanguageAlpha3(currentRaw);
-    final currentLevelRaw = (data['level'] as String?) ?? 'beginner';
-    final levelForCall = _normalizeLevel(currentLevelRaw);
+    final levelForCall = effectiveLearningLevel(data['level'] as String?);
 
     String selected = current;
     final enabledCountries = await FirebaseFirestore.instance
@@ -355,15 +355,3 @@ String _normalizeTargetLanguageAlpha3(String raw) {
     }
 }
 
-
-String _normalizeLevel(String raw) {
-    final v = raw.trim().toLowerCase();
-    switch (v) {
-        case 'beginner':
-        case 'intermediate':
-        case 'advanced':
-            return v;
-        default:
-            return 'beginner';
-    }
-}

@@ -33,7 +33,7 @@
 | `level` | `beginner` \| `intermediate` \| `advanced` |
 | `curriculumId` | 커리큘럼 정본 ID (`core_v1`) |
 | `curriculumPhase` | `1` \| `2` (동일 topicId, 2단계는 새 어휘) |
-| `learningDay` | `1..50` (KST 캘린더와 별도 진행 일차; **당일 완료만으로 +1 하지 않음**) |
+| `learningDay` | `1..50` (KST 캘린더와 별도; **당일 15/5/13 완료 시 +1**, 미완료 시 날짜 변경해도 유지) |
 | `learningMode` | `curriculum` \| `review` \| `free_study` |
 | `cycleReviewStatus` | `none` \| `available` \| `in_progress` \| `completed` \| `skipped` |
 
@@ -51,9 +51,14 @@
   "quizGoal": 20,
   "quizDone": 5,
   "progressPercent": 22,
+  "curriculumDayAdvanced": false,
   "updatedAt": "serverTimestamp"
 }
 ```
+
+| 필드 | 설명 |
+|------|------|
+| `curriculumDayAdvanced` | 해당 KST 날짜 완료로 `learningDay +1` 반영 완료 여부 (중복 +1 방지) |
 
 ---
 

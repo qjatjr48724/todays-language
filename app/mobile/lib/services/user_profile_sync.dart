@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../config/feature_flags.dart';
 import '../models/curriculum_state.dart';
 
 /// 대상언어(학습 언어) — 한·영·일만 선택 가능, 나머지는 추후 오픈.
@@ -44,6 +45,8 @@ Future<void> ensureUserProfileDocument(User user) async {
     fallback: 'JPN',
   );
 
+  final effectiveLevel = effectiveLearningLevel(current['level'] as String?);
+
   final data = <String, dynamic>{
     'email': user.email,
     'displayName': user.displayName ?? '',
@@ -51,6 +54,7 @@ Future<void> ensureUserProfileDocument(User user) async {
     // ISO-3166-1 alpha-3 (국가 코드) 표기 사용: JPN/ESP/...
     'nativeLanguage': nativeLanguage,
     'targetLanguage': targetLanguage,
+    'level': effectiveLevel,
     'timezone': 'Asia/Seoul',
     'lastLoginAt': FieldValue.serverTimestamp(),
 

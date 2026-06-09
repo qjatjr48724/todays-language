@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../config/feature_flags.dart';
 import '../models/curriculum_state.dart';
 
 class UserPrefs {
@@ -30,7 +31,7 @@ Future<UserPrefs> fetchUserPrefs(User user) async {
   return UserPrefs(
     // ISO-3166-1 alpha-3 표기: 기본값 JPN
     targetLanguage: (targetLanguage == null || targetLanguage.isEmpty) ? 'JPN' : targetLanguage,
-    level: (level == null || level.isEmpty) ? 'beginner' : level,
+    level: effectiveLearningLevel(level),
     curriculum: CurriculumState.fromUserData(data),
   );
 }

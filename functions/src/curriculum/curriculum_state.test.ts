@@ -6,6 +6,7 @@ import {
   curriculumStateBackfillPatch,
   curriculumStateFromUserData,
   DEFAULT_CURRICULUM_STATE,
+  effectiveLearningLevel,
   normalizeLearningLevel,
 } from "./curriculum_state";
 import { CURRICULUM_CORE_V1_TOTAL_DAYS } from "./core_v1_rotation";
@@ -49,5 +50,12 @@ describe("curriculum_state", () => {
   it("normalizeLearningLevel", () => {
     assert.equal(normalizeLearningLevel("Intermediate"), "intermediate");
     assert.equal(normalizeLearningLevel("invalid"), "beginner");
+  });
+
+  it("effectiveLearningLevel forces beginner when difficulty UI is off", () => {
+    assert.equal(effectiveLearningLevel("intermediate"), "beginner");
+    assert.equal(effectiveLearningLevel("advanced"), "beginner");
+    assert.equal(effectiveLearningLevel("beginner"), "beginner");
+    assert.equal(effectiveLearningLevel(undefined), "beginner");
   });
 });

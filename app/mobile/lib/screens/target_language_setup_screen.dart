@@ -125,10 +125,9 @@ class _TargetLanguageSetupScreenState extends State<TargetLanguageSetupScreen> {
       final docRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
       final current = await docRef.get();
       final data = current.data() ?? <String, dynamic>{};
-      // 난이도 UI 비활성 시 신규·재설정 모두 초급 고정
-      final normalizedLevel = kLearningDifficultyUiEnabled
-          ? CurriculumState.normalizeLearningLevel(_selectedLevel)
-          : CurriculumState.normalizeLearningLevel('beginner');
+      final normalizedLevel = effectiveLearningLevel(
+        kLearningDifficultyUiEnabled ? _selectedLevel : 'beginner',
+      );
 
       await docRef.set(
         {

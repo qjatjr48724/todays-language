@@ -2,10 +2,10 @@
  * 사용자 커리큘럼 학습 상태 — `users/{uid}` 필드 정본.
  * 캘린더(KST dateKst)와 분리된 learningDay / phase 기준.
  *
- * learningDay 진행 규칙(기획):
- * - 하루(KST)에 한 커리큘럼 일차 분량만 학습한다.
- * - 당일 1일차 목표를 모두 완료해도 같은 날 2일차로 넘어가지 않는다.
- * - learningDay +1 은 KST 날짜 전환(또는 별도 advance 로직)에서만 수행한다.
+ * learningDay 진행 규칙(D-1):
+ * - 당일 단어·문장·마무리(15/5/13) 전부 완료 시 learningDay +1 (앱 트랜잭션).
+ * - 미완료 시 KST 날짜가 바뀌어도 learningDay 유지 (daily_progress만 당일 0부터).
+ * - 1..50 clamp, daily_progress.curriculumDayAdvanced 로 중복 +1 방지.
  */
 
 import {
@@ -37,6 +37,18 @@ export const CURRICULUM_PHASE_MAX = 2 as const;
 
 export const LEARNING_LEVELS = ["beginner", "intermediate", "advanced"] as const;
 export type LearningLevel = (typeof LEARNING_LEVELS)[number];
+
+/** 앱 `kLearningDifficultyUiEnabled`와 동기 — false면 초급만 사용·선생성 */
+export const LEARNING_DIFFICULTY_UI_ENABLED = false;
+
+export const FORCED_LEARNING_LEVEL: LearningLevel = "beginner";
+
+export function effectiveLearningLevel(raw: unknown): LearningLevel {
+  if (!LEARNING_DIFFICULTY_UI_ENABLED) {
+    return FORCED_LEARNING_LEVEL;
+  }
+  return normalizeLearningLevel(raw);
+}
 
 export const DEFAULT_CURRICULUM_STATE: CurriculumState = {
   curriculumId: CURRICULUM_CORE_V1_ID,

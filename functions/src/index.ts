@@ -38,7 +38,10 @@ import {
   loadUserLearningProfile,
   type UserLearningProfile,
 } from "./learning_sets/user_learning_profile";
-import { normalizeLearningLevel } from "./curriculum/curriculum_state";
+import {
+  effectiveLearningLevel,
+  LEARNING_DIFFICULTY_UI_ENABLED,
+} from "./curriculum/curriculum_state";
 
 type GenerateWordResponse = {
   word: string;
@@ -138,8 +141,8 @@ const DEFAULT_RETENTION_DAYS = 7;
 /** 일일 단어·문장 세트 공유 소유자 (모든 유저가 동일 15/5 풀 사용, 커서만 사용자별). */
 const GLOBAL_LEARNING_SET_OWNER = "global_learning_set_owner";
 
-/** 1단계(phase 1) 커리큘럼 50일치 선생성 대상 (초·중 × KOR/USA/JPN) */
-const PREGEN_CURRICULUM_PAIRS: CurriculumPregenPair[] = [
+/** 1단계(phase 1) 커리큘럼 50일치 선생성 — 초·중 전체(난이도 UI on 시) */
+const PREGEN_CURRICULUM_PAIRS_ALL: CurriculumPregenPair[] = [
   { targetLanguage: "KOR", level: "beginner" },
   { targetLanguage: "KOR", level: "intermediate" },
   { targetLanguage: "USA", level: "beginner" },
@@ -147,6 +150,19 @@ const PREGEN_CURRICULUM_PAIRS: CurriculumPregenPair[] = [
   { targetLanguage: "JPN", level: "beginner" },
   { targetLanguage: "JPN", level: "intermediate" },
 ];
+
+/** 난이도 UI off 시 선생성·시드 대상 (초급만) */
+const PREGEN_CURRICULUM_PAIRS_BEGINNER_ONLY: CurriculumPregenPair[] = [
+  { targetLanguage: "KOR", level: "beginner" },
+  { targetLanguage: "USA", level: "beginner" },
+  { targetLanguage: "JPN", level: "beginner" },
+];
+
+function activePregenCurriculumPairs(): CurriculumPregenPair[] {
+  return LEARNING_DIFFICULTY_UI_ENABLED
+    ? PREGEN_CURRICULUM_PAIRS_ALL
+    : PREGEN_CURRICULUM_PAIRS_BEGINNER_ONLY;
+}
 const PREGEN_CURRICULUM_PHASE = 1;
 admin.initializeApp();
 const db = admin.firestore();
@@ -194,7 +210,7 @@ async function resolveUserLearningProfile(
   const tl = normalizeTargetLanguage(
     (requestData?.targetLanguage ?? base.targetLanguage) as string
   );
-  const level = normalizeLearningLevel((requestData?.level ?? base.level) as string);
+  const level = effectiveLearningLevel(requestData?.level ?? base.level);
   return {
     targetLanguage: tl.external,
     level,
@@ -949,6 +965,7 @@ async function materializeGlobalTodayWordSetIfAbsent(
   level: string,
   dateKst?: string
 ): Promise<FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>> {
+  level = effectiveLearningLevel(level);
   await ensureGlobalLearningOwnerDoc();
   const tl = normalizeTargetLanguage(targetLanguage);
   const canonicalLang = tl.external;
@@ -1003,6 +1020,7 @@ async function materializeGlobalTodaySentenceSetIfAbsent(
   level: string,
   dateKst?: string
 ): Promise<FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>> {
+  level = effectiveLearningLevel(level);
   await ensureGlobalLearningOwnerDoc();
   const tl = normalizeTargetLanguage(targetLanguage);
   const canonicalLang = tl.external;
@@ -1069,6 +1087,7 @@ async function materializeGlobalCurriculumWordSetIfAbsent(
   phase: number,
   learningDay: number
 ): Promise<FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>> {
+  level = effectiveLearningLevel(level);
   if (!isCurriculumSetLevel(level)) {
     throw new HttpsError(
       "failed-precondition",
@@ -1118,6 +1137,7 @@ async function materializeGlobalCurriculumSentenceSetIfAbsent(
   phase: number,
   learningDay: number
 ): Promise<FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>> {
+  level = effectiveLearningLevel(level);
   if (!isCurriculumSetLevel(level)) {
     throw new HttpsError(
       "failed-precondition",
@@ -1230,13 +1250,14 @@ function resolvePregenPairs(
   level?: string
 ): CurriculumPregenPair[] {
   if (!targetLanguage && !level) {
-    return PREGEN_CURRICULUM_PAIRS;
+    return activePregenCurriculumPairs();
   }
   const tl = targetLanguage?.trim().toUpperCase();
-  const lv = level?.trim().toLowerCase();
-  return PREGEN_CURRICULUM_PAIRS.filter((p) => {
+  const lv = effectiveLearningLevel(level);
+  return activePregenCurriculumPairs().filter((p) => {
     if (tl && p.targetLanguage !== tl) return false;
     if (lv && p.level !== lv) return false;
+    if (!LEARNING_DIFFICULTY_UI_ENABLED && p.level !== "beginner") return false;
     return true;
   });
 }
@@ -1587,7 +1608,7 @@ export const ensureTodayLearningSets = onCall(
 /**
  * 언어/레벨 선택 시 현재 learningDay 세트 존재 확인 (초·중).
  * - 1단계 50일치는 `seedCurriculumPhase1Sets`로 미리 생성해 둔다. 없을 때만 materialize(폴백).
- * - 당일 완료로 learningDay가 올라가지는 않는다.
+ * - learningDay +1 은 앱 D-1(일일 15/5/13 완료)에서 처리한다.
  */
 export const ensureLearningSetForToday = onCall(
   { region: "asia-northeast3", secrets: ["OPENAI_API_KEY"], timeoutSeconds: 300, memory: "512MiB" },
@@ -1712,10 +1733,10 @@ export const pregenerateDailyLearningSets = onSchedule(
     console.log("[pregenerateDailyLearningSets] start", {
       todayKst,
       phase: PREGEN_CURRICULUM_PHASE,
-      pairs: PREGEN_CURRICULUM_PAIRS.length,
+      pairs: activePregenCurriculumPairs().length,
     });
     const summary = await pregenerateCurriculumPhase1Days(
-      PREGEN_CURRICULUM_PAIRS,
+      activePregenCurriculumPairs(),
       materializeCurriculumPhase1Day
     );
     console.log("[pregenerateDailyLearningSets] done", { todayKst, ...summary });

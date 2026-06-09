@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
+import '../config/feature_flags.dart';
 import '../services/daily_progress_sync.dart';
 import '../services/user_profile_sync.dart';
 import '../models/curriculum_state.dart';
@@ -50,6 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _bootstrap(User user) async {
     try {
       await ensureUserProfileDocument(user);
+      await reconcilePendingLearningDayAdvances(user);
       final prefs = await fetchUserPrefs(user);
       final progress = await ensureTodayDailyProgress(user);
       if (!mounted) return;
@@ -74,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() {
           _prefs = UserPrefs(
             targetLanguage: (tl == null || tl.isEmpty) ? _prefs.targetLanguage : tl,
-            level: (lv == null || lv.isEmpty) ? _prefs.level : lv,
+            level: effectiveLearningLevel(lv),
             curriculum: CurriculumState.fromUserData(data),
           );
         });
