@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.dart';
+import '../services/chat_repository.dart';
+import 'chat_room_screen.dart';
 
 class CommunityScreen extends StatelessWidget {
-  const CommunityScreen({super.key});
+  const CommunityScreen({super.key, ChatRepository? chatRepository})
+      : _chatRepository = chatRepository;
+
+  final ChatRepository? _chatRepository;
 
   Widget _menuTile({
     required IconData icon,
@@ -22,6 +27,28 @@ class CommunityScreen extends StatelessWidget {
     );
   }
 
+
+  Future<void> _openChatRoom(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    final repo = _chatRepository ?? ChatRepository();
+    final targetLanguage = await repo.loadUserTargetLanguage();
+    if (!context.mounted) return;
+    if (targetLanguage == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.chat_language_not_ready)),
+      );
+      return;
+    }
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ChatRoomScreen(
+          targetLanguage: targetLanguage,
+          repository: repo,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -35,7 +62,7 @@ class CommunityScreen extends StatelessWidget {
               icon: Icons.forum_outlined,
               title: l10n.community_menu_chat,
               subtitle: l10n.community_menu_chat_subtitle,
-              onTap: null,
+              onTap: () => _openChatRoom(context),
             ),
             const SizedBox(height: 12),
             _menuTile(
@@ -57,4 +84,3 @@ class CommunityScreen extends StatelessWidget {
     );
   }
 }
-

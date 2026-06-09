@@ -30,6 +30,34 @@ service cloud.firestore {
       allow read: if isSignedIn();
       allow write: if false;
     }
+
+    function userTargetLanguage() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.targetLanguage;
+    }
+
+    function isSupportedChatRoom(roomId) {
+      return roomId in ['KOR', 'USA', 'JPN'];
+    }
+
+    // 언어별 공개 채팅 — 학습 언어(targetLanguage)와 방 ID가 일치하는 사용자만 읽기/쓰기
+    match /chat_rooms/{roomId}/messages/{messageId} {
+      allow read: if isSignedIn()
+        && isSupportedChatRoom(roomId)
+        && userTargetLanguage() == roomId;
+
+      allow create: if isSignedIn()
+        && isSupportedChatRoom(roomId)
+        && userTargetLanguage() == roomId
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.targetLanguage == roomId
+        && request.resource.data.text is string
+        && request.resource.data.text.size() > 0
+        && request.resource.data.text.size() <= 500
+        && request.resource.data.displayName is string
+        && request.resource.data.createdAtMs is int;
+
+      allow update, delete: if false;
+    }
   }
 }
 
