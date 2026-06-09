@@ -26,6 +26,8 @@
   "login_error_too_many_requests": "시도가 너무 많습니다. 잠시 후 다시 시도해 주세요.",
   "login_error_unknown": "인증에 실패했습니다. ({code})",
 
+  "auth_session_duplicate_login": "다른 기기에서 로그인되어 이 기기에서는 로그아웃되었습니다.",
+
   "language_setup_appbar_title": "언어 선택",
   "language_setup_welcome_title": "처음 시작하기",
   "language_setup_welcome_subtitle": "로컬 언어(설명)와 대상 언어(학습)를 선택해주세요.",
@@ -73,6 +75,35 @@
   "community_menu_certificates_subtitle": "언어를 공부하면 이런 자격증을 취득할 수 있어요!",
   "community_menu_phrase_guide": "기본 회화 가이드",
   "community_menu_phrase_guide_subtitle": "공부한게 조금 서툴러도 여행가서 주눅들지 말아요!",
+  "chat_room_appbar_title": "{language} 채팅",
+  "@chat_room_appbar_title": {
+    "placeholders": {
+      "language": { "type": "String" }
+    }
+  },
+  "chat_empty_hint": "아직 메시지가 없어요. 첫 인사를 남겨 보세요!",
+  "chat_input_hint": "메시지 입력",
+  "chat_send_button": "보내기",
+  "chat_load_failed": "채팅을 불러오지 못했어요: {error}",
+  "@chat_load_failed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "chat_send_failed": "전송에 실패했어요: {error}",
+  "@chat_send_failed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "chat_language_not_ready": "학습 언어를 먼저 설정해 주세요.",
+  "chat_send_empty_error": "메시지를 입력해 주세요.",
+  "chat_send_too_long_error": "메시지는 {maxLength}자 이하로 입력해 주세요.",
+  "@chat_send_too_long_error": {
+    "placeholders": {
+      "maxLength": { "type": "int" }
+    }
+  },
   "home_basic_characters_button": "기초 문자 공부하기",
   "home_basic_characters_subtitle": "문자 · 발음 · 예시 표로 보기",
   "basic_characters_screen_title": "기초문자 공부하기",

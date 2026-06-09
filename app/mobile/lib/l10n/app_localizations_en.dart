@@ -85,6 +85,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get auth_session_duplicate_login =>
+      'You were signed out because this account was used on another device.';
+
+  @override
   String get language_setup_appbar_title => 'Language Selection';
 
   @override
@@ -238,6 +242,42 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get community_menu_phrase_guide_subtitle =>
       'Even if you\'re not fluent yet, don\'t feel shy when you travel!';
+
+  @override
+  String chat_room_appbar_title(String language) {
+    return '$language chat';
+  }
+
+  @override
+  String get chat_empty_hint => 'No messages yet. Say hello!';
+
+  @override
+  String get chat_input_hint => 'Type a message';
+
+  @override
+  String get chat_send_button => 'Send';
+
+  @override
+  String chat_load_failed(String error) {
+    return 'Could not load chat: $error';
+  }
+
+  @override
+  String chat_send_failed(String error) {
+    return 'Could not send: $error';
+  }
+
+  @override
+  String get chat_language_not_ready =>
+      'Please set your learning language first.';
+
+  @override
+  String get chat_send_empty_error => 'Please enter a message.';
+
+  @override
+  String chat_send_too_long_error(int maxLength) {
+    return 'Message must be $maxLength characters or fewer.';
+  }
 
   @override
   String get home_basic_characters_button => 'Study basic characters';

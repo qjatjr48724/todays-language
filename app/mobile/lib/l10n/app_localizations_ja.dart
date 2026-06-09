@@ -81,6 +81,9 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get auth_session_duplicate_login => '別の端末でログインされたため、この端末からログアウトされました。';
+
+  @override
   String get language_setup_appbar_title => '言語の選択';
 
   @override
@@ -225,6 +228,41 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get community_menu_phrase_guide_subtitle => 'まだ不慣れでも、旅行先で気後れしないでね！';
+
+  @override
+  String chat_room_appbar_title(String language) {
+    return '$language チャット';
+  }
+
+  @override
+  String get chat_empty_hint => 'まだメッセージがありません。最初の挨拶を送ってみましょう！';
+
+  @override
+  String get chat_input_hint => 'メッセージを入力';
+
+  @override
+  String get chat_send_button => '送信';
+
+  @override
+  String chat_load_failed(String error) {
+    return 'チャットを読み込めませんでした: $error';
+  }
+
+  @override
+  String chat_send_failed(String error) {
+    return '送信に失敗しました: $error';
+  }
+
+  @override
+  String get chat_language_not_ready => '先に学習言語を設定してください。';
+
+  @override
+  String get chat_send_empty_error => 'メッセージを入力してください。';
+
+  @override
+  String chat_send_too_long_error(int maxLength) {
+    return 'メッセージは$maxLength文字以内で入力してください。';
+  }
 
   @override
   String get home_basic_characters_button => '基礎文字を学ぶ';

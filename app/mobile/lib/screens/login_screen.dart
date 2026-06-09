@@ -1,10 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'email_login_screen.dart';
 import 'main_nav_screen.dart';
 import '../l10n/app_localizations.dart';
+import '../services/auth_session_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,7 +16,13 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  bool _loading = false;
+  String? _errorMessage;
   StreamSubscription<User?>? _authSub;
+
+  /// 디버그 전용 테스트 계정 — 릴리즈 빌드에는 UI·호출 경로 없음
+  static const _testEmail = 'test@test.com';
+  static const _testPassword = 'test1234';
 
   @override
   void initState() {
@@ -33,6 +41,50 @@ class _LoginScreenState extends State<LoginScreen> {
   void dispose() {
     _authSub?.cancel();
     super.dispose();
+  }
+
+
+  /// 테스트 계정 로그인 — 없으면 자동 가입 후 로그인
+  Future<void> _signInTestAccount() async {
+    final l10n = AppLocalizations.of(context)!;
+    setState(() {
+      _loading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _testEmail,
+        password: _testPassword,
+      );
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await AuthSessionService().claimSession(user);
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: _testEmail,
+          password: _testPassword,
+        );
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: _testEmail,
+          password: _testPassword,
+        );
+        final user = FirebaseAuth.instance.currentUser;
+        if (user != null) {
+          await AuthSessionService().claimSession(user);
+        }
+        return;
+      }
+      if (!mounted) return;
+      setState(() => _errorMessage = _messageForAuthException(e, context));
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _errorMessage = l10n.login_test_unknown_error);
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
   }
 
   @override
@@ -57,19 +109,53 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 18),
               FilledButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const EmailLoginScreen(),
-                    ),
-                  );
-                },
+                onPressed: _loading
+                    ? null
+                    : () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const EmailLoginScreen(),
+                          ),
+                        );
+                      },
                 child: Text(l10n.login_email_button),
               ),
+              if (_errorMessage != null) ...[
+                const SizedBox(height: 12),
+                Text(
+                  _errorMessage!,
+                  style: TextStyle(color: scheme.error),
+                ),
+              ],
+              if (kDebugMode) ...[
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: _loading ? null : _signInTestAccount,
+                  icon: const Icon(Icons.bolt),
+                  label: Text(l10n.login_debug_test_login),
+                ),
+              ],
             ],
           ),
         ),
       ),
     );
+  }
+}
+
+
+String _messageForAuthException(FirebaseAuthException e, BuildContext context) {
+  final l10n = AppLocalizations.of(context)!;
+  switch (e.code) {
+    case 'invalid-email':
+      return l10n.login_error_invalid_email;
+    case 'user-not-found':
+    case 'wrong-password':
+    case 'invalid-credential':
+      return l10n.login_error_credentials;
+    case 'too-many-requests':
+      return l10n.login_error_too_many_requests;
+    default:
+      return e.message ?? l10n.login_error_unknown(e.code);
   }
 }

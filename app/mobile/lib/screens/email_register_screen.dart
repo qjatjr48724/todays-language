@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../data/legal/privacy_policy_content.dart';
 import '../data/legal/terms_of_service_content.dart';
 import '../l10n/app_localizations.dart';
+import '../services/auth_session_service.dart';
 import '../services/user_profile_sync.dart';
 import 'privacy_policy_screen.dart';
 import 'terms_of_service_screen.dart';
@@ -96,6 +97,7 @@ class _EmailRegisterScreenState extends State<EmailRegisterScreen> {
           },
           'updatedAt': FieldValue.serverTimestamp(),
         }, SetOptions(merge: true));
+        await AuthSessionService().claimSession(credential.user!);
       }
       if (!mounted) return;
       Navigator.of(context).pop();

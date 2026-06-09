@@ -226,6 +226,12 @@ abstract class AppLocalizations {
   /// **'인증에 실패했습니다. ({code})'**
   String login_error_unknown(Object code);
 
+  /// No description provided for @auth_session_duplicate_login.
+  ///
+  /// In ko, this message translates to:
+  /// **'다른 기기에서 로그인되어 이 기기에서는 로그아웃되었습니다.'**
+  String get auth_session_duplicate_login;
+
   /// No description provided for @language_setup_appbar_title.
   ///
   /// In ko, this message translates to:
@@ -489,6 +495,60 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'공부한게 조금 서툴러도 여행가서 주눅들지 말아요!'**
   String get community_menu_phrase_guide_subtitle;
+
+  /// No description provided for @chat_room_appbar_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'{language} 채팅'**
+  String chat_room_appbar_title(String language);
+
+  /// No description provided for @chat_empty_hint.
+  ///
+  /// In ko, this message translates to:
+  /// **'아직 메시지가 없어요. 첫 인사를 남겨 보세요!'**
+  String get chat_empty_hint;
+
+  /// No description provided for @chat_input_hint.
+  ///
+  /// In ko, this message translates to:
+  /// **'메시지 입력'**
+  String get chat_input_hint;
+
+  /// No description provided for @chat_send_button.
+  ///
+  /// In ko, this message translates to:
+  /// **'보내기'**
+  String get chat_send_button;
+
+  /// No description provided for @chat_load_failed.
+  ///
+  /// In ko, this message translates to:
+  /// **'채팅을 불러오지 못했어요: {error}'**
+  String chat_load_failed(String error);
+
+  /// No description provided for @chat_send_failed.
+  ///
+  /// In ko, this message translates to:
+  /// **'전송에 실패했어요: {error}'**
+  String chat_send_failed(String error);
+
+  /// No description provided for @chat_language_not_ready.
+  ///
+  /// In ko, this message translates to:
+  /// **'학습 언어를 먼저 설정해 주세요.'**
+  String get chat_language_not_ready;
+
+  /// No description provided for @chat_send_empty_error.
+  ///
+  /// In ko, this message translates to:
+  /// **'메시지를 입력해 주세요.'**
+  String get chat_send_empty_error;
+
+  /// No description provided for @chat_send_too_long_error.
+  ///
+  /// In ko, this message translates to:
+  /// **'메시지는 {maxLength}자 이하로 입력해 주세요.'**
+  String chat_send_too_long_error(int maxLength);
 
   /// No description provided for @home_basic_characters_button.
   ///

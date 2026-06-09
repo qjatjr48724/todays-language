@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../auth_gate.dart';
 import '../config/feature_flags.dart';
+import '../services/auth_session_service.dart';
 import '../config/firebase_functions_config.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/flag_thumb.dart';
@@ -224,6 +225,7 @@ class MyInfoScreen extends StatelessWidget {
                             },
                           );
 
+                          await AuthSessionService().clearLocalSession();
                           await FirebaseAuth.instance.signOut();
                           await Future<void>.delayed(const Duration(seconds: 2));
                           if (!context.mounted) return;

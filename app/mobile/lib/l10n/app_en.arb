@@ -26,6 +26,8 @@
   "login_error_too_many_requests": "Too many attempts. Please try again later.",
   "login_error_unknown": "Authentication failed. ({code})",
 
+  "auth_session_duplicate_login": "You were signed out because this account was used on another device.",
+
   "language_setup_appbar_title": "Language Selection",
   "language_setup_welcome_title": "Get started",
   "language_setup_welcome_subtitle": "Please choose your local language (for explanations) and target language (for learning).",
@@ -74,6 +76,35 @@
   "community_menu_certificates_subtitle": "Here are certificates you can earn as you learn a language!",
   "community_menu_phrase_guide": "Phrase guide",
   "community_menu_phrase_guide_subtitle": "Even if you're not fluent yet, don't feel shy when you travel!",
+  "chat_room_appbar_title": "{language} chat",
+  "@chat_room_appbar_title": {
+    "placeholders": {
+      "language": { "type": "String" }
+    }
+  },
+  "chat_empty_hint": "No messages yet. Say hello!",
+  "chat_input_hint": "Type a message",
+  "chat_send_button": "Send",
+  "chat_load_failed": "Could not load chat: {error}",
+  "@chat_load_failed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "chat_send_failed": "Could not send: {error}",
+  "@chat_send_failed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "chat_language_not_ready": "Please set your learning language first.",
+  "chat_send_empty_error": "Please enter a message.",
+  "chat_send_too_long_error": "Message must be {maxLength} characters or fewer.",
+  "@chat_send_too_long_error": {
+    "placeholders": {
+      "maxLength": { "type": "int" }
+    }
+  },
   "home_basic_characters_button": "Study basic characters",
   "home_basic_characters_subtitle": "Table: character · sound · example",
   "basic_characters_screen_title": "Basic characters",

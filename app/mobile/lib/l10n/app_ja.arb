@@ -26,6 +26,8 @@
   "login_error_too_many_requests": "試行回数が多すぎます。しばらくしてから再試行してください。",
   "login_error_unknown": "認証に失敗しました。({code})",
 
+  "auth_session_duplicate_login": "別の端末でログインされたため、この端末からログアウトされました。",
+
   "language_setup_appbar_title": "言語の選択",
   "language_setup_welcome_title": "はじめましょう",
   "language_setup_welcome_subtitle": "ローカル言語（説明用）と対象言語（学習用）を選択してください。",
@@ -74,6 +76,35 @@
   "community_menu_certificates_subtitle": "言語を学ぶと、こんな資格を取得できます！",
   "community_menu_phrase_guide": "基本会話ガイド",
   "community_menu_phrase_guide_subtitle": "まだ不慣れでも、旅行先で気後れしないでね！",
+  "chat_room_appbar_title": "{language} チャット",
+  "@chat_room_appbar_title": {
+    "placeholders": {
+      "language": { "type": "String" }
+    }
+  },
+  "chat_empty_hint": "まだメッセージがありません。最初の挨拶を送ってみましょう！",
+  "chat_input_hint": "メッセージを入力",
+  "chat_send_button": "送信",
+  "chat_load_failed": "チャットを読み込めませんでした: {error}",
+  "@chat_load_failed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "chat_send_failed": "送信に失敗しました: {error}",
+  "@chat_send_failed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "chat_language_not_ready": "先に学習言語を設定してください。",
+  "chat_send_empty_error": "メッセージを入力してください。",
+  "chat_send_too_long_error": "メッセージは{maxLength}文字以内で入力してください。",
+  "@chat_send_too_long_error": {
+    "placeholders": {
+      "maxLength": { "type": "int" }
+    }
+  },
   "home_basic_characters_button": "基礎文字を学ぶ",
   "home_basic_characters_subtitle": "文字・発音・例を表で",
   "basic_characters_screen_title": "基礎文字",

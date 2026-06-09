@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'email_register_screen.dart';
 import '../l10n/app_localizations.dart';
+import '../services/auth_session_service.dart';
 
 class EmailLoginScreen extends StatefulWidget {
   const EmailLoginScreen({super.key});
@@ -37,6 +38,10 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await AuthSessionService().claimSession(user);
+      }
       if (!mounted) return;
       Navigator.of(context).pop();
     } on FirebaseAuthException catch (e) {

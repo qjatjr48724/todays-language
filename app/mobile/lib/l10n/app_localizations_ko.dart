@@ -81,6 +81,9 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get auth_session_duplicate_login => '다른 기기에서 로그인되어 이 기기에서는 로그아웃되었습니다.';
+
+  @override
   String get language_setup_appbar_title => '언어 선택';
 
   @override
@@ -227,6 +230,41 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get community_menu_phrase_guide_subtitle =>
       '공부한게 조금 서툴러도 여행가서 주눅들지 말아요!';
+
+  @override
+  String chat_room_appbar_title(String language) {
+    return '$language 채팅';
+  }
+
+  @override
+  String get chat_empty_hint => '아직 메시지가 없어요. 첫 인사를 남겨 보세요!';
+
+  @override
+  String get chat_input_hint => '메시지 입력';
+
+  @override
+  String get chat_send_button => '보내기';
+
+  @override
+  String chat_load_failed(String error) {
+    return '채팅을 불러오지 못했어요: $error';
+  }
+
+  @override
+  String chat_send_failed(String error) {
+    return '전송에 실패했어요: $error';
+  }
+
+  @override
+  String get chat_language_not_ready => '학습 언어를 먼저 설정해 주세요.';
+
+  @override
+  String get chat_send_empty_error => '메시지를 입력해 주세요.';
+
+  @override
+  String chat_send_too_long_error(int maxLength) {
+    return '메시지는 $maxLength자 이하로 입력해 주세요.';
+  }
 
   @override
   String get home_basic_characters_button => '기초 문자 공부하기';
