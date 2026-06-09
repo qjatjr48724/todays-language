@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../auth_gate.dart';
+import '../config/feature_flags.dart';
 import '../config/firebase_functions_config.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/flag_thumb.dart';
@@ -128,38 +129,40 @@ class MyInfoScreen extends StatelessWidget {
                     label: l10n.my_info_target_language_label,
                     alpha3: targetLanguage,
                   ),
-                  const SizedBox(height: 12),
-                  Divider(color: scheme.outlineVariant),
-                  const SizedBox(height: 16),
-                  Text(
-                    l10n.my_info_difficulty_header,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          _levelLabel(level, l10n),
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                      ),
-                      ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 120),
-                        child: OutlinedButton.icon(
-                          onPressed: () => _openLevelPicker(
-                            context,
-                            currentLevel: level,
-                            targetLanguage: targetLanguage,
+                  if (kLearningDifficultyUiEnabled) ...[
+                    const SizedBox(height: 12),
+                    Divider(color: scheme.outlineVariant),
+                    const SizedBox(height: 16),
+                    Text(
+                      l10n.my_info_difficulty_header,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            _levelLabel(level, l10n),
+                            style: Theme.of(context).textTheme.bodyLarge,
                           ),
-                          icon: const Icon(Icons.tune, size: 18),
-                          label: Text(l10n.my_info_change_button),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Divider(color: scheme.outlineVariant),
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 120),
+                          child: OutlinedButton.icon(
+                            onPressed: () => _openLevelPicker(
+                              context,
+                              currentLevel: level,
+                              targetLanguage: targetLanguage,
+                            ),
+                            icon: const Icon(Icons.tune, size: 18),
+                            label: Text(l10n.my_info_change_button),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Divider(color: scheme.outlineVariant),
+                  ],
                   const SizedBox(height: 16),
                   Text(
                     l10n.my_info_device_change_header,

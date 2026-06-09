@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'main_nav_screen.dart';
+import '../config/feature_flags.dart';
 import '../l10n/app_localizations.dart';
 import '../models/curriculum_state.dart';
 import '../services/user_profile_sync.dart';
@@ -124,7 +125,10 @@ class _TargetLanguageSetupScreenState extends State<TargetLanguageSetupScreen> {
       final docRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
       final current = await docRef.get();
       final data = current.data() ?? <String, dynamic>{};
-      final normalizedLevel = CurriculumState.normalizeLearningLevel(_selectedLevel);
+      // 난이도 UI 비활성 시 신규·재설정 모두 초급 고정
+      final normalizedLevel = kLearningDifficultyUiEnabled
+          ? CurriculumState.normalizeLearningLevel(_selectedLevel)
+          : CurriculumState.normalizeLearningLevel('beginner');
 
       await docRef.set(
         {
@@ -203,15 +207,17 @@ class _TargetLanguageSetupScreenState extends State<TargetLanguageSetupScreen> {
                             onSelect: (choice) => setState(() => _targetChoice = choice),
                           ),
                   ),
-                  const SizedBox(height: 16),
-                  _PickerCard(
-                    title: l10n.onboarding_difficulty_card_title,
-                    subtitle: l10n.onboarding_difficulty_card_subtitle,
-                    child: LearningLevelSelector(
-                      selectedLevel: _selectedLevel,
-                      onSelect: (level) => setState(() => _selectedLevel = level),
+                  if (kLearningDifficultyUiEnabled) ...[
+                    const SizedBox(height: 16),
+                    _PickerCard(
+                      title: l10n.onboarding_difficulty_card_title,
+                      subtitle: l10n.onboarding_difficulty_card_subtitle,
+                      child: LearningLevelSelector(
+                        selectedLevel: _selectedLevel,
+                        onSelect: (level) => setState(() => _selectedLevel = level),
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),
