@@ -1735,3 +1735,87 @@ unauthenticated: 로그인 상태 확인
 2. 익일 수동 검증: 완료 계정 → `learningDay` +1·다음 세트 / 미완료 계정 → 동일 일차
 3. C′는 1단계 50일 학습·검증 여유 후 착수
 
+---
+
+## [단계 37] D-1 구현·초급 고정·중복 로그인·채팅 MVP·개발 규칙 통합 (2026-06-10)
+
+### 1) 오늘 한 일
+
+**Phase D-1 — `learningDay +1` (앱)**
+- 당일 **단어 15 + 문장 5 + 마무리 13** 전부 완료 시 `users/{uid}.learningDay +1` (즉시, 트랜잭션)
+- `daily_progress/{dateKst}.curriculumDayAdvanced`로 중복 +1 방지
+- 홈 진입 시 최근 31일 KST 날짜 ID 직접 조회로 미반영 완료분 백필 (`reconcilePendingLearningDayAdvances`)
+- D-1 로직을 `daily_progress_sync.dart`에 통합 (별도 `curriculum_day_advance.dart` 제거)
+- `curriculum_state_test.dart`에 D-1 순수 함수 테스트 추가
+
+**초급 고정 (난이도 UI off 운영)**
+- 앱·Functions `effectiveLearningLevel` — 프로필·Callable·선생성 모두 **beginner** 강제
+- `ensureUserProfileDocument` 로그인 시 `level: beginner` 갱신
+- Functions 선생성 대상: KOR/USA/JPN × **beginner** 3조합만 (중급 3조합 제외)
+- `curriculum_state.ts`에 플래그·정책 통합 (`config/feature_flags` 별도 파일 제거)
+
+**중복 로그인 방지**
+- `AuthSessionService`: Firestore `activeSessionId` + 로컬 SharedPreferences 세션 선점
+- `AuthSessionWatcher`: 다른 기기 로그인 시 이 기기 자동 로그아웃 + i18n 스낵바
+- 로그인·회원가입·명시적 로그아웃 시 세션 claim/clear 연동
+
+**커뮤니티 채팅 MVP**
+- Firestore 실시간: `chat_rooms/{KOR|USA|JPN}/messages/{id}` (텍스트만)
+- `ChatRoomScreen` + `community_screen` 채팅 메뉴 연동
+- `firestore.rules`: 학습 언어(`targetLanguage`)와 방 ID 일치 시 read/create
+- i18n `chat_*`, `community_menu_chat_*` · `chat_message_test.dart`
+
+**기타**
+- `login_screen`: `kDebugMode` 테스트 계정 자동 로그인 (`test@test.com`)
+- Firestore 인덱스 오류 수정: D-1 백필 `orderBy` 제거 → KST 날짜 ID 직접 `get`
+- 테스트 계정 `learningDay` 3→2 Firestore 수동 보정으로 2/50일차 정상화 확인
+
+**문서·규칙**
+- `KARPATHY_GUIDELINE.md` 내용 → `DEV_RULES.md` §0-1 **AI·코드 작성 원칙** 통합
+- `.cursor/rules/Dev-Rules.mdc` 동기 (사전 제안·승인, 최소 변경, TDD)
+- `CLAUDE.md`, `FIRESTORE_MIN_SCHEMA.md` (`curriculumDayAdvanced`, D-1 규칙) 갱신
+
+### 2) 합의·결정
+
+- D-1 **구현 완료(앱)** — Functions 검증 callable은 권장·미구현
+- 난이도 UI 비활성 기간 **초급만** 학습·선생성
+- 채팅: 신고·차단·rate limit·Functions 없음 (Firestore 직접)
+- `learningDay` 테스트 데이터 꼬임 시 Firestore `users/{uid}.learningDay` 수동 보정 가능
+
+### 3) 완료 기준 체크
+
+- [x] `flutter gen-l10n` · `flutter analyze` 통과
+- [x] `curriculum_state_test` (D-1·초급 고정 포함) 통과
+- [x] `auth_session_service_test` 통과
+- [x] `chat_message_test` 통과
+- [x] `functions` `npm test` (14) 통과
+- [x] 사용자 확인: `learningDay=2` 수동 수정 후 **2/50일차** 표시
+- [ ] `firebase deploy --only firestore:rules` (채팅 규칙)
+- [ ] Functions 선생성·Callable 초급 고정 **배포** (`pregenerateDailyLearningSets` 등)
+- [ ] 2에뮬레이터 중복 로그인·채팅 수동 검증
+
+### 4) 추가/변경 파일(주요)
+
+| 영역 | 파일 |
+|------|------|
+| D-1 | `daily_progress_sync.dart`, `home_screen.dart`, `curriculum_state.dart`, `curriculum_state_test.dart` |
+| 초급 고정 | `feature_flags.dart`, `user_profile_sync.dart`, `user_prefs.dart`, `target_language_picker.dart`, `curriculum_state.ts`, `index.ts` |
+| 중복 로그인 | `auth_session_service.dart`, `auth_session_watcher.dart`, `email_login_screen.dart`, `login_screen.dart` |
+| 채팅 | `chat_message.dart`, `chat_repository.dart`, `chat_room_screen.dart`, `community_screen.dart`, `firestore.rules` |
+| 문서 | `DEV_RULES.md`, `Dev-Rules.mdc`, `KARPATHY_GUIDELINE.md`, `CLAUDE.md`, `FIRESTORE_MIN_SCHEMA.md` |
+
+### 5) 이슈·해결
+
+| 이슈 | 원인 | 해결 |
+|------|------|------|
+| 홈 `failed-precondition` 인덱스 오류 | D-1 백필 `orderBy(documentId)` | KST 날짜 ID 31일 직접 조회 |
+| 3/50일차 (기대 2/50) | 테스트 중 완료일 2일 + 백필 +2 | Firestore `learningDay=2` 수동 보정 |
+| 중급 커서 `intermediate_1_3` | 프로필 `level` 잔존 | 초급 고정 + `level: beginner` 갱신 |
+
+### 6) 다음 액션
+
+1. Firestore rules·Functions **배포** (채팅·초급 선생성)
+2. D-1 익일 검증: 완료 계정 2→3일차 / 미완료 동일 일차
+3. 중복 로그인·채팅 2계정 수동 테스트
+4. D-2 (50일차 완료 → 점검 available) 또는 C′ 보류 유지
+
