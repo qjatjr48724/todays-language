@@ -1819,3 +1819,73 @@ unauthenticated: 로그인 상태 확인
 3. 중복 로그인·채팅 2계정 수동 테스트
 4. D-2 (50일차 완료 → 점검 available) 또는 C′ 보류 유지
 
+---
+
+## [단계 38] 학습 음성 TTS·Storage 선생성·앱 재생 UX (2026-06-11)
+
+### 1) 오늘 한 일
+
+**학습 음성 파이프라인 (Functions + Storage)**
+- Google Cloud Text-to-Speech(WaveNet)로 합성 → Firebase Storage `learning_audio/{언어}/{해시}.mp3` 저장
+- 동일 언어·동일 텍스트는 SHA-256 해시 경로로 **중복 TTS 방지**
+- Firestore 세트 항목에 경로 매핑: `wordAudioPath`, `exampleAudioPath`, `sentenceAudioPath`
+- 커리큘럼·일일 세트 **materialize 시** AI 생성 직후 음성 enrich
+- 기존 세트(음성 없음)는 materialize 재진입 시 **백필** (`wordItemNeedsAudio` / `sentenceItemNeedsAudio`)
+- `storage.rules`: `learning_audio/**` 로그인 사용자 read-only, 쓰기는 Admin(Functions)만
+- `firebase.json`에 Storage rules 배포 설정 추가
+- `@google-cloud/text-to-speech` 의존성 · `audio_path.test.ts`
+
+**앱 재생 UI**
+- `firebase_storage` + `audioplayers`
+- `LearningAudioService` — Storage 경로 → download URL → 재생
+- `LearningAudioIconButton` — 오늘의 단어(단어·예문), 오늘의 문장(문장) 🔊 버튼
+- Callable 응답 `wordAudioPath` / `exampleAudioPath` / `sentenceAudioPath` 연동
+- i18n `learning_audio_play_*`, `learning_audio_play_failed`
+- 재생 **완료 시** 정지 아이콘 → 듣기 아이콘 자동 복귀 (`onPlayerComplete` + `ChangeNotifier`)
+
+**운영·검증 (사용자)**
+- GCP Cloud Text-to-Speech API 사용 설정 · Firebase Storage 버킷 생성 완료
+- 관리자 도구 `ensureLearningSetForToday`로 현재 일차 음성 백필·테스트
+- 23:55 스케줄러: **비어 있는 일차** 신규 생성 시 문제 세트 + TTS **동시 생성** (Functions 배포 전제)
+- 초급 고정(`LEARNING_DIFFICULTY_UI_ENABLED=false`) 확인 — **신규 `*_intermediate_*` 세트는 생성 안 함** (잔존 문서만 가능)
+
+### 2) 합의·결정
+
+- 실시간 TTS(앱) 대신 **pregen 시 1회 합성 + Storage 재생** (비용·음질 일관성)
+- 파일명은 해시, **매핑은 Firestore `*AudioPath`** (파일명으로 역조회하지 않음)
+- 대상 텍스트: 단어 `word`, 예문 `example`, 문장 `sentence` (한국어 뜻·`exampleMeaningKo`는 TTS 제외)
+- 난이도 UI off 기간 선생성·학습은 **beginner 3조합**만
+
+### 3) 완료 기준 체크
+
+- [x] `functions` `npm test` (16, `audio_path` 포함) 통과
+- [x] `flutter analyze` 통과
+- [x] 사용자: TTS API·Storage 준비 완료
+- [x] 사용자: 현재 일차 음성 재생 테스트(단어·예문)
+- [ ] `firebase deploy --only functions,storage` (TTS 코드·rules 반영 확인)
+- [ ] 23:55 스케줄러로 빈 일차 생성 시 TTS 포함 운영 검증
+- [ ] 전 일차(1~50) 음성 일괄 백필(필요 시 `seedCurriculumPhase1Sets` 또는 관리자 ensure 반복)
+
+### 4) 추가/변경 파일(주요)
+
+| 영역 | 파일 |
+|------|------|
+| Functions TTS | `functions/src/learning_audio/*`, `functions/src/index.ts`, `functions/package.json` |
+| Storage 규칙 | `storage.rules`, `firebase.json` |
+| 앱 재생 | `learning_audio_service.dart`, `learning_audio_icon_button.dart`, `today_words_screen.dart`, `today_sentences_screen.dart`, `pubspec.yaml` |
+| i18n | `app_*.arb`, `app_localizations_*.dart` |
+
+### 5) 이슈·해결
+
+| 이슈 | 해결 |
+|------|------|
+| Storage 파일명이 불규칙해 보임 | 의도된 해시 경로; Firestore `*AudioPath`로 매핑 |
+| 재생 후 정지 아이콘 유지 | `onPlayerComplete`로 재생 상태 초기화 |
+
+### 6) 다음 액션
+
+1. Functions + Storage rules **배포** (`firebase deploy --only functions,storage`)
+2. 빈 커리큘럼 일차 — 23:55 스케줄러 TTS 포함 생성 모니터링
+3. (선택) 1~50일 음성 백필 일괄 실행
+4. 채팅·중복 로그인 등 [단계 37] 미검증 항목 이어서 수동 테스트
+
