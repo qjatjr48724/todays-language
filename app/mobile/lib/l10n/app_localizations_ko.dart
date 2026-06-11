@@ -839,6 +839,20 @@ class AppLocalizationsKo extends AppLocalizations {
   String get words_example_section_title => '예문';
 
   @override
+  String get learning_audio_play_word => '단어 듣기';
+
+  @override
+  String get learning_audio_play_example => '예문 듣기';
+
+  @override
+  String get learning_audio_play_sentence => '문장 듣기';
+
+  @override
+  String learning_audio_play_failed(Object error) {
+    return '음성을 재생하지 못했습니다: $error';
+  }
+
+  @override
   String get sentences_appbar_title => '오늘의 문장';
 
   @override

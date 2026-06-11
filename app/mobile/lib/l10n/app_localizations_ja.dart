@@ -837,6 +837,20 @@ class AppLocalizationsJa extends AppLocalizations {
   String get words_example_section_title => '例文';
 
   @override
+  String get learning_audio_play_word => '単語を再生';
+
+  @override
+  String get learning_audio_play_example => '例文を再生';
+
+  @override
+  String get learning_audio_play_sentence => '文を再生';
+
+  @override
+  String learning_audio_play_failed(Object error) {
+    return '音声を再生できませんでした: $error';
+  }
+
+  @override
   String get sentences_appbar_title => '今日の文';
 
   @override

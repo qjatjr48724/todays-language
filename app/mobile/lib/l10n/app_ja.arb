@@ -332,6 +332,16 @@
   "words_debug_source": "debugSource: {source}",
   "words_example_section_title": "例文",
 
+  "learning_audio_play_word": "単語を再生",
+  "learning_audio_play_example": "例文を再生",
+  "learning_audio_play_sentence": "文を再生",
+  "learning_audio_play_failed": "音声を再生できませんでした: {error}",
+  "@learning_audio_play_failed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+
   "sentences_appbar_title": "今日の文",
   "sentences_loading_sample": "サンプルを読み込み中…",
   "sentences_sample_reload": "サンプルを再読み込み",

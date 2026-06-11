@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 
 import '../services/daily_progress_sync.dart';
+import '../services/learning_audio_service.dart';
 import '../l10n/app_localizations.dart';
+import '../ui/learning_audio_icon_button.dart';
 
 class TodaySentencesScreen extends StatefulWidget {
   const TodaySentencesScreen({
@@ -31,8 +33,10 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
   String? _sentenceHira;
   String? _meaning;
   List<_SentenceVocabHint> _vocabHints = const [];
+  String? _sentenceAudioPath;
   String? _debugSource;
   bool _completedCurrent = false;
+  final _learningAudio = LearningAudioService();
 
   DailyProgressView? _todayProgress;
   bool _relearnActive = false;
@@ -59,6 +63,12 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
     _fetchSentenceSample();
   }
 
+  @override
+  void dispose() {
+    _learningAudio.dispose();
+    super.dispose();
+  }
+
   Future<void> _loadTodayProgress() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
@@ -83,6 +93,7 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
   }
 
   Future<void> _fetchSentenceSample({bool forceRefreshToken = false}) async {
+    await _learningAudio.stop();
     setState(() {
       _aiLoading = true;
       _aiError = null;
@@ -90,6 +101,7 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
       _sentenceHira = null;
       _meaning = null;
       _vocabHints = const [];
+      _sentenceAudioPath = null;
       _debugSource = null;
       _completedCurrent = false;
       _error = null;
@@ -111,6 +123,7 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
       final sentence = data['sentence']?.toString() ?? '';
       final sentenceHira = data['sentenceHira']?.toString();
       final meaning = data['meaningKo']?.toString() ?? '';
+      final sentenceAudioPath = data['sentenceAudioPath']?.toString();
       final debugSource = data['debugSource']?.toString();
       final hintsRaw = data['vocabularyHints'];
       final hints = <_SentenceVocabHint>[];
@@ -131,6 +144,7 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
         _sentenceHira = sentenceHira;
         _meaning = meaning;
         _vocabHints = hints;
+        _sentenceAudioPath = sentenceAudioPath;
         _debugSource = debugSource;
         _aiLoading = false;
       });
@@ -227,9 +241,22 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
                 child: Text(l10n.sentences_sample_reload),
               ),
             ] else ...[
-              Text(
-                _sentence ?? '-',
-                style: textTheme.headlineSmall,
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(
+                      _sentence ?? '-',
+                      style: textTheme.headlineSmall,
+                    ),
+                  ),
+                  LearningAudioIconButton(
+                    storagePath: _sentenceAudioPath,
+                    tooltip: l10n.learning_audio_play_sentence,
+                    audioService: _learningAudio,
+                    onError: (e) => showLearningAudioErrorSnackBar(context, e),
+                  ),
+                ],
               ),
               if (showHiraLine) ...[
                 const SizedBox(height: 8),

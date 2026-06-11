@@ -1595,6 +1595,30 @@ abstract class AppLocalizations {
   /// **'예문'**
   String get words_example_section_title;
 
+  /// No description provided for @learning_audio_play_word.
+  ///
+  /// In ko, this message translates to:
+  /// **'단어 듣기'**
+  String get learning_audio_play_word;
+
+  /// No description provided for @learning_audio_play_example.
+  ///
+  /// In ko, this message translates to:
+  /// **'예문 듣기'**
+  String get learning_audio_play_example;
+
+  /// No description provided for @learning_audio_play_sentence.
+  ///
+  /// In ko, this message translates to:
+  /// **'문장 듣기'**
+  String get learning_audio_play_sentence;
+
+  /// No description provided for @learning_audio_play_failed.
+  ///
+  /// In ko, this message translates to:
+  /// **'음성을 재생하지 못했습니다: {error}'**
+  String learning_audio_play_failed(Object error);
+
   /// No description provided for @sentences_appbar_title.
   ///
   /// In ko, this message translates to:

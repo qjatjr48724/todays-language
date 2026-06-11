@@ -332,6 +332,16 @@
   "words_debug_source": "debugSource: {source}",
   "words_example_section_title": "Example",
 
+  "learning_audio_play_word": "Play word",
+  "learning_audio_play_example": "Play example",
+  "learning_audio_play_sentence": "Play sentence",
+  "learning_audio_play_failed": "Could not play audio: {error}",
+  "@learning_audio_play_failed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+
   "sentences_appbar_title": "Today's Sentences",
   "sentences_loading_sample": "Loading sample…",
   "sentences_sample_reload": "Reload sample",

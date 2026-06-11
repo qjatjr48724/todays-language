@@ -331,6 +331,16 @@
   "words_debug_source": "debugSource: {source}",
   "words_example_section_title": "예문",
 
+  "learning_audio_play_word": "단어 듣기",
+  "learning_audio_play_example": "예문 듣기",
+  "learning_audio_play_sentence": "문장 듣기",
+  "learning_audio_play_failed": "음성을 재생하지 못했습니다: {error}",
+  "@learning_audio_play_failed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+
   "sentences_appbar_title": "오늘의 문장",
   "sentences_loading_sample": "샘플을 불러오는 중…",
   "sentences_sample_reload": "샘플 다시 불러오기",

@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 
 import '../services/daily_progress_sync.dart';
+import '../services/learning_audio_service.dart';
 import '../l10n/app_localizations.dart';
+import '../ui/learning_audio_icon_button.dart';
 
 class TodayWordsScreen extends StatefulWidget {
   const TodayWordsScreen({
@@ -31,7 +33,10 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
   String? _meaning;
   String? _example;
   String? _exampleMeaningKo;
+  String? _wordAudioPath;
+  String? _exampleAudioPath;
   String? _debugSource;
+  final _learningAudio = LearningAudioService();
   bool _completedCurrent = false;
 
   String? _error;
@@ -62,6 +67,12 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
     _fetchWordSample();
   }
 
+  @override
+  void dispose() {
+    _learningAudio.dispose();
+    super.dispose();
+  }
+
   Future<void> _loadTodayProgress() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
@@ -90,6 +101,7 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
   }
 
   Future<void> _fetchWordSample({bool forceRefreshToken = false}) async {
+    await _learningAudio.stop();
     setState(() {
       _aiLoading = true;
       _aiError = null;
@@ -98,6 +110,8 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
       _meaning = null;
       _example = null;
       _exampleMeaningKo = null;
+      _wordAudioPath = null;
+      _exampleAudioPath = null;
       _debugSource = null;
       _completedCurrent = false;
       _error = null;
@@ -121,6 +135,8 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
       final meaning = data['meaningKo']?.toString() ?? '';
       final example = data['example']?.toString();
       final exampleMeaningKo = data['exampleMeaningKo']?.toString();
+      final wordAudioPath = data['wordAudioPath']?.toString();
+      final exampleAudioPath = data['exampleAudioPath']?.toString();
       final debugSource = data['debugSource']?.toString();
 
       if (!mounted) return;
@@ -130,6 +146,8 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
         _meaning = meaning;
         _example = example;
         _exampleMeaningKo = exampleMeaningKo;
+        _wordAudioPath = wordAudioPath;
+        _exampleAudioPath = exampleAudioPath;
         _debugSource = debugSource;
         _aiLoading = false;
       });
@@ -227,11 +245,24 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
                 child: Text(l10n.words_sample_reload),
               ),
             ] else ...[
-              Text(
-                _word ?? '-',
-                style: textTheme.headlineMedium?.copyWith(
-                  fontSize: (textTheme.headlineMedium?.fontSize ?? 28) + 4,
-                ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(
+                      _word ?? '-',
+                      style: textTheme.headlineMedium?.copyWith(
+                        fontSize: (textTheme.headlineMedium?.fontSize ?? 28) + 4,
+                      ),
+                    ),
+                  ),
+                  LearningAudioIconButton(
+                    storagePath: _wordAudioPath,
+                    tooltip: l10n.learning_audio_play_word,
+                    audioService: _learningAudio,
+                    onError: (e) => showLearningAudioErrorSnackBar(context, e),
+                  ),
+                ],
               ),
               if (showHiraLine) ...[
                 const SizedBox(height: 6),
@@ -258,6 +289,8 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
                   l10n: l10n,
                   example: _example!.trim(),
                   exampleMeaningKo: _exampleMeaningKo?.trim(),
+                  exampleAudioPath: _exampleAudioPath,
+                  audioService: _learningAudio,
                 ),
               ],
             ],
@@ -333,11 +366,15 @@ class _WordExampleCard extends StatelessWidget {
     required this.l10n,
     required this.example,
     this.exampleMeaningKo,
+    this.exampleAudioPath,
+    this.audioService,
   });
 
   final AppLocalizations l10n;
   final String example;
   final String? exampleMeaningKo;
+  final String? exampleAudioPath;
+  final LearningAudioService? audioService;
 
   @override
   Widget build(BuildContext context) {
@@ -359,12 +396,24 @@ class _WordExampleCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              l10n.words_example_section_title,
-              style: textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: scheme.onSurface,
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    l10n.words_example_section_title,
+                    style: textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: scheme.onSurface,
+                    ),
+                  ),
+                ),
+                LearningAudioIconButton(
+                  storagePath: exampleAudioPath,
+                  tooltip: l10n.learning_audio_play_example,
+                  audioService: audioService,
+                  onError: (e) => showLearningAudioErrorSnackBar(context, e),
+                ),
+              ],
             ),
             const SizedBox(height: 12),
             Text(

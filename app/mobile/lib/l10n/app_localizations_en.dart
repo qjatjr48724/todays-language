@@ -866,6 +866,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get words_example_section_title => 'Example';
 
   @override
+  String get learning_audio_play_word => 'Play word';
+
+  @override
+  String get learning_audio_play_example => 'Play example';
+
+  @override
+  String get learning_audio_play_sentence => 'Play sentence';
+
+  @override
+  String learning_audio_play_failed(Object error) {
+    return 'Could not play audio: $error';
+  }
+
+  @override
   String get sentences_appbar_title => 'Today\'s Sentences';
 
   @override
