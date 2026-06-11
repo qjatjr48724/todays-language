@@ -53,7 +53,10 @@ class _HomeScreenState extends State<HomeScreen> {
       await ensureUserProfileDocument(user);
       await reconcilePendingLearningDayAdvances(user);
       final prefs = await fetchUserPrefs(user);
-      final progress = await ensureTodayDailyProgress(user);
+      final progress = await ensureTodayDailyProgress(
+        user,
+        targetLanguage: prefs.targetLanguage,
+      );
       if (!mounted) return;
       setState(() {
         _prefs = prefs;
@@ -72,14 +75,20 @@ class _HomeScreenState extends State<HomeScreen> {
         final data = snap.data() ?? <String, dynamic>{};
         final tl = (data['targetLanguage'] as String?)?.trim();
         final lv = (data['level'] as String?)?.trim();
+        final nextTargetLanguage =
+            (tl == null || tl.isEmpty) ? _prefs.targetLanguage : tl;
+        final languageChanged = nextTargetLanguage != _prefs.targetLanguage;
         if (!mounted) return;
         setState(() {
           _prefs = UserPrefs(
-            targetLanguage: (tl == null || tl.isEmpty) ? _prefs.targetLanguage : tl,
+            targetLanguage: nextTargetLanguage,
             level: effectiveLearningLevel(lv),
             curriculum: CurriculumState.fromUserData(data),
           );
         });
+        if (languageChanged) {
+          _refreshTodayProgress();
+        }
       }, onError: (_) {
         // Firestore 규칙/네트워크 이슈 등으로 스트림이 실패해도 홈 흐름을 깨지지 않게 함
       });
@@ -120,7 +129,10 @@ class _HomeScreenState extends State<HomeScreen> {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
     try {
-      final p = await ensureTodayDailyProgress(user);
+      final p = await ensureTodayDailyProgress(
+        user,
+        targetLanguage: _prefs.targetLanguage,
+      );
       if (!mounted) return;
       setState(() => _todayProgress = p);
     } catch (_) {

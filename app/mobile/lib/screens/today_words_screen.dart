@@ -77,7 +77,10 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
     try {
-      final p = await ensureTodayDailyProgress(user);
+      final p = await ensureTodayDailyProgress(
+        user,
+        targetLanguage: widget.targetLanguage,
+      );
       if (!mounted) return;
       setState(() {
         _todayProgress = p;
@@ -173,7 +176,11 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
       _error = null;
     });
     try {
-      final p = await incrementTodayDailyProgress(user, kind: DailyProgressKind.word);
+      final p = await incrementTodayDailyProgress(
+        user,
+        kind: DailyProgressKind.word,
+        targetLanguage: widget.targetLanguage,
+      );
       if (!mounted) return;
       setState(() {
         _completedCurrent = true;

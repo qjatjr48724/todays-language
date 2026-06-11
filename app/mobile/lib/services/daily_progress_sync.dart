@@ -12,6 +12,9 @@ const int kDailyWordGoalDefault = 15;
 const int kDailySentenceGoalDefault = 5;
 const int kDailyQuizGoalDefault = 13;
 
+/// 언어별 당일 진척도 맵 필드 (`KOR` / `JPN` / `USA` …)
+const String kByLanguageField = 'byLanguage';
+
 /// [docs/FIRESTORE_MIN_SCHEMA.md] — `users/{uid}/daily_progress/{dateKst}`
 class DailyProgressView {
   const DailyProgressView({
@@ -32,6 +35,8 @@ class DailyProgressView {
   final int sentenceDone;
   final int quizGoal;
   final int quizDone;
+
+  /// 당일 전체 진행률 — 언어 중 가장 높은 학습률(0~100).
   final int progressPercent;
 
   static DailyProgressView fromMap(String dateKst, Map<String, dynamic> m) {
@@ -56,6 +61,200 @@ class DailyProgressView {
 }
 
 
+/// 언어 코드를 daily_progress `byLanguage` 키(alpha-3)로 통일합니다.
+String normalizeDailyProgressLanguageCode(String raw) {
+  final v = raw.trim();
+  if (v.isEmpty) return 'JPN';
+  switch (v.toLowerCase()) {
+    case 'ja':
+      return 'JPN';
+    case 'es':
+      return 'ESP';
+    default:
+      return v.toUpperCase();
+  }
+}
+
+
+/// 언어별 단어·문장·마무리 완료 수.
+class LanguageProgressSlice {
+  const LanguageProgressSlice({
+    required this.wordDone,
+    required this.sentenceDone,
+    required this.quizDone,
+  });
+
+  final int wordDone;
+  final int sentenceDone;
+  final int quizDone;
+
+  static const LanguageProgressSlice empty = LanguageProgressSlice(
+    wordDone: 0,
+    sentenceDone: 0,
+    quizDone: 0,
+  );
+
+  Map<String, int> toFirestoreMap() => {
+        'wordDone': wordDone,
+        'sentenceDone': sentenceDone,
+        'quizDone': quizDone,
+      };
+
+  LanguageProgressSlice copyWith({
+    int? wordDone,
+    int? sentenceDone,
+    int? quizDone,
+  }) {
+    return LanguageProgressSlice(
+      wordDone: wordDone ?? this.wordDone,
+      sentenceDone: sentenceDone ?? this.sentenceDone,
+      quizDone: quizDone ?? this.quizDone,
+    );
+  }
+}
+
+
+int _intFromDynamic(dynamic v, int def) {
+  if (v is int) return v;
+  if (v is num) return v.toInt();
+  return def;
+}
+
+
+LanguageProgressSlice parseLanguageProgressSlice(Map<String, dynamic>? raw) {
+  if (raw == null || raw.isEmpty) return LanguageProgressSlice.empty;
+  return LanguageProgressSlice(
+    wordDone: _intFromDynamic(raw['wordDone'], 0),
+    sentenceDone: _intFromDynamic(raw['sentenceDone'], 0),
+    quizDone: _intFromDynamic(raw['quizDone'], 0),
+  );
+}
+
+
+Map<String, LanguageProgressSlice> parseByLanguageField(dynamic raw) {
+  if (raw is! Map) return <String, LanguageProgressSlice>{};
+  final out = <String, LanguageProgressSlice>{};
+  for (final entry in raw.entries) {
+    final lang = normalizeDailyProgressLanguageCode(entry.key.toString());
+    if (entry.value is Map) {
+      out[lang] = parseLanguageProgressSlice(
+        Map<String, dynamic>.from(entry.value as Map),
+      );
+    }
+  }
+  return out;
+}
+
+
+Map<String, dynamic> serializeByLanguageField(
+  Map<String, LanguageProgressSlice> byLanguage,
+) {
+  return byLanguage.map(
+    (lang, slice) => MapEntry(lang, slice.toFirestoreMap()),
+  );
+}
+
+
+/// 구버전(최상위 wordDone 등) 문서를 `byLanguage`로 이전합니다.
+Map<String, LanguageProgressSlice> migrateLegacyProgressToByLanguage(
+  Map<String, dynamic> data, {
+  required String fallbackLanguage,
+}) {
+  final existing = parseByLanguageField(data[kByLanguageField]);
+  if (existing.isNotEmpty) return existing;
+
+  final lang = normalizeDailyProgressLanguageCode(fallbackLanguage);
+  final legacy = LanguageProgressSlice(
+    wordDone: _intFromDynamic(data['wordDone'], 0),
+    sentenceDone: _intFromDynamic(data['sentenceDone'], 0),
+    quizDone: _intFromDynamic(data['quizDone'], 0),
+  );
+  if (legacy.wordDone == 0 &&
+      legacy.sentenceDone == 0 &&
+      legacy.quizDone == 0) {
+    return existing;
+  }
+  return {lang: legacy};
+}
+
+
+int computeSliceProgressPercent({
+  required LanguageProgressSlice slice,
+  required int wordGoal,
+  required int sentenceGoal,
+  required int quizGoal,
+}) {
+  final totalGoal = wordGoal + sentenceGoal + quizGoal;
+  if (totalGoal <= 0) return 0;
+  final totalDone = slice.wordDone + slice.sentenceDone + slice.quizDone;
+  return ((totalDone / totalGoal) * 100).round().clamp(0, 100);
+}
+
+
+/// 당일 학습률이 가장 높은 언어의 진행률(0~100)을 반환합니다.
+int computeMaxProgressPercentAcrossLanguages({
+  required Map<String, LanguageProgressSlice> byLanguage,
+  required int wordGoal,
+  required int sentenceGoal,
+  required int quizGoal,
+}) {
+  if (byLanguage.isEmpty) return 0;
+  var maxPercent = 0;
+  for (final slice in byLanguage.values) {
+    final percent = computeSliceProgressPercent(
+      slice: slice,
+      wordGoal: wordGoal,
+      sentenceGoal: sentenceGoal,
+      quizGoal: quizGoal,
+    );
+    if (percent > maxPercent) maxPercent = percent;
+  }
+  return maxPercent;
+}
+
+
+LanguageProgressSlice sliceForLanguage(
+  Map<String, LanguageProgressSlice> byLanguage,
+  String targetLanguage,
+) {
+  return byLanguage[normalizeDailyProgressLanguageCode(targetLanguage)] ??
+      LanguageProgressSlice.empty;
+}
+
+
+bool isLanguageSliceComplete({
+  required LanguageProgressSlice slice,
+  required int wordGoal,
+  required int sentenceGoal,
+  required int quizGoal,
+}) {
+  return slice.wordDone >= wordGoal &&
+      slice.sentenceDone >= sentenceGoal &&
+      slice.quizDone >= quizGoal;
+}
+
+
+DailyProgressView buildDailyProgressView({
+  required String dateKst,
+  required int wordGoal,
+  required int sentenceGoal,
+  required int quizGoal,
+  required LanguageProgressSlice slice,
+  required int displayProgressPercent,
+}) {
+  return DailyProgressView(
+    dateKst: dateKst,
+    wordGoal: wordGoal,
+    wordDone: slice.wordDone,
+    sentenceGoal: sentenceGoal,
+    sentenceDone: slice.sentenceDone,
+    quizGoal: quizGoal,
+    quizDone: slice.quizDone,
+    progressPercent: displayProgressPercent.clamp(0, 100),
+  );
+}
+
+
 // --- D-1: 당일 15/5/13 완료 시 커리큘럼 일차(learningDay) +1 ---
 
 /// `daily_progress/{dateKst}` — 해당 KST 날짜 완료로 learningDay +1 처리 여부
@@ -70,25 +269,32 @@ bool isDailyProgressComplete(DailyProgressView progress) {
 }
 
 
-/// Firestore 맵 기준 일일 완료 여부 (트랜잭션 내부용).
+/// Firestore 맵 기준 — 언어 중 하나라도 당일 목표를 달성했는지 확인합니다.
 bool isDailyProgressMapComplete(Map<String, dynamic> data) {
-  int iv(String k, int def) {
-    final v = data[k];
-    if (v is int) return v;
-    if (v is num) return v.toInt();
-    return def;
+  final wordGoal = _intFromDynamic(data['wordGoal'], kDailyWordGoalDefault);
+  final sentenceGoal =
+      _intFromDynamic(data['sentenceGoal'], kDailySentenceGoalDefault);
+  final quizGoal = _intFromDynamic(data['quizGoal'], kDailyQuizGoalDefault);
+
+  final byLanguage = parseByLanguageField(data[kByLanguageField]);
+  if (byLanguage.isNotEmpty) {
+    for (final slice in byLanguage.values) {
+      if (isLanguageSliceComplete(
+        slice: slice,
+        wordGoal: wordGoal,
+        sentenceGoal: sentenceGoal,
+        quizGoal: quizGoal,
+      )) {
+        return true;
+      }
+    }
+    return false;
   }
 
-  final wordGoal = iv('wordGoal', kDailyWordGoalDefault);
-  final sentenceGoal = iv('sentenceGoal', kDailySentenceGoalDefault);
-  final quizGoal = iv('quizGoal', kDailyQuizGoalDefault);
-  final wordDone = iv('wordDone', 0);
-  final sentenceDone = iv('sentenceDone', 0);
-  final quizDone = iv('quizDone', 0);
-
-  return wordDone >= wordGoal &&
-      sentenceDone >= sentenceGoal &&
-      quizDone >= quizGoal;
+  // 구버전 최상위 필드 호환
+  return _intFromDynamic(data['wordDone'], 0) >= wordGoal &&
+      _intFromDynamic(data['sentenceDone'], 0) >= sentenceGoal &&
+      _intFromDynamic(data['quizDone'], 0) >= quizGoal;
 }
 
 
@@ -97,7 +303,8 @@ bool canAdvanceLearningDayForUser(Map<String, dynamic> userData) {
   final state = CurriculumState.fromUserData(userData);
   if (state.learningMode != 'curriculum') return false;
 
-  final level = CurriculumState.normalizeLearningLevel(userData['level'] as String?);
+  final level =
+      CurriculumState.normalizeLearningLevel(userData['level'] as String?);
   if (level == 'advanced') return false;
 
   return state.learningDay < CurriculumState.totalDays;
@@ -180,8 +387,47 @@ Future<int> reconcilePendingLearningDayAdvances(User user) async {
 }
 
 
+DailyProgressView _viewFromFirestoreData({
+  required String dateKst,
+  required Map<String, dynamic> data,
+  required String targetLanguage,
+}) {
+  final wordGoal = _intFromDynamic(data['wordGoal'], kDailyWordGoalDefault);
+  final sentenceGoal =
+      _intFromDynamic(data['sentenceGoal'], kDailySentenceGoalDefault);
+  final quizGoal = _intFromDynamic(data['quizGoal'], kDailyQuizGoalDefault);
+
+  final byLanguage = migrateLegacyProgressToByLanguage(
+    data,
+    fallbackLanguage: targetLanguage,
+  );
+  final slice = sliceForLanguage(byLanguage, targetLanguage);
+  final maxPercent = computeMaxProgressPercentAcrossLanguages(
+    byLanguage: byLanguage,
+    wordGoal: wordGoal,
+    sentenceGoal: sentenceGoal,
+    quizGoal: quizGoal,
+  );
+
+  return buildDailyProgressView(
+    dateKst: dateKst,
+    wordGoal: wordGoal,
+    sentenceGoal: sentenceGoal,
+    quizGoal: quizGoal,
+    slice: slice,
+    displayProgressPercent: maxPercent,
+  );
+}
+
+
 /// 오늘(KST) 문서가 없으면 스키마 기본값으로 생성하고, 있으면 `updatedAt`만 갱신합니다.
-Future<DailyProgressView> ensureTodayDailyProgress(User user) async {
+///
+/// [targetLanguage]가 주어지면 해당 언어의 단어·문장·마무리 진척도를 반환하고,
+/// 전체 진행률(`progressPercent`)은 당일 가장 높은 언어 학습률을 사용합니다.
+Future<DailyProgressView> ensureTodayDailyProgress(
+  User user, {
+  String? targetLanguage,
+}) async {
   final dateKst = todayKstYyyyMmDd();
   final ref = FirebaseFirestore.instance
       .collection('users')
@@ -189,38 +435,66 @@ Future<DailyProgressView> ensureTodayDailyProgress(User user) async {
       .collection('daily_progress')
       .doc(dateKst);
 
+  final lang = normalizeDailyProgressLanguageCode(targetLanguage ?? 'JPN');
+
   final snap = await ref.get();
   if (!snap.exists) {
     await ref.set({
       'dateKst': dateKst,
       'wordGoal': kDailyWordGoalDefault,
-      'wordDone': 0,
       'sentenceGoal': kDailySentenceGoalDefault,
-      'sentenceDone': 0,
       'quizGoal': kDailyQuizGoalDefault,
-      'quizDone': 0,
+      kByLanguageField: <String, dynamic>{},
       'progressPercent': 0,
       'updatedAt': FieldValue.serverTimestamp(),
     });
   } else {
-    await ref.set(
-      {'updatedAt': FieldValue.serverTimestamp()},
-      SetOptions(merge: true),
+    final data = snap.data() ?? <String, dynamic>{};
+    final byLanguage = migrateLegacyProgressToByLanguage(
+      data,
+      fallbackLanguage: lang,
     );
+    if (data[kByLanguageField] == null && byLanguage.isNotEmpty) {
+      await ref.set(
+        {
+          kByLanguageField: serializeByLanguageField(byLanguage),
+          'progressPercent': computeMaxProgressPercentAcrossLanguages(
+            byLanguage: byLanguage,
+            wordGoal: _intFromDynamic(data['wordGoal'], kDailyWordGoalDefault),
+            sentenceGoal:
+                _intFromDynamic(data['sentenceGoal'], kDailySentenceGoalDefault),
+            quizGoal: _intFromDynamic(data['quizGoal'], kDailyQuizGoalDefault),
+          ),
+          'updatedAt': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
+    } else {
+      await ref.set(
+        {'updatedAt': FieldValue.serverTimestamp()},
+        SetOptions(merge: true),
+      );
+    }
   }
 
   final after = await ref.get();
   final data = after.data() ?? {};
-  return DailyProgressView.fromMap(dateKst, data);
+  return _viewFromFirestoreData(
+    dateKst: dateKst,
+    data: data,
+    targetLanguage: lang,
+  );
 }
+
 
 /// 오늘(KST) 진도를 1회 증가시키고 progressPercent까지 갱신합니다.
 ///
-/// - 트랜잭션으로 동시 업데이트를 안전하게 처리합니다.
-/// - goal을 초과하지 않도록 clamp 합니다.
+/// - [targetLanguage] 언어 슬라이스만 증가합니다.
+/// - 전체 `progressPercent`는 당일 가장 높은 언어 학습률로 저장합니다.
 Future<DailyProgressView> incrementTodayDailyProgress(
   User user, {
   required DailyProgressKind kind,
+  required String targetLanguage,
 }) async {
   final dateKst = todayKstYyyyMmDd();
   final ref = FirebaseFirestore.instance
@@ -230,50 +504,55 @@ Future<DailyProgressView> incrementTodayDailyProgress(
       .doc(dateKst);
 
   final userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+  final lang = normalizeDailyProgressLanguageCode(targetLanguage);
 
   return FirebaseFirestore.instance.runTransaction((tx) async {
     final snap = await tx.get(ref);
     final data = snap.data() ?? <String, dynamic>{};
 
-    int iv(String k, int def) {
-      final v = data[k];
-      if (v is int) return v;
-      if (v is num) return v.toInt();
-      return def;
-    }
+    final wordGoal = _intFromDynamic(data['wordGoal'], kDailyWordGoalDefault);
+    final sentenceGoal =
+        _intFromDynamic(data['sentenceGoal'], kDailySentenceGoalDefault);
+    final quizGoal = _intFromDynamic(data['quizGoal'], kDailyQuizGoalDefault);
 
-    final wordGoal = iv('wordGoal', kDailyWordGoalDefault);
-    final sentenceGoal = iv('sentenceGoal', kDailySentenceGoalDefault);
-    final quizGoal = iv('quizGoal', kDailyQuizGoalDefault);
-
-    var wordDone = iv('wordDone', 0);
-    var sentenceDone = iv('sentenceDone', 0);
-    var quizDone = iv('quizDone', 0);
+    var byLanguage = migrateLegacyProgressToByLanguage(
+      data,
+      fallbackLanguage: lang,
+    );
+    var slice = sliceForLanguage(byLanguage, lang);
 
     switch (kind) {
       case DailyProgressKind.word:
-        wordDone = (wordDone + 1).clamp(0, wordGoal);
+        slice = slice.copyWith(
+          wordDone: (slice.wordDone + 1).clamp(0, wordGoal),
+        );
       case DailyProgressKind.sentence:
-        sentenceDone = (sentenceDone + 1).clamp(0, sentenceGoal);
+        slice = slice.copyWith(
+          sentenceDone: (slice.sentenceDone + 1).clamp(0, sentenceGoal),
+        );
       case DailyProgressKind.quiz:
-        quizDone = (quizDone + 1).clamp(0, quizGoal);
+        slice = slice.copyWith(
+          quizDone: (slice.quizDone + 1).clamp(0, quizGoal),
+        );
     }
 
-    final totalGoal = wordGoal + sentenceGoal + quizGoal;
-    final totalDone = wordDone + sentenceDone + quizDone;
-    final percent = totalGoal <= 0
-        ? 0
-        : ((totalDone / totalGoal) * 100).round().clamp(0, 100);
+    byLanguage = Map<String, LanguageProgressSlice>.from(byLanguage)
+      ..[lang] = slice;
+
+    final maxPercent = computeMaxProgressPercentAcrossLanguages(
+      byLanguage: byLanguage,
+      wordGoal: wordGoal,
+      sentenceGoal: sentenceGoal,
+      quizGoal: quizGoal,
+    );
 
     final progressPayload = <String, dynamic>{
       'dateKst': dateKst,
       'wordGoal': wordGoal,
-      'wordDone': wordDone,
       'sentenceGoal': sentenceGoal,
-      'sentenceDone': sentenceDone,
       'quizGoal': quizGoal,
-      'quizDone': quizDone,
-      'progressPercent': percent,
+      kByLanguageField: serializeByLanguageField(byLanguage),
+      'progressPercent': maxPercent,
       'updatedAt': FieldValue.serverTimestamp(),
     };
 
@@ -286,24 +565,26 @@ Future<DailyProgressView> incrementTodayDailyProgress(
       progressData: progressPayload,
     );
 
-    return DailyProgressView(
+    return buildDailyProgressView(
       dateKst: dateKst,
       wordGoal: wordGoal,
-      wordDone: wordDone,
       sentenceGoal: sentenceGoal,
-      sentenceDone: sentenceDone,
       quizGoal: quizGoal,
-      quizDone: quizDone,
-      progressPercent: percent,
+      slice: slice,
+      displayProgressPercent: maxPercent,
     );
   });
 }
 
+
 /// 오늘(KST) 진도를 0으로 초기화하고 progressPercent까지 갱신합니다.
 ///
 /// - goal 값은 유지합니다.
-/// - 문서가 없어도 생성/병합되도록 처리합니다.
-Future<DailyProgressView> resetTodayDailyProgress(User user) async {
+/// - 모든 언어 슬라이스를 초기화합니다.
+Future<DailyProgressView> resetTodayDailyProgress(
+  User user, {
+  String targetLanguage = 'JPN',
+}) async {
   final dateKst = todayKstYyyyMmDd();
   final ref = FirebaseFirestore.instance
       .collection('users')
@@ -315,42 +596,32 @@ Future<DailyProgressView> resetTodayDailyProgress(User user) async {
     final snap = await tx.get(ref);
     final data = snap.data() ?? <String, dynamic>{};
 
-    int iv(String k, int def) {
-      final v = data[k];
-      if (v is int) return v;
-      if (v is num) return v.toInt();
-      return def;
-    }
-
-    final wordGoal = iv('wordGoal', kDailyWordGoalDefault);
-    final sentenceGoal = iv('sentenceGoal', kDailySentenceGoalDefault);
-    final quizGoal = iv('quizGoal', kDailyQuizGoalDefault);
+    final wordGoal = _intFromDynamic(data['wordGoal'], kDailyWordGoalDefault);
+    final sentenceGoal =
+        _intFromDynamic(data['sentenceGoal'], kDailySentenceGoalDefault);
+    final quizGoal = _intFromDynamic(data['quizGoal'], kDailyQuizGoalDefault);
 
     tx.set(
       ref,
       {
         'dateKst': dateKst,
         'wordGoal': wordGoal,
-        'wordDone': 0,
         'sentenceGoal': sentenceGoal,
-        'sentenceDone': 0,
         'quizGoal': quizGoal,
-        'quizDone': 0,
+        kByLanguageField: <String, dynamic>{},
         'progressPercent': 0,
         'updatedAt': FieldValue.serverTimestamp(),
       },
       SetOptions(merge: true),
     );
 
-    return DailyProgressView(
+    return buildDailyProgressView(
       dateKst: dateKst,
       wordGoal: wordGoal,
-      wordDone: 0,
       sentenceGoal: sentenceGoal,
-      sentenceDone: 0,
       quizGoal: quizGoal,
-      quizDone: 0,
-      progressPercent: 0,
+      slice: LanguageProgressSlice.empty,
+      displayProgressPercent: 0,
     );
   });
 
@@ -369,19 +640,36 @@ Future<DailyProgressView> resetTodayDailyProgress(User user) async {
       .collection('daily_sentence_cursor');
 
   final batch = FirebaseFirestore.instance.batch();
-  final cursorSnap = await cursorCol.where('dateKst', isEqualTo: dateKst).get();
+  final cursorSnap =
+      await cursorCol.where('dateKst', isEqualTo: dateKst).get();
   for (final doc in cursorSnap.docs) {
     batch.delete(doc.reference);
   }
-  final wordCursorSnap = await wordCursorCol.where('dateKst', isEqualTo: dateKst).get();
+  final wordCursorSnap =
+      await wordCursorCol.where('dateKst', isEqualTo: dateKst).get();
   for (final doc in wordCursorSnap.docs) {
     batch.delete(doc.reference);
   }
-  final sentenceCursorSnap = await sentenceCursorCol.where('dateKst', isEqualTo: dateKst).get();
+  final sentenceCursorSnap =
+      await sentenceCursorCol.where('dateKst', isEqualTo: dateKst).get();
   for (final doc in sentenceCursorSnap.docs) {
     batch.delete(doc.reference);
   }
   await batch.commit();
 
   return resetView;
+}
+
+
+/// Firestore 일일 진도 맵을 [targetLanguage] 기준 뷰로 변환합니다.
+DailyProgressView dailyProgressViewForLanguage(
+  String dateKst,
+  Map<String, dynamic> data, {
+  required String targetLanguage,
+}) {
+  return _viewFromFirestoreData(
+    dateKst: dateKst,
+    data: data,
+    targetLanguage: targetLanguage,
+  );
 }

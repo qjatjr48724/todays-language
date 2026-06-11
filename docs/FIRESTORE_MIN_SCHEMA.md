@@ -44,13 +44,14 @@
 ```json
 {
   "dateKst": "2026-03-24",
-  "wordGoal": 50,
-  "wordDone": 12,
-  "sentenceGoal": 10,
-  "sentenceDone": 3,
-  "quizGoal": 20,
-  "quizDone": 5,
-  "progressPercent": 22,
+  "wordGoal": 15,
+  "sentenceGoal": 5,
+  "quizGoal": 13,
+  "byLanguage": {
+    "KOR": { "wordDone": 5, "sentenceDone": 0, "quizDone": 0 },
+    "JPN": { "wordDone": 10, "sentenceDone": 2, "quizDone": 0 }
+  },
+  "progressPercent": 36,
   "curriculumDayAdvanced": false,
   "updatedAt": "serverTimestamp"
 }
@@ -58,7 +59,9 @@
 
 | 필드 | 설명 |
 |------|------|
-| `curriculumDayAdvanced` | 해당 KST 날짜 완료로 `learningDay +1` 반영 완료 여부 (중복 +1 방지) |
+| `byLanguage` | 학습 대상 언어(alpha-3)별 당일 완료 수. UI는 현재 `targetLanguage` 슬라이스를 표시 |
+| `progressPercent` | 당일 **언어 중 가장 높은** 학습률(0~100). 캘린더·홈 전체 진행 바에 사용 |
+| `curriculumDayAdvanced` | 해당 KST 날짜 완료로 `learningDay +1` 반영 완료 여부 (중복 +1 방지). **언어 중 하나**가 15/5/13 달성 시 +1 |
 
 ---
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../services/daily_progress_sync.dart';
+import '../services/user_prefs.dart';
 import '../ui/bordered_linear_progress.dart';
 import '../ui/section_card.dart';
 import '../utils/kst_date.dart';
@@ -17,6 +18,7 @@ class ProgressScreen extends StatefulWidget {
 
 class ProgressScreenState extends State<ProgressScreen> {
   DailyProgressView? _progress;
+  String _targetLanguage = 'JPN';
   bool _loading = true;
   DateTime _focusedMonth = DateTime.now();
   bool _calendarLoading = true;
@@ -45,9 +47,14 @@ class ProgressScreenState extends State<ProgressScreen> {
     if (mounted) {
       setState(() => _loading = true);
     }
-    final p = await ensureTodayDailyProgress(user);
+    final prefs = await fetchUserPrefs(user);
+    final p = await ensureTodayDailyProgress(
+      user,
+      targetLanguage: prefs.targetLanguage,
+    );
     if (!mounted) return;
     setState(() {
+      _targetLanguage = prefs.targetLanguage;
       _progress = p;
       _loading = false;
     });
@@ -207,20 +214,18 @@ class ProgressScreenState extends State<ProgressScreen> {
                   // 문서가 없으면 "기록 없음"으로 0/x 를 보여줍니다.
                   final data = snap.data() ?? <String, dynamic>{};
 
-                  int iv(String k, int def) {
-                    final v = data[k];
-                    if (v is int) return v;
-                    if (v is num) return v.toInt();
-                    return def;
-                  }
-
-                  final percent = iv('progressPercent', 0).clamp(0, 100);
-                  final wordGoal = iv('wordGoal', kDailyWordGoalDefault);
-                  final wordDone = iv('wordDone', 0);
-                  final sentenceGoal = iv('sentenceGoal', kDailySentenceGoalDefault);
-                  final sentenceDone = iv('sentenceDone', 0);
-                  final quizGoal = iv('quizGoal', kDailyQuizGoalDefault);
-                  final quizDone = iv('quizDone', 0);
+                  final detailView = dailyProgressViewForLanguage(
+                    dateId,
+                    data,
+                    targetLanguage: _targetLanguage,
+                  );
+                  final percent = detailView.progressPercent;
+                  final wordGoal = detailView.wordGoal;
+                  final wordDone = detailView.wordDone;
+                  final sentenceGoal = detailView.sentenceGoal;
+                  final sentenceDone = detailView.sentenceDone;
+                  final quizGoal = detailView.quizGoal;
+                  final quizDone = detailView.quizDone;
 
                   final hasAny =
                       (wordDone + sentenceDone + quizDone) > 0 || percent > 0;

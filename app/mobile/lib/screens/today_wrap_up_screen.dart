@@ -156,10 +156,17 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
     final l10n = AppLocalizations.of(context)!;
     setState(() => _submitting = true);
     try {
-      final current = await ensureTodayDailyProgress(user);
+      final current = await ensureTodayDailyProgress(
+        user,
+        targetLanguage: widget.targetLanguage,
+      );
       final need = (current.quizGoal - current.quizDone).clamp(0, current.quizGoal);
       for (var i = 0; i < need; i++) {
-        await incrementTodayDailyProgress(user, kind: DailyProgressKind.quiz);
+        await incrementTodayDailyProgress(
+          user,
+          kind: DailyProgressKind.quiz,
+          targetLanguage: widget.targetLanguage,
+        );
       }
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
