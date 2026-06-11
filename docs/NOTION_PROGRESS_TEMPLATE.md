@@ -1889,3 +1889,64 @@ unauthenticated: 로그인 상태 확인
 3. (선택) 1~50일 음성 백필 일괄 실행
 4. 채팅·중복 로그인 등 [단계 37] 미검증 항목 이어서 수동 테스트
 
+---
+
+## [단계 39] 언어별 당일 진척도·최고 학습률 표시 (2026-05-28)
+
+### 1) 오늘 한 일
+
+**언어별 일일 진도 (`byLanguage`)**
+- `users/{uid}/daily_progress/{dateKst}`에 `byLanguage.{KOR|JPN|USA}` 맵 추가
+  - 언어별 `wordDone` / `sentenceDone` / `quizDone` 저장
+- 전체 진행률 `progressPercent` = 당일 **언어 중 가장 높은** 학습률(0~100)
+  - 홈 진행 바·진행 탭·캘린더 스티커에 반영
+- 현재 `targetLanguage` 기준 단어·문장·마무리 카운트 표시
+  - 언어 변경 시 미학습 언어는 **0/15**, **0/5** 등으로 표시
+  - 다시 돌아오면 해당 언어 슬라이스 복원 (예: KOR 5/15)
+- `incrementTodayDailyProgress`에 `targetLanguage` 필수 — 해당 언어 슬라이스만 +1
+- 구버전(최상위 `wordDone`만 있는 문서) → 첫 조회 시 현재 언어로 `byLanguage` 자동 이전
+- D-1 `learningDay +1`: **언어 중 하나**가 15/5/13 달성 시 트리거 (기존 중복 방지 유지)
+
+**화면 연동**
+- `home_screen` — `targetLanguage`별 진척 + 최고 학습률; 언어 변경 시 진도 refresh
+- `today_words_screen` / `today_sentences_screen` / `today_wrap_up_screen` — increment·조회 시 언어 전달
+- `progress_screen` — 오늘 요약·일별 상세에 현재 언어 슬라이스 + 최고 진행률
+
+**문서·테스트**
+- `docs/FIRESTORE_MIN_SCHEMA.md` — `byLanguage`·`progressPercent` 의미 정리
+- `app/mobile/test/daily_progress_sync_test.dart` — 최고 학습률·마이그레이션·완료 판정 5건
+
+### 2) 합의·결정
+
+- 진행률(%)은 언어 무관 **금일 최고 학습률** 기준
+- 단어·문장(·마무리) 카운트는 **현재 학습 언어** 기준, 언어별로 Firestore에 분리 저장
+- 단어·문장 **커서**는 기존처럼 언어×레벨별 문서 ID 유지 (변경 없음)
+
+### 3) 완료 기준 체크
+
+- [x] `flutter test test/daily_progress_sync_test.dart test/curriculum_state_test.dart` 통과 (17)
+- [x] `flutter analyze` 통과
+- [x] 사용자: KOR 학습 → JPN 전환(0/15) → KOR 복귀(5/15) 수동 테스트 OK
+
+### 4) 추가/변경 파일(주요)
+
+| 영역 | 파일 |
+|------|------|
+| 핵심 로직 | `app/mobile/lib/services/daily_progress_sync.dart` |
+| UI | `home_screen.dart`, `progress_screen.dart`, `today_words_screen.dart`, `today_sentences_screen.dart`, `today_wrap_up_screen.dart` |
+| 테스트 | `app/mobile/test/daily_progress_sync_test.dart` |
+| 스키마 문서 | `docs/FIRESTORE_MIN_SCHEMA.md` |
+
+### 5) 이슈·해결
+
+| 이슈 | 해결 |
+|------|------|
+| 기존 단일 `wordDone`으로 언어 전환 시 진척도가 섞임 | `byLanguage` 슬라이스 + 조회 시 `targetLanguage` 분기 |
+| 홈 전체 %와 카드 5/15 불일치 가능 | 뷰 모델: 슬라이스(현재 언어) + `progressPercent`(최고 학습률) 분리 |
+
+### 6) 다음 액션
+
+1. [단계 38] Functions + Storage rules 배포 (`firebase deploy --only functions,storage`)
+2. 23:55 스케줄러 TTS 포함 생성 운영 검증
+3. 채팅·중복 로그인 등 [단계 37] 미검증 항목 수동 테스트
+
