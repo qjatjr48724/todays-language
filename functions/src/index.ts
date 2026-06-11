@@ -42,6 +42,12 @@ import {
   effectiveLearningLevel,
   LEARNING_DIFFICULTY_UI_ENABLED,
 } from "./curriculum/curriculum_state";
+import {
+  enrichSentenceItemsWithAudio,
+  enrichWordItemsWithAudio,
+  sentenceItemNeedsAudio,
+  wordItemNeedsAudio,
+} from "./learning_audio/enrich";
 
 type GenerateWordResponse = {
   word: string;
@@ -51,6 +57,10 @@ type GenerateWordResponse = {
   example?: string;
   /** 예문(example)의 한국어 해석·뜻 */
   exampleMeaningKo?: string;
+  /** Cloud Storage 경로 — 단어 음성 */
+  wordAudioPath?: string;
+  /** Cloud Storage 경로 — 예문 음성 */
+  exampleAudioPath?: string;
   debugSource?: "openai" | "fallback" | "daily_set" | "curriculum_set";
 };
 
@@ -68,6 +78,8 @@ type GenerateSentenceResponse = {
   meaningKo: string;
   /** 문장에 나온 표현·단어와 한국어 뜻 (생성 시점에 선별) */
   vocabularyHints?: SentenceVocabHint[];
+  /** Cloud Storage 경로 — 문장 음성 */
+  sentenceAudioPath?: string;
   debugSource?: "openai" | "fallback" | "daily_set" | "curriculum_set";
 };
 
@@ -77,6 +89,8 @@ type StoredWordItem = {
   meaningKo: string;
   example?: string;
   exampleMeaningKo?: string;
+  wordAudioPath?: string;
+  exampleAudioPath?: string;
 };
 
 type DailyWordSet = {
@@ -93,6 +107,7 @@ type StoredSentenceItem = {
   sentenceHira?: string;
   meaningKo: string;
   vocabularyHints?: SentenceVocabHint[];
+  sentenceAudioPath?: string;
 };
 
 type DailySentenceSet = {
@@ -979,13 +994,20 @@ async function materializeGlobalTodayWordSetIfAbsent(
       Array.isArray(data.words) &&
       data.words.length > 0
     ) {
+      if (data.words.some((w) => wordItemNeedsAudio(w))) {
+        const words = await enrichWordItemsWithAudio(data.words, canonicalLang);
+        await ref.set({ words, updatedAtMs: Date.now() }, { merge: true });
+      }
       return ref;
     }
   }
 
   const ymd = dateKst ?? todayKstYyyyMmDd();
   await cleanupExpiredLearningSets(GLOBAL_LEARNING_SET_OWNER, ymd);
-  const words = await buildDailyWordItems(canonicalLang, level);
+  const words = await enrichWordItemsWithAudio(
+    await buildDailyWordItems(canonicalLang, level),
+    canonicalLang
+  );
   const payload: DailyWordSet = {
     dateKst: ymd,
     targetLanguage: canonicalLang,
@@ -1034,6 +1056,13 @@ async function materializeGlobalTodaySentenceSetIfAbsent(
       Array.isArray(data.sentences) &&
       data.sentences.length > 0
     ) {
+      if (data.sentences.some((s) => sentenceItemNeedsAudio(s))) {
+        const sentences = await enrichSentenceItemsWithAudio(
+          data.sentences,
+          canonicalLang
+        );
+        await ref.set({ sentences, updatedAtMs: Date.now() }, { merge: true });
+      }
       return ref;
     }
   }
@@ -1052,7 +1081,10 @@ async function materializeGlobalTodaySentenceSetIfAbsent(
     .filter((w) => w.trim().length > 0)
     .slice(0, Math.min(DAILY_SENTENCE_COUNT, words.length));
 
-  const sentences = await buildDailySentenceItems(canonicalLang, level, vocab.length > 0 ? vocab : undefined);
+  const sentences = await enrichSentenceItemsWithAudio(
+    await buildDailySentenceItems(canonicalLang, level, vocab.length > 0 ? vocab : undefined),
+    canonicalLang
+  );
   const payload: DailySentenceSet = {
     dateKst: ymd,
     targetLanguage: canonicalLang,
@@ -1109,13 +1141,20 @@ async function materializeGlobalCurriculumWordSetIfAbsent(
       Array.isArray(data.words) &&
       data.words.length > 0
     ) {
+      if (data.words.some((w) => wordItemNeedsAudio(w))) {
+        const words = await enrichWordItemsWithAudio(data.words, canonicalLang);
+        await ref.set({ words, updatedAtMs: Date.now() }, { merge: true });
+      }
       return ref;
     }
   }
 
   const curriculum = curriculumPromptContextForDay(learningDay, phase);
   const spec = getCurriculumDaySpec(learningDay);
-  const words = await buildDailyWordItems(canonicalLang, level, curriculum);
+  const words = await enrichWordItemsWithAudio(
+    await buildDailyWordItems(canonicalLang, level, curriculum),
+    canonicalLang
+  );
   const payload: CurriculumWordSet = {
     curriculumId: CURRICULUM_CORE_V1_ID,
     targetLanguage: canonicalLang,
@@ -1159,6 +1198,13 @@ async function materializeGlobalCurriculumSentenceSetIfAbsent(
       Array.isArray(data.sentences) &&
       data.sentences.length > 0
     ) {
+      if (data.sentences.some((s) => sentenceItemNeedsAudio(s))) {
+        const sentences = await enrichSentenceItemsWithAudio(
+          data.sentences,
+          canonicalLang
+        );
+        await ref.set({ sentences, updatedAtMs: Date.now() }, { merge: true });
+      }
       return ref;
     }
   }
@@ -1185,11 +1231,14 @@ async function materializeGlobalCurriculumSentenceSetIfAbsent(
     .filter((w) => w.trim().length > 0)
     .slice(0, Math.min(DAILY_SENTENCE_COUNT, words.length));
 
-  const sentences = await buildDailySentenceItems(
-    canonicalLang,
-    level,
-    vocab.length > 0 ? vocab : undefined,
-    curriculum
+  const sentences = await enrichSentenceItemsWithAudio(
+    await buildDailySentenceItems(
+      canonicalLang,
+      level,
+      vocab.length > 0 ? vocab : undefined,
+      curriculum
+    ),
+    canonicalLang
   );
   const payload: CurriculumSentenceSet = {
     curriculumId: CURRICULUM_CORE_V1_ID,
@@ -1314,6 +1363,8 @@ async function popWordFromCurriculumSet(
       ...(picked.readingHira ? { readingHira: picked.readingHira } : {}),
       ...(picked.example ? { example: picked.example } : {}),
       ...(picked.exampleMeaningKo ? { exampleMeaningKo: picked.exampleMeaningKo } : {}),
+      ...(picked.wordAudioPath ? { wordAudioPath: picked.wordAudioPath } : {}),
+      ...(picked.exampleAudioPath ? { exampleAudioPath: picked.exampleAudioPath } : {}),
       debugSource: "curriculum_set",
     };
   });
@@ -1372,6 +1423,7 @@ async function popSentenceFromCurriculumSet(
       ...(picked.vocabularyHints && picked.vocabularyHints.length > 0
           ? { vocabularyHints: picked.vocabularyHints }
           : {}),
+      ...(picked.sentenceAudioPath ? { sentenceAudioPath: picked.sentenceAudioPath } : {}),
       debugSource: "curriculum_set",
     };
   });
@@ -1422,6 +1474,8 @@ async function popWordFromTodaySet(
       ...(picked.readingHira ? { readingHira: picked.readingHira } : {}),
       ...(picked.example ? { example: picked.example } : {}),
       ...(picked.exampleMeaningKo ? { exampleMeaningKo: picked.exampleMeaningKo } : {}),
+      ...(picked.wordAudioPath ? { wordAudioPath: picked.wordAudioPath } : {}),
+      ...(picked.exampleAudioPath ? { exampleAudioPath: picked.exampleAudioPath } : {}),
       debugSource: "daily_set",
     };
   });
@@ -1473,6 +1527,7 @@ async function popSentenceFromTodaySet(
       ...(picked.vocabularyHints && picked.vocabularyHints.length > 0
           ? { vocabularyHints: picked.vocabularyHints }
           : {}),
+      ...(picked.sentenceAudioPath ? { sentenceAudioPath: picked.sentenceAudioPath } : {}),
       debugSource: "daily_set",
     };
   });
