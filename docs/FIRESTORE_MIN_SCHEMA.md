@@ -20,6 +20,10 @@
   "curriculumId": "core_v1",
   "curriculumPhase": 1,
   "learningDay": 1,
+  "learningDayByLanguage": {
+    "KOR": 3,
+    "JPN": 1
+  },
   "learningMode": "curriculum",
   "cycleReviewStatus": "none",
   "createdAt": "serverTimestamp",
@@ -33,7 +37,8 @@
 | `level` | `beginner` \| `intermediate` \| `advanced` |
 | `curriculumId` | 커리큘럼 정본 ID (`core_v1`) |
 | `curriculumPhase` | `1` \| `2` (동일 topicId, 2단계는 새 어휘) |
-| `learningDay` | `1..50` (KST 캘린더와 별도; **당일 15/5/13 완료 시 +1**, 미완료 시 날짜 변경해도 유지) |
+| `learningDay` | (레거시) 단일 일차 — 신규는 `learningDayByLanguage` 사용 |
+| `learningDayByLanguage` | 학습 대상 언어(alpha-3)별 커리큘럼 일차 `1..50`. **해당 언어** 당일 15/5/13 완료 시 +1 |
 | `learningMode` | `curriculum` \| `review` \| `free_study` |
 | `cycleReviewStatus` | `none` \| `available` \| `in_progress` \| `completed` \| `skipped` |
 
@@ -52,7 +57,10 @@
     "JPN": { "wordDone": 10, "sentenceDone": 2, "quizDone": 0 }
   },
   "progressPercent": 36,
-  "curriculumDayAdvanced": false,
+  "curriculumDayAdvancedByLanguage": {
+    "KOR": false,
+    "JPN": true
+  },
   "updatedAt": "serverTimestamp"
 }
 ```
@@ -61,7 +69,8 @@
 |------|------|
 | `byLanguage` | 학습 대상 언어(alpha-3)별 당일 완료 수. UI는 현재 `targetLanguage` 슬라이스를 표시 |
 | `progressPercent` | 당일 **언어 중 가장 높은** 학습률(0~100). 캘린더·홈 전체 진행 바에 사용 |
-| `curriculumDayAdvanced` | 해당 KST 날짜 완료로 `learningDay +1` 반영 완료 여부 (중복 +1 방지). **언어 중 하나**가 15/5/13 달성 시 +1 |
+| `curriculumDayAdvanced` | (레거시) 해당 KST 날짜 전역 +1 반영 여부 |
+| `curriculumDayAdvancedByLanguage` | 언어별 +1 반영 완료 여부. **해당 언어** 15/5/13 달성 시 해당 언어 `learningDayByLanguage` +1 |
 
 ---
 

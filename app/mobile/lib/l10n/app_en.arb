@@ -304,6 +304,7 @@
   "progress_detail_word_title": "Today's Words",
   "progress_detail_sentence_title": "Today's Sentences",
   "progress_detail_wrapup_title": "Today's Wrap-up",
+  "progress_detail_language_section": "Language · {language}",
   "progress_close_button": "Close",
 
   "progress_calendar_load_failed": "Failed to load calendar data: {error}",

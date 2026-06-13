@@ -304,6 +304,7 @@
   "progress_detail_word_title": "今日の単語",
   "progress_detail_sentence_title": "今日の文",
   "progress_detail_wrapup_title": "今日のまとめ",
+  "progress_detail_language_section": "学習言語 · {language}",
   "progress_close_button": "閉じる",
 
   "progress_calendar_load_failed": "カレンダーデータを読み込めませんでした: {error}",

@@ -792,6 +792,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get progress_detail_wrapup_title => 'Today\'s Wrap-up';
 
   @override
+  String progress_detail_language_section(Object language) {
+    return 'Language · $language';
+  }
+
+  @override
   String get progress_close_button => 'Close';
 
   @override

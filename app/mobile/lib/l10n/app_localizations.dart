@@ -1475,6 +1475,12 @@ abstract class AppLocalizations {
   /// **'오늘의 마무리'**
   String get progress_detail_wrapup_title;
 
+  /// No description provided for @progress_detail_language_section.
+  ///
+  /// In ko, this message translates to:
+  /// **'학습 언어 · {language}'**
+  String progress_detail_language_section(Object language);
+
   /// No description provided for @progress_close_button.
   ///
   /// In ko, this message translates to:

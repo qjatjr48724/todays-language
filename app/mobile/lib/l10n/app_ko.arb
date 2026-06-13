@@ -303,6 +303,7 @@
   "progress_detail_word_title": "오늘의 단어",
   "progress_detail_sentence_title": "오늘의 문장",
   "progress_detail_wrapup_title": "오늘의 마무리",
+  "progress_detail_language_section": "학습 언어 · {language}",
   "progress_close_button": "닫기",
 
   "progress_calendar_load_failed": "캘린더 데이터를 불러오지 못했습니다: {error}",

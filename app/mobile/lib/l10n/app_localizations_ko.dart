@@ -766,6 +766,11 @@ class AppLocalizationsKo extends AppLocalizations {
   String get progress_detail_wrapup_title => '오늘의 마무리';
 
   @override
+  String progress_detail_language_section(Object language) {
+    return '학습 언어 · $language';
+  }
+
+  @override
   String get progress_close_button => '닫기';
 
   @override

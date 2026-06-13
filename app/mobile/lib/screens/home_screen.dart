@@ -83,7 +83,10 @@ class _HomeScreenState extends State<HomeScreen> {
           _prefs = UserPrefs(
             targetLanguage: nextTargetLanguage,
             level: effectiveLearningLevel(lv),
-            curriculum: CurriculumState.fromUserData(data),
+            curriculum: CurriculumState.fromUserData(
+      data,
+      targetLanguage: nextTargetLanguage,
+    ),
           );
         });
         if (languageChanged) {

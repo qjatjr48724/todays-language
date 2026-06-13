@@ -60,28 +60,45 @@ void main() {
     });
 
 
-    test('isDailyProgressMapComplete는 언어 중 하나 완료면 true', () {
+    test('isLanguageDailyProgressComplete는 해당 언어만 완료 판정', () {
       expect(
-        isDailyProgressMapComplete({
-          'wordGoal': 15,
-          'sentenceGoal': 5,
-          'quizGoal': 13,
-          kByLanguageField: {
-            'KOR': {'wordDone': 5, 'sentenceDone': 0, 'quizDone': 0},
-            'JPN': {
-              'wordDone': 15,
-              'sentenceDone': 5,
-              'quizDone': 13,
+        isLanguageDailyProgressComplete(
+          {
+            'wordGoal': 15,
+            'sentenceGoal': 5,
+            'quizGoal': 13,
+            kByLanguageField: {
+              'KOR': {'wordDone': 5, 'sentenceDone': 0, 'quizDone': 0},
+              'JPN': {
+                'wordDone': 15,
+                'sentenceDone': 5,
+                'quizDone': 13,
+              },
             },
           },
-        }),
+          'JPN',
+        ),
         isTrue,
+      );
+      expect(
+        isLanguageDailyProgressComplete(
+          {
+            'wordGoal': 15,
+            'sentenceGoal': 5,
+            'quizGoal': 13,
+            kByLanguageField: {
+              'KOR': {'wordDone': 5, 'sentenceDone': 0, 'quizDone': 0},
+            },
+          },
+          'KOR',
+        ),
+        isFalse,
       );
     });
 
 
-    test('dailyProgressViewForLanguage는 현재 언어 슬라이스와 최고 진행률을 조합', () {
-      final view = dailyProgressViewForLanguage(
+    test('dailyProgressEntriesByLanguage는 언어별 슬라이스 목록을 반환', () {
+      final entries = dailyProgressEntriesByLanguage(
         '2026-05-28',
         {
           'wordGoal': 15,
@@ -89,14 +106,17 @@ void main() {
           'quizGoal': 13,
           kByLanguageField: {
             'KOR': {'wordDone': 5, 'sentenceDone': 0, 'quizDone': 0},
-            'JPN': {'wordDone': 10, 'sentenceDone': 0, 'quizDone': 0},
+            'JPN': {'wordDone': 10, 'sentenceDone': 2, 'quizDone': 0},
           },
         },
-        targetLanguage: 'KOR',
+        preferredLanguage: 'JPN',
       );
 
-      expect(view.wordDone, 5);
-      expect(view.progressPercent, greaterThan(view.wordDone));
+      expect(entries.length, 2);
+      expect(entries.first.languageCode, 'JPN');
+      expect(entries.first.view.wordDone, 10);
+      expect(entries.last.languageCode, 'KOR');
+      expect(entries.last.view.wordDone, 5);
     });
   });
 }

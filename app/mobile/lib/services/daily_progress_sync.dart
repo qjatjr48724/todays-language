@@ -255,10 +255,13 @@ DailyProgressView buildDailyProgressView({
 }
 
 
-// --- D-1: 당일 15/5/13 완료 시 커리큘럼 일차(learningDay) +1 ---
+// --- D-1: 당일 15/5/13 완료 시 해당 언어 learningDay +1 ---
 
-/// `daily_progress/{dateKst}` — 해당 KST 날짜 완료로 learningDay +1 처리 여부
+/// `daily_progress/{dateKst}` — 구버전 전역 +1 플래그 (마이그레이션 호환)
 const String kCurriculumDayAdvancedField = 'curriculumDayAdvanced';
+
+/// `daily_progress/{dateKst}` — 언어별 +1 반영 완료 여부
+const String kCurriculumDayAdvancedByLanguageField = 'curriculumDayAdvancedByLanguage';
 
 
 /// 일일 목표(단어·문장·마무리)를 모두 달성했는지 확인합니다.
@@ -269,38 +272,50 @@ bool isDailyProgressComplete(DailyProgressView progress) {
 }
 
 
-/// Firestore 맵 기준 — 언어 중 하나라도 당일 목표를 달성했는지 확인합니다.
-bool isDailyProgressMapComplete(Map<String, dynamic> data) {
+/// Firestore 맵 + 언어 코드 기준 해당 언어 일일 완료 여부.
+bool isLanguageDailyProgressComplete(
+  Map<String, dynamic> data,
+  String targetLanguage,
+) {
   final wordGoal = _intFromDynamic(data['wordGoal'], kDailyWordGoalDefault);
   final sentenceGoal =
       _intFromDynamic(data['sentenceGoal'], kDailySentenceGoalDefault);
   final quizGoal = _intFromDynamic(data['quizGoal'], kDailyQuizGoalDefault);
 
-  final byLanguage = parseByLanguageField(data[kByLanguageField]);
-  if (byLanguage.isNotEmpty) {
-    for (final slice in byLanguage.values) {
-      if (isLanguageSliceComplete(
-        slice: slice,
-        wordGoal: wordGoal,
-        sentenceGoal: sentenceGoal,
-        quizGoal: quizGoal,
-      )) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  // 구버전 최상위 필드 호환
-  return _intFromDynamic(data['wordDone'], 0) >= wordGoal &&
-      _intFromDynamic(data['sentenceDone'], 0) >= sentenceGoal &&
-      _intFromDynamic(data['quizDone'], 0) >= quizGoal;
+  final byLanguage = migrateLegacyProgressToByLanguage(
+    data,
+    fallbackLanguage: targetLanguage,
+  );
+  final slice = sliceForLanguage(byLanguage, targetLanguage);
+  return isLanguageSliceComplete(
+    slice: slice,
+    wordGoal: wordGoal,
+    sentenceGoal: sentenceGoal,
+    quizGoal: quizGoal,
+  );
 }
 
 
-/// 커리큘럼 모드(초·중)에서 learningDay를 올릴 수 있는지 확인합니다.
-bool canAdvanceLearningDayForUser(Map<String, dynamic> userData) {
-  final state = CurriculumState.fromUserData(userData);
+bool _isCurriculumDayAdvancedForLanguage(
+  Map<String, dynamic> progressData,
+  String lang,
+) {
+  final raw = progressData[kCurriculumDayAdvancedByLanguageField];
+  if (raw is Map && raw[lang] == true) return true;
+  if (progressData[kCurriculumDayAdvancedField] == true) return true;
+  return false;
+}
+
+
+/// 커리큘럼 모드(초·중)에서 해당 언어 learningDay를 올릴 수 있는지 확인합니다.
+bool canAdvanceLearningDayForUser(
+  Map<String, dynamic> userData, {
+  required String targetLanguage,
+}) {
+  final state = CurriculumState.fromUserData(
+    userData,
+    targetLanguage: targetLanguage,
+  );
   if (state.learningMode != 'curriculum') return false;
 
   final level =
@@ -311,50 +326,67 @@ bool canAdvanceLearningDayForUser(Map<String, dynamic> userData) {
 }
 
 
-/// 트랜잭션 안에서 일일 완료 시 learningDay +1 (중복 방지).
+/// 트랜잭션 안에서 해당 언어 일일 완료 시 learningDayByLanguage +1 (중복 방지).
 Future<bool> tryAdvanceLearningDayInTransaction(
   Transaction tx, {
   required DocumentReference<Map<String, dynamic>> userRef,
   required DocumentReference<Map<String, dynamic>> progressRef,
   required Map<String, dynamic> progressData,
+  required String targetLanguage,
 }) async {
-  if (!isDailyProgressMapComplete(progressData)) return false;
-  if (progressData[kCurriculumDayAdvancedField] == true) return false;
+  final lang = normalizeDailyProgressLanguageCode(targetLanguage);
+  if (!isLanguageDailyProgressComplete(progressData, lang)) return false;
+  if (_isCurriculumDayAdvancedForLanguage(progressData, lang)) return false;
 
   final userSnap = await tx.get(userRef);
   final userData = userSnap.data() ?? <String, dynamic>{};
 
-  if (!canAdvanceLearningDayForUser(userData)) {
+  if (!canAdvanceLearningDayForUser(userData, targetLanguage: lang)) {
     tx.set(
       progressRef,
-      {kCurriculumDayAdvancedField: true},
+      {
+        kCurriculumDayAdvancedByLanguageField: {lang: true},
+      },
       SetOptions(merge: true),
     );
     return false;
   }
 
-  final currentDay = CurriculumState.fromUserData(userData).learningDay;
+  final currentDay = CurriculumState.learningDayForLanguage(userData, lang);
   final nextDay = (currentDay + 1).clamp(1, CurriculumState.totalDays);
+
+  final byLangDays = Map<String, int>.from(
+    CurriculumState.migrateLegacyLearningDayToByLanguage(
+      userData,
+      fallbackLanguage: lang,
+    ),
+  )..[lang] = nextDay;
 
   tx.set(
     userRef,
     {
-      'learningDay': nextDay,
+      CurriculumState.learningDayByLanguageField: byLangDays,
       'updatedAt': FieldValue.serverTimestamp(),
     },
     SetOptions(merge: true),
   );
   tx.set(
     progressRef,
-    {kCurriculumDayAdvancedField: true},
+    {
+      kCurriculumDayAdvancedByLanguageField: {lang: true},
+    },
     SetOptions(merge: true),
   );
   return true;
 }
 
 
-/// 특정 KST 날짜 문서가 완료됐으면 learningDay +1을 시도합니다.
-Future<bool> tryAdvanceLearningDayForDate(User user, String dateKst) async {
+/// 특정 KST 날짜·언어 문서가 완료됐으면 해당 언어 learningDay +1을 시도합니다.
+Future<bool> tryAdvanceLearningDayForDate(
+  User user,
+  String dateKst, {
+  String? targetLanguage,
+}) async {
   final userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
   final progressRef = userRef.collection('daily_progress').doc(dateKst);
 
@@ -363,12 +395,31 @@ Future<bool> tryAdvanceLearningDayForDate(User user, String dateKst) async {
     if (!progressSnap.exists) return false;
 
     final data = progressSnap.data() ?? <String, dynamic>{};
-    return tryAdvanceLearningDayInTransaction(
-      tx,
-      userRef: userRef,
-      progressRef: progressRef,
-      progressData: data,
-    );
+    final byLanguage = parseByLanguageField(data[kByLanguageField]);
+
+    if (byLanguage.isEmpty) {
+      final lang = normalizeDailyProgressLanguageCode(targetLanguage ?? 'JPN');
+      return tryAdvanceLearningDayInTransaction(
+        tx,
+        userRef: userRef,
+        progressRef: progressRef,
+        progressData: data,
+        targetLanguage: lang,
+      );
+    }
+
+    var advancedAny = false;
+    for (final lang in byLanguage.keys) {
+      final progressed = await tryAdvanceLearningDayInTransaction(
+        tx,
+        userRef: userRef,
+        progressRef: progressRef,
+        progressData: data,
+        targetLanguage: lang,
+      );
+      if (progressed) advancedAny = true;
+    }
+    return advancedAny;
   });
 }
 
@@ -563,6 +614,7 @@ Future<DailyProgressView> incrementTodayDailyProgress(
       userRef: userRef,
       progressRef: ref,
       progressData: progressPayload,
+      targetLanguage: lang,
     );
 
     return buildDailyProgressView(
@@ -672,4 +724,73 @@ DailyProgressView dailyProgressViewForLanguage(
     data: data,
     targetLanguage: targetLanguage,
   );
+}
+
+
+/// 날짜 상세 — 언어별 일일 진도 항목
+class LanguageDayProgressEntry {
+  const LanguageDayProgressEntry({
+    required this.languageCode,
+    required this.view,
+  });
+
+  final String languageCode;
+  final DailyProgressView view;
+
+  bool get hasActivity =>
+      view.wordDone > 0 ||
+      view.sentenceDone > 0 ||
+      view.quizDone > 0 ||
+      view.progressPercent > 0;
+}
+
+
+/// `daily_progress` 문서에서 언어별 일일 진도 목록을 만듭니다.
+///
+/// [preferredLanguage]가 있으면 목록 맨 앞에 배치합니다.
+List<LanguageDayProgressEntry> dailyProgressEntriesByLanguage(
+  String dateKst,
+  Map<String, dynamic> data, {
+  String? preferredLanguage,
+}) {
+  final wordGoal = _intFromDynamic(data['wordGoal'], kDailyWordGoalDefault);
+  final sentenceGoal =
+      _intFromDynamic(data['sentenceGoal'], kDailySentenceGoalDefault);
+  final quizGoal = _intFromDynamic(data['quizGoal'], kDailyQuizGoalDefault);
+
+  final fallback = normalizeDailyProgressLanguageCode(preferredLanguage ?? 'JPN');
+  final byLanguage = migrateLegacyProgressToByLanguage(
+    data,
+    fallbackLanguage: fallback,
+  );
+  if (byLanguage.isEmpty) return <LanguageDayProgressEntry>[];
+
+  final pref = normalizeDailyProgressLanguageCode(preferredLanguage ?? '');
+  final langs = byLanguage.keys.toList()
+    ..sort((a, b) {
+      if (a == pref) return -1;
+      if (b == pref) return 1;
+      return a.compareTo(b);
+    });
+
+  return langs.map((lang) {
+    final slice = byLanguage[lang] ?? LanguageProgressSlice.empty;
+    final percent = computeSliceProgressPercent(
+      slice: slice,
+      wordGoal: wordGoal,
+      sentenceGoal: sentenceGoal,
+      quizGoal: quizGoal,
+    );
+    return LanguageDayProgressEntry(
+      languageCode: lang,
+      view: buildDailyProgressView(
+        dateKst: dateKst,
+        wordGoal: wordGoal,
+        sentenceGoal: sentenceGoal,
+        quizGoal: quizGoal,
+        slice: slice,
+        displayProgressPercent: percent,
+      ),
+    );
+  }).toList();
 }

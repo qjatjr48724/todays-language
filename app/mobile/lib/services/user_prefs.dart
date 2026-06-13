@@ -32,7 +32,10 @@ Future<UserPrefs> fetchUserPrefs(User user) async {
     // ISO-3166-1 alpha-3 표기: 기본값 JPN
     targetLanguage: (targetLanguage == null || targetLanguage.isEmpty) ? 'JPN' : targetLanguage,
     level: effectiveLearningLevel(level),
-    curriculum: CurriculumState.fromUserData(data),
+    curriculum: CurriculumState.fromUserData(
+      data,
+      targetLanguage: (targetLanguage == null || targetLanguage.isEmpty) ? 'JPN' : targetLanguage,
+    ),
   );
 }
 

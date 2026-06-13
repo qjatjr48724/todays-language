@@ -764,6 +764,11 @@ class AppLocalizationsJa extends AppLocalizations {
   String get progress_detail_wrapup_title => '今日のまとめ';
 
   @override
+  String progress_detail_language_section(Object language) {
+    return '学習言語 · $language';
+  }
+
+  @override
   String get progress_close_button => '閉じる';
 
   @override

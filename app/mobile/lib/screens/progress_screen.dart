@@ -136,157 +136,25 @@ class ProgressScreenState extends State<ProgressScreen> {
     setState(() => _openingDetail = true);
     try {
       final dateId = formatYyyyMmDd(day);
+      DocumentSnapshot<Map<String, dynamic>>? snap;
+      Object? fetchError;
+      try {
+        snap = await _fetchDailyProgressById(dateId);
+      } catch (e) {
+        fetchError = e;
+      }
+      if (!mounted) return;
+
       await showModalBottomSheet<void>(
         context: context,
         showDragHandle: true,
         isScrollControlled: true,
         builder: (context) {
-          final scheme = Theme.of(context).colorScheme;
-          final l10n = AppLocalizations.of(context)!;
-          return MediaQuery(
-            // 바텀시트 텍스트만 20% 축소(다른 화면 영향 없음)
-            data: MediaQuery.of(context).copyWith(
-              textScaler: const TextScaler.linear(0.8),
-            ),
-            child: SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
-                child: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>?>(
-                  future: _fetchDailyProgressById(dateId),
-                  builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return SizedBox(
-                      height: 220,
-                      child: Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const SizedBox(
-                              width: 22,
-                              height: 22,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              l10n.progress_detail_loading,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(color: scheme.onSurfaceVariant),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }
-
-                  if (snapshot.hasError) {
-                    return SizedBox(
-                      height: 220,
-                      child: Center(
-                        child: Text(
-                          l10n.progress_detail_load_failed(
-                            (snapshot.error?.toString() ?? '').isEmpty
-                                ? '-'
-                                : snapshot.error.toString(),
-                          ),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: scheme.error),
-                        ),
-                      ),
-                    );
-                  }
-
-                  final snap = snapshot.data;
-                  if (snap == null) {
-                    return SizedBox(
-                      height: 220,
-                      child: Center(
-                        child: Text(
-                          l10n.progress_detail_login_required,
-                          style: TextStyle(color: scheme.onSurfaceVariant),
-                        ),
-                      ),
-                    );
-                  }
-
-                  // 문서가 없으면 "기록 없음"으로 0/x 를 보여줍니다.
-                  final data = snap.data() ?? <String, dynamic>{};
-
-                  final detailView = dailyProgressViewForLanguage(
-                    dateId,
-                    data,
-                    targetLanguage: _targetLanguage,
-                  );
-                  final percent = detailView.progressPercent;
-                  final wordGoal = detailView.wordGoal;
-                  final wordDone = detailView.wordDone;
-                  final sentenceGoal = detailView.sentenceGoal;
-                  final sentenceDone = detailView.sentenceDone;
-                  final quizGoal = detailView.quizGoal;
-                  final quizDone = detailView.quizDone;
-
-                  final hasAny =
-                      (wordDone + sentenceDone + quizDone) > 0 || percent > 0;
-
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.progress_detail_header(dateId),
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      const SizedBox(height: 10),
-                      if (!hasAny) ...[
-                        Text(
-                          l10n.progress_detail_no_record,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(color: scheme.onSurfaceVariant),
-                        ),
-                        const SizedBox(height: 12),
-                      ],
-                      Row(
-                        children: [
-                          Expanded(
-                            child: BorderedLinearProgress(percent: percent),
-                          ),
-                          const SizedBox(width: 12),
-                          Text(l10n.common_percent(percent)),
-                        ],
-                      ),
-                      const SizedBox(height: 14),
-                      _DetailRow(
-                        title: l10n.progress_detail_word_title,
-                        value: '$wordDone / $wordGoal',
-                      ),
-                      const SizedBox(height: 8),
-                      _DetailRow(
-                        title: l10n.progress_detail_sentence_title,
-                        value: '$sentenceDone / $sentenceGoal',
-                      ),
-                      const SizedBox(height: 8),
-                      _DetailRow(
-                        title: l10n.progress_detail_wrapup_title,
-                        value: '$quizDone / $quizGoal',
-                      ),
-                      const SizedBox(height: 14),
-                      SizedBox(
-                        width: double.infinity,
-                        child: FilledButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          child: Text(l10n.progress_close_button),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-                ),
-              ),
-            ),
+          return _ProgressDayDetailSheet(
+            dateId: dateId,
+            snap: snap,
+            fetchError: fetchError,
+            targetLanguage: _targetLanguage,
           );
         },
       );
@@ -583,6 +451,132 @@ class ProgressScreenState extends State<ProgressScreen> {
   }
 }
 
+
+/// 캘린더 날짜 상세 바텀시트 — 열기 전에 데이터를 받아 드래그 시 재요청·깜빡임을 방지합니다.
+class _ProgressDayDetailSheet extends StatelessWidget {
+  const _ProgressDayDetailSheet({
+    required this.dateId,
+    required this.snap,
+    required this.fetchError,
+    required this.targetLanguage,
+  });
+
+  final String dateId;
+  final DocumentSnapshot<Map<String, dynamic>>? snap;
+  final Object? fetchError;
+  final String targetLanguage;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
+
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(
+        textScaler: const TextScaler.linear(0.8),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 8,
+            bottom: 20 + MediaQuery.viewInsetsOf(context).bottom,
+          ),
+          child: _buildBody(context, scheme, l10n),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBody(
+    BuildContext context,
+    ColorScheme scheme,
+    AppLocalizations l10n,
+  ) {
+    if (fetchError != null) {
+      return SizedBox(
+        height: 220,
+        child: Center(
+          child: Text(
+            l10n.progress_detail_load_failed(
+              fetchError.toString().isEmpty ? '-' : fetchError.toString(),
+            ),
+            textAlign: TextAlign.center,
+            style: TextStyle(color: scheme.error),
+          ),
+        ),
+      );
+    }
+
+    if (snap == null) {
+      return SizedBox(
+        height: 220,
+        child: Center(
+          child: Text(
+            l10n.progress_detail_login_required,
+            style: TextStyle(color: scheme.onSurfaceVariant),
+          ),
+        ),
+      );
+    }
+
+    final data = snap!.data() ?? <String, dynamic>{};
+    final entries = dailyProgressEntriesByLanguage(
+      dateId,
+      data,
+      preferredLanguage: targetLanguage,
+    );
+    final hasAny = entries.any((e) => e.hasActivity);
+    final normalizedTarget = normalizeDailyProgressLanguageCode(targetLanguage);
+
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.progress_detail_header(dateId),
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: 10),
+          if (!hasAny) ...[
+            Text(
+              l10n.progress_detail_no_record,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium
+                  ?.copyWith(color: scheme.onSurfaceVariant),
+            ),
+            const SizedBox(height: 12),
+          ],
+          for (var i = 0; i < entries.length; i++) ...[
+            if (i > 0) ...[
+              const SizedBox(height: 12),
+              Divider(color: scheme.outlineVariant),
+              const SizedBox(height: 12),
+            ],
+            _LanguageDayDetailSection(
+              entry: entries[i],
+              highlight: entries[i].languageCode == normalizedTarget,
+            ),
+          ],
+          const SizedBox(height: 14),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(l10n.progress_close_button),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
 class _LegendItem extends StatelessWidget {
   const _LegendItem({required this.label, required this.child});
 
@@ -637,6 +631,79 @@ class _DetailRow extends StatelessWidget {
     );
   }
 }
+
+
+/// 캘린더 날짜 상세 — 언어별 진행 블록
+class _LanguageDayDetailSection extends StatelessWidget {
+  const _LanguageDayDetailSection({
+    required this.entry,
+    required this.highlight,
+  });
+
+  final LanguageDayProgressEntry entry;
+  final bool highlight;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final scheme = Theme.of(context).colorScheme;
+    final view = entry.view;
+    final percent = view.progressPercent;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: highlight ? scheme.primary : scheme.outlineVariant,
+          width: highlight ? 1.5 : 1,
+        ),
+        color: highlight
+            ? scheme.primary.withValues(alpha: 0.06)
+            : scheme.surfaceContainerHighest.withValues(alpha: 0.35),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.progress_detail_language_section(entry.languageCode),
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: highlight ? scheme.primary : null,
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: BorderedLinearProgress(percent: percent),
+              ),
+              const SizedBox(width: 12),
+              Text(l10n.common_percent(percent)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          _DetailRow(
+            title: l10n.progress_detail_word_title,
+            value: '${view.wordDone} / ${view.wordGoal}',
+          ),
+          const SizedBox(height: 8),
+          _DetailRow(
+            title: l10n.progress_detail_sentence_title,
+            value: '${view.sentenceDone} / ${view.sentenceGoal}',
+          ),
+          const SizedBox(height: 8),
+          _DetailRow(
+            title: l10n.progress_detail_wrapup_title,
+            value: '${view.quizDone} / ${view.quizGoal}',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 
 enum _StickerShape { square, triangle, circle }
 

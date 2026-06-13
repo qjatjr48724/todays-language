@@ -1,7 +1,7 @@
 /// 사용자 커리큘럼 학습 상태 — `users/{uid}` 필드 (Functions `curriculum_state.ts`와 동기).
 ///
-/// learningDay: 커리큘럼 진행 일차(1..50).
-/// 당일 단어·문장·마무리(15/5/13) 전부 완료 시 +1 (D-1). 미완료 시 KST 날짜가 바뀌어도 유지.
+/// learningDay: **학습 대상 언어(alpha-3)별** 커리큘럼 진행 일차(1..50).
+/// 당일 단어·문장·마무리(15/5/13) 전부 완료 시 해당 언어만 +1 (D-1).
 class CurriculumState {
   const CurriculumState({
     required this.curriculumId,
@@ -15,6 +15,9 @@ class CurriculumState {
   static const int totalDays = 50;
   static const int phaseMin = 1;
   static const int phaseMax = 2;
+
+  /// `users/{uid}.learningDayByLanguage`
+  static const String learningDayByLanguageField = 'learningDayByLanguage';
 
   static const Set<String> learningLevels = {'beginner', 'intermediate', 'advanced'};
 
@@ -39,14 +42,21 @@ class CurriculumState {
         cycleReviewStatus: 'none',
       );
 
-  static CurriculumState fromUserData(Map<String, dynamic>? data) {
+  /// [targetLanguage]가 주어지면 해당 언어의 `learningDayByLanguage` 값을 사용합니다.
+  static CurriculumState fromUserData(
+    Map<String, dynamic>? data, {
+    String? targetLanguage,
+  }) {
     final d = data ?? <String, dynamic>{};
     final def = defaults();
     final idRaw = (d['curriculumId'] as String?)?.trim();
+    final lang = _normalizeLanguageCode(
+      targetLanguage ?? (d['targetLanguage'] as String?) ?? 'JPN',
+    );
     return CurriculumState(
       curriculumId: (idRaw == null || idRaw.isEmpty) ? def.curriculumId : idRaw,
       curriculumPhase: _parsePhase(d['curriculumPhase']) ?? def.curriculumPhase,
-      learningDay: _clampLearningDay(d['learningDay']),
+      learningDay: learningDayForLanguage(d, lang),
       learningMode: _parseLearningMode(d['learningMode']) ?? def.learningMode,
       cycleReviewStatus:
           _parseCycleReviewStatus(d['cycleReviewStatus']) ?? def.cycleReviewStatus,
@@ -95,6 +105,56 @@ class CurriculumState {
         'learningMode': learningMode,
         'cycleReviewStatus': cycleReviewStatus,
       };
+
+  static String _normalizeLanguageCode(String raw) {
+    final v = raw.trim();
+    if (v.isEmpty) return 'JPN';
+    switch (v.toLowerCase()) {
+      case 'ja':
+        return 'JPN';
+      case 'es':
+        return 'ESP';
+      default:
+        return v.toUpperCase();
+    }
+  }
+
+  static Map<String, int> parseLearningDayByLanguage(dynamic raw) {
+    if (raw is! Map) return <String, int>{};
+    final out = <String, int>{};
+    for (final entry in raw.entries) {
+      final lang = _normalizeLanguageCode(entry.key.toString());
+      final n = entry.value is num ? (entry.value as num).toInt() : int.tryParse('${entry.value}');
+      if (n != null) out[lang] = _clampLearningDay(n);
+    }
+    return out;
+  }
+
+  /// 구버전 최상위 `learningDay` → `learningDayByLanguage` 이전
+  static Map<String, int> migrateLegacyLearningDayToByLanguage(
+    Map<String, dynamic> data, {
+    required String fallbackLanguage,
+  }) {
+    final existing = parseLearningDayByLanguage(data[learningDayByLanguageField]);
+    if (existing.isNotEmpty) return existing;
+
+    final lang = _normalizeLanguageCode(fallbackLanguage);
+    if (data['learningDay'] == null) return <String, int>{};
+    return {lang: _clampLearningDay(data['learningDay'])};
+  }
+
+  /// 특정 학습 언어의 커리큘럼 일차(1..50)
+  static int learningDayForLanguage(
+    Map<String, dynamic> data,
+    String targetLanguage,
+  ) {
+    final lang = _normalizeLanguageCode(targetLanguage);
+    final byLang = migrateLegacyLearningDayToByLanguage(
+      data,
+      fallbackLanguage: targetLanguage,
+    );
+    return byLang[lang] ?? defaults().learningDay;
+  }
 
   static int _clampLearningDay(Object? raw) {
     final n = raw is num ? raw.toInt() : int.tryParse('$raw');

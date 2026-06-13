@@ -37,8 +37,31 @@ void main() {
       expect(patch.containsKey('learningDay'), isFalse);
     });
 
+    test('fromUserData uses per-language learningDay', () {
+      final state = CurriculumState.fromUserData(
+        {
+          'learningDayByLanguage': {'KOR': 3, 'JPN': 1},
+        },
+        targetLanguage: 'JPN',
+      );
+      expect(state.learningDay, 1);
+    });
+
+
+    test('fromUserData migrates legacy learningDay', () {
+      final state = CurriculumState.fromUserData(
+        {'learningDay': 5, 'targetLanguage': 'KOR'},
+        targetLanguage: 'KOR',
+      );
+      expect(state.learningDay, 5);
+    });
+
+
     test('clampLearningDay', () {
-      final state = CurriculumState.fromUserData({'learningDay': 999});
+      final state = CurriculumState.fromUserData(
+        {'learningDayByLanguage': {'KOR': 999}},
+        targetLanguage: 'KOR',
+      );
       expect(state.learningDay, CurriculumState.totalDays);
     });
 
@@ -90,17 +113,39 @@ void main() {
     });
 
 
-    test('isDailyProgressMapComplete matches view rule', () {
+    test('isLanguageDailyProgressComplete matches language slice', () {
       expect(
-        isDailyProgressMapComplete({
-          'wordGoal': 15,
-          'wordDone': 15,
-          'sentenceGoal': 5,
-          'sentenceDone': 5,
-          'quizGoal': 13,
-          'quizDone': 13,
-        }),
+        isLanguageDailyProgressComplete(
+          {
+            'wordGoal': 15,
+            'sentenceGoal': 5,
+            'quizGoal': 13,
+            kByLanguageField: {
+              'KOR': {'wordDone': 5, 'sentenceDone': 0, 'quizDone': 0},
+              'JPN': {
+                'wordDone': 15,
+                'sentenceDone': 5,
+                'quizDone': 13,
+              },
+            },
+          },
+          'JPN',
+        ),
         isTrue,
+      );
+      expect(
+        isLanguageDailyProgressComplete(
+          {
+            'wordGoal': 15,
+            'sentenceGoal': 5,
+            'quizGoal': 13,
+            kByLanguageField: {
+              'KOR': {'wordDone': 5, 'sentenceDone': 0, 'quizDone': 0},
+            },
+          },
+          'KOR',
+        ),
+        isFalse,
       );
     });
   });
@@ -109,11 +154,14 @@ void main() {
   group('D-1 canAdvanceLearningDayForUser', () {
     test('allows beginner curriculum user below day 50', () {
       expect(
-        canAdvanceLearningDayForUser({
-          'learningMode': 'curriculum',
-          'level': 'beginner',
-          'learningDay': 1,
-        }),
+        canAdvanceLearningDayForUser(
+          {
+            'learningMode': 'curriculum',
+            'level': 'beginner',
+            'learningDayByLanguage': {'KOR': 1},
+          },
+          targetLanguage: 'KOR',
+        ),
         isTrue,
       );
     });
@@ -121,19 +169,25 @@ void main() {
 
     test('blocks advanced level and non-curriculum mode', () {
       expect(
-        canAdvanceLearningDayForUser({
-          'learningMode': 'curriculum',
-          'level': 'advanced',
-          'learningDay': 1,
-        }),
+        canAdvanceLearningDayForUser(
+          {
+            'learningMode': 'curriculum',
+            'level': 'advanced',
+            'learningDayByLanguage': {'KOR': 1},
+          },
+          targetLanguage: 'KOR',
+        ),
         isFalse,
       );
       expect(
-        canAdvanceLearningDayForUser({
-          'learningMode': 'free_study',
-          'level': 'beginner',
-          'learningDay': 1,
-        }),
+        canAdvanceLearningDayForUser(
+          {
+            'learningMode': 'free_study',
+            'level': 'beginner',
+            'learningDayByLanguage': {'KOR': 1},
+          },
+          targetLanguage: 'KOR',
+        ),
         isFalse,
       );
     });
@@ -141,11 +195,14 @@ void main() {
 
     test('blocks when already at total days', () {
       expect(
-        canAdvanceLearningDayForUser({
-          'learningMode': 'curriculum',
-          'level': 'intermediate',
-          'learningDay': CurriculumState.totalDays,
-        }),
+        canAdvanceLearningDayForUser(
+          {
+            'learningMode': 'curriculum',
+            'level': 'intermediate',
+            'learningDayByLanguage': {'JPN': CurriculumState.totalDays},
+          },
+          targetLanguage: 'JPN',
+        ),
         isFalse,
       );
     });
