@@ -58,6 +58,9 @@ export const DEFAULT_CURRICULUM_STATE: CurriculumState = {
   cycleReviewStatus: "none",
 };
 
+/** `users/{uid}.learningDayByLanguage` — alpha-3 언어별 커리큘럼 일차(1..50) */
+export const LEARNING_DAY_BY_LANGUAGE_FIELD = "learningDayByLanguage";
+
 const LEARNING_MODES: readonly LearningMode[] = ["curriculum", "review", "free_study"];
 const CYCLE_REVIEW_STATUSES: readonly CycleReviewStatus[] = [
   "none",
@@ -106,19 +109,71 @@ export function parseCycleReviewStatus(raw: unknown): CycleReviewStatus | undefi
   return undefined;
 }
 
+/** alpha-3 학습 언어 코드 정규화 (daily_progress·커리큘럼 공통) */
+export function normalizeCurriculumLanguageCode(raw: unknown): string {
+  const v = String(raw ?? "").trim();
+  if (v.length === 0) return "JPN";
+  switch (v.toLowerCase()) {
+    case "ja":
+      return "JPN";
+    case "es":
+      return "ESP";
+    default:
+      return v.toUpperCase();
+  }
+}
+
+export function parseLearningDayByLanguage(raw: unknown): Record<string, number> {
+  if (!raw || typeof raw !== "object") return {};
+  const out: Record<string, number> = {};
+  for (const [key, value] of Object.entries(raw as Record<string, unknown>)) {
+    const lang = normalizeCurriculumLanguageCode(key);
+    out[lang] = clampLearningDay(Number(value));
+  }
+  return out;
+}
+
+/** 구버전 최상위 `learningDay` → `learningDayByLanguage` 이전 */
+export function migrateLegacyLearningDayToByLanguage(
+  data: Record<string, unknown>,
+  fallbackLanguage: string
+): Record<string, number> {
+  const existing = parseLearningDayByLanguage(data[LEARNING_DAY_BY_LANGUAGE_FIELD]);
+  if (Object.keys(existing).length > 0) return existing;
+
+  const lang = normalizeCurriculumLanguageCode(fallbackLanguage);
+  if (data.learningDay == null) return {};
+  return { [lang]: clampLearningDay(Number(data.learningDay)) };
+}
+
+/** 특정 학습 언어의 커리큘럼 일차(1..50) */
+export function learningDayForLanguage(
+  data: Record<string, unknown> | undefined,
+  targetLanguage: string
+): number {
+  const d = data ?? {};
+  const lang = normalizeCurriculumLanguageCode(targetLanguage);
+  const byLang = migrateLegacyLearningDayToByLanguage(d, targetLanguage);
+  return clampLearningDay(byLang[lang] ?? DEFAULT_CURRICULUM_STATE.learningDay);
+}
+
 /** Firestore users/{uid} 문서에서 커리큘럼 상태 읽기(누락·잘못된 값은 기본값 보정) */
 export function curriculumStateFromUserData(
-  data: Record<string, unknown> | undefined
+  data: Record<string, unknown> | undefined,
+  options?: { targetLanguage?: string }
 ): CurriculumState {
   const d = data ?? {};
   const curriculumIdRaw = String(d.curriculumId ?? "").trim();
   const curriculumId =
     curriculumIdRaw.length > 0 ? curriculumIdRaw : DEFAULT_CURRICULUM_STATE.curriculumId;
+  const targetLanguage = normalizeCurriculumLanguageCode(
+    options?.targetLanguage ?? d.targetLanguage ?? "JPN"
+  );
 
   return {
     curriculumId,
     curriculumPhase: parseCurriculumPhase(d.curriculumPhase) ?? DEFAULT_CURRICULUM_STATE.curriculumPhase,
-    learningDay: clampLearningDay(Number(d.learningDay ?? DEFAULT_CURRICULUM_STATE.learningDay)),
+    learningDay: learningDayForLanguage(d, targetLanguage),
     learningMode: parseLearningMode(d.learningMode) ?? DEFAULT_CURRICULUM_STATE.learningMode,
     cycleReviewStatus:
       parseCycleReviewStatus(d.cycleReviewStatus) ?? DEFAULT_CURRICULUM_STATE.cycleReviewStatus,

@@ -3,6 +3,7 @@ import * as admin from "firebase-admin";
 import {
   curriculumStateFromUserData,
   effectiveLearningLevel,
+  normalizeCurriculumLanguageCode,
 } from "../curriculum/curriculum_state";
 
 /** 커리큘럼 세트 AI 생성 대상 level (초·중) */
@@ -29,7 +30,9 @@ export async function loadUserLearningProfile(
   const data = snap.data() ?? {};
   const tl = normalizeTargetLanguage((data.targetLanguage as string) ?? "JPN");
   const level = effectiveLearningLevel(data.level);
-  const state = curriculumStateFromUserData(data as Record<string, unknown>);
+  const state = curriculumStateFromUserData(data as Record<string, unknown>, {
+    targetLanguage: normalizeCurriculumLanguageCode(tl.external),
+  });
   return {
     targetLanguage: tl.external,
     level,

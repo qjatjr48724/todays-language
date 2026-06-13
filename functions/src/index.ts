@@ -39,6 +39,7 @@ import {
   type UserLearningProfile,
 } from "./learning_sets/user_learning_profile";
 import {
+  curriculumStateFromUserData,
   effectiveLearningLevel,
   LEARNING_DIFFICULTY_UI_ENABLED,
 } from "./curriculum/curriculum_state";
@@ -221,16 +222,19 @@ async function resolveUserLearningProfile(
   uid: string,
   requestData: Record<string, unknown> | undefined
 ): Promise<UserLearningProfile> {
+  const userSnap = await db.collection("users").doc(uid).get();
+  const userData = (userSnap.data() ?? {}) as Record<string, unknown>;
   const base = await loadUserLearningProfile(db, uid, normalizeTargetLanguage);
   const tl = normalizeTargetLanguage(
     (requestData?.targetLanguage ?? base.targetLanguage) as string
   );
   const level = effectiveLearningLevel(requestData?.level ?? base.level);
+  const state = curriculumStateFromUserData(userData, { targetLanguage: tl.external });
   return {
     targetLanguage: tl.external,
     level,
-    curriculumPhase: base.curriculumPhase,
-    learningDay: base.learningDay,
+    curriculumPhase: state.curriculumPhase,
+    learningDay: state.learningDay,
   };
 }
 

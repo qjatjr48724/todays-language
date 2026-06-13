@@ -7,6 +7,7 @@ import {
   curriculumStateFromUserData,
   DEFAULT_CURRICULUM_STATE,
   effectiveLearningLevel,
+  learningDayForLanguage,
   normalizeLearningLevel,
 } from "./curriculum_state";
 import { CURRICULUM_CORE_V1_TOTAL_DAYS } from "./core_v1_rotation";
@@ -50,6 +51,27 @@ describe("curriculum_state", () => {
   it("normalizeLearningLevel", () => {
     assert.equal(normalizeLearningLevel("Intermediate"), "intermediate");
     assert.equal(normalizeLearningLevel("invalid"), "beginner");
+  });
+
+  it("learningDayForLanguage uses per-language map", () => {
+    const day = learningDayForLanguage(
+      { learningDayByLanguage: { KOR: 3, JPN: 1 } },
+      "JPN"
+    );
+    assert.equal(day, 1);
+  });
+
+  it("learningDayForLanguage migrates legacy learningDay", () => {
+    const day = learningDayForLanguage({ learningDay: 5, targetLanguage: "KOR" }, "KOR");
+    assert.equal(day, 5);
+  });
+
+  it("curriculumStateFromUserData uses targetLanguage learningDay", () => {
+    const state = curriculumStateFromUserData(
+      { learningDayByLanguage: { KOR: 3, JPN: 1 } },
+      { targetLanguage: "JPN" }
+    );
+    assert.equal(state.learningDay, 1);
   });
 
   it("effectiveLearningLevel forces beginner when difficulty UI is off", () => {
