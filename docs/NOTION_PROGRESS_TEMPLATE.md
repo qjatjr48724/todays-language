@@ -1950,3 +1950,66 @@ unauthenticated: 로그인 상태 확인
 2. 23:55 스케줄러 TTS 포함 생성 운영 검증
 3. 채팅·중복 로그인 등 [단계 37] 미검증 항목 수동 테스트
 
+---
+
+## [단계 40] 언어별 커리큘럼 일차·캘린더 날짜 상세·Functions 배포 (2026-05-28)
+
+### 1) 오늘 한 일
+
+**언어별 커리큘럼 일차 (`learningDayByLanguage`)**
+- `users/{uid}.learningDayByLanguage.{KOR|JPN|USA}` — 언어별 `learningDay` 1..50 분리
+- D-1 +1: **해당 언어** 15/5/13 완료 시 그 언어 일차만 +1 (`curriculumDayAdvancedByLanguage`)
+- 구버전 최상위 `learningDay` → 현재 `targetLanguage`로 자동 이전
+- Functions `resolveUserLearningProfile` / `loadUserLearningProfile` — 요청·프로필 언어 기준 일차 반환
+- 앱 `CurriculumState.fromUserData(..., targetLanguage:)` · `user_prefs` · `home_screen` 연동
+
+**진행률 탭 — 캘린더 날짜 상세 (옵션 B)**
+- 날짜 탭 바텀시트에 `byLanguage` 기준 **언어별 목록** 표시 (진행 %, 단어/문장/마무리)
+- 현재 학습 언어 블록 맨 위 + 테두리 강조
+- i18n `progress_detail_language_section`
+
+**UX 수정**
+- 바텀시트 드래그 시 깜빡임: `FutureBuilder` 제거 → **열기 전 Firestore 선조회** + 고정 콘텐츠 위젯
+
+**배포·검증**
+- `firebase deploy --only functions` — `todays-language-dev` 11개 함수 업데이트 성공
+- Storage rules: 추가 수정 없음(기존 `learning_audio/**` 규칙 유지·이미 배포된 상태로 확인)
+
+### 2) 합의·결정
+
+- 커리큘럼 일차는 **언어마다 독립** (KOR 3일차 완료 후 JPN 전환 → JPN 1일차부터)
+- 캘린더 **스티커**는 당일 최고 학습률 유지; **날짜 상세**에서만 언어별 breakdown
+- Storage rules는 TTS 경로만 사용 중 — 별도 변경·재배포 불필요
+
+### 3) 완료 기준 체크
+
+- [x] `functions npm test` 19건 통과 · `npm run build` 통과
+- [x] `flutter test` · `flutter analyze` 통과
+- [x] Functions 배포 완료 (`asia-northeast3`)
+- [x] 사용자: 캘린더 날짜 상세 언어별 목록 확인
+- [x] 사용자: 바텀시트 드래그 깜빡임 수정 확인
+
+### 4) 추가/변경 파일(주요)
+
+| 영역 | 파일 |
+|------|------|
+| Functions 일차 | `curriculum_state.ts`, `user_learning_profile.ts`, `index.ts` |
+| 앱 일차·진도 | `curriculum_state.dart`, `daily_progress_sync.dart`, `user_prefs.dart`, `home_screen.dart` |
+| 진행 UI | `progress_screen.dart`, `app_*.arb` |
+| 스키마 | `docs/FIRESTORE_MIN_SCHEMA.md` |
+| 테스트 | `curriculum_state.test.ts`, `curriculum_state_test.dart`, `daily_progress_sync_test.dart` |
+
+### 5) 이슈·해결
+
+| 이슈 | 해결 |
+|------|------|
+| KOR 2일차 후 JPN 전환 시 JPN 3일차 노출 | `learningDayByLanguage` + 언어별 D-1 |
+| 캘린더 상세가 선택 언어 1개만 표시 | `dailyProgressEntriesByLanguage` + 언어별 섹션 UI |
+| 바텀시트 드래그 시 로딩 깜빡임 | 선조회 + `_ProgressDayDetailSheet` 정적 렌더 |
+
+### 6) 다음 액션
+
+1. 언어별 일차·JPN 1일차 복귀 시나리오 운영 환경 재확인 (Functions 배포 후)
+2. (선택) 홈·진행 탭 상단 %를 **선택 언어 기준**으로 변경
+3. 23:55 스케줄러 TTS·채팅 등 [단계 37]~[38] 미검증 항목 이어서 수동 테스트
+
