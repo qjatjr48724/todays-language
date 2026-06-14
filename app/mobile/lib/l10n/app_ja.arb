@@ -272,6 +272,8 @@
 
   "progress_home_title": "今日の進捗",
   "progress_kst_subtitle_prefix": "KST · {date}",
+  "progress_kst_subtitle_with_language": "KST · {date} · {language}",
+  "progress_other_languages_hint": "他の学習言語にも今日の記録があります。カレンダーの日付をタップして確認してください。",
   "progress_word_line": "単語 {wordDone}/{wordGoal}",
   "progress_sentence_line": "文 {sentenceDone}/{sentenceGoal}",
   "progress_wrapup_line": "まとめ {quizDone}/{quizGoal}",

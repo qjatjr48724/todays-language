@@ -19,6 +19,7 @@ class ProgressScreen extends StatefulWidget {
 class ProgressScreenState extends State<ProgressScreen> {
   DailyProgressView? _progress;
   String _targetLanguage = 'JPN';
+  bool _otherLanguagesToday = false;
   bool _loading = true;
   DateTime _focusedMonth = DateTime.now();
   bool _calendarLoading = true;
@@ -31,8 +32,14 @@ class ProgressScreenState extends State<ProgressScreen> {
     super.initState();
     final kstNow = kstNowDate();
     _focusedMonth = DateTime(kstNow.year, kstNow.month, 1);
-    _load();
-    _loadMonth();
+    _bootstrap();
+  }
+
+
+  /// 프로필 언어를 먼저 읽은 뒤 캘린더를 조회해 fallback 언어 불일치를 방지합니다.
+  Future<void> _bootstrap() async {
+    await _load();
+    await _loadMonth();
   }
 
   /// 하단 탭으로 Progress 화면이 다시 선택될 때 최신 데이터로 갱신합니다.
@@ -52,10 +59,22 @@ class ProgressScreenState extends State<ProgressScreen> {
       user,
       targetLanguage: prefs.targetLanguage,
     );
+    final todaySnap = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .collection('daily_progress')
+        .doc(todayKstYyyyMmDd())
+        .get();
+    final todayData = todaySnap.data() ?? <String, dynamic>{};
+    final otherLangs = hasOtherLanguageProgressToday(
+      todayData,
+      targetLanguage: prefs.targetLanguage,
+    );
     if (!mounted) return;
     setState(() {
       _targetLanguage = prefs.targetLanguage;
       _progress = p;
+      _otherLanguagesToday = otherLangs;
       _loading = false;
     });
   }
@@ -86,11 +105,10 @@ class ProgressScreenState extends State<ProgressScreen> {
       final out = <String, int>{};
       for (final doc in snap.docs) {
         final data = doc.data();
-        final percent = data['progressPercent'];
-        int v = 0;
-        if (percent is int) v = percent;
-        if (percent is num) v = percent.toInt();
-        out[doc.id] = v.clamp(0, 100);
+        out[doc.id] = resolveCalendarDayProgressPercent(
+          data,
+          fallbackLanguage: _targetLanguage,
+        );
       }
       if (!mounted) return;
       setState(() {
@@ -389,8 +407,9 @@ class ProgressScreenState extends State<ProgressScreen> {
                         children: [
                           SectionCard(
                             title: l10n.progress_home_title,
-                            subtitle: l10n.progress_kst_subtitle_prefix(
+                            subtitle: l10n.progress_kst_subtitle_with_language(
                               todayKstYyyyMmDd(),
+                              normalizeDailyProgressLanguageCode(_targetLanguage),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -425,6 +444,18 @@ class ProgressScreenState extends State<ProgressScreen> {
                                     p.quizGoal,
                                   ),
                                 ),
+                                if (_otherLanguagesToday) ...[
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    l10n.progress_other_languages_hint,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.copyWith(
+                                          color: scheme.onSurfaceVariant,
+                                        ),
+                                  ),
+                                ],
                               ],
                             ),
                           ),

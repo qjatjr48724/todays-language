@@ -271,6 +271,8 @@
 
   "progress_home_title": "오늘의 진행률",
   "progress_kst_subtitle_prefix": "KST · {date}",
+  "progress_kst_subtitle_with_language": "KST · {date} · {language}",
+  "progress_other_languages_hint": "다른 학습 언어에도 오늘 기록이 있습니다. 캘린더에서 날짜를 눌러 확인하세요.",
   "progress_word_line": "단어 {wordDone}/{wordGoal}",
   "progress_sentence_line": "문장 {sentenceDone}/{sentenceGoal}",
   "progress_wrapup_line": "마무리 {quizDone}/{quizGoal}",

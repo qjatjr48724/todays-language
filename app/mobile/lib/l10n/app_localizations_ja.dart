@@ -671,6 +671,15 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String progress_kst_subtitle_with_language(Object date, Object language) {
+    return 'KST · $date · $language';
+  }
+
+  @override
+  String get progress_other_languages_hint =>
+      '他の学習言語にも今日の記録があります。カレンダーの日付をタップして確認してください。';
+
+  @override
   String progress_word_line(Object wordDone, Object wordGoal) {
     return '単語 $wordDone/$wordGoal';
   }

@@ -1313,6 +1313,18 @@ abstract class AppLocalizations {
   /// **'KST · {date}'**
   String progress_kst_subtitle_prefix(Object date);
 
+  /// No description provided for @progress_kst_subtitle_with_language.
+  ///
+  /// In ko, this message translates to:
+  /// **'KST · {date} · {language}'**
+  String progress_kst_subtitle_with_language(Object date, Object language);
+
+  /// No description provided for @progress_other_languages_hint.
+  ///
+  /// In ko, this message translates to:
+  /// **'다른 학습 언어에도 오늘 기록이 있습니다. 캘린더에서 날짜를 눌러 확인하세요.'**
+  String get progress_other_languages_hint;
+
   /// No description provided for @progress_word_line.
   ///
   /// In ko, this message translates to:

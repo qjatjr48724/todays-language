@@ -272,6 +272,8 @@
 
   "progress_home_title": "Today's Progress",
   "progress_kst_subtitle_prefix": "KST · {date}",
+  "progress_kst_subtitle_with_language": "KST · {date} · {language}",
+  "progress_other_languages_hint": "You also have progress in another language today. Tap a date on the calendar to view details.",
   "progress_word_line": "Words {wordDone}/{wordGoal}",
   "progress_sentence_line": "Sentences {sentenceDone}/{sentenceGoal}",
   "progress_wrapup_line": "Wrap-up {quizDone}/{quizGoal}",
