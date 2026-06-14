@@ -1,0 +1,124 @@
+{
+  "languages": [
+    {
+      "languageAlpha3": "JPN",
+      "sortOrder": 1,
+      "certifications": [
+        {
+          "id": "jlpt",
+          "name": "JLPT",
+          "fullName": {
+            "ko": "일본어능력시험",
+            "en": "Japanese-Language Proficiency Test",
+            "ja": "日本語能力試験"
+          },
+          "summary": {
+            "ko": "일본어 비모국어권 학습자의 일본어 능력을 측정하는 국제 공인 시험입니다. N5(초급)부터 N1(고급)까지 5단계로 구분되며, 일본 유학·취업·비자 신청 시 자주 요구됩니다.",
+            "en": "An internationally recognized test of Japanese for non-native speakers. Levels run from N5 (beginner) to N1 (advanced) and are often required for study, work, or visas in Japan.",
+            "ja": "日本語を母語としない学習者の日本語能力を測る国際的な試験です。N5（初級）からN1（上級）まで5段階があり、留学・就職・ビザ申請で広く使われます。"
+          },
+          "levels": ["N5", "N4", "N3", "N2", "N1"],
+          "officialUrl": "https://www.jlpt.jp/",
+          "sortOrder": 1
+        }
+      ]
+    },
+    {
+      "languageAlpha3": "USA",
+      "sortOrder": 2,
+      "certifications": [
+        {
+          "id": "toeic",
+          "name": "TOEIC",
+          "fullName": {
+            "ko": "토익",
+            "en": "Test of English for International Communication",
+            "ja": "TOEIC（国際コミュニケーション英語能力試験）"
+          },
+          "summary": {
+            "ko": "비즈니스·일상 영어 의사소통 능력을 점수로 평가하는 시험입니다. 한국·일본 등에서 취업·승진 시 가장 많이 활용되는 영어 시험 중 하나입니다.",
+            "en": "Measures practical English for work and everyday communication. Widely used for hiring and promotion, especially in East Asia.",
+            "ja": "ビジネスや日常の英語コミュニケーション能力を点数で評価する試験です。就職・昇進で広く利用されています。"
+          },
+          "levels": ["Listening & Reading", "Speaking", "Writing"],
+          "officialUrl": "https://www.ets.org/toeic",
+          "sortOrder": 1
+        },
+        {
+          "id": "toefl",
+          "name": "TOEFL",
+          "fullName": {
+            "ko": "토플",
+            "en": "Test of English as a Foreign Language",
+            "ja": "TOEFL（外国人向け英語能力試験）"
+          },
+          "summary": {
+            "ko": "학술 영어 중심의 시험으로, 미국·캐나다 등 해외 대학 입학에 널리 요구됩니다. iBT(인터넷 기반) 형식이 일반적입니다.",
+            "en": "An academic English test commonly required for university admission in the U.S., Canada, and elsewhere. The iBT (Internet-based) format is standard.",
+            "ja": "学術英語を中心とした試験で、米国・カナダなどの大学入学で広く求められます。iBT（インターネット方式）が一般的です。"
+          },
+          "levels": ["iBT"],
+          "officialUrl": "https://www.ets.org/toefl",
+          "sortOrder": 2
+        },
+        {
+          "id": "ielts",
+          "name": "IELTS",
+          "fullName": {
+            "ko": "아이엘츠",
+            "en": "International English Language Testing System",
+            "ja": "IELTS（国際英語語学テスト）"
+          },
+          "summary": {
+            "ko": "영국·호주·캐나다 등에서 인정하는 영어 능력 시험입니다. Academic(학술)과 General Training(이민·취업) 모듈이 있으며 밴드 점수(0~9)로 평가합니다.",
+            "en": "Recognized in the UK, Australia, Canada, and more. Offers Academic and General Training modules with band scores from 0 to 9.",
+            "ja": "英国・オーストラリア・カナダなどで認められる英語試験です。Academic と General Training があり、バンドスコア（0〜9）で評価します。"
+          },
+          "levels": ["Academic", "General Training"],
+          "officialUrl": "https://www.ielts.org/",
+          "sortOrder": 3
+        }
+      ]
+    },
+    {
+      "languageAlpha3": "KOR",
+      "sortOrder": 3,
+      "certifications": [
+        {
+          "id": "topik",
+          "name": "TOPIK",
+          "fullName": {
+            "ko": "한국어능력시험",
+            "en": "Test of Proficiency in Korean",
+            "ja": "TOPIK（韓国語能力試験）"
+          },
+          "summary": {
+            "ko": "외국인·재외동포의 한국어 능력을 평가하는 시험입니다. TOPIK I(1~2급)과 TOPIK II(3~6급)로 나뉘며, 한국 유학·취업·비자(K-ETA 등)에서 활용됩니다.",
+            "en": "Assesses Korean for non-native speakers and overseas Koreans. TOPIK I (levels 1–2) and TOPIK II (levels 3–6) support study, work, and visas in Korea.",
+            "ja": "外国人・在外同胞の韓国語能力を評価する試験です。TOPIK I（1〜2級）と TOPIK II（3〜6級）があり、留学・就職・ビザで利用されます。"
+          },
+          "levels": ["TOPIK I (1~2)", "TOPIK II (3~6)"],
+          "officialUrl": "https://www.topik.go.kr/",
+          "sortOrder": 1
+        },
+        {
+          "id": "klat",
+          "name": "KLAT",
+          "fullName": {
+            "ko": "한국어능력검정시험",
+            "en": "Korean Language Ability Test",
+            "ja": "韓国語能力検定試験（KLAT）"
+          },
+          "summary": {
+            "ko": "국내에서 시행되는 한국어 종합 능력 검정 시험입니다. 듣기·말하기·읽기·쓰기·문법 등을 평가하며, 학년·연령별 급수(1~42급)로 나뉩니다. TOPIK(외국인 대상)와는 별도 시험입니다.",
+            "en": "A comprehensive Korean proficiency test held in Korea, covering listening, speaking, reading, writing, and grammar across many grade levels (1–42). Separate from TOPIK, which targets non-native learners.",
+            "ja": "韓国内で実施される韓国語総合能力検定試験です。聴解・話す・読む・書く・文法などを評価し、学年・年齢別の級（1〜42級）があります。外国人向け TOPIK とは別の試験です。"
+          },
+          "levels": ["1~42급"],
+          "officialUrl": "https://www.klat.or.kr/",
+          "sortOrder": 2
+        }
+      ]
+    }
+  ]
+}

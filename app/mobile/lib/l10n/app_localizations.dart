@@ -496,6 +496,96 @@ abstract class AppLocalizations {
   /// **'공부한게 조금 서툴러도 여행가서 주눅들지 말아요!'**
   String get community_menu_phrase_guide_subtitle;
 
+  /// No description provided for @cert_hub_appbar_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'언어별 자격증'**
+  String get cert_hub_appbar_title;
+
+  /// No description provided for @cert_my_learning_language_section.
+  ///
+  /// In ko, this message translates to:
+  /// **'내 학습 언어'**
+  String get cert_my_learning_language_section;
+
+  /// No description provided for @cert_other_languages_section.
+  ///
+  /// In ko, this message translates to:
+  /// **'다른 언어'**
+  String get cert_other_languages_section;
+
+  /// No description provided for @cert_my_language_cert_count.
+  ///
+  /// In ko, this message translates to:
+  /// **'자격증 {count}개 · 전체 보기'**
+  String cert_my_language_cert_count(Object count);
+
+  /// No description provided for @cert_language_cert_count.
+  ///
+  /// In ko, this message translates to:
+  /// **'자격증 {count}개'**
+  String cert_language_cert_count(Object count);
+
+  /// No description provided for @cert_language_kor.
+  ///
+  /// In ko, this message translates to:
+  /// **'한국어'**
+  String get cert_language_kor;
+
+  /// No description provided for @cert_language_jpn.
+  ///
+  /// In ko, this message translates to:
+  /// **'일본어'**
+  String get cert_language_jpn;
+
+  /// No description provided for @cert_language_usa.
+  ///
+  /// In ko, this message translates to:
+  /// **'영어'**
+  String get cert_language_usa;
+
+  /// No description provided for @cert_list_appbar_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'{language} 자격증'**
+  String cert_list_appbar_title(Object language);
+
+  /// No description provided for @cert_list_empty.
+  ///
+  /// In ko, this message translates to:
+  /// **'등록된 자격증이 없습니다.'**
+  String get cert_list_empty;
+
+  /// No description provided for @cert_detail_appbar_fallback.
+  ///
+  /// In ko, this message translates to:
+  /// **'자격증 상세'**
+  String get cert_detail_appbar_fallback;
+
+  /// No description provided for @cert_detail_levels_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'급수·과목'**
+  String get cert_detail_levels_title;
+
+  /// No description provided for @cert_detail_official_site_button.
+  ///
+  /// In ko, this message translates to:
+  /// **'공식 사이트 열기'**
+  String get cert_detail_official_site_button;
+
+  /// No description provided for @cert_link_open_failed.
+  ///
+  /// In ko, this message translates to:
+  /// **'공식 사이트를 열 수 없습니다.'**
+  String get cert_link_open_failed;
+
+  /// No description provided for @cert_load_failed.
+  ///
+  /// In ko, this message translates to:
+  /// **'자격증 정보를 불러오지 못했습니다. ({detail})'**
+  String cert_load_failed(Object detail);
+
   /// No description provided for @chat_room_appbar_title.
   ///
   /// In ko, this message translates to:

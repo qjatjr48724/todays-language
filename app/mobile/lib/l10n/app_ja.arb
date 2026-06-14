@@ -76,6 +76,42 @@
   "community_menu_certificates_subtitle": "言語を学ぶと、こんな資格を取得できます！",
   "community_menu_phrase_guide": "基本会話ガイド",
   "community_menu_phrase_guide_subtitle": "まだ不慣れでも、旅行先で気後れしないでね！",
+
+  "cert_hub_appbar_title": "言語別の資格",
+  "cert_my_learning_language_section": "学習中の言語",
+  "cert_other_languages_section": "その他の言語",
+  "cert_my_language_cert_count": "資格 {count}件 · すべて見る",
+  "@cert_my_language_cert_count": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "cert_language_cert_count": "資格 {count}件",
+  "@cert_language_cert_count": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "cert_language_kor": "韓国語",
+  "cert_language_jpn": "日本語",
+  "cert_language_usa": "英語",
+  "cert_list_appbar_title": "{language}の資格",
+  "@cert_list_appbar_title": {
+    "placeholders": {
+      "language": {}
+    }
+  },
+  "cert_list_empty": "登録された資格がありません。",
+  "cert_detail_appbar_fallback": "資格の詳細",
+  "cert_detail_levels_title": "級・科目",
+  "cert_detail_official_site_button": "公式サイトを開く",
+  "cert_link_open_failed": "公式サイトを開けませんでした。",
+  "cert_load_failed": "資格情報を読み込めませんでした。（{detail}）",
+  "@cert_load_failed": {
+    "placeholders": {
+      "detail": {}
+    }
+  },
   "chat_room_appbar_title": "{language} チャット",
   "@chat_room_appbar_title": {
     "placeholders": {

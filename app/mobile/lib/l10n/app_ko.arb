@@ -75,6 +75,42 @@
   "community_menu_certificates_subtitle": "언어를 공부하면 이런 자격증을 취득할 수 있어요!",
   "community_menu_phrase_guide": "기본 회화 가이드",
   "community_menu_phrase_guide_subtitle": "공부한게 조금 서툴러도 여행가서 주눅들지 말아요!",
+
+  "cert_hub_appbar_title": "언어별 자격증",
+  "cert_my_learning_language_section": "내 학습 언어",
+  "cert_other_languages_section": "다른 언어",
+  "cert_my_language_cert_count": "자격증 {count}개 · 전체 보기",
+  "@cert_my_language_cert_count": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "cert_language_cert_count": "자격증 {count}개",
+  "@cert_language_cert_count": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "cert_language_kor": "한국어",
+  "cert_language_jpn": "일본어",
+  "cert_language_usa": "영어",
+  "cert_list_appbar_title": "{language} 자격증",
+  "@cert_list_appbar_title": {
+    "placeholders": {
+      "language": {}
+    }
+  },
+  "cert_list_empty": "등록된 자격증이 없습니다.",
+  "cert_detail_appbar_fallback": "자격증 상세",
+  "cert_detail_levels_title": "급수·과목",
+  "cert_detail_official_site_button": "공식 사이트 열기",
+  "cert_link_open_failed": "공식 사이트를 열 수 없습니다.",
+  "cert_load_failed": "자격증 정보를 불러오지 못했습니다. ({detail})",
+  "@cert_load_failed": {
+    "placeholders": {
+      "detail": {}
+    }
+  },
   "chat_room_appbar_title": "{language} 채팅",
   "@chat_room_appbar_title": {
     "placeholders": {

@@ -244,6 +244,59 @@ class AppLocalizationsEn extends AppLocalizations {
       'Even if you\'re not fluent yet, don\'t feel shy when you travel!';
 
   @override
+  String get cert_hub_appbar_title => 'Language certificates';
+
+  @override
+  String get cert_my_learning_language_section => 'My learning language';
+
+  @override
+  String get cert_other_languages_section => 'Other languages';
+
+  @override
+  String cert_my_language_cert_count(Object count) {
+    return '$count certificates · View all';
+  }
+
+  @override
+  String cert_language_cert_count(Object count) {
+    return '$count certificates';
+  }
+
+  @override
+  String get cert_language_kor => 'Korean';
+
+  @override
+  String get cert_language_jpn => 'Japanese';
+
+  @override
+  String get cert_language_usa => 'English';
+
+  @override
+  String cert_list_appbar_title(Object language) {
+    return '$language certificates';
+  }
+
+  @override
+  String get cert_list_empty => 'No certificates listed yet.';
+
+  @override
+  String get cert_detail_appbar_fallback => 'Certificate details';
+
+  @override
+  String get cert_detail_levels_title => 'Levels & modules';
+
+  @override
+  String get cert_detail_official_site_button => 'Open official site';
+
+  @override
+  String get cert_link_open_failed => 'Could not open the official site.';
+
+  @override
+  String cert_load_failed(Object detail) {
+    return 'Failed to load certificate data. ($detail)';
+  }
+
+  @override
   String chat_room_appbar_title(String language) {
     return '$language chat';
   }

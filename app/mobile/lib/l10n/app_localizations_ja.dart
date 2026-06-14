@@ -230,6 +230,59 @@ class AppLocalizationsJa extends AppLocalizations {
   String get community_menu_phrase_guide_subtitle => 'まだ不慣れでも、旅行先で気後れしないでね！';
 
   @override
+  String get cert_hub_appbar_title => '言語別の資格';
+
+  @override
+  String get cert_my_learning_language_section => '学習中の言語';
+
+  @override
+  String get cert_other_languages_section => 'その他の言語';
+
+  @override
+  String cert_my_language_cert_count(Object count) {
+    return '資格 $count件 · すべて見る';
+  }
+
+  @override
+  String cert_language_cert_count(Object count) {
+    return '資格 $count件';
+  }
+
+  @override
+  String get cert_language_kor => '韓国語';
+
+  @override
+  String get cert_language_jpn => '日本語';
+
+  @override
+  String get cert_language_usa => '英語';
+
+  @override
+  String cert_list_appbar_title(Object language) {
+    return '$languageの資格';
+  }
+
+  @override
+  String get cert_list_empty => '登録された資格がありません。';
+
+  @override
+  String get cert_detail_appbar_fallback => '資格の詳細';
+
+  @override
+  String get cert_detail_levels_title => '級・科目';
+
+  @override
+  String get cert_detail_official_site_button => '公式サイトを開く';
+
+  @override
+  String get cert_link_open_failed => '公式サイトを開けませんでした。';
+
+  @override
+  String cert_load_failed(Object detail) {
+    return '資格情報を読み込めませんでした。（$detail）';
+  }
+
+  @override
   String chat_room_appbar_title(String language) {
     return '$language チャット';
   }

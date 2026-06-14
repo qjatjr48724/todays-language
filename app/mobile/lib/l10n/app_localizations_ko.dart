@@ -232,6 +232,59 @@ class AppLocalizationsKo extends AppLocalizations {
       '공부한게 조금 서툴러도 여행가서 주눅들지 말아요!';
 
   @override
+  String get cert_hub_appbar_title => '언어별 자격증';
+
+  @override
+  String get cert_my_learning_language_section => '내 학습 언어';
+
+  @override
+  String get cert_other_languages_section => '다른 언어';
+
+  @override
+  String cert_my_language_cert_count(Object count) {
+    return '자격증 $count개 · 전체 보기';
+  }
+
+  @override
+  String cert_language_cert_count(Object count) {
+    return '자격증 $count개';
+  }
+
+  @override
+  String get cert_language_kor => '한국어';
+
+  @override
+  String get cert_language_jpn => '일본어';
+
+  @override
+  String get cert_language_usa => '영어';
+
+  @override
+  String cert_list_appbar_title(Object language) {
+    return '$language 자격증';
+  }
+
+  @override
+  String get cert_list_empty => '등록된 자격증이 없습니다.';
+
+  @override
+  String get cert_detail_appbar_fallback => '자격증 상세';
+
+  @override
+  String get cert_detail_levels_title => '급수·과목';
+
+  @override
+  String get cert_detail_official_site_button => '공식 사이트 열기';
+
+  @override
+  String get cert_link_open_failed => '공식 사이트를 열 수 없습니다.';
+
+  @override
+  String cert_load_failed(Object detail) {
+    return '자격증 정보를 불러오지 못했습니다. ($detail)';
+  }
+
+  @override
   String chat_room_appbar_title(String language) {
     return '$language 채팅';
   }

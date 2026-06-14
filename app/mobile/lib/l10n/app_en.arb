@@ -76,6 +76,42 @@
   "community_menu_certificates_subtitle": "Here are certificates you can earn as you learn a language!",
   "community_menu_phrase_guide": "Phrase guide",
   "community_menu_phrase_guide_subtitle": "Even if you're not fluent yet, don't feel shy when you travel!",
+
+  "cert_hub_appbar_title": "Language certificates",
+  "cert_my_learning_language_section": "My learning language",
+  "cert_other_languages_section": "Other languages",
+  "cert_my_language_cert_count": "{count} certificates · View all",
+  "@cert_my_language_cert_count": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "cert_language_cert_count": "{count} certificates",
+  "@cert_language_cert_count": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "cert_language_kor": "Korean",
+  "cert_language_jpn": "Japanese",
+  "cert_language_usa": "English",
+  "cert_list_appbar_title": "{language} certificates",
+  "@cert_list_appbar_title": {
+    "placeholders": {
+      "language": {}
+    }
+  },
+  "cert_list_empty": "No certificates listed yet.",
+  "cert_detail_appbar_fallback": "Certificate details",
+  "cert_detail_levels_title": "Levels & modules",
+  "cert_detail_official_site_button": "Open official site",
+  "cert_link_open_failed": "Could not open the official site.",
+  "cert_load_failed": "Failed to load certificate data. ({detail})",
+  "@cert_load_failed": {
+    "placeholders": {
+      "detail": {}
+    }
+  },
   "chat_room_appbar_title": "{language} chat",
   "@chat_room_appbar_title": {
     "placeholders": {

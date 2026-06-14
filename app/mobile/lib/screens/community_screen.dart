@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.dart';
 import '../services/chat_repository.dart';
+import 'certification_hub_screen.dart';
 import 'chat_room_screen.dart';
 
 class CommunityScreen extends StatelessWidget {
@@ -69,7 +70,13 @@ class CommunityScreen extends StatelessWidget {
               icon: Icons.verified_outlined,
               title: l10n.community_menu_certificates,
               subtitle: l10n.community_menu_certificates_subtitle,
-              onTap: null,
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const CertificationHubScreen(),
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 12),
             _menuTile(
