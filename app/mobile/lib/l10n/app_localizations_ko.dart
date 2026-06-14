@@ -320,6 +320,11 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String chat_date_divider(int year, int month, int day) {
+    return '----- $year년 $month월 $day일 -----';
+  }
+
+  @override
   String get home_basic_characters_button => '기초 문자 공부하기';
 
   @override

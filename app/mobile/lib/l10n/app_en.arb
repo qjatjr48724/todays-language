@@ -141,6 +141,14 @@
       "maxLength": { "type": "int" }
     }
   },
+  "chat_date_divider": "----- {month}/{day}/{year} -----",
+  "@chat_date_divider": {
+    "placeholders": {
+      "year": { "type": "int" },
+      "month": { "type": "int" },
+      "day": { "type": "int" }
+    }
+  },
   "home_basic_characters_button": "Study basic characters",
   "home_basic_characters_subtitle": "Table: character · sound · example",
   "basic_characters_screen_title": "Basic characters",

@@ -2013,3 +2013,72 @@ unauthenticated: 로그인 상태 확인
 2. (선택) 홈·진행 탭 상단 %를 **선택 언어 기준**으로 변경
 3. 23:55 스케줄러 TTS·채팅 등 [단계 37]~[38] 미검증 항목 이어서 수동 테스트
 
+---
+
+## [단계 41] 진행도 표시 안정화·자격증 허브 MVP·채팅 시간 UX (2026-05-28)
+
+### 1) 오늘 한 일
+
+**일일 진도 파싱·표시 안정화** (`209254c`)
+- `byLanguage` 언어 코드 정규화 (`ko`→`KOR`, `en`→`USA` 등 Functions와 동기)
+- `byLanguage` 안에 잘못 중첩된 `wordGoal`·`dateKst` 등 문서 필드 **읽기 시 복구** + 열 때 **자동 구조 수리**
+- 레거시 최상위 `wordDone`과 `byLanguage` **병합(max)** — 과도기 문서 진도 누락 방지
+- 진행률 탭: 프로필 언어 로드 후 캘린더 조회, **선택 언어 기준** 상단 카드 + **다른 언어 기록 안내** 문구
+- `daily_progress_sync_test` 15건
+
+**진행도 표시 이슈 조사 (에뮬레이터)**
+- tester1/tester2 동일 표시 확인 → **기기별 분리 저장 아님**, Firestore 계정·날짜·`targetLanguage` 조건 불일치였음
+- 상단 0%(JPN) + 캘린더 빨강 + 6/14 상세 **KOR 13/15** → **선택 언어(JPN) 카드** vs **다른 언어(KOR) 기록** 의도된 UX로 정상 판정
+- stuck 에뮬레이터(`qemu` zombie) → 프로세스 종료 후 `tester1` 재실행
+
+**언어별 자격증 허브 MVP** (`178e3f2`)
+- 커뮤니티 → 언어별 자격증: **내 학습 언어 바로가기** + 다른 언어 목록 → 목록 → **풀 페이지 상세** + 공식 사이트(`url_launcher`)
+- 정적 JSON `assets/certifications/certifications.json` (A옵션, 추후 Firestore B 전환 가능)
+- 자격증: **JLPT** / **TOEIC·TOEFL·IELTS** / **TOPIK·KLAT(한국어능력검정시험)**
+- `certification_repository_test` 6건
+
+**채팅 UX — 시간·날짜 구분선**
+- 메시지 말풍선 하단 **KST 24시간 `HH:mm`** 표기
+- **KST 자정** 넘긴 날 첫 메시지 위 `----- yyyy년 mm월 dd일 -----` (ko/en/ja i18n)
+- `chat_message_timeline.dart` + `chat_message_timeline_test` 3건
+
+### 2) 합의·결정
+
+- 진행률 **상단 카드** = 현재 `targetLanguage` 슬라이스; **캘린더·날짜 상세** = 언어별·최고 학습률 유지
+- 자격증은 **허브(안내+링크)만** MVP — 게시판·후기는 [단계 37] 정책 정비 후
+- 자격증 데이터는 **앱 번들 JSON** 우선; 규모 확대 시 `public_metadata/certifications` 이전
+- 채팅 시간 표기는 **KST 24시간제** 고정
+
+### 3) 완료 기준 체크
+
+- [x] `flutter test` (`daily_progress_sync`, `certification_repository`, `chat_message_timeline`) 통과
+- [x] `flutter analyze` 통과
+- [x] 사용자: tester1/tester2 진행률·6/14 KOR 13/15 동일 확인
+- [x] 사용자: 자격증 허브·공식 사이트 링크 확인
+- [x] 사용자: 채팅 `HH:mm`·날짜 구분선 확인
+
+### 4) 추가/변경 파일(주요)
+
+| 영역 | 파일 |
+|------|------|
+| 진도 | `daily_progress_sync.dart`, `progress_screen.dart`, `daily_progress_sync_test.dart` |
+| 자격증 | `certifications.json`, `certification.dart`, `certification_repository.dart`, `certification_*_screen.dart`, `community_screen.dart` |
+| 채팅 UX | `chat_message_timeline.dart`, `chat_room_screen.dart`, `chat_message_timeline_test.dart` |
+| i18n | `app_*.arb` (`progress_*`, `cert_*`, `chat_date_divider`) |
+| 기타 | `pubspec.yaml`(`url_launcher`), `AndroidManifest.xml`(https intent) |
+
+### 5) Git 커밋
+
+| 해시 | 메시지 |
+|------|--------|
+| `209254c` | fix(mobile): 일일 진도 파싱·표시 안정화 및 진행률 탭 UX 보강 |
+| `178e3f2` | feat(mobile): 언어별 자격증 허브 MVP 추가 |
+| (본 커밋) | feat(mobile): 채팅 KST 시간·날짜 구분선 + [단계 41] 진행 기록 |
+
+### 6) 다음 액션
+
+1. (선택) 자격증 Firestore `public_metadata` 이전 + seed 함수
+2. (선택) 진행률 탭 상단에 **당일 최고 학습률** 보조 표시
+3. 채팅 100건 이전 페이징·서버 타임스탬프 검토
+4. 자격증 커뮤니티(후기·게시) — UGC 정책·신고 플로우 선행
+

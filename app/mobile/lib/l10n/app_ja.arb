@@ -141,6 +141,14 @@
       "maxLength": { "type": "int" }
     }
   },
+  "chat_date_divider": "----- {year}年{month}月{day}日 -----",
+  "@chat_date_divider": {
+    "placeholders": {
+      "year": { "type": "int" },
+      "month": { "type": "int" },
+      "day": { "type": "int" }
+    }
+  },
   "home_basic_characters_button": "基礎文字を学ぶ",
   "home_basic_characters_subtitle": "文字・発音・例を表で",
   "basic_characters_screen_title": "基礎文字",

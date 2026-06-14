@@ -318,6 +318,11 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String chat_date_divider(int year, int month, int day) {
+    return '----- $year年$month月$day日 -----';
+  }
+
+  @override
   String get home_basic_characters_button => '基礎文字を学ぶ';
 
   @override

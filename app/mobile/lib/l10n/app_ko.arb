@@ -140,6 +140,14 @@
       "maxLength": { "type": "int" }
     }
   },
+  "chat_date_divider": "----- {year}년 {month}월 {day}일 -----",
+  "@chat_date_divider": {
+    "placeholders": {
+      "year": { "type": "int" },
+      "month": { "type": "int" },
+      "day": { "type": "int" }
+    }
+  },
   "home_basic_characters_button": "기초 문자 공부하기",
   "home_basic_characters_subtitle": "문자 · 발음 · 예시 표로 보기",
   "basic_characters_screen_title": "기초문자 공부하기",

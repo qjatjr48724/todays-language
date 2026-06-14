@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../models/chat_message.dart';
 import '../services/chat_repository.dart';
+import '../utils/chat_message_timeline.dart';
 
 /// 학습 언어(`targetLanguage`) 공개 채팅방 — 텍스트만 MVP
 class ChatRoomScreen extends StatefulWidget {
@@ -130,11 +131,18 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                     ),
                   );
                 }
+                final timeline = buildChatTimeline(messages);
                 return ListView.builder(
                   padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-                  itemCount: messages.length,
+                  itemCount: timeline.length,
                   itemBuilder: (context, index) {
-                    final m = messages[index];
+                    final item = timeline[index];
+                    if (item.type == ChatTimelineItemType.dateDivider) {
+                      return _DateDivider(
+                        createdAtMs: item.createdAtMs ?? 0,
+                      );
+                    }
+                    final m = item.message!;
                     final isMine = uid != null && m.uid == uid;
                     return _MessageBubble(message: m, isMine: isMine);
                   },
@@ -197,6 +205,35 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
 }
 
 
+/// KST 날짜 구분선 — `----- yyyy년 mm월 dd일 -----`
+class _DateDivider extends StatelessWidget {
+  const _DateDivider({required this.createdAtMs});
+
+  final int createdAtMs;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final scheme = Theme.of(context).colorScheme;
+    final kst = kstDateTimeFromEpochMs(createdAtMs);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      child: Center(
+        child: Text(
+          l10n.chat_date_divider(kst.year, kst.month, kst.day),
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: scheme.onSurfaceVariant,
+                letterSpacing: 0.2,
+              ),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+}
+
+
 class _MessageBubble extends StatelessWidget {
   const _MessageBubble({
     required this.message,
@@ -245,6 +282,20 @@ class _MessageBubble extends StatelessWidget {
             child: Text(
               message.text,
               style: TextStyle(color: fg),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(
+              top: 4,
+              left: isMine ? 0 : 4,
+              right: isMine ? 4 : 0,
+            ),
+            child: Text(
+              formatKstHhMm(message.createdAtMs),
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                    fontSize: 11,
+                  ),
             ),
           ),
         ],

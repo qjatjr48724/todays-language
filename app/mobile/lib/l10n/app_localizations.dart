@@ -640,6 +640,12 @@ abstract class AppLocalizations {
   /// **'메시지는 {maxLength}자 이하로 입력해 주세요.'**
   String chat_send_too_long_error(int maxLength);
 
+  /// No description provided for @chat_date_divider.
+  ///
+  /// In ko, this message translates to:
+  /// **'----- {year}년 {month}월 {day}일 -----'**
+  String chat_date_divider(int year, int month, int day);
+
   /// No description provided for @home_basic_characters_button.
   ///
   /// In ko, this message translates to:
