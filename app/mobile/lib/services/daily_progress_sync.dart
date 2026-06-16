@@ -509,6 +509,27 @@ bool isDailyProgressComplete(DailyProgressView progress) {
 }
 
 
+/// 일일 목표를 모두 채운 언어 슬라이스 (관리자·테스트용).
+LanguageProgressSlice filledLanguageProgressSlice({
+  required int wordGoal,
+  required int sentenceGoal,
+  required int quizGoal,
+}) {
+  return LanguageProgressSlice(
+    wordDone: wordGoal,
+    sentenceDone: sentenceGoal,
+    quizDone: quizGoal,
+  );
+}
+
+
+/// KST 기준 해당 `dateKst` 일차가 이미 지났는지 (오늘 미포함).
+bool isPastKstCalendarDay(String dateKst, {DateTime? referenceKstDate}) {
+  final today = formatYyyyMmDd(referenceKstDate ?? kstNowDate());
+  return dateKst.compareTo(today) < 0;
+}
+
+
 /// Firestore 맵 + 언어 코드 기준 해당 언어 일일 완료 여부.
 bool isLanguageDailyProgressComplete(
   Map<String, dynamic> data,
@@ -619,11 +640,16 @@ Future<bool> tryAdvanceLearningDayInTransaction(
 
 
 /// 특정 KST 날짜·언어 문서가 완료됐으면 해당 언어 learningDay +1을 시도합니다.
+///
+/// 당일(`dateKst` == 오늘 KST) 문서는 여기서 +1하지 않습니다.
+/// 관리자 「금일 학습량 채우기」 후 자정 이후 전일 문서를 보정할 때 사용합니다.
 Future<bool> tryAdvanceLearningDayForDate(
   User user,
   String dateKst, {
   String? targetLanguage,
 }) async {
+  if (!isPastKstCalendarDay(dateKst)) return false;
+
   final userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
   final progressRef = userRef.collection('daily_progress').doc(dateKst);
 
@@ -867,6 +893,81 @@ Future<DailyProgressView> incrementTodayDailyProgress(
       slice: slice,
       displayProgressPercent: computeSliceProgressPercent(
         slice: slice,
+        wordGoal: wordGoal,
+        sentenceGoal: sentenceGoal,
+        quizGoal: quizGoal,
+      ),
+    );
+  });
+}
+
+
+/// 관리자: 오늘(KST) 해당 언어 일일 학습량을 목표치까지 채웁니다.
+///
+/// - 즉시 learningDay +1은 하지 않습니다.
+/// - KST 자정 이후 홈 진입 시 [reconcilePendingLearningDayAdvances]가 전일 완료를 반영합니다.
+Future<DailyProgressView> fillTodayDailyProgressForAdmin(
+  User user, {
+  required String targetLanguage,
+}) async {
+  final lang = normalizeDailyProgressLanguageCode(targetLanguage);
+  await ensureTodayDailyProgress(user, targetLanguage: lang);
+
+  final dateKst = todayKstYyyyMmDd();
+  final ref = FirebaseFirestore.instance
+      .collection('users')
+      .doc(user.uid)
+      .collection('daily_progress')
+      .doc(dateKst);
+
+  return FirebaseFirestore.instance.runTransaction((tx) async {
+    final snap = await tx.get(ref);
+    final data = snap.data() ?? <String, dynamic>{};
+
+    final wordGoal = _intFromDynamic(data['wordGoal'], kDailyWordGoalDefault);
+    final sentenceGoal =
+        _intFromDynamic(data['sentenceGoal'], kDailySentenceGoalDefault);
+    final quizGoal = _intFromDynamic(data['quizGoal'], kDailyQuizGoalDefault);
+
+    var byLanguage = migrateLegacyProgressToByLanguage(
+      data,
+      fallbackLanguage: lang,
+    );
+    final filled = filledLanguageProgressSlice(
+      wordGoal: wordGoal,
+      sentenceGoal: sentenceGoal,
+      quizGoal: quizGoal,
+    );
+    byLanguage = Map<String, LanguageProgressSlice>.from(byLanguage)
+      ..[lang] = filled;
+
+    final maxPercent = computeMaxProgressPercentAcrossLanguages(
+      byLanguage: byLanguage,
+      wordGoal: wordGoal,
+      sentenceGoal: sentenceGoal,
+      quizGoal: quizGoal,
+    );
+
+    final progressPayload = <String, dynamic>{
+      'dateKst': dateKst,
+      'wordGoal': wordGoal,
+      'sentenceGoal': sentenceGoal,
+      'quizGoal': quizGoal,
+      kByLanguageField: serializeByLanguageField(byLanguage),
+      'progressPercent': maxPercent,
+      'updatedAt': FieldValue.serverTimestamp(),
+    };
+
+    tx.set(ref, progressPayload, SetOptions(merge: true));
+
+    return buildDailyProgressView(
+      dateKst: dateKst,
+      wordGoal: wordGoal,
+      sentenceGoal: sentenceGoal,
+      quizGoal: quizGoal,
+      slice: filled,
+      displayProgressPercent: computeSliceProgressPercent(
+        slice: filled,
         wordGoal: wordGoal,
         sentenceGoal: sentenceGoal,
         quizGoal: quizGoal,

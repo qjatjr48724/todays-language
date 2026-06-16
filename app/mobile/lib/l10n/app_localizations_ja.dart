@@ -1335,6 +1335,11 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String admin_tools_country_list_title(Object count) {
+    return '国一覧（$count件）';
+  }
+
+  @override
   String get admin_tools_section_notification_permission => '通知権限';
 
   @override
@@ -1352,6 +1357,20 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get admin_tools_section_daily_progress => '今日の進捗（デバッグ）';
+
+  @override
+  String get admin_tools_fill_daily_progress_button => '本日の学習量を満たす';
+
+  @override
+  String get admin_tools_fill_daily_progress_title => '本日の学習量を満たす';
+
+  @override
+  String get admin_tools_fill_daily_progress_message =>
+      '現在の学習言語について、本日の単語・文・まとめ目標（15/5/13）をすべて達成した状態にします。次のカリキュラム問題セットはKSTの深夜以降、アプリを開くと反映されます。';
+
+  @override
+  String get admin_tools_fill_daily_progress_snackbar =>
+      '本日の学習量を満たしました。次の日は深夜（KST）以降に反映されます。';
 
   @override
   String get admin_tools_section_learning_set => '学習セット';

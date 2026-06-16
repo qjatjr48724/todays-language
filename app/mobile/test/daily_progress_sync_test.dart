@@ -278,5 +278,32 @@ void main() {
       expect(view.progressPercent, greaterThan(0));
       expect(view.progressPercent, lessThan(40));
     });
+    test('filledLanguageProgressSlice는 목표치를 모두 채운다', () {
+      final slice = filledLanguageProgressSlice(
+        wordGoal: 15,
+        sentenceGoal: 5,
+        quizGoal: 13,
+      );
+      expect(slice.wordDone, 15);
+      expect(slice.sentenceDone, 5);
+      expect(slice.quizDone, 13);
+      expect(
+        isLanguageSliceComplete(
+          slice: slice,
+          wordGoal: 15,
+          sentenceGoal: 5,
+          quizGoal: 13,
+        ),
+        isTrue,
+      );
+    });
+
+
+    test('isPastKstCalendarDay는 오늘 KST 날짜를 과거로 보지 않는다', () {
+      final ref = DateTime(2026, 5, 28);
+      expect(isPastKstCalendarDay('2026-05-28', referenceKstDate: ref), isFalse);
+      expect(isPastKstCalendarDay('2026-05-27', referenceKstDate: ref), isTrue);
+      expect(isPastKstCalendarDay('2026-05-29', referenceKstDate: ref), isFalse);
+    });
   });
 }

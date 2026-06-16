@@ -1337,6 +1337,11 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String admin_tools_country_list_title(Object count) {
+    return '국가 목록 ($count개)';
+  }
+
+  @override
   String get admin_tools_section_notification_permission => '알림 권한';
 
   @override
@@ -1354,6 +1359,20 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get admin_tools_section_daily_progress => '오늘 진행률 (디버그)';
+
+  @override
+  String get admin_tools_fill_daily_progress_button => '금일 학습량 채우기';
+
+  @override
+  String get admin_tools_fill_daily_progress_title => '금일 학습량 채우기';
+
+  @override
+  String get admin_tools_fill_daily_progress_message =>
+      '현재 학습 언어의 오늘 단어·문장·마무리 목표(15/5/13)를 모두 달성한 상태로 설정합니다. 커리큘럼 다음 일차 문제 세트는 KST 자정 이후 앱을 열면 반영됩니다.';
+
+  @override
+  String get admin_tools_fill_daily_progress_snackbar =>
+      '오늘 학습량을 채웠습니다. 다음 일차는 자정(KST) 이후 반영됩니다.';
 
   @override
   String get admin_tools_section_learning_set => '학습 세트';

@@ -566,6 +566,12 @@
   "admin_tools_refresh_cache_status": "Refresh cache status",
   "admin_tools_cache_empty": "public_metadata/countries/items is empty. Run seedCountryCatalog first.",
   "admin_tools_enabled_label": "enabled={value}",
+  "admin_tools_country_list_title": "Country list ({count})",
+  "@admin_tools_country_list_title": {
+    "placeholders": {
+      "count": {}
+    }
+  },
 
   "admin_tools_section_notification_permission": "Notification permission",
   "admin_tools_reset_notification_permission_button": "Reset notification prompt",
@@ -574,6 +580,10 @@
   "admin_tools_open_notification_permission": "Open notification permission screen",
 
   "admin_tools_section_daily_progress": "Today's progress (debug)",
+  "admin_tools_fill_daily_progress_button": "Fill today's learning goals",
+  "admin_tools_fill_daily_progress_title": "Fill today's learning goals",
+  "admin_tools_fill_daily_progress_message": "Marks today's word, sentence, and wrap-up goals (15/5/13) as complete for your current learning language. The next curriculum problem set applies after KST midnight when you open the app.",
+  "admin_tools_fill_daily_progress_snackbar": "Today's goals are filled. The next curriculum day applies after KST midnight.",
   "admin_tools_section_learning_set": "Learning set",
   "admin_tools_ensure_learning_set": "ensureLearningSetForToday (current profile)"
 }

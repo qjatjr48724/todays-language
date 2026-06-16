@@ -2471,6 +2471,12 @@ abstract class AppLocalizations {
   /// **'enabled={value}'**
   String admin_tools_enabled_label(Object value);
 
+  /// No description provided for @admin_tools_country_list_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'국가 목록 ({count}개)'**
+  String admin_tools_country_list_title(Object count);
+
   /// No description provided for @admin_tools_section_notification_permission.
   ///
   /// In ko, this message translates to:
@@ -2506,6 +2512,30 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'오늘 진행률 (디버그)'**
   String get admin_tools_section_daily_progress;
+
+  /// No description provided for @admin_tools_fill_daily_progress_button.
+  ///
+  /// In ko, this message translates to:
+  /// **'금일 학습량 채우기'**
+  String get admin_tools_fill_daily_progress_button;
+
+  /// No description provided for @admin_tools_fill_daily_progress_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'금일 학습량 채우기'**
+  String get admin_tools_fill_daily_progress_title;
+
+  /// No description provided for @admin_tools_fill_daily_progress_message.
+  ///
+  /// In ko, this message translates to:
+  /// **'현재 학습 언어의 오늘 단어·문장·마무리 목표(15/5/13)를 모두 달성한 상태로 설정합니다. 커리큘럼 다음 일차 문제 세트는 KST 자정 이후 앱을 열면 반영됩니다.'**
+  String get admin_tools_fill_daily_progress_message;
+
+  /// No description provided for @admin_tools_fill_daily_progress_snackbar.
+  ///
+  /// In ko, this message translates to:
+  /// **'오늘 학습량을 채웠습니다. 다음 일차는 자정(KST) 이후 반영됩니다.'**
+  String get admin_tools_fill_daily_progress_snackbar;
 
   /// No description provided for @admin_tools_section_learning_set.
   ///

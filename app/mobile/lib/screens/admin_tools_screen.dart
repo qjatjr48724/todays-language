@@ -22,8 +22,12 @@ class _AdminToolsScreenState extends State<AdminToolsScreen> {
   bool _busy = false;
   String? _error;
   int _countryStatusNonce = 0;
+  bool _countryListExpanded = false;
 
-  Future<void> _run(Future<void> Function() fn) async {
+  Future<void> _run(
+    Future<void> Function() fn, {
+    String? successMessage,
+  }) async {
     setState(() {
       _busy = true;
       _error = null;
@@ -33,7 +37,9 @@ class _AdminToolsScreenState extends State<AdminToolsScreen> {
       if (!mounted) return;
       final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.admin_tools_done_snackbar)),
+        SnackBar(
+          content: Text(successMessage ?? l10n.admin_tools_done_snackbar),
+        ),
       );
     } catch (e) {
       if (!mounted) return;
@@ -226,10 +232,26 @@ class _AdminToolsScreenState extends State<AdminToolsScreen> {
                       );
                     }
 
-                    return Column(
-                      children: [
-                        ...items.map(row),
-                      ],
+                    return Theme(
+                      data: Theme.of(context).copyWith(
+                        dividerColor: Colors.transparent,
+                      ),
+                      child: ExpansionTile(
+                        key: ValueKey<int>(_countryStatusNonce),
+                        initiallyExpanded: _countryListExpanded,
+                        onExpansionChanged: (expanded) {
+                          setState(() => _countryListExpanded = expanded);
+                        },
+                        tilePadding: EdgeInsets.zero,
+                        childrenPadding: EdgeInsets.zero,
+                        title: Text(
+                          innerL10n.admin_tools_country_list_title(
+                            items.length,
+                          ),
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                        children: items.map(row).toList(growable: false),
+                      ),
                     );
                   },
                 ),
@@ -271,6 +293,33 @@ class _AdminToolsScreenState extends State<AdminToolsScreen> {
             _Section(
               title: l10n.admin_tools_section_daily_progress,
               children: [
+                FilledButton.tonal(
+                  onPressed: () async {
+                    final snap = await docRef.get();
+                    final data = snap.data() ?? <String, dynamic>{};
+                    final tl =
+                        (data['targetLanguage'] as String?)?.trim() ?? 'JPN';
+                    final ok = await _confirm(
+                      l10n.admin_tools_fill_daily_progress_title,
+                      l10n.admin_tools_fill_daily_progress_message,
+                    );
+                    if (!ok) {
+                      return;
+                    }
+                    await _run(
+                      () async {
+                        await fillTodayDailyProgressForAdmin(
+                          user,
+                          targetLanguage: tl,
+                        );
+                      },
+                      successMessage:
+                          l10n.admin_tools_fill_daily_progress_snackbar,
+                    );
+                  },
+                  child: Text(l10n.admin_tools_fill_daily_progress_button),
+                ),
+                const SizedBox(height: 8),
                 OutlinedButton.icon(
                   onPressed: () async {
                     final ok = await _confirm(

@@ -566,6 +566,12 @@
   "admin_tools_refresh_cache_status": "キャッシュ状態を更新",
   "admin_tools_cache_empty": "public_metadata/countries/items が空です。先に seedCountryCatalog を実行してください。",
   "admin_tools_enabled_label": "enabled={value}",
+  "admin_tools_country_list_title": "国一覧（{count}件）",
+  "@admin_tools_country_list_title": {
+    "placeholders": {
+      "count": {}
+    }
+  },
 
   "admin_tools_section_notification_permission": "通知権限",
   "admin_tools_reset_notification_permission_button": "通知案内をリセット",
@@ -574,6 +580,10 @@
   "admin_tools_open_notification_permission": "通知権限画面を開く",
 
   "admin_tools_section_daily_progress": "今日の進捗（デバッグ）",
+  "admin_tools_fill_daily_progress_button": "本日の学習量を満たす",
+  "admin_tools_fill_daily_progress_title": "本日の学習量を満たす",
+  "admin_tools_fill_daily_progress_message": "現在の学習言語について、本日の単語・文・まとめ目標（15/5/13）をすべて達成した状態にします。次のカリキュラム問題セットはKSTの深夜以降、アプリを開くと反映されます。",
+  "admin_tools_fill_daily_progress_snackbar": "本日の学習量を満たしました。次の日は深夜（KST）以降に反映されます。",
   "admin_tools_section_learning_set": "学習セット",
   "admin_tools_ensure_learning_set": "ensureLearningSetForToday（現在のプロフィール）"
 }

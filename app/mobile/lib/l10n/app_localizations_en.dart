@@ -1388,6 +1388,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String admin_tools_country_list_title(Object count) {
+    return 'Country list ($count)';
+  }
+
+  @override
   String get admin_tools_section_notification_permission =>
       'Notification permission';
 
@@ -1409,6 +1414,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get admin_tools_section_daily_progress => 'Today\'s progress (debug)';
+
+  @override
+  String get admin_tools_fill_daily_progress_button =>
+      'Fill today\'s learning goals';
+
+  @override
+  String get admin_tools_fill_daily_progress_title =>
+      'Fill today\'s learning goals';
+
+  @override
+  String get admin_tools_fill_daily_progress_message =>
+      'Marks today\'s word, sentence, and wrap-up goals (15/5/13) as complete for your current learning language. The next curriculum problem set applies after KST midnight when you open the app.';
+
+  @override
+  String get admin_tools_fill_daily_progress_snackbar =>
+      'Today\'s goals are filled. The next curriculum day applies after KST midnight.';
 
   @override
   String get admin_tools_section_learning_set => 'Learning set';
