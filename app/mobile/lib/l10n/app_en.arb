@@ -585,6 +585,49 @@
   "admin_tools_fill_daily_progress_message": "Marks today's word, sentence, and wrap-up goals (15/5/13) as complete for your current learning language. The next curriculum problem set applies after KST midnight when you open the app.",
   "admin_tools_fill_daily_progress_snackbar": "Today's goals are filled. The next curriculum day applies after KST midnight.",
   "admin_tools_section_learning_set": "Learning set",
-  "admin_tools_ensure_learning_set": "ensureLearningSetForToday (current profile)"
+  "admin_tools_ensure_learning_set": "ensureLearningSetForToday (current profile)",
+
+  "admin_tools_section_curriculum_day": "Curriculum day (admin)",
+  "admin_tools_curriculum_day_hint": "Day (1–50)",
+  "admin_tools_curriculum_day_invalid": "Enter a day between 1 and 50.",
+  "admin_tools_ensure_curriculum_day_set": "Generate day N problem set",
+  "admin_tools_ensure_curriculum_day_set_title": "Generate curriculum day set",
+  "admin_tools_ensure_curriculum_day_set_message": "Creates word and sentence sets for day {day} only if missing. Skips if they already exist.",
+  "@admin_tools_ensure_curriculum_day_set_message": {
+    "placeholders": { "day": { "type": "int" } }
+  },
+  "admin_tools_ensure_curriculum_day_set_created": "Created day {day} set.",
+  "@admin_tools_ensure_curriculum_day_set_created": {
+    "placeholders": { "day": { "type": "int" } }
+  },
+  "admin_tools_ensure_curriculum_day_set_skipped": "Day {day} set already exists.",
+  "@admin_tools_ensure_curriculum_day_set_skipped": {
+    "placeholders": { "day": { "type": "int" } }
+  },
+  "admin_tools_apply_curriculum_preview": "Study with day N set",
+  "admin_tools_apply_curriculum_preview_title": "Curriculum day study test",
+  "admin_tools_apply_curriculum_preview_message": "Words, sentences, and wrap-up will use day {day}. Creates the set first if missing.",
+  "@admin_tools_apply_curriculum_preview_message": {
+    "placeholders": { "day": { "type": "int" } }
+  },
+  "admin_tools_apply_curriculum_preview_snackbar": "Studying with day {day} set.",
+  "@admin_tools_apply_curriculum_preview_snackbar": {
+    "placeholders": { "day": { "type": "int" } }
+  },
+  "admin_tools_clear_curriculum_preview": "Clear study test",
+  "admin_tools_clear_curriculum_preview_title": "Clear curriculum test",
+  "admin_tools_clear_curriculum_preview_message": "Return to your actual learning day.",
+  "admin_tools_clear_curriculum_preview_snackbar": "Curriculum test cleared.",
+  "admin_tools_curriculum_preview_active": "Testing: day {day} set (actual day {actualDay})",
+  "@admin_tools_curriculum_preview_active": {
+    "placeholders": {
+      "day": { "type": "int" },
+      "actualDay": { "type": "int" }
+    }
+  },
+  "home_curriculum_preview_banner": "Admin test: using day {day} set",
+  "@home_curriculum_preview_banner": {
+    "placeholders": { "day": { "type": "int" } }
+  }
 }
 

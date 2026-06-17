@@ -35,8 +35,8 @@ type CurriculumSentenceSetDoc = {
   sentences?: unknown[];
 };
 
-/** phase 1 일차(단어+문장) 세트가 이미 채워져 있는지 */
-export async function isCurriculumPhase1DayMaterialized(
+/** 커리큘럼 일차 단어 세트가 이미 채워져 있는지 */
+export async function isCurriculumWordDayMaterialized(
   targetLanguage: string,
   level: string,
   learningDay: number,
@@ -49,10 +49,16 @@ export async function isCurriculumPhase1DayMaterialized(
     learningDay
   ).get();
   const wdata = wordSnap.data() as CurriculumWordSetDoc | undefined;
-  if (!Array.isArray(wdata?.words) || wdata.words.length === 0) {
-    return false;
-  }
+  return Array.isArray(wdata?.words) && wdata.words.length > 0;
+}
 
+/** 커리큘럼 일차 문장 세트가 이미 채워져 있는지 */
+export async function isCurriculumSentenceDayMaterialized(
+  targetLanguage: string,
+  level: string,
+  learningDay: number,
+  phase = 1
+): Promise<boolean> {
   const sentenceSnap = await globalCurriculumSentenceSetRef(
     targetLanguage,
     level,
@@ -61,6 +67,30 @@ export async function isCurriculumPhase1DayMaterialized(
   ).get();
   const sdata = sentenceSnap.data() as CurriculumSentenceSetDoc | undefined;
   return Array.isArray(sdata?.sentences) && sdata.sentences.length > 0;
+}
+
+/** phase 1 일차(단어+문장) 세트가 이미 채워져 있는지 */
+export async function isCurriculumPhase1DayMaterialized(
+  targetLanguage: string,
+  level: string,
+  learningDay: number,
+  phase = 1
+): Promise<boolean> {
+  const wordReady = await isCurriculumWordDayMaterialized(
+    targetLanguage,
+    level,
+    learningDay,
+    phase
+  );
+  if (!wordReady) {
+    return false;
+  }
+  return isCurriculumSentenceDayMaterialized(
+    targetLanguage,
+    level,
+    learningDay,
+    phase
+  );
 }
 
 /**

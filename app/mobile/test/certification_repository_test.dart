@@ -21,12 +21,11 @@ void main() {
       );
     });
 
-    test('JPN 그룹에 JLPT가 포함된다', () async {
+    test('JPN 그룹에 JLPT·JPT·SJPT가 포함된다', () async {
       final group = await repo.groupForLanguage('JPN');
       expect(group, isNotNull);
-      expect(group!.certifications.length, 1);
-      expect(group.certifications.first.id, 'jlpt');
-      expect(group.certifications.first.name, 'JLPT');
+      final ids = group!.certifications.map((e) => e.id).toList();
+      expect(ids, ['jlpt', 'jpt', 'sjpt']);
     });
 
     test('USA 그룹에 TOEIC·TOEFL·IELTS가 포함된다', () async {

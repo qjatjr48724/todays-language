@@ -19,6 +19,10 @@ class CurriculumState {
   /// `users/{uid}.learningDayByLanguage`
   static const String learningDayByLanguageField = 'learningDayByLanguage';
 
+  /// 관리자 커리큘럼 테스트 일차 — `users/{uid}.adminCurriculumPreviewDayByLanguage`
+  static const String adminCurriculumPreviewDayByLanguageField =
+      'adminCurriculumPreviewDayByLanguage';
+
   static const Set<String> learningLevels = {'beginner', 'intermediate', 'advanced'};
 
   final String curriculumId;
@@ -154,6 +158,39 @@ class CurriculumState {
       fallbackLanguage: targetLanguage,
     );
     return byLang[lang] ?? defaults().learningDay;
+  }
+
+  static Map<String, int> parseAdminPreviewDayByLanguage(dynamic raw) {
+    if (raw is! Map) return <String, int>{};
+    final out = <String, int>{};
+    for (final entry in raw.entries) {
+      final lang = _normalizeLanguageCode(entry.key.toString());
+      final n = entry.value is num ? (entry.value as num).toInt() : int.tryParse('${entry.value}');
+      if (n != null) out[lang] = _clampLearningDay(n);
+    }
+    return out;
+  }
+
+  /// 관리자 테스트 일차(없으면 null)
+  static int? adminPreviewDayForLanguage(
+    Map<String, dynamic> data,
+    String targetLanguage,
+  ) {
+    final lang = _normalizeLanguageCode(targetLanguage);
+    final day = parseAdminPreviewDayByLanguage(
+      data[adminCurriculumPreviewDayByLanguageField],
+    )[lang];
+    return day != null && day >= 1 ? day : null;
+  }
+
+  /// 관리자 프리뷰가 있으면 우선, 없으면 실제 learningDay
+  static int effectiveLearningDayForLanguage(
+    Map<String, dynamic> data,
+    String targetLanguage,
+  ) {
+    final preview = adminPreviewDayForLanguage(data, targetLanguage);
+    if (preview != null) return preview;
+    return learningDayForLanguage(data, targetLanguage);
   }
 
   static int _clampLearningDay(Object? raw) {

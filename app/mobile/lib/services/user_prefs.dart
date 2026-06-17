@@ -9,11 +9,17 @@ class UserPrefs {
     required this.targetLanguage,
     required this.level,
     required this.curriculum,
+    this.previewLearningDay,
   });
 
   final String targetLanguage;
   final String level;
   final CurriculumState curriculum;
+
+  /// 관리자 커리큘럼 테스트 일차(없으면 null)
+  final int? previewLearningDay;
+
+  int get displayLearningDay => previewLearningDay ?? curriculum.learningDay;
 
   // ISO-3166-1 alpha-3 표기: 기본값 JPN
   static UserPrefs fallback() => UserPrefs(
@@ -35,6 +41,10 @@ Future<UserPrefs> fetchUserPrefs(User user) async {
     curriculum: CurriculumState.fromUserData(
       data,
       targetLanguage: (targetLanguage == null || targetLanguage.isEmpty) ? 'JPN' : targetLanguage,
+    ),
+    previewLearningDay: CurriculumState.adminPreviewDayForLanguage(
+      data,
+      (targetLanguage == null || targetLanguage.isEmpty) ? 'JPN' : targetLanguage,
     ),
   );
 }

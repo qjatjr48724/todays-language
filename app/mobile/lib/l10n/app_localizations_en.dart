@@ -1437,4 +1437,79 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get admin_tools_ensure_learning_set =>
       'ensureLearningSetForToday (current profile)';
+
+  @override
+  String get admin_tools_section_curriculum_day => 'Curriculum day (admin)';
+
+  @override
+  String get admin_tools_curriculum_day_hint => 'Day (1–50)';
+
+  @override
+  String get admin_tools_curriculum_day_invalid =>
+      'Enter a day between 1 and 50.';
+
+  @override
+  String get admin_tools_ensure_curriculum_day_set =>
+      'Generate day N problem set';
+
+  @override
+  String get admin_tools_ensure_curriculum_day_set_title =>
+      'Generate curriculum day set';
+
+  @override
+  String admin_tools_ensure_curriculum_day_set_message(int day) {
+    return 'Creates word and sentence sets for day $day only if missing. Skips if they already exist.';
+  }
+
+  @override
+  String admin_tools_ensure_curriculum_day_set_created(int day) {
+    return 'Created day $day set.';
+  }
+
+  @override
+  String admin_tools_ensure_curriculum_day_set_skipped(int day) {
+    return 'Day $day set already exists.';
+  }
+
+  @override
+  String get admin_tools_apply_curriculum_preview => 'Study with day N set';
+
+  @override
+  String get admin_tools_apply_curriculum_preview_title =>
+      'Curriculum day study test';
+
+  @override
+  String admin_tools_apply_curriculum_preview_message(int day) {
+    return 'Words, sentences, and wrap-up will use day $day. Creates the set first if missing.';
+  }
+
+  @override
+  String admin_tools_apply_curriculum_preview_snackbar(int day) {
+    return 'Studying with day $day set.';
+  }
+
+  @override
+  String get admin_tools_clear_curriculum_preview => 'Clear study test';
+
+  @override
+  String get admin_tools_clear_curriculum_preview_title =>
+      'Clear curriculum test';
+
+  @override
+  String get admin_tools_clear_curriculum_preview_message =>
+      'Return to your actual learning day.';
+
+  @override
+  String get admin_tools_clear_curriculum_preview_snackbar =>
+      'Curriculum test cleared.';
+
+  @override
+  String admin_tools_curriculum_preview_active(int day, int actualDay) {
+    return 'Testing: day $day set (actual day $actualDay)';
+  }
+
+  @override
+  String home_curriculum_preview_banner(int day) {
+    return 'Admin test: using day $day set';
+  }
 }

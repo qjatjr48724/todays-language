@@ -84,9 +84,13 @@ class _HomeScreenState extends State<HomeScreen> {
             targetLanguage: nextTargetLanguage,
             level: effectiveLearningLevel(lv),
             curriculum: CurriculumState.fromUserData(
-      data,
-      targetLanguage: nextTargetLanguage,
-    ),
+              data,
+              targetLanguage: nextTargetLanguage,
+            ),
+            previewLearningDay: CurriculumState.adminPreviewDayForLanguage(
+              data,
+              nextTargetLanguage,
+            ),
           );
         });
         if (languageChanged) {
@@ -207,6 +211,24 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 8),
               Text(_profileError!, style: TextStyle(color: scheme.error)),
             ],
+            if (_prefs.previewLearningDay != null) ...[
+              const SizedBox(height: 8),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: scheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  l10n.home_curriculum_preview_banner(_prefs.previewLearningDay!),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: scheme.onPrimaryContainer,
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+              ),
+            ],
             const SizedBox(height: 16),
 
             HomeFeatureCard(
@@ -314,7 +336,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (_prefs.curriculum.learningMode == 'curriculum')
                     Text(
                       l10n.home_curriculum_day_label(
-                        _prefs.curriculum.learningDay,
+                        _prefs.displayLearningDay,
                         CurriculumState.totalDays,
                       ),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(

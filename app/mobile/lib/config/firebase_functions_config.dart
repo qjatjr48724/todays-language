@@ -13,6 +13,12 @@ HttpsCallable callableEnsureTodayLearningSets() =>
 HttpsCallable callableEnsureLearningSetForToday() =>
     appFirebaseFunctions().httpsCallable('ensureLearningSetForToday');
 
+HttpsCallable callableEnsureCurriculumDaySet() =>
+    appFirebaseFunctions().httpsCallable('ensureCurriculumDaySet');
+
+HttpsCallable callableSetAdminCurriculumPreviewDay() =>
+    appFirebaseFunctions().httpsCallable('setAdminCurriculumPreviewDay');
+
 HttpsCallable callableGenerateWord() =>
     appFirebaseFunctions().httpsCallable('generateWord');
 

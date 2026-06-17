@@ -10,6 +10,7 @@ import {
   isCurriculumSetLevel,
   loadUserLearningProfile,
 } from "../learning_sets/user_learning_profile";
+import { applyAdminPreviewToProfile } from "../admin/curriculum_preview";
 import { db } from "../shared/firebase";
 
 type WrapUpDeckItem = {
@@ -64,10 +65,17 @@ export const getWrapUpDeck = onCall(
       throw new HttpsError("unauthenticated", "로그인이 필요합니다.");
     }
 
-    const profile = await loadUserLearningProfile(
+    const userSnap = await db.collection("users").doc(request.auth.uid).get();
+    const userData = (userSnap.data() ?? {}) as Record<string, unknown>;
+    const baseProfile = await loadUserLearningProfile(
       db,
       request.auth.uid,
       normalizeTargetLanguage
+    );
+    const profile = applyAdminPreviewToProfile(
+      request.auth.uid,
+      userData,
+      baseProfile
     );
     const targetLanguage =
       (request.data?.targetLanguage as string | undefined) ?? profile.targetLanguage;

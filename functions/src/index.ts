@@ -2,6 +2,7 @@ export { seedCountryCatalog, syncCountryFlags } from "./metadata/callables";
 export { scheduledSyncCountryFlags } from "./metadata/schedules";
 export { getWrapUpDeck } from "./wrap_up/callables";
 export { cleanupLegacyFirestoreDocs } from "./maintenance/cleanup";
+export { setAdminCurriculumPreviewDay } from "./admin/curriculum_admin_callables";
 
 import {
   buildDailySentenceBatchSystemPrompt,
@@ -30,9 +31,19 @@ import {
   globalTodayWordSetRef,
 } from "./learning_sets/refs";
 import {
+  isCurriculumPhase1DayMaterialized,
   pregenerateCurriculumPhase1Days,
   type CurriculumPregenPair,
 } from "./learning_sets/curriculum_pregen";
+import {
+  loadPriorCurriculumSentenceDedupKeys,
+  loadPriorCurriculumWordDedupKeys,
+} from "./learning_sets/curriculum_blocked_content";
+import {
+  blockedListForPrompt,
+  sentenceContentDedupKey,
+  wordContentDedupKey,
+} from "./learning_sets/content_dedup_keys";
 import {
   isCurriculumSetLevel,
   loadUserLearningProfile,
@@ -40,9 +51,13 @@ import {
 } from "./learning_sets/user_learning_profile";
 import {
   curriculumStateFromUserData,
+  clampLearningDay,
   effectiveLearningLevel,
   LEARNING_DIFFICULTY_UI_ENABLED,
+  parseCurriculumPhase,
 } from "./curriculum/curriculum_state";
+import { applyAdminPreviewToProfile } from "./admin/curriculum_preview";
+import { assertAdminToolsUid } from "./admin/admin_tools_auth";
 import {
   enrichSentenceItemsWithAudio,
   enrichWordItemsWithAudio,
@@ -224,18 +239,19 @@ async function resolveUserLearningProfile(
 ): Promise<UserLearningProfile> {
   const userSnap = await db.collection("users").doc(uid).get();
   const userData = (userSnap.data() ?? {}) as Record<string, unknown>;
-  const base = await loadUserLearningProfile(db, uid, normalizeTargetLanguage);
+  const loaded = await loadUserLearningProfile(db, uid, normalizeTargetLanguage);
   const tl = normalizeTargetLanguage(
-    (requestData?.targetLanguage ?? base.targetLanguage) as string
+    (requestData?.targetLanguage ?? loaded.targetLanguage) as string
   );
-  const level = effectiveLearningLevel(requestData?.level ?? base.level);
+  const level = effectiveLearningLevel(requestData?.level ?? loaded.level);
   const state = curriculumStateFromUserData(userData, { targetLanguage: tl.external });
-  return {
+  const profile: UserLearningProfile = {
     targetLanguage: tl.external,
     level,
     curriculumPhase: state.curriculumPhase,
     learningDay: state.learningDay,
   };
+  return applyAdminPreviewToProfile(uid, userData, profile);
 }
 
 async function ensureGlobalLearningOwnerDoc(nowMs = Date.now()): Promise<void> {
@@ -266,13 +282,6 @@ function shuffle<T>(arr: T[]): T[] {
     [out[i], out[j]] = [out[j], out[i]];
   }
   return out;
-}
-
-function normalizePromptKey(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/\s+/g, "")
-    .replace(/[^\p{L}\p{N}]/gu, "");
 }
 
 async function cleanupExpiredLearningSets(uid: string, todayKst: string): Promise<void> {
@@ -630,11 +639,11 @@ function parseSentenceItem(value: unknown): StoredSentenceItem | null {
 }
 
 function wordDedupKey(word: string): string {
-  return normalizePromptKey(word);
+  return wordContentDedupKey(word);
 }
 
 function sentenceDedupKey(sentence: string): string {
-  return normalizePromptKey(sentence);
+  return sentenceContentDedupKey(sentence);
 }
 
 async function generateDailyWordChunkWithOpenAI(
@@ -642,7 +651,8 @@ async function generateDailyWordChunkWithOpenAI(
   level: string,
   count: number,
   diversitySeed: string,
-  curriculum?: CurriculumPromptContext
+  curriculum?: CurriculumPromptContext,
+  blockedHeadwords?: string[]
 ): Promise<StoredWordItem[]> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
@@ -657,14 +667,16 @@ async function generateDailyWordChunkWithOpenAI(
       targetLanguage,
       level,
       count,
-      curriculum
+      curriculum,
+      Boolean(blockedHeadwords && blockedHeadwords.length > 0)
     );
     const userPrompt = buildDailyWordBatchUserPromptJson(
       targetLanguage,
       level,
       count,
       diversitySeed,
-      curriculum
+      curriculum,
+      blockedHeadwords
     );
 
     const response = await fetch(OPENAI_API_URL, {
@@ -725,7 +737,8 @@ async function generateDailySentenceBatchWithOpenAI(
   count: number,
   diversitySeed: string,
   requiredVocabulary?: string[],
-  curriculum?: CurriculumPromptContext
+  curriculum?: CurriculumPromptContext,
+  blockedSentences?: string[]
 ): Promise<StoredSentenceItem[]> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
@@ -741,7 +754,8 @@ async function generateDailySentenceBatchWithOpenAI(
       level,
       count,
       requiredVocabulary,
-      curriculum
+      curriculum,
+      Boolean(blockedSentences && blockedSentences.length > 0)
     );
     const userPrompt = buildDailySentenceBatchUserPromptJson(
       targetLanguage,
@@ -749,7 +763,8 @@ async function generateDailySentenceBatchWithOpenAI(
       count,
       diversitySeed,
       requiredVocabulary,
-      curriculum
+      curriculum,
+      blockedSentences
     );
 
     const response = await fetch(OPENAI_API_URL, {
@@ -822,11 +837,13 @@ function mergeWordBatchInto(
 async function buildDailyWordItems(
   targetLanguage: string,
   level: string,
-  curriculum?: CurriculumPromptContext
+  curriculum?: CurriculumPromptContext,
+  blockedKeys?: Set<string>
 ): Promise<StoredWordItem[]> {
   const internalLang = normalizeTargetLanguage(targetLanguage).internal;
   const out: StoredWordItem[] = [];
-  const used = new Set<string>();
+  const used = new Set<string>(blockedKeys ?? []);
+  const blockedForPrompt = blockedListForPrompt(used);
   const t0 = Date.now();
 
   // 15개 목표: 배치 1회(+필요 시 top-up)로 생성.
@@ -840,14 +857,16 @@ async function buildDailyWordItems(
       level,
       DAILY_WORD_BATCH_SIZE,
       parallelSeeds[0],
-      curriculum
+      curriculum,
+      blockedForPrompt
     ),
     generateDailyWordChunkWithOpenAI(
       internalLang,
       level,
       DAILY_WORD_BATCH_SIZE,
       parallelSeeds[1],
-      curriculum
+      curriculum,
+      blockedForPrompt
     ),
   ]);
 
@@ -869,7 +888,8 @@ async function buildDailyWordItems(
         level,
         need,
         `words-topup-${Date.now()}-${Math.random().toString(36).slice(2)}`,
-        curriculum
+        curriculum,
+        blockedForPrompt
       );
       mergeWordBatchInto(batch, out, used);
     } catch (e) {
@@ -894,8 +914,8 @@ async function buildDailyWordItems(
       }
     } catch {
       const fb = fallbackWord(internalLang, level);
-      const fk = `${wordDedupKey(fb.word)}#${out.length}`;
-      if (!used.has(fk)) {
+      const fk = wordDedupKey(fb.word);
+      if (fk && !used.has(fk)) {
         used.add(fk);
         out.push({
           word: fb.word,
@@ -913,9 +933,11 @@ async function buildDailySentenceItems(
   targetLanguage: string,
   level: string,
   requiredVocabulary?: string[],
-  curriculum?: CurriculumPromptContext
+  curriculum?: CurriculumPromptContext,
+  blockedKeys?: Set<string>
 ): Promise<StoredSentenceItem[]> {
   const internalLang = normalizeTargetLanguage(targetLanguage).internal;
+  const blockedForPrompt = blockedListForPrompt(blockedKeys ?? []);
   try {
     const batch = await generateDailySentenceBatchWithOpenAI(
       internalLang,
@@ -923,10 +945,11 @@ async function buildDailySentenceItems(
       DAILY_SENTENCE_COUNT,
       `s-${Date.now()}-${Math.random().toString(36).slice(2)}`,
       requiredVocabulary,
-      curriculum
+      curriculum,
+      blockedForPrompt
     );
     const out: StoredSentenceItem[] = [];
-    const used = new Set<string>();
+    const used = new Set<string>(blockedKeys ?? []);
     for (const item of batch) {
       const key = sentenceDedupKey(item.sentence);
       if (!key || used.has(key)) {
@@ -943,7 +966,7 @@ async function buildDailySentenceItems(
   }
 
   const out: StoredSentenceItem[] = [];
-  const used = new Set<string>();
+  const used = new Set<string>(blockedKeys ?? []);
   let attempts = 0;
   while (out.length < DAILY_SENTENCE_COUNT && attempts < 40) {
     attempts += 1;
@@ -961,8 +984,8 @@ async function buildDailySentenceItems(
       }
     } catch {
       const fb = fallbackSentence(internalLang, level);
-      const fk = `${sentenceDedupKey(fb.sentence)}#${out.length}`;
-      if (!used.has(fk)) {
+      const fk = sentenceDedupKey(fb.sentence);
+      if (fk && !used.has(fk)) {
         used.add(fk);
         out.push({
           sentence: fb.sentence,
@@ -1155,8 +1178,14 @@ async function materializeGlobalCurriculumWordSetIfAbsent(
 
   const curriculum = curriculumPromptContextForDay(learningDay, phase);
   const spec = getCurriculumDaySpec(learningDay);
+  const blockedWords = await loadPriorCurriculumWordDedupKeys(
+    canonicalLang,
+    level,
+    phase,
+    learningDay
+  );
   const words = await enrichWordItemsWithAudio(
-    await buildDailyWordItems(canonicalLang, level, curriculum),
+    await buildDailyWordItems(canonicalLang, level, curriculum, blockedWords),
     canonicalLang
   );
   const payload: CurriculumWordSet = {
@@ -1235,12 +1264,19 @@ async function materializeGlobalCurriculumSentenceSetIfAbsent(
     .filter((w) => w.trim().length > 0)
     .slice(0, Math.min(DAILY_SENTENCE_COUNT, words.length));
 
+  const blockedSentences = await loadPriorCurriculumSentenceDedupKeys(
+    canonicalLang,
+    level,
+    phase,
+    learningDay
+  );
   const sentences = await enrichSentenceItemsWithAudio(
     await buildDailySentenceItems(
       canonicalLang,
       level,
       vocab.length > 0 ? vocab : undefined,
-      curriculum
+      curriculum,
+      blockedSentences
     ),
     canonicalLang
   );
@@ -1722,6 +1758,112 @@ export const ensureLearningSetForToday = onCall(
       elapsedMs: Date.now() - t0,
     });
     return { ok: true, targetLanguage, level, curriculumPhase, learningDay };
+  }
+);
+
+/**
+ * 관리자 전용: 지정 일차(N) 커리큘럼 단어·문장 세트 생성.
+ * - 해당 일차 세트가 이미 있으면 skip (재생성 없음)
+ */
+export const ensureCurriculumDaySet = onCall(
+  { region: "asia-northeast3", secrets: ["OPENAI_API_KEY"], timeoutSeconds: 300, memory: "512MiB" },
+  async (
+    request
+  ): Promise<{
+    ok: true;
+    status: "created" | "skipped";
+    targetLanguage: string;
+    level: string;
+    curriculumPhase: number;
+    learningDay: number;
+  }> => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "로그인이 필요합니다.");
+    }
+    assertAdminToolsUid(request.auth.uid);
+
+    const rawDay = request.data?.learningDay;
+    const learningDay = clampLearningDay(
+      typeof rawDay === "number" ? rawDay : Number.parseInt(String(rawDay ?? ""), 10)
+    );
+    const profile = await resolveUserLearningProfile(
+      request.auth.uid,
+      request.data as Record<string, unknown>
+    );
+    const targetLanguage =
+      ((request.data?.targetLanguage as string | undefined)?.trim() ||
+        profile.targetLanguage) as string;
+    const level = effectiveLearningLevel(
+      (request.data?.level as string | undefined) ?? profile.level
+    );
+    const curriculumPhase =
+      parseCurriculumPhase(request.data?.curriculumPhase) ?? profile.curriculumPhase;
+
+    if (!isCurriculumSetLevel(level)) {
+      throw new HttpsError(
+        "failed-precondition",
+        "curriculum day sets are only available for beginner and intermediate levels"
+      );
+    }
+
+    const ready = await isCurriculumPhase1DayMaterialized(
+      targetLanguage,
+      level,
+      learningDay,
+      curriculumPhase
+    );
+    if (ready) {
+      console.log("[ensureCurriculumDaySet] skipped (already exists)", {
+        targetLanguage,
+        level,
+        curriculumPhase,
+        learningDay,
+      });
+      return {
+        ok: true,
+        status: "skipped",
+        targetLanguage,
+        level,
+        curriculumPhase,
+        learningDay,
+      };
+    }
+
+    console.log("[ensureCurriculumDaySet] creating", {
+      uid: request.auth.uid,
+      targetLanguage,
+      level,
+      curriculumPhase,
+      learningDay,
+    });
+    const t0 = Date.now();
+    await materializeGlobalCurriculumWordSetIfAbsent(
+      targetLanguage,
+      level,
+      curriculumPhase,
+      learningDay
+    );
+    await materializeGlobalCurriculumSentenceSetIfAbsent(
+      targetLanguage,
+      level,
+      curriculumPhase,
+      learningDay
+    );
+    console.log("[ensureCurriculumDaySet] done", {
+      targetLanguage,
+      level,
+      curriculumPhase,
+      learningDay,
+      elapsedMs: Date.now() - t0,
+    });
+    return {
+      ok: true,
+      status: "created",
+      targetLanguage,
+      level,
+      curriculumPhase,
+      learningDay,
+    };
   }
 );
 

@@ -1378,4 +1378,73 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get admin_tools_ensure_learning_set =>
       'ensureLearningSetForToday（現在のプロフィール）';
+
+  @override
+  String get admin_tools_section_curriculum_day => 'カリキュラム日次（管理者）';
+
+  @override
+  String get admin_tools_curriculum_day_hint => '日次（1–50）';
+
+  @override
+  String get admin_tools_curriculum_day_invalid => '1〜50の日次を入力してください。';
+
+  @override
+  String get admin_tools_ensure_curriculum_day_set => 'N日次問題セット生成';
+
+  @override
+  String get admin_tools_ensure_curriculum_day_set_title => 'カリキュラム日次セット生成';
+
+  @override
+  String admin_tools_ensure_curriculum_day_set_message(int day) {
+    return '$day日次の単語・文セットがない場合のみ生成します。既にある場合はスキップします。';
+  }
+
+  @override
+  String admin_tools_ensure_curriculum_day_set_created(int day) {
+    return '$day日次セットを生成しました。';
+  }
+
+  @override
+  String admin_tools_ensure_curriculum_day_set_skipped(int day) {
+    return '$day日次セットは既にあります。';
+  }
+
+  @override
+  String get admin_tools_apply_curriculum_preview => 'N日次で学習テスト';
+
+  @override
+  String get admin_tools_apply_curriculum_preview_title => 'カリキュラム日次学習テスト';
+
+  @override
+  String admin_tools_apply_curriculum_preview_message(int day) {
+    return '単語・文・まとめが$day日次セットを使用します。セットがなければ先に生成します。';
+  }
+
+  @override
+  String admin_tools_apply_curriculum_preview_snackbar(int day) {
+    return '$day日次セットで学習テスト中です。';
+  }
+
+  @override
+  String get admin_tools_clear_curriculum_preview => '学習テスト解除';
+
+  @override
+  String get admin_tools_clear_curriculum_preview_title => 'カリキュラムテスト解除';
+
+  @override
+  String get admin_tools_clear_curriculum_preview_message => '実際の学習日次に戻します。';
+
+  @override
+  String get admin_tools_clear_curriculum_preview_snackbar =>
+      'カリキュラムテストを解除しました。';
+
+  @override
+  String admin_tools_curriculum_preview_active(int day, int actualDay) {
+    return 'テスト中: $day日次セット（実際の日次 $actualDay）';
+  }
+
+  @override
+  String home_curriculum_preview_banner(int day) {
+    return '管理者テスト: $day日次セット使用中';
+  }
 }

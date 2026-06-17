@@ -206,5 +206,27 @@ void main() {
         isFalse,
       );
     });
+
+    test('effectiveLearningDayForLanguage uses admin preview when set', () {
+      expect(
+        CurriculumState.effectiveLearningDayForLanguage(
+          {
+            'learningDayByLanguage': {'JPN': 2},
+            CurriculumState.adminCurriculumPreviewDayByLanguageField: {'JPN': 7},
+          },
+          'JPN',
+        ),
+        7,
+      );
+      expect(
+        CurriculumState.adminPreviewDayForLanguage(
+          {
+            CurriculumState.adminCurriculumPreviewDayByLanguageField: {'ja': 3},
+          },
+          'JPN',
+        ),
+        3,
+      );
+    });
   });
 }

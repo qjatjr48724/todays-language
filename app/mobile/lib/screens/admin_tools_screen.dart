@@ -7,6 +7,7 @@ import 'language_setup_screen.dart';
 import 'notification_permission_screen.dart';
 import 'target_language_setup_screen.dart';
 import '../l10n/app_localizations.dart';
+import '../models/curriculum_state.dart';
 import '../services/daily_progress_sync.dart';
 
 class AdminToolsScreen extends StatefulWidget {
@@ -23,10 +24,65 @@ class _AdminToolsScreenState extends State<AdminToolsScreen> {
   String? _error;
   int _countryStatusNonce = 0;
   bool _countryListExpanded = false;
+  final TextEditingController _curriculumDayController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCurriculumDayDefault();
+  }
+
+  Future<void> _loadCurriculumDayDefault() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+    final snap = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
+    final data = snap.data() ?? <String, dynamic>{};
+    final tl = (data['targetLanguage'] as String?)?.trim() ?? 'JPN';
+    final day = CurriculumState.effectiveLearningDayForLanguage(data, tl);
+    if (mounted) {
+      _curriculumDayController.text = '$day';
+    }
+  }
+
+  @override
+  void dispose() {
+    _curriculumDayController.dispose();
+    super.dispose();
+  }
+
+  int? _parseCurriculumDayInput(AppLocalizations l10n) {
+    final raw = _curriculumDayController.text.trim();
+    final day = int.tryParse(raw);
+    if (day == null || day < 1 || day > CurriculumState.totalDays) {
+      setState(() => _error = l10n.admin_tools_curriculum_day_invalid);
+      return null;
+    }
+    return day;
+  }
+
+  Future<Map<String, dynamic>> _ensureCurriculumDaySetForAdmin({
+    required User user,
+    required int day,
+    required String targetLanguage,
+    required String level,
+  }) async {
+    await user.getIdToken(true);
+    final callable = callableEnsureCurriculumDaySet();
+    final result = await callable.call<Map<String, dynamic>>({
+      'learningDay': day,
+      'targetLanguage': targetLanguage,
+      'level': level,
+    });
+    return result.data;
+  }
 
   Future<void> _run(
     Future<void> Function() fn, {
     String? successMessage,
+    bool showSuccessSnackbar = true,
   }) async {
     setState(() {
       _busy = true;
@@ -35,12 +91,14 @@ class _AdminToolsScreenState extends State<AdminToolsScreen> {
     try {
       await fn();
       if (!mounted) return;
-      final l10n = AppLocalizations.of(context)!;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(successMessage ?? l10n.admin_tools_done_snackbar),
-        ),
-      );
+      if (showSuccessSnackbar) {
+        final l10n = AppLocalizations.of(context)!;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(successMessage ?? l10n.admin_tools_done_snackbar),
+          ),
+        );
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() => _error = '$e');
@@ -335,6 +393,169 @@ class _AdminToolsScreenState extends State<AdminToolsScreen> {
                   },
                   icon: const Icon(Icons.restart_alt),
                   label: Text(l10n.home_reset_debug_button_label),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 16),
+            _Section(
+              title: l10n.admin_tools_section_curriculum_day,
+              children: [
+                StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                  stream: docRef.snapshots(),
+                  builder: (context, snap) {
+                    final data = snap.data?.data() ?? <String, dynamic>{};
+                    final tl =
+                        (data['targetLanguage'] as String?)?.trim() ?? 'JPN';
+                    final preview = CurriculumState.adminPreviewDayForLanguage(
+                      data,
+                      tl,
+                    );
+                    final actual = CurriculumState.learningDayForLanguage(
+                      data,
+                      tl,
+                    );
+                    if (preview == null) {
+                      return const SizedBox.shrink();
+                    }
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Text(
+                        l10n.admin_tools_curriculum_preview_active(
+                          preview,
+                          actual,
+                        ),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: scheme.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                      ),
+                    );
+                  },
+                ),
+                TextField(
+                  controller: _curriculumDayController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: l10n.admin_tools_curriculum_day_hint,
+                    border: const OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                FilledButton.tonal(
+                  onPressed: () async {
+                    final day = _parseCurriculumDayInput(l10n);
+                    if (day == null) {
+                      return;
+                    }
+                    final snap = await docRef.get();
+                    final data = snap.data() ?? <String, dynamic>{};
+                    final tl =
+                        (data['targetLanguage'] as String?)?.trim() ?? 'JPN';
+                    final level =
+                        (data['level'] as String?)?.trim() ?? 'beginner';
+                    final ok = await _confirm(
+                      l10n.admin_tools_ensure_curriculum_day_set_title,
+                      l10n.admin_tools_ensure_curriculum_day_set_message(day),
+                    );
+                    if (!ok) {
+                      return;
+                    }
+                    await _run(
+                      () async {
+                        final result = await _ensureCurriculumDaySetForAdmin(
+                          user: user,
+                          day: day,
+                          targetLanguage: tl,
+                          level: level,
+                        );
+                        if (!mounted) return;
+                        final innerL10n = AppLocalizations.of(context)!;
+                        final status = result['status'] as String? ?? '';
+                        final msg = status == 'skipped'
+                            ? innerL10n
+                                .admin_tools_ensure_curriculum_day_set_skipped(
+                                day,
+                              )
+                            : innerL10n
+                                .admin_tools_ensure_curriculum_day_set_created(
+                                day,
+                              );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(msg)),
+                        );
+                      },
+                      showSuccessSnackbar: false,
+                    );
+                  },
+                  child: Text(l10n.admin_tools_ensure_curriculum_day_set),
+                ),
+                const SizedBox(height: 8),
+                FilledButton.tonal(
+                  onPressed: () async {
+                    final day = _parseCurriculumDayInput(l10n);
+                    if (day == null) {
+                      return;
+                    }
+                    final snap = await docRef.get();
+                    final data = snap.data() ?? <String, dynamic>{};
+                    final tl =
+                        (data['targetLanguage'] as String?)?.trim() ?? 'JPN';
+                    final level =
+                        (data['level'] as String?)?.trim() ?? 'beginner';
+                    final ok = await _confirm(
+                      l10n.admin_tools_apply_curriculum_preview_title,
+                      l10n.admin_tools_apply_curriculum_preview_message(day),
+                    );
+                    if (!ok) {
+                      return;
+                    }
+                    await _run(
+                      () async {
+                        await _ensureCurriculumDaySetForAdmin(
+                          user: user,
+                          day: day,
+                          targetLanguage: tl,
+                          level: level,
+                        );
+                        await user.getIdToken(true);
+                        final callable = callableSetAdminCurriculumPreviewDay();
+                        await callable.call<Map<String, dynamic>>({
+                          'learningDay': day,
+                          'targetLanguage': tl,
+                        });
+                      },
+                      successMessage:
+                          l10n.admin_tools_apply_curriculum_preview_snackbar(
+                        day,
+                      ),
+                    );
+                  },
+                  child: Text(l10n.admin_tools_apply_curriculum_preview),
+                ),
+                const SizedBox(height: 8),
+                OutlinedButton(
+                  onPressed: () async {
+                    final ok = await _confirm(
+                      l10n.admin_tools_clear_curriculum_preview_title,
+                      l10n.admin_tools_clear_curriculum_preview_message,
+                    );
+                    if (!ok) {
+                      return;
+                    }
+                    await _run(
+                      () async {
+                        await user.getIdToken(true);
+                        final callable = callableSetAdminCurriculumPreviewDay();
+                        await callable.call<Map<String, dynamic>>({
+                          'learningDay': null,
+                        });
+                      },
+                      successMessage:
+                          l10n.admin_tools_clear_curriculum_preview_snackbar,
+                    );
+                  },
+                  child: Text(l10n.admin_tools_clear_curriculum_preview),
                 ),
               ],
             ),

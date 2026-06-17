@@ -585,6 +585,49 @@
   "admin_tools_fill_daily_progress_message": "現在の学習言語について、本日の単語・文・まとめ目標（15/5/13）をすべて達成した状態にします。次のカリキュラム問題セットはKSTの深夜以降、アプリを開くと反映されます。",
   "admin_tools_fill_daily_progress_snackbar": "本日の学習量を満たしました。次の日は深夜（KST）以降に反映されます。",
   "admin_tools_section_learning_set": "学習セット",
-  "admin_tools_ensure_learning_set": "ensureLearningSetForToday（現在のプロフィール）"
+  "admin_tools_ensure_learning_set": "ensureLearningSetForToday（現在のプロフィール）",
+
+  "admin_tools_section_curriculum_day": "カリキュラム日次（管理者）",
+  "admin_tools_curriculum_day_hint": "日次（1–50）",
+  "admin_tools_curriculum_day_invalid": "1〜50の日次を入力してください。",
+  "admin_tools_ensure_curriculum_day_set": "N日次問題セット生成",
+  "admin_tools_ensure_curriculum_day_set_title": "カリキュラム日次セット生成",
+  "admin_tools_ensure_curriculum_day_set_message": "{day}日次の単語・文セットがない場合のみ生成します。既にある場合はスキップします。",
+  "@admin_tools_ensure_curriculum_day_set_message": {
+    "placeholders": { "day": { "type": "int" } }
+  },
+  "admin_tools_ensure_curriculum_day_set_created": "{day}日次セットを生成しました。",
+  "@admin_tools_ensure_curriculum_day_set_created": {
+    "placeholders": { "day": { "type": "int" } }
+  },
+  "admin_tools_ensure_curriculum_day_set_skipped": "{day}日次セットは既にあります。",
+  "@admin_tools_ensure_curriculum_day_set_skipped": {
+    "placeholders": { "day": { "type": "int" } }
+  },
+  "admin_tools_apply_curriculum_preview": "N日次で学習テスト",
+  "admin_tools_apply_curriculum_preview_title": "カリキュラム日次学習テスト",
+  "admin_tools_apply_curriculum_preview_message": "単語・文・まとめが{day}日次セットを使用します。セットがなければ先に生成します。",
+  "@admin_tools_apply_curriculum_preview_message": {
+    "placeholders": { "day": { "type": "int" } }
+  },
+  "admin_tools_apply_curriculum_preview_snackbar": "{day}日次セットで学習テスト中です。",
+  "@admin_tools_apply_curriculum_preview_snackbar": {
+    "placeholders": { "day": { "type": "int" } }
+  },
+  "admin_tools_clear_curriculum_preview": "学習テスト解除",
+  "admin_tools_clear_curriculum_preview_title": "カリキュラムテスト解除",
+  "admin_tools_clear_curriculum_preview_message": "実際の学習日次に戻します。",
+  "admin_tools_clear_curriculum_preview_snackbar": "カリキュラムテストを解除しました。",
+  "admin_tools_curriculum_preview_active": "テスト中: {day}日次セット（実際の日次 {actualDay}）",
+  "@admin_tools_curriculum_preview_active": {
+    "placeholders": {
+      "day": { "type": "int" },
+      "actualDay": { "type": "int" }
+    }
+  },
+  "home_curriculum_preview_banner": "管理者テスト: {day}日次セット使用中",
+  "@home_curriculum_preview_banner": {
+    "placeholders": { "day": { "type": "int" } }
+  }
 }
 

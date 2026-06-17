@@ -20,6 +20,40 @@
           "levels": ["N5", "N4", "N3", "N2", "N1"],
           "officialUrl": "https://www.jlpt.jp/",
           "sortOrder": 1
+        },
+        {
+          "id": "jpt",
+          "name": "JPT",
+          "fullName": {
+            "ko": "일본어능력검정시험",
+            "en": "Japanese Proficiency Test",
+            "ja": "日本語能力検定試験"
+          },
+          "summary": {
+            "ko": "일상·비즈니스 상황의 듣기·읽기 능력을 점수로 평가하는 시험입니다. 연중 여러 차례 시행되며, 국내 기업 채용·승진이나 일본어 실무 능력 증명에 활용됩니다. JLPT와 달리 말하기·쓰기는 포함하지 않습니다.",
+            "en": "Assesses listening and reading for everyday and business Japanese with a score out of 990. Offered frequently throughout the year and used for hiring, promotion, and practical proficiency proof. Does not include speaking or writing sections.",
+            "ja": "日常・ビジネス場面の聴解・読解能力を990点満点で評価する試験です。年間を通じて複数回実施され、就職・昇進や実務日本語力の証明に使われます。話す・書くは含みません。"
+          },
+          "levels": ["Listening & Reading (10~990점)"],
+          "officialUrl": "https://www.jpt.co.kr/",
+          "sortOrder": 2
+        },
+        {
+          "id": "sjpt",
+          "name": "SJPT",
+          "fullName": {
+            "ko": "일본어 말하기 시험",
+            "en": "Spoken Japanese Proficiency Test",
+            "ja": "日本語会話能力試験"
+          },
+          "summary": {
+            "ko": "국내 최초 CBT 방식의 일본어 말하기(Speaking) 시험입니다. 자기소개·질의응답·롤플레이 등으로 발음·유창성·내용 적절성을 평가하며, Level 1~10으로 표시됩니다. 국내 기업·기관의 일본어 회화 능력 평가에 활용됩니다.",
+            "en": "A computer-based speaking test that evaluates pronunciation, fluency, and appropriacy through tasks such as self-introduction, Q&A, and role-play. Results are reported on Levels 1–10 and are used for conversational proficiency assessment in companies and institutions.",
+            "ja": "コンピューター方式の日本語スピーキング試験です。自己紹介・質疑応答・ロールプレイなどで発音・流暢さ・内容の適切さを評価し、Level 1〜10で示されます。企業・機関での会話力評価に利用されます。"
+          },
+          "levels": ["Level 1", "Level 2", "...", "Level 10"],
+          "officialUrl": "https://www.ybmsjpt.co.kr/",
+          "sortOrder": 3
         }
       ]
     },

@@ -2082,3 +2082,68 @@ unauthenticated: 로그인 상태 확인
 3. 채팅 100건 이전 페이징·서버 타임스탬프 검토
 4. 자격증 커뮤니티(후기·게시) — UGC 정책·신고 플로우 선행
 
+---
+
+## [단계 42] 커리큘럼 일차 중복 방지·관리자 N일차 생성/학습 테스트·JPT·SJPT (2026-06-17)
+
+### 1) 오늘 한 일
+
+**커리큘럼 일차 간 콘텐츠 중복 방지 (Functions)**
+- `content_dedup_keys.ts` — 단어·문장 정규화 키·프롬프트 blocked 목록 상한
+- `curriculum_blocked_content.ts` — 이전 일차 Firestore 세트에서 dedup 키 로드
+- `prompts.ts` — `blockedHeadwords` / `blockedSentences` 프롬프트 반영
+- `index.ts` — `buildDailyWordItems` / `buildDailySentenceItems`에 선행 일차 blocked set 전달, fallback `#${out.length}` 우회 제거
+- `curriculum_pregen.ts` — 단어·문장 materialized 여부 헬퍼 분리
+- `npm test` 27건 통과
+
+**관리자: N일차 커리큘럼 세트 생성 + N일차 학습 테스트**
+- Callable `ensureCurriculumDaySet` — 지정 일차 세트가 **없을 때만** 생성, 있으면 `skipped`
+- Callable `setAdminCurriculumPreviewDay` — `adminCurriculumPreviewDayByLanguage`에 테스트 일차 저장/해제
+- `resolveUserLearningProfile`·`getWrapUpDeck` — 관리자 UID일 때 프리뷰 일차로 세트 조회
+- 앱 `AdminToolsScreen` — 일차 입력, 세트 생성, 학습 테스트 적용/해제 UI
+- 홈 — 프리뷰 중 배너·표시 일차(`displayLearningDay`) 반영
+- i18n ko/en/ja — 관리자 커리큘럼·홈 배너 키 추가
+
+**자격증 데이터 보강**
+- `certifications.json` — 일본어 **JPT**·**SJPT** 항목 추가
+- `certification_repository_test` — JPN `['jlpt','jpt','sjpt']` 기대값 갱신
+
+### 2) 합의·결정
+
+- N일차 세트 생성은 **관리자 전용** (`AdminToolsScreen.testAdminUid` = Functions `ADMIN_TOOLS_UID`)
+- 기존 일차 세트가 DB에 있으면 **재생성하지 않음** (skip)
+- 학습 테스트(프리뷰)는 **단어·문장·마무리 조회만** 오버라이드; 실제 `learningDay` +1 진행에는 영향 없음
+- 일차 간 dedup은 **신규 생성분부터** 적용 — 기존 Firestore 1·2일차 등은 삭제 후 재생성 + Functions 배포 필요
+
+### 3) 완료 기준 체크
+
+- [x] `npm run build` · `npm test` (Functions) 통과
+- [x] `flutter gen-l10n` · `flutter analyze` · `curriculum_state_test` 통과
+- [ ] Functions 배포 (`ensureCurriculumDaySet`, `setAdminCurriculumPreviewDay`)
+- [ ] 관리자 계정: N일차 생성(skip/created)·학습 테스트·해제 수동 검증
+- [ ] (선택) 기존 중복 일차 세트 삭제 후 재생성으로 dedup 효과 확인
+
+### 4) 추가/변경 파일(주요)
+
+| 영역 | 파일 |
+|------|------|
+| Functions dedup | `content_dedup_keys.ts`, `curriculum_blocked_content.ts`, `prompts.ts`, `index.ts` |
+| Functions admin | `admin/admin_tools_auth.ts`, `admin/curriculum_preview.ts`, `admin/curriculum_admin_callables.ts` |
+| 앱 관리자·홈 | `admin_tools_screen.dart`, `home_screen.dart`, `curriculum_state.dart`, `user_prefs.dart` |
+| Callable 연동 | `firebase_functions_config.dart` |
+| 자격증 | `certifications.json`, `certification_repository_test.dart` |
+| i18n | `app_*.arb`, `app_localizations*.dart` |
+| 테스트 | `curriculum_preview.test.ts`, `curriculum_state_test.dart` |
+
+### 5) Git 커밋
+
+| 해시 | 메시지 |
+|------|--------|
+| (본 커밋) | feat: 커리큘럼 일차 dedup·관리자 N일차 생성/학습 테스트·JPT/SJPT |
+
+### 6) 다음 액션
+
+1. `firebase deploy --only functions:ensureCurriculumDaySet,functions:setAdminCurriculumPreviewDay` 및 관리자 수동 테스트
+2. 중복이 확인된 기존 일차 세트 삭제 후 `ensureCurriculumDaySet`으로 재생성
+3. (선택) 문화·맥락 프롬프트(`usageNoteKo` 등) `prompts.ts` 반영
+

@@ -2548,6 +2548,114 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'ensureLearningSetForToday(현재 프로필)'**
   String get admin_tools_ensure_learning_set;
+
+  /// No description provided for @admin_tools_section_curriculum_day.
+  ///
+  /// In ko, this message translates to:
+  /// **'커리큘럼 일차 (관리자)'**
+  String get admin_tools_section_curriculum_day;
+
+  /// No description provided for @admin_tools_curriculum_day_hint.
+  ///
+  /// In ko, this message translates to:
+  /// **'일차 (1–50)'**
+  String get admin_tools_curriculum_day_hint;
+
+  /// No description provided for @admin_tools_curriculum_day_invalid.
+  ///
+  /// In ko, this message translates to:
+  /// **'1~50 사이의 일차를 입력하세요.'**
+  String get admin_tools_curriculum_day_invalid;
+
+  /// No description provided for @admin_tools_ensure_curriculum_day_set.
+  ///
+  /// In ko, this message translates to:
+  /// **'N일차 문제 세트 생성'**
+  String get admin_tools_ensure_curriculum_day_set;
+
+  /// No description provided for @admin_tools_ensure_curriculum_day_set_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'커리큘럼 일차 세트 생성'**
+  String get admin_tools_ensure_curriculum_day_set_title;
+
+  /// No description provided for @admin_tools_ensure_curriculum_day_set_message.
+  ///
+  /// In ko, this message translates to:
+  /// **'{day}일차 단어·문장 세트가 없을 때만 생성합니다. 이미 있으면 건너뜁니다.'**
+  String admin_tools_ensure_curriculum_day_set_message(int day);
+
+  /// No description provided for @admin_tools_ensure_curriculum_day_set_created.
+  ///
+  /// In ko, this message translates to:
+  /// **'{day}일차 세트를 생성했습니다.'**
+  String admin_tools_ensure_curriculum_day_set_created(int day);
+
+  /// No description provided for @admin_tools_ensure_curriculum_day_set_skipped.
+  ///
+  /// In ko, this message translates to:
+  /// **'{day}일차 세트가 이미 있습니다.'**
+  String admin_tools_ensure_curriculum_day_set_skipped(int day);
+
+  /// No description provided for @admin_tools_apply_curriculum_preview.
+  ///
+  /// In ko, this message translates to:
+  /// **'N일차로 학습 테스트'**
+  String get admin_tools_apply_curriculum_preview;
+
+  /// No description provided for @admin_tools_apply_curriculum_preview_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'커리큘럼 일차 학습 테스트'**
+  String get admin_tools_apply_curriculum_preview_title;
+
+  /// No description provided for @admin_tools_apply_curriculum_preview_message.
+  ///
+  /// In ko, this message translates to:
+  /// **'단어·문장·마무리가 {day}일차 세트를 사용합니다. 세트가 없으면 먼저 생성합니다.'**
+  String admin_tools_apply_curriculum_preview_message(int day);
+
+  /// No description provided for @admin_tools_apply_curriculum_preview_snackbar.
+  ///
+  /// In ko, this message translates to:
+  /// **'{day}일차 세트로 학습 테스트 중입니다.'**
+  String admin_tools_apply_curriculum_preview_snackbar(int day);
+
+  /// No description provided for @admin_tools_clear_curriculum_preview.
+  ///
+  /// In ko, this message translates to:
+  /// **'학습 테스트 해제'**
+  String get admin_tools_clear_curriculum_preview;
+
+  /// No description provided for @admin_tools_clear_curriculum_preview_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'커리큘럼 테스트 해제'**
+  String get admin_tools_clear_curriculum_preview_title;
+
+  /// No description provided for @admin_tools_clear_curriculum_preview_message.
+  ///
+  /// In ko, this message translates to:
+  /// **'실제 학습 일차로 되돌립니다.'**
+  String get admin_tools_clear_curriculum_preview_message;
+
+  /// No description provided for @admin_tools_clear_curriculum_preview_snackbar.
+  ///
+  /// In ko, this message translates to:
+  /// **'커리큘럼 테스트를 해제했습니다.'**
+  String get admin_tools_clear_curriculum_preview_snackbar;
+
+  /// No description provided for @admin_tools_curriculum_preview_active.
+  ///
+  /// In ko, this message translates to:
+  /// **'테스트 중: {day}일차 세트 (실제 일차 {actualDay})'**
+  String admin_tools_curriculum_preview_active(int day, int actualDay);
+
+  /// No description provided for @home_curriculum_preview_banner.
+  ///
+  /// In ko, this message translates to:
+  /// **'관리자 테스트: {day}일차 세트 사용 중'**
+  String home_curriculum_preview_banner(int day);
 }
 
 class _AppLocalizationsDelegate

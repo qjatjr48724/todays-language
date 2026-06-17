@@ -123,13 +123,20 @@ export function buildDailyWordBatchSystemPrompt(
   targetLanguage: string,
   level: string,
   count: number,
-  curriculum?: CurriculumPromptContext
+  curriculum?: CurriculumPromptContext,
+  hasBlockedHeadwords = false
 ): string {
   const lang = languageLabel(targetLanguage);
   const lines = [
     `You create exactly ${count} distinct practical vocabulary items in ${lang} for a Korean native speaker learning that language.`,
     `Learner level: ${level}.`,
     "Every item must use a different headword (no duplicates, no near-duplicates).",
+    ...(hasBlockedHeadwords
+      ? [
+          "Do not use any headword listed in blockedHeadwords (already taught on prior curriculum days).",
+          "Choose fresh vocabulary not overlapping blockedHeadwords.",
+        ]
+      : []),
     "Return ONLY a raw JSON object (no markdown, no extra text).",
     "Shape: {\"words\":[{\"word\":string,\"meaningKo\":string,\"example\":string?,\"exampleMeaningKo\":string?,\"readingHira\":string?}, ...]}",
     `The \"words\" array MUST have length exactly ${count}.`,
@@ -152,7 +159,8 @@ export function buildDailyWordBatchUserPromptJson(
   level: string,
   count: number,
   diversitySeed: string,
-  curriculum?: CurriculumPromptContext
+  curriculum?: CurriculumPromptContext,
+  blockedHeadwords?: string[]
 ): string {
   return JSON.stringify({
     targetLanguage,
@@ -161,6 +169,9 @@ export function buildDailyWordBatchUserPromptJson(
     batchSize: count,
     diversitySeed,
     ...(curriculum ? { curriculum } : {}),
+    ...(blockedHeadwords && blockedHeadwords.length > 0
+      ? { blockedHeadwords }
+      : {}),
   });
 }
 
@@ -170,7 +181,8 @@ export function buildDailySentenceBatchSystemPrompt(
   level: string,
   count: number,
   requiredVocabulary?: string[],
-  curriculum?: CurriculumPromptContext
+  curriculum?: CurriculumPromptContext,
+  hasBlockedSentences = false
 ): string {
   const lang = languageLabel(targetLanguage);
   const vocabLine =
@@ -181,6 +193,11 @@ export function buildDailySentenceBatchSystemPrompt(
     `You create exactly ${count} distinct short sentences in ${lang} for a Korean native speaker at level ${level}.`,
     "Each sentence must be unique and useful for daily study.",
     vocabLine,
+    ...(hasBlockedSentences
+      ? [
+          "Do not output any sentence matching blockedSentences (already used on prior curriculum days).",
+        ]
+      : []),
     "Return ONLY a raw JSON object (no markdown, no extra text).",
     "Shape: {\"sentences\":[{\"sentence\":string,\"meaningKo\":string,\"sentenceHira\":string?,\"vocabularyHints\":[{word:string,meaningKo:string},...]}, ...]}",
     `The \"sentences\" array MUST have length exactly ${count}.`,
@@ -204,7 +221,8 @@ export function buildDailySentenceBatchUserPromptJson(
   count: number,
   diversitySeed: string,
   requiredVocabulary?: string[],
-  curriculum?: CurriculumPromptContext
+  curriculum?: CurriculumPromptContext,
+  blockedSentences?: string[]
 ): string {
   return JSON.stringify({
     targetLanguage,
@@ -216,5 +234,8 @@ export function buildDailySentenceBatchUserPromptJson(
         ? { requiredVocabulary }
         : {}),
     ...(curriculum ? { curriculum } : {}),
+    ...(blockedSentences && blockedSentences.length > 0
+      ? { blockedSentences }
+      : {}),
   });
 }
