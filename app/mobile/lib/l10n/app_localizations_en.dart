@@ -1512,4 +1512,86 @@ class AppLocalizationsEn extends AppLocalizations {
   String home_curriculum_preview_banner(int day) {
     return 'Admin test: using day $day set';
   }
+
+  @override
+  String get home_curriculum_review_card_title => 'Review past days';
+
+  @override
+  String get home_curriculum_review_card_subtitle =>
+      'Study words and sentences from before your current day';
+
+  @override
+  String home_curriculum_review_banner(int day, int actualDay) {
+    return 'Reviewing day $day (current day $actualDay)';
+  }
+
+  @override
+  String get home_curriculum_review_clear_button => 'End review';
+
+  @override
+  String get home_curriculum_review_cleared => 'Review ended.';
+
+  @override
+  String home_curriculum_review_started(int day) {
+    return 'Started reviewing day $day.';
+  }
+
+  @override
+  String get curriculum_review_title => 'Review past days';
+
+  @override
+  String curriculum_review_subtitle(int currentDay) {
+    return 'Current day $currentDay — choose a day to review.';
+  }
+
+  @override
+  String get curriculum_review_empty => 'No earlier days to review.';
+
+  @override
+  String curriculum_review_day_label(int day) {
+    return 'Day $day';
+  }
+
+  @override
+  String get curriculum_review_day_ready => 'Word and sentence sets ready';
+
+  @override
+  String get curriculum_review_day_not_ready => 'Preparing';
+
+  @override
+  String get curriculum_review_clear_button => 'Clear review';
+
+  @override
+  String curriculum_review_target_language(String language) {
+    return 'Target language: $language';
+  }
+
+  @override
+  String curriculum_review_study_appbar_title(int day) {
+    return 'Day $day review';
+  }
+
+  @override
+  String get curriculum_review_study_notice =>
+      'Does not affect today\'s progress.';
+
+  @override
+  String words_appbar_title_review(int day) {
+    return 'Day $day review · Words';
+  }
+
+  @override
+  String words_description_curriculum_review(int day) {
+    return 'Day $day word review. Does not affect today\'s progress.';
+  }
+
+  @override
+  String sentences_appbar_title_review(int day) {
+    return 'Day $day review · Sentences';
+  }
+
+  @override
+  String sentences_description_curriculum_review(int day) {
+    return 'Day $day sentence review. Does not affect today\'s progress.';
+  }
 }

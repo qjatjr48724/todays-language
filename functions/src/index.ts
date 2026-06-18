@@ -56,7 +56,7 @@ import {
   LEARNING_DIFFICULTY_UI_ENABLED,
   parseCurriculumPhase,
 } from "./curriculum/curriculum_state";
-import { applyAdminPreviewToProfile } from "./admin/curriculum_preview";
+import { applyWordSentenceStudyDayToProfile } from "./curriculum/curriculum_study_day";
 import { assertAdminToolsUid } from "./admin/admin_tools_auth";
 import {
   enrichSentenceItemsWithAudio,
@@ -251,7 +251,7 @@ async function resolveUserLearningProfile(
     curriculumPhase: state.curriculumPhase,
     learningDay: state.learningDay,
   };
-  return applyAdminPreviewToProfile(uid, userData, profile);
+  return applyWordSentenceStudyDayToProfile(uid, userData, profile);
 }
 
 async function ensureGlobalLearningOwnerDoc(nowMs = Date.now()): Promise<void> {

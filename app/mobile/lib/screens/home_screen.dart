@@ -14,6 +14,7 @@ import '../ui/bordered_linear_progress.dart';
 import '../ui/home_feature_card.dart';
 import '../ui/section_card.dart';
 import 'my_info_screen.dart';
+import 'curriculum_review_screen.dart';
 import 'today_sentences_screen.dart';
 import 'today_words_screen.dart';
 import 'today_wrap_up_screen.dart';
@@ -88,6 +89,10 @@ class _HomeScreenState extends State<HomeScreen> {
               targetLanguage: nextTargetLanguage,
             ),
             previewLearningDay: CurriculumState.adminPreviewDayForLanguage(
+              data,
+              nextTargetLanguage,
+            ),
+            reviewLearningDay: CurriculumState.curriculumReviewDayForLanguage(
               data,
               nextTargetLanguage,
             ),
@@ -166,6 +171,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final percent = p == null
         ? null
         : (p.progressPercent > 0 ? p.progressPercent : _computedProgressPercent(p));
+
+    final showReviewMenu = _prefs.curriculum.learningDay > 1 &&
+        _prefs.curriculum.learningMode == 'curriculum';
 
     return Scaffold(
       appBar: AppBar(
@@ -320,6 +328,28 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
+
+            if (showReviewMenu) ...[
+              const SizedBox(height: 16),
+              HomeFeatureCard(
+                title: l10n.home_curriculum_review_card_title,
+                subtitle: l10n.home_curriculum_review_card_subtitle,
+                icon: Icons.history_edu_outlined,
+                compactRow: true,
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => CurriculumReviewScreen(
+                        targetLanguage: _prefs.targetLanguage,
+                        level: _prefs.level,
+                        currentLearningDay: _prefs.curriculum.learningDay,
+                        curriculumPhase: _prefs.curriculum.curriculumPhase,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
 
             const SizedBox(height: 16),
             SectionCard(

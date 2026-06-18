@@ -1449,4 +1449,85 @@ class AppLocalizationsKo extends AppLocalizations {
   String home_curriculum_preview_banner(int day) {
     return '관리자 테스트: $day일차 세트 사용 중';
   }
+
+  @override
+  String get home_curriculum_review_card_title => '이전 일차 복습';
+
+  @override
+  String get home_curriculum_review_card_subtitle =>
+      '현재 일차보다 이전 단어·문장을 다시 학습합니다';
+
+  @override
+  String home_curriculum_review_banner(int day, int actualDay) {
+    return '$day일차 복습 중 (현재 학습 $actualDay일차)';
+  }
+
+  @override
+  String get home_curriculum_review_clear_button => '복습 종료';
+
+  @override
+  String get home_curriculum_review_cleared => '복습을 종료했습니다.';
+
+  @override
+  String home_curriculum_review_started(int day) {
+    return '$day일차 복습을 시작했습니다.';
+  }
+
+  @override
+  String get curriculum_review_title => '이전 일차 복습';
+
+  @override
+  String curriculum_review_subtitle(int currentDay) {
+    return '현재 $currentDay일차 — 복습할 일차를 선택하세요.';
+  }
+
+  @override
+  String get curriculum_review_empty => '복습할 이전 일차가 없습니다.';
+
+  @override
+  String curriculum_review_day_label(int day) {
+    return '$day일차';
+  }
+
+  @override
+  String get curriculum_review_day_ready => '단어·문장 세트 준비됨';
+
+  @override
+  String get curriculum_review_day_not_ready => '준비 중';
+
+  @override
+  String get curriculum_review_clear_button => '복습 해제';
+
+  @override
+  String curriculum_review_target_language(String language) {
+    return '대상 언어: $language';
+  }
+
+  @override
+  String curriculum_review_study_appbar_title(int day) {
+    return '$day일차 복습';
+  }
+
+  @override
+  String get curriculum_review_study_notice => '오늘 진도에는 반영되지 않습니다.';
+
+  @override
+  String words_appbar_title_review(int day) {
+    return '$day일차 복습 · 단어';
+  }
+
+  @override
+  String words_description_curriculum_review(int day) {
+    return '$day일차 단어 복습입니다. 오늘 진도에는 반영되지 않습니다.';
+  }
+
+  @override
+  String sentences_appbar_title_review(int day) {
+    return '$day일차 복습 · 문장';
+  }
+
+  @override
+  String sentences_description_curriculum_review(int day) {
+    return '$day일차 문장 복습입니다. 오늘 진도에는 반영되지 않습니다.';
+  }
 }

@@ -23,6 +23,10 @@ class CurriculumState {
   static const String adminCurriculumPreviewDayByLanguageField =
       'adminCurriculumPreviewDayByLanguage';
 
+  /// 이전 일차 복습 — `users/{uid}.curriculumReviewDayByLanguage`
+  static const String curriculumReviewDayByLanguageField =
+      'curriculumReviewDayByLanguage';
+
   static const Set<String> learningLevels = {'beginner', 'intermediate', 'advanced'};
 
   final String curriculumId;
@@ -191,6 +195,41 @@ class CurriculumState {
     final preview = adminPreviewDayForLanguage(data, targetLanguage);
     if (preview != null) return preview;
     return learningDayForLanguage(data, targetLanguage);
+  }
+
+  static String normalizeLanguageCodeForStorage(String raw) =>
+      _normalizeLanguageCode(raw);
+
+  static Map<String, int> parseCurriculumReviewDayByLanguage(dynamic raw) {
+    if (raw is! Map) return <String, int>{};
+    final out = <String, int>{};
+    for (final entry in raw.entries) {
+      final lang = _normalizeLanguageCode(entry.key.toString());
+      final n = entry.value is num ? (entry.value as num).toInt() : int.tryParse('${entry.value}');
+      if (n != null) out[lang] = _clampLearningDay(n);
+    }
+    return out;
+  }
+
+  /// 이전 일차 복습 일차(없으면 null). 현재 일차보다 작을 때만 유효.
+  static int? curriculumReviewDayForLanguage(
+    Map<String, dynamic> data,
+    String targetLanguage,
+  ) {
+    final lang = _normalizeLanguageCode(targetLanguage);
+    final actual = learningDayForLanguage(data, targetLanguage);
+    final day = parseCurriculumReviewDayByLanguage(
+      data[curriculumReviewDayByLanguageField],
+    )[lang];
+    if (day == null || day < 1 || day >= actual) return null;
+    return day;
+  }
+
+  static bool canShowCurriculumReviewMenu(
+    Map<String, dynamic> data,
+    String targetLanguage,
+  ) {
+    return learningDayForLanguage(data, targetLanguage) > 1;
   }
 
   static int _clampLearningDay(Object? raw) {

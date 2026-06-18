@@ -2656,6 +2656,126 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'관리자 테스트: {day}일차 세트 사용 중'**
   String home_curriculum_preview_banner(int day);
+
+  /// No description provided for @home_curriculum_review_card_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'이전 일차 복습'**
+  String get home_curriculum_review_card_title;
+
+  /// No description provided for @home_curriculum_review_card_subtitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'현재 일차보다 이전 단어·문장을 다시 학습합니다'**
+  String get home_curriculum_review_card_subtitle;
+
+  /// No description provided for @home_curriculum_review_banner.
+  ///
+  /// In ko, this message translates to:
+  /// **'{day}일차 복습 중 (현재 학습 {actualDay}일차)'**
+  String home_curriculum_review_banner(int day, int actualDay);
+
+  /// No description provided for @home_curriculum_review_clear_button.
+  ///
+  /// In ko, this message translates to:
+  /// **'복습 종료'**
+  String get home_curriculum_review_clear_button;
+
+  /// No description provided for @home_curriculum_review_cleared.
+  ///
+  /// In ko, this message translates to:
+  /// **'복습을 종료했습니다.'**
+  String get home_curriculum_review_cleared;
+
+  /// No description provided for @home_curriculum_review_started.
+  ///
+  /// In ko, this message translates to:
+  /// **'{day}일차 복습을 시작했습니다.'**
+  String home_curriculum_review_started(int day);
+
+  /// No description provided for @curriculum_review_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'이전 일차 복습'**
+  String get curriculum_review_title;
+
+  /// No description provided for @curriculum_review_subtitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'현재 {currentDay}일차 — 복습할 일차를 선택하세요.'**
+  String curriculum_review_subtitle(int currentDay);
+
+  /// No description provided for @curriculum_review_empty.
+  ///
+  /// In ko, this message translates to:
+  /// **'복습할 이전 일차가 없습니다.'**
+  String get curriculum_review_empty;
+
+  /// No description provided for @curriculum_review_day_label.
+  ///
+  /// In ko, this message translates to:
+  /// **'{day}일차'**
+  String curriculum_review_day_label(int day);
+
+  /// No description provided for @curriculum_review_day_ready.
+  ///
+  /// In ko, this message translates to:
+  /// **'단어·문장 세트 준비됨'**
+  String get curriculum_review_day_ready;
+
+  /// No description provided for @curriculum_review_day_not_ready.
+  ///
+  /// In ko, this message translates to:
+  /// **'준비 중'**
+  String get curriculum_review_day_not_ready;
+
+  /// No description provided for @curriculum_review_clear_button.
+  ///
+  /// In ko, this message translates to:
+  /// **'복습 해제'**
+  String get curriculum_review_clear_button;
+
+  /// No description provided for @curriculum_review_target_language.
+  ///
+  /// In ko, this message translates to:
+  /// **'대상 언어: {language}'**
+  String curriculum_review_target_language(String language);
+
+  /// No description provided for @curriculum_review_study_appbar_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'{day}일차 복습'**
+  String curriculum_review_study_appbar_title(int day);
+
+  /// No description provided for @curriculum_review_study_notice.
+  ///
+  /// In ko, this message translates to:
+  /// **'오늘 진도에는 반영되지 않습니다.'**
+  String get curriculum_review_study_notice;
+
+  /// No description provided for @words_appbar_title_review.
+  ///
+  /// In ko, this message translates to:
+  /// **'{day}일차 복습 · 단어'**
+  String words_appbar_title_review(int day);
+
+  /// No description provided for @words_description_curriculum_review.
+  ///
+  /// In ko, this message translates to:
+  /// **'{day}일차 단어 복습입니다. 오늘 진도에는 반영되지 않습니다.'**
+  String words_description_curriculum_review(int day);
+
+  /// No description provided for @sentences_appbar_title_review.
+  ///
+  /// In ko, this message translates to:
+  /// **'{day}일차 복습 · 문장'**
+  String sentences_appbar_title_review(int day);
+
+  /// No description provided for @sentences_description_curriculum_review.
+  ///
+  /// In ko, this message translates to:
+  /// **'{day}일차 문장 복습입니다. 오늘 진도에는 반영되지 않습니다.'**
+  String sentences_description_curriculum_review(int day);
 }
 
 class _AppLocalizationsDelegate

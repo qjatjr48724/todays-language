@@ -1447,4 +1447,84 @@ class AppLocalizationsJa extends AppLocalizations {
   String home_curriculum_preview_banner(int day) {
     return '管理者テスト: $day日次セット使用中';
   }
+
+  @override
+  String get home_curriculum_review_card_title => '過去日次の復習';
+
+  @override
+  String get home_curriculum_review_card_subtitle => '現在の日次より前の単語・文を復習します';
+
+  @override
+  String home_curriculum_review_banner(int day, int actualDay) {
+    return '$day日次を復習中（現在の学習 $actualDay日次）';
+  }
+
+  @override
+  String get home_curriculum_review_clear_button => '復習終了';
+
+  @override
+  String get home_curriculum_review_cleared => '復習を終了しました。';
+
+  @override
+  String home_curriculum_review_started(int day) {
+    return '$day日次の復習を開始しました。';
+  }
+
+  @override
+  String get curriculum_review_title => '過去日次の復習';
+
+  @override
+  String curriculum_review_subtitle(int currentDay) {
+    return '現在 $currentDay日次 — 復習する日次を選んでください。';
+  }
+
+  @override
+  String get curriculum_review_empty => '復習できる過去の日次がありません。';
+
+  @override
+  String curriculum_review_day_label(int day) {
+    return '$day日次';
+  }
+
+  @override
+  String get curriculum_review_day_ready => '単語・文セット準備済み';
+
+  @override
+  String get curriculum_review_day_not_ready => '準備中';
+
+  @override
+  String get curriculum_review_clear_button => '復習解除';
+
+  @override
+  String curriculum_review_target_language(String language) {
+    return '対象言語: $language';
+  }
+
+  @override
+  String curriculum_review_study_appbar_title(int day) {
+    return '$day日次の復習';
+  }
+
+  @override
+  String get curriculum_review_study_notice => '今日の進度には反映されません。';
+
+  @override
+  String words_appbar_title_review(int day) {
+    return '$day日次復習 · 単語';
+  }
+
+  @override
+  String words_description_curriculum_review(int day) {
+    return '$day日次の単語復習です。今日の進度には反映されません。';
+  }
+
+  @override
+  String sentences_appbar_title_review(int day) {
+    return '$day日次復習 · 文';
+  }
+
+  @override
+  String sentences_description_curriculum_review(int day) {
+    return '$day日次の文復習です。今日の進度には反映されません。';
+  }
 }

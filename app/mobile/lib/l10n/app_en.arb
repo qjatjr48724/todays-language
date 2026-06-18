@@ -628,6 +628,60 @@
   "home_curriculum_preview_banner": "Admin test: using day {day} set",
   "@home_curriculum_preview_banner": {
     "placeholders": { "day": { "type": "int" } }
+  },
+
+  "home_curriculum_review_card_title": "Review past days",
+  "home_curriculum_review_card_subtitle": "Study words and sentences from before your current day",
+  "home_curriculum_review_banner": "Reviewing day {day} (current day {actualDay})",
+  "@home_curriculum_review_banner": {
+    "placeholders": {
+      "day": { "type": "int" },
+      "actualDay": { "type": "int" }
+    }
+  },
+  "home_curriculum_review_clear_button": "End review",
+  "home_curriculum_review_cleared": "Review ended.",
+  "home_curriculum_review_started": "Started reviewing day {day}.",
+  "@home_curriculum_review_started": {
+    "placeholders": { "day": { "type": "int" } }
+  },
+  "curriculum_review_title": "Review past days",
+  "curriculum_review_subtitle": "Current day {currentDay} — choose a day to review.",
+  "@curriculum_review_subtitle": {
+    "placeholders": { "currentDay": { "type": "int" } }
+  },
+  "curriculum_review_empty": "No earlier days to review.",
+  "curriculum_review_day_label": "Day {day}",
+  "@curriculum_review_day_label": {
+    "placeholders": { "day": { "type": "int" } }
+  },
+  "curriculum_review_day_ready": "Word and sentence sets ready",
+  "curriculum_review_day_not_ready": "Preparing",
+  "curriculum_review_clear_button": "Clear review",
+  "curriculum_review_target_language": "Target language: {language}",
+  "@curriculum_review_target_language": {
+    "placeholders": { "language": { "type": "String" } }
+  },
+  "curriculum_review_study_appbar_title": "Day {day} review",
+  "@curriculum_review_study_appbar_title": {
+    "placeholders": { "day": { "type": "int" } }
+  },
+  "curriculum_review_study_notice": "Does not affect today's progress.",
+  "words_appbar_title_review": "Day {day} review · Words",
+  "@words_appbar_title_review": {
+    "placeholders": { "day": { "type": "int" } }
+  },
+  "words_description_curriculum_review": "Day {day} word review. Does not affect today's progress.",
+  "@words_description_curriculum_review": {
+    "placeholders": { "day": { "type": "int" } }
+  },
+  "sentences_appbar_title_review": "Day {day} review · Sentences",
+  "@sentences_appbar_title_review": {
+    "placeholders": { "day": { "type": "int" } }
+  },
+  "sentences_description_curriculum_review": "Day {day} sentence review. Does not affect today's progress.",
+  "@sentences_description_curriculum_review": {
+    "placeholders": { "day": { "type": "int" } }
   }
 }
 

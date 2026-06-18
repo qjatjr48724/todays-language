@@ -10,6 +10,7 @@ class UserPrefs {
     required this.level,
     required this.curriculum,
     this.previewLearningDay,
+    this.reviewLearningDay,
   });
 
   final String targetLanguage;
@@ -18,6 +19,11 @@ class UserPrefs {
 
   /// 관리자 커리큘럼 테스트 일차(없으면 null)
   final int? previewLearningDay;
+
+  /// 이전 일차 복습 일차(없으면 null)
+  final int? reviewLearningDay;
+
+  bool get isCurriculumReviewActive => reviewLearningDay != null;
 
   int get displayLearningDay => previewLearningDay ?? curriculum.learningDay;
 
@@ -43,6 +49,10 @@ Future<UserPrefs> fetchUserPrefs(User user) async {
       targetLanguage: (targetLanguage == null || targetLanguage.isEmpty) ? 'JPN' : targetLanguage,
     ),
     previewLearningDay: CurriculumState.adminPreviewDayForLanguage(
+      data,
+      (targetLanguage == null || targetLanguage.isEmpty) ? 'JPN' : targetLanguage,
+    ),
+    reviewLearningDay: CurriculumState.curriculumReviewDayForLanguage(
       data,
       (targetLanguage == null || targetLanguage.isEmpty) ? 'JPN' : targetLanguage,
     ),

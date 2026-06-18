@@ -14,10 +14,20 @@ class TodayWordsScreen extends StatefulWidget {
     super.key,
     required this.targetLanguage,
     required this.level,
+    this.curriculumReviewMode = false,
+    this.reviewLearningDay,
+    this.embedded = false,
   });
 
   final String targetLanguage;
   final String level;
+
+  /// 이전 일차 복습 — 진도에 영향 없음.
+  final bool curriculumReviewMode;
+  final int? reviewLearningDay;
+
+  /// 탭 등 상위 Scaffold 안에 넣을 때 body만 렌더링.
+  final bool embedded;
 
   @override
   State<TodayWordsScreen> createState() => _TodayWordsScreenState();
@@ -45,18 +55,22 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
   /// 오늘 단어 목표 달성 후 「다음 단어」를 다시 쓰려면 true.
   bool _relearnActive = false;
 
+  bool get _inReviewMode => widget.curriculumReviewMode;
+
   bool get _wordCapReached =>
+      !_inReviewMode &&
       _todayProgress != null &&
       _todayProgress!.wordDone >= _todayProgress!.wordGoal;
 
-  bool get _showRelearnButton => _wordCapReached && !_relearnActive;
+  bool get _showRelearnButton => !_inReviewMode && _wordCapReached && !_relearnActive;
 
   bool get _canUseNextButton =>
       !_aiLoading &&
       !_savingProgress &&
-      (!_wordCapReached || _relearnActive);
+      (_inReviewMode || !_wordCapReached || _relearnActive);
 
   bool get _canMarkComplete =>
+      !_inReviewMode &&
       !_wordCapReached &&
       !(_aiLoading || _aiError != null || _completedCurrent || _savingProgress);
 
@@ -210,13 +224,23 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
         widget.level != 'beginner' &&
         _wordReadingHira != null &&
         _wordReadingHira!.trim().isNotEmpty;
-    return Scaffold(
-      appBar: AppBar(title: Text(l10n.words_appbar_title)),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+    final body = Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (_inReviewMode &&
+              widget.reviewLearningDay != null &&
+              !widget.embedded) ...[
+            Text(
+              l10n.words_description_curriculum_review(widget.reviewLearningDay!),
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium
+                  ?.copyWith(color: scheme.onSurfaceVariant),
+            ),
+            const SizedBox(height: 16),
+          ],
             if (_wordCapReached && !_relearnActive) ...[
               Text(
                 l10n.words_description_goal_reached(
@@ -303,7 +327,7 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
             ],
 
             const Spacer(),
-            if (!_wordCapReached)
+            if (!_inReviewMode && !_wordCapReached)
               Text(
                 l10n.words_description_normal,
                 style: Theme.of(context)
@@ -320,28 +344,29 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
                     ),
               ),
             ],
-            if (!_wordCapReached || (kDebugMode && _debugSource != null))
+            if ((!_inReviewMode && !_wordCapReached) || (kDebugMode && _debugSource != null))
               const SizedBox(height: 12),
-            FilledButton.icon(
-              onPressed: _canMarkComplete ? _markDone : null,
-              icon: _savingProgress
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.check),
-              label: Text(
-                _wordCapReached
-                    ? l10n.words_button_goal_reached
-                    : _savingProgress
-                        ? l10n.words_button_saving
-                        : (_completedCurrent
-                            ? l10n.words_button_completed_reflected
-                            : l10n.words_button_increment),
+            if (!_inReviewMode)
+              FilledButton.icon(
+                onPressed: _canMarkComplete ? _markDone : null,
+                icon: _savingProgress
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.check),
+                label: Text(
+                  _wordCapReached
+                      ? l10n.words_button_goal_reached
+                      : _savingProgress
+                          ? l10n.words_button_saving
+                          : (_completedCurrent
+                              ? l10n.words_button_completed_reflected
+                              : l10n.words_button_increment),
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
+            if (!_inReviewMode) const SizedBox(height: 8),
             if (_showRelearnButton) ...[
               FilledButton.tonalIcon(
                 onPressed: (_aiLoading || _savingProgress) ? null : _startRelearn,
@@ -361,7 +386,21 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
             ],
           ],
         ),
+    );
+
+    if (widget.embedded) {
+      return body;
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          _inReviewMode && widget.reviewLearningDay != null
+              ? l10n.words_appbar_title_review(widget.reviewLearningDay!)
+              : l10n.words_appbar_title,
+        ),
       ),
+      body: body,
     );
   }
 }

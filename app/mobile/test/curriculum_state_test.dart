@@ -218,14 +218,35 @@ void main() {
         ),
         7,
       );
+    });
+
+    test('curriculumReviewDayForLanguage only returns valid prior days', () {
       expect(
-        CurriculumState.adminPreviewDayForLanguage(
+        CurriculumState.curriculumReviewDayForLanguage(
           {
-            CurriculumState.adminCurriculumPreviewDayByLanguageField: {'ja': 3},
+            'learningDayByLanguage': {'JPN': 4},
+            CurriculumState.curriculumReviewDayByLanguageField: {'JPN': 3},
           },
           'JPN',
         ),
         3,
+      );
+      expect(
+        CurriculumState.curriculumReviewDayForLanguage(
+          {
+            'learningDayByLanguage': {'JPN': 4},
+            CurriculumState.curriculumReviewDayByLanguageField: {'JPN': 4},
+          },
+          'JPN',
+        ),
+        isNull,
+      );
+      expect(
+        CurriculumState.canShowCurriculumReviewMenu(
+          {'learningDayByLanguage': {'JPN': 1}},
+          'JPN',
+        ),
+        isFalse,
       );
     });
   });

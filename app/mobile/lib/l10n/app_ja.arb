@@ -628,6 +628,60 @@
   "home_curriculum_preview_banner": "管理者テスト: {day}日次セット使用中",
   "@home_curriculum_preview_banner": {
     "placeholders": { "day": { "type": "int" } }
+  },
+
+  "home_curriculum_review_card_title": "過去日次の復習",
+  "home_curriculum_review_card_subtitle": "現在の日次より前の単語・文を復習します",
+  "home_curriculum_review_banner": "{day}日次を復習中（現在の学習 {actualDay}日次）",
+  "@home_curriculum_review_banner": {
+    "placeholders": {
+      "day": { "type": "int" },
+      "actualDay": { "type": "int" }
+    }
+  },
+  "home_curriculum_review_clear_button": "復習終了",
+  "home_curriculum_review_cleared": "復習を終了しました。",
+  "home_curriculum_review_started": "{day}日次の復習を開始しました。",
+  "@home_curriculum_review_started": {
+    "placeholders": { "day": { "type": "int" } }
+  },
+  "curriculum_review_title": "過去日次の復習",
+  "curriculum_review_subtitle": "現在 {currentDay}日次 — 復習する日次を選んでください。",
+  "@curriculum_review_subtitle": {
+    "placeholders": { "currentDay": { "type": "int" } }
+  },
+  "curriculum_review_empty": "復習できる過去の日次がありません。",
+  "curriculum_review_day_label": "{day}日次",
+  "@curriculum_review_day_label": {
+    "placeholders": { "day": { "type": "int" } }
+  },
+  "curriculum_review_day_ready": "単語・文セット準備済み",
+  "curriculum_review_day_not_ready": "準備中",
+  "curriculum_review_clear_button": "復習解除",
+  "curriculum_review_target_language": "対象言語: {language}",
+  "@curriculum_review_target_language": {
+    "placeholders": { "language": { "type": "String" } }
+  },
+  "curriculum_review_study_appbar_title": "{day}日次の復習",
+  "@curriculum_review_study_appbar_title": {
+    "placeholders": { "day": { "type": "int" } }
+  },
+  "curriculum_review_study_notice": "今日の進度には反映されません。",
+  "words_appbar_title_review": "{day}日次復習 · 単語",
+  "@words_appbar_title_review": {
+    "placeholders": { "day": { "type": "int" } }
+  },
+  "words_description_curriculum_review": "{day}日次の単語復習です。今日の進度には反映されません。",
+  "@words_description_curriculum_review": {
+    "placeholders": { "day": { "type": "int" } }
+  },
+  "sentences_appbar_title_review": "{day}日次復習 · 文",
+  "@sentences_appbar_title_review": {
+    "placeholders": { "day": { "type": "int" } }
+  },
+  "sentences_description_curriculum_review": "{day}日次の文復習です。今日の進度には反映されません。",
+  "@sentences_description_curriculum_review": {
+    "placeholders": { "day": { "type": "int" } }
   }
 }
 
