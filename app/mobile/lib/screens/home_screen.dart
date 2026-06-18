@@ -211,7 +211,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -237,7 +237,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ],
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
 
             HomeFeatureCard(
               title: l10n.home_basic_characters_button,
@@ -254,14 +254,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     .then((_) => _refreshTodayProgress());
               },
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
 
             GridView.count(
               crossAxisCount: 2,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 12,
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
               // 카드 안 Column(아이콘행+제목+부제+진행)이 세로로 넉넉히 들어가도록 셀을 약간 높임
               childAspectRatio: 0.9,
               children: [
@@ -330,7 +330,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
 
             if (showReviewMenu) ...[
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               HomeFeatureCard(
                 title: l10n.home_curriculum_review_card_title,
                 subtitle: l10n.home_curriculum_review_card_subtitle,
@@ -351,7 +351,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             SectionCard(
               title: l10n.home_progress_section_title,
               trailing: Column(

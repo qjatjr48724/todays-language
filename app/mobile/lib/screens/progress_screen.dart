@@ -295,7 +295,7 @@ class ProgressScreenState extends State<ProgressScreen> {
                   crossAxisSpacing: 5,
                   // 달력 셀 내부(숫자 + 스티커)가 아래로 overflow 되는 문제를 방지하기 위해
                   // 정사각형보다 살짝 "세로로" 여유를 둡니다.
-                  childAspectRatio: 0.85,
+                  childAspectRatio: 1.0,
                 ),
                 itemBuilder: (context, index) {
                   final dayNumber = index - leadingBlankCount + 1;

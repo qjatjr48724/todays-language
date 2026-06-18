@@ -2147,3 +2147,58 @@ unauthenticated: 로그인 상태 확인
 2. 중복이 확인된 기존 일차 세트 삭제 후 `ensureCurriculumDaySet`으로 재생성
 3. (선택) 문화·맥락 프롬프트(`usageNoteKo` 등) `prompts.ts` 반영
 
+---
+
+## [단계 43] 이전 일차 복습·홈/진행률 UI 간격 조정 (2026-06-17)
+
+### 1) 오늘 한 일
+
+**이전 일차 복습 (Functions + Flutter)**
+- Functions `curriculum_review.ts` · `curriculum_study_day.ts` — `curriculumReviewDayByLanguage` 파싱·유효성, `generateWord`/`generateSentence` 조회 시 복습 일차 반영 (관리자 프리뷰 > 복습 > 실제 일차 우선순위)
+- 앱 일차 목록(`CurriculumReviewScreen`) — 현재 `targetLanguage` 기준 1..N-1, 상단 대상 언어 표기, 세트 준비 여부 Firestore 직접 조회
+- 복습 학습 화면(`CurriculumReviewStudyScreen`) — 단어|문장 탭(기본 단어), 기존 오늘의 단어/문장 UX·진도 미반영
+- 홈 — 복습 메뉴를 **오늘의 마무리** 아래 배치; 홈 단어/문장은 항상 현재 일차만
+- i18n ko/en/ja — 복습·학습 화면 키 추가
+- 개발 규칙 — undo 요청 시 작업 트리 복원 해석 추가
+
+**홈·진행률 UI 간격 조정**
+- 홈 본문 패딩 `24` → `fromLTRB(20, 16, 20, 20)` (상단 16)
+- 메뉴 블록 간 `SizedBox` `16` → `12`, 그리드 간격 `12` → `10`
+- 진행률 캘린더 날짜 셀 `childAspectRatio` `0.85` → **`1.0`** (정사각형에 가깝게)
+
+### 2) 합의·결정
+
+- 복습 일차 목록 Callable 없이 앱+Firestore로 처리
+- 복습 학습 화면 이탈 시 `dispose`에서 복습 일차 자동 해제
+- 캘린더 셀 높이는 고정 px 없이 `childAspectRatio`로 제어 (1.0 = 너비≈높이)
+
+### 3) 완료 기준 체크
+
+- [x] `npm test` (Functions curriculum_review) · `curriculum_state_test` 통과
+- [x] `flutter gen-l10n` · `flutter analyze` 통과
+- [ ] Functions 배포 (`generateWord`, `generateSentence`)
+- [ ] 2일차+ 사용자: 복습 목록 → 일차 선택 → 단어/문장 탭 학습 수동 검증
+- [ ] 진행률 탭 캘린더 셀 overflow 없음 확인 (`childAspectRatio: 1.0`)
+
+### 4) 추가/변경 파일(주요)
+
+| 영역 | 파일 |
+|------|------|
+| Functions 복습 | `curriculum_review.ts`, `curriculum_study_day.ts`, `index.ts` |
+| 앱 복습 | `curriculum_review_screen.dart`, `curriculum_review_study_screen.dart`, `curriculum_review_service.dart` |
+| 앱 학습 | `today_words_screen.dart`, `today_sentences_screen.dart` (`embedded`) |
+| 홈·진행률 UI | `home_screen.dart`, `progress_screen.dart` |
+| 기타 | `curriculum_state.dart`, `user_prefs.dart`, `target_language_label.dart`, `app_*.arb` |
+
+### 5) Git 커밋
+
+| 해시 | 메시지 |
+|------|--------|
+| `5a98af6` | feat: 이전 일차 복습 기능 및 홈 복습 메뉴 배치 |
+| (본 커밋) | ui(mobile): 홈·진행률 레이아웃 간격 조정 및 [단계 43] 진행 기록 |
+
+### 6) 다음 액션
+
+1. `firebase deploy --only functions:generateWord,functions:generateSentence`
+2. 복습 플로우 E2E 수동 테스트 (일차 선택·탭 전환·뒤로가기 후 현재 일차 복귀)
+3. (선택) 캘린더 `childAspectRatio` 추가 미세 조정
