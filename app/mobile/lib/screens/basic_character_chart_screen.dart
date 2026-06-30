@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../services/analytics/analytics_action_log.dart';
 import '../data/basic_character/basic_character_kana_rows.dart';
 import '../l10n/app_localizations.dart';
 import '../models/basic_character_entry.dart';
@@ -111,7 +112,9 @@ class _BasicCharacterChartScreenState extends State<BasicCharacterChartScreen> {
                 ],
                 selected: {_korTab},
                 onSelectionChanged: (selected) {
-                  setState(() => _korTab = selected.first);
+                  final tab = selected.first;
+                  logCharacterTabSelect('${_selected.id}:${tab.name}');
+                  setState(() => _korTab = tab);
                 },
               ),
             ],
@@ -149,7 +152,9 @@ class _BasicCharacterChartScreenState extends State<BasicCharacterChartScreen> {
                   ],
                   selected: {_jpnTab},
                   onSelectionChanged: (selected) {
-                    setState(() => _jpnTab = selected.first);
+                    final tab = selected.first;
+                    logCharacterTabSelect('${_selected.id}:${jpnKanaTabKey(tab)}');
+                    setState(() => _jpnTab = tab);
                   },
                 ),
               ),

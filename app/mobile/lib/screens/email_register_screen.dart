@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../data/legal/privacy_policy_content.dart';
 import '../data/legal/terms_of_service_content.dart';
 import '../l10n/app_localizations.dart';
+import '../services/analytics/analytics_action_log.dart';
 import '../services/auth_session_service.dart';
 import '../services/user_profile_sync.dart';
 import 'privacy_policy_screen.dart';
@@ -77,6 +78,7 @@ class _EmailRegisterScreenState extends State<EmailRegisterScreen> {
       _errorMessage = null;
     });
     try {
+      await logAuthAttempt('email_register');
       final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text,
@@ -100,8 +102,11 @@ class _EmailRegisterScreenState extends State<EmailRegisterScreen> {
         await AuthSessionService().claimSession(credential.user!);
       }
       if (!mounted) return;
+      await logAuthResult(authMethod: 'email_register', success: true);
+      await logConsentComplete();
       Navigator.of(context).pop();
     } on FirebaseAuthException catch (e) {
+      await logAuthResult(authMethod: 'email_register', success: false);
       setState(() => _errorMessage = _messageForAuthException(e, context));
     } catch (_) {
       setState(() => _errorMessage = l10n.email_register_error_unknown);

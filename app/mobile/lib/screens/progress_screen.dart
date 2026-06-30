@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../services/analytics/analytics_action_log.dart';
 import '../services/daily_progress_sync.dart';
 import '../services/user_prefs.dart';
 import '../ui/bordered_linear_progress.dart';
@@ -126,6 +127,7 @@ class ProgressScreenState extends State<ProgressScreen> {
   }
 
   void _changeMonth(int delta) {
+    logProgressMonthChange(delta);
     final next = DateTime(_focusedMonth.year, _focusedMonth.month + delta, 1);
     setState(() => _focusedMonth = next);
     _loadMonth();
@@ -154,6 +156,7 @@ class ProgressScreenState extends State<ProgressScreen> {
     setState(() => _openingDetail = true);
     try {
       final dateId = formatYyyyMmDd(day);
+      logProgressDayOpen(dateId);
       DocumentSnapshot<Map<String, dynamic>>? snap;
       Object? fetchError;
       try {

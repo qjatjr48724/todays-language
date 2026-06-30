@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../services/analytics/analytics_action_log.dart';
 import '../l10n/app_localizations.dart';
 import '../services/curriculum_review_service.dart';
 import 'today_sentences_screen.dart';
@@ -55,6 +56,9 @@ class _CurriculumReviewStudyScreenState extends State<CurriculumReviewStudyScree
             widget.reviewLearningDay,
           )),
           bottom: TabBar(
+            onTap: (index) {
+              logReviewTabSelect(index == 0 ? 'words' : 'sentences');
+            },
             tabs: [
               Tab(text: l10n.home_today_words_title),
               Tab(text: l10n.home_today_sentences_title),

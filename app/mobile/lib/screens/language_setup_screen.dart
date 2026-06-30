@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 
 import 'target_language_setup_screen.dart';
 import '../l10n/app_localizations.dart';
+import '../services/analytics/analytics_navigation.dart';
+import '../services/analytics/analytics_screens.dart';
+import '../services/analytics/tracked_scaffold.dart';
 
 class LanguageSetupScreen extends StatefulWidget {
   const LanguageSetupScreen({super.key});
@@ -115,8 +118,10 @@ class _LanguageSetupScreenState extends State<LanguageSetupScreen> {
         SetOptions(merge: true),
       );
       if (!mounted) return;
-      Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => const TargetLanguageSetupScreen()),
+      pushAnalyticsScreen(
+        context,
+        screenName: AnalyticsScreens.targetLanguageSetup,
+        builder: (_) => const TargetLanguageSetupScreen(),
       );
     } catch (e) {
       if (!mounted) return;
@@ -133,7 +138,9 @@ class _LanguageSetupScreenState extends State<LanguageSetupScreen> {
     final scheme = Theme.of(context).colorScheme;
     final canSave = !_saving && _native != null;
 
-    return Scaffold(
+    return trackedScaffold(
+      screenName: AnalyticsScreens.languageSetup,
+      scaffold: Scaffold(
       appBar: AppBar(
         title: Text(l10n.language_setup_appbar_title),
         automaticallyImplyLeading: false,
@@ -203,6 +210,7 @@ class _LanguageSetupScreenState extends State<LanguageSetupScreen> {
           ],
         ),
       ),
+    ),
     );
   }
 }

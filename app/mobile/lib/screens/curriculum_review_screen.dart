@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.dart';
 import '../services/curriculum_review_service.dart';
+import '../services/analytics/analytics_action_log.dart';
+import '../services/analytics/analytics_navigation.dart';
+import '../services/analytics/analytics_screens.dart';
 import '../utils/target_language_label.dart';
 import 'curriculum_review_study_screen.dart';
 
@@ -74,13 +77,14 @@ class _CurriculumReviewScreenState extends State<CurriculumReviewScreen> {
         learningDay: day,
       );
       if (!mounted) return;
-      await Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => CurriculumReviewStudyScreen(
-            reviewLearningDay: day,
-            targetLanguage: widget.targetLanguage,
-            level: widget.level,
-          ),
+      await logReviewDaySelect(day);
+      await pushAnalyticsScreen(
+        context,
+        screenName: AnalyticsScreens.curriculumReviewStudy,
+        builder: (_) => CurriculumReviewStudyScreen(
+          reviewLearningDay: day,
+          targetLanguage: widget.targetLanguage,
+          level: widget.level,
         ),
       );
     } catch (e) {

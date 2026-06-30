@@ -6,6 +6,10 @@ import 'dart:async';
 import 'email_login_screen.dart';
 import 'main_nav_screen.dart';
 import '../l10n/app_localizations.dart';
+import '../services/analytics/analytics_action_log.dart';
+import '../services/analytics/analytics_navigation.dart';
+import '../services/analytics/analytics_screens.dart';
+import '../services/analytics/tracked_scaffold.dart';
 import '../services/auth_session_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -53,6 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
+      await logAuthAttempt('debug_test');
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _testEmail,
         password: _testPassword,
@@ -61,6 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (user != null) {
         await AuthSessionService().claimSession(user);
       }
+      await logAuthResult(authMethod: 'debug_test', success: true);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -75,9 +81,11 @@ class _LoginScreenState extends State<LoginScreen> {
         if (user != null) {
           await AuthSessionService().claimSession(user);
         }
+        await logAuthResult(authMethod: 'debug_test', success: true);
         return;
       }
       if (!mounted) return;
+      await logAuthResult(authMethod: 'debug_test', success: false);
       setState(() => _errorMessage = _messageForAuthException(e, context));
     } catch (_) {
       if (!mounted) return;
@@ -93,7 +101,9 @@ class _LoginScreenState extends State<LoginScreen> {
     final scheme = Theme.of(context).colorScheme;
     final t = Theme.of(context).textTheme;
 
-    return Scaffold(
+    return trackedScaffold(
+      screenName: AnalyticsScreens.login,
+      scaffold: Scaffold(
       appBar: AppBar(title: Text(l10n.login_appbar_title)),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -112,10 +122,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 onPressed: _loading
                     ? null
                     : () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const EmailLoginScreen(),
-                          ),
+                        pushAnalyticsScreen(
+                          context,
+                          screenName: AnalyticsScreens.emailLogin,
+                          builder: (_) => const EmailLoginScreen(),
                         );
                       },
                 child: Text(l10n.login_email_button),
@@ -139,6 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
+    ),
     );
   }
 }

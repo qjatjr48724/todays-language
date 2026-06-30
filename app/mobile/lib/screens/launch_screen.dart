@@ -7,6 +7,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../auth_gate.dart';
 import '../l10n/app_localizations.dart';
+import '../services/analytics/analytics_navigation.dart';
+import '../services/analytics/analytics_screens.dart';
+import '../services/analytics/tracked_scaffold.dart';
 import 'notification_permission_screen.dart';
 
 enum _BlockReason {
@@ -114,9 +117,10 @@ class _LaunchScreenState extends State<LaunchScreen> {
     if (asked) return;
 
     if (!mounted) return;
-    final nav = Navigator.of(context);
-    final result = await nav.push<bool>(
-      MaterialPageRoute(builder: (_) => const NotificationPermissionScreen()),
+    final result = await pushAnalyticsScreen<bool>(
+      context,
+      screenName: AnalyticsScreens.notificationPermission,
+      builder: (_) => const NotificationPermissionScreen(),
     );
 
     // 사용자가 허용/거부 어떤 선택을 하든 "한 번은 물어봤다"로 기록합니다.
@@ -178,7 +182,9 @@ class _LaunchScreenState extends State<LaunchScreen> {
             _blockReason != null ||
             (!_navigating && FirebaseAuth.instance.currentUser == null));
 
-    return Scaffold(
+    return trackedScaffold(
+      screenName: AnalyticsScreens.launch,
+      scaffold: Scaffold(
       body: InkWell(
         onTap: _onTap,
         child: Container(
@@ -237,6 +243,7 @@ class _LaunchScreenState extends State<LaunchScreen> {
           ),
         ),
       ),
+    ),
     );
   }
 }

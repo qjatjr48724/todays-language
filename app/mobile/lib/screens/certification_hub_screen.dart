@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.dart';
 import '../models/certification.dart';
+import '../services/analytics/analytics_action_log.dart';
+import '../services/analytics/analytics_navigation.dart';
+import '../services/analytics/analytics_screens.dart';
 import '../services/certification_repository.dart';
 import '../services/user_prefs.dart';
 import 'certification_detail_screen.dart';
@@ -87,24 +90,29 @@ class _CertificationHubScreenState extends State<CertificationHubScreen> {
 
 
   void _openLanguageList(CertificationLanguageGroup group) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => CertificationListScreen(
-          languageAlpha3: group.languageAlpha3,
-          repository: _repo,
-        ),
+    logCertificationOpen(
+      certId: group.languageAlpha3,
+      entryPoint: 'hub_language',
+    );
+    pushAnalyticsScreen(
+      context,
+      screenName: AnalyticsScreens.certificationList,
+      builder: (_) => CertificationListScreen(
+        languageAlpha3: group.languageAlpha3,
+        repository: _repo,
       ),
     );
   }
 
 
   void _openCertDetail(Certification cert) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => CertificationDetailScreen(
-          certificationId: cert.id,
-          repository: _repo,
-        ),
+    logCertificationOpen(certId: cert.id, entryPoint: 'hub_detail');
+    pushAnalyticsScreen(
+      context,
+      screenName: AnalyticsScreens.certificationDetail,
+      builder: (_) => CertificationDetailScreen(
+        certificationId: cert.id,
+        repository: _repo,
       ),
     );
   }

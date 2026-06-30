@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 
 import 'email_register_screen.dart';
 import '../l10n/app_localizations.dart';
+import '../services/analytics/analytics_action_log.dart';
+import '../services/analytics/analytics_navigation.dart';
+import '../services/analytics/analytics_screens.dart';
 import '../services/auth_session_service.dart';
 
 class EmailLoginScreen extends StatefulWidget {
@@ -34,6 +37,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
       _errorMessage = null;
     });
     try {
+      await logAuthAttempt('email');
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text,
@@ -43,8 +47,10 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
         await AuthSessionService().claimSession(user);
       }
       if (!mounted) return;
+      await logAuthResult(authMethod: 'email', success: true);
       Navigator.of(context).pop();
     } on FirebaseAuthException catch (e) {
+      await logAuthResult(authMethod: 'email', success: false);
       setState(() => _errorMessage = _messageForAuthException(e, context));
     } catch (_) {
       setState(() => _errorMessage = l10n.email_login_error_unknown);
@@ -126,10 +132,10 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                       onPressed: _loading
                           ? null
                           : () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (_) => const EmailRegisterScreen(),
-                                ),
+                              pushAnalyticsScreen(
+                                context,
+                                screenName: AnalyticsScreens.emailRegister,
+                                builder: (_) => const EmailRegisterScreen(),
                               );
                             },
                       child: Text(l10n.email_login_to_register_button),

@@ -5,6 +5,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'auth_session_watcher.dart';
 import 'firebase_options.dart';
 import 'screens/launch_screen.dart';
+import 'services/analytics/analytics_lifecycle_binding.dart';
+import 'services/analytics/app_crashlytics_service.dart';
 import 'ui/app_theme.dart';
 import 'l10n/app_localizations.dart';
 import 'utils/app_restart.dart';
@@ -14,6 +16,8 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await AppCrashlyticsService.instance.initialize();
+  AnalyticsLifecycleBinding.instance.install();
   runApp(const AppRoot());
 }
 

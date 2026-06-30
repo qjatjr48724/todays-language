@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../services/analytics/analytics_action_log.dart';
 import '../l10n/app_localizations.dart';
 import '../services/app_notification_preferences.dart';
 
@@ -65,6 +66,10 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
         setState(() => _busy = true);
         try {
             await AppNotificationPreferences.setEnabled(enable);
+            await logSettingsToggle(
+              settingId: 'app_notifications',
+              enabled: enable,
+            );
             if (!mounted) return;
             setState(() => _appEnabled = enable);
 

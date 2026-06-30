@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../services/analytics/analytics_action_log.dart';
 import '../l10n/app_localizations.dart';
 
 
@@ -155,7 +156,10 @@ class _ConsentScrollAgreeScreenState extends State<ConsentScrollAgreeScreen> {
                 child: Padding(
                     padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
                     child: FilledButton(
-                        onPressed: () => Navigator.of(context).pop(true),
+                        onPressed: () {
+                            logConsentComplete();
+                            Navigator.of(context).pop(true);
+                        },
                         child: Text(l10n.consent_scroll_agree_button),
                     ),
                 ),

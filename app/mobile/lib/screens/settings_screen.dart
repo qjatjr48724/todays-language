@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../services/analytics/analytics_navigation.dart';
+import '../services/analytics/analytics_screens.dart';
 import '../l10n/app_localizations.dart';
 import '../services/target_language_picker.dart';
 import 'admin_tools_screen.dart';
@@ -61,11 +63,11 @@ class SettingsScreen extends StatelessWidget {
                             title: l10n.settings_notification_tile,
                             subtitle: l10n.settings_notification_subtitle,
                             onTap: () {
-                                Navigator.of(context).push(
-                                    MaterialPageRoute<void>(
-                                        builder: (_) =>
-                                            const NotificationSettingsScreen(),
-                                    ),
+                                pushAnalyticsScreen(
+                                    context,
+                                    screenName: AnalyticsScreens.notificationSettings,
+                                    builder: (_) =>
+                                        const NotificationSettingsScreen(),
                                 );
                             },
                         ),
@@ -101,11 +103,11 @@ class SettingsScreen extends StatelessWidget {
                                 title: l10n.settings_admin_tile,
                                 subtitle: l10n.settings_admin_subtitle,
                                 onTap: () {
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute<void>(
-                                            builder: (_) =>
-                                                const AdminToolsScreen(),
-                                        ),
+                                    pushAnalyticsScreen(
+                                        context,
+                                        screenName: AnalyticsScreens.adminTools,
+                                        builder: (_) =>
+                                            const AdminToolsScreen(),
                                     );
                                 },
                             ),

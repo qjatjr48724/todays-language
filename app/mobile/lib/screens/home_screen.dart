@@ -13,6 +13,9 @@ import '../services/user_prefs.dart';
 import '../ui/bordered_linear_progress.dart';
 import '../ui/home_feature_card.dart';
 import '../ui/section_card.dart';
+import '../services/analytics/analytics_action_log.dart';
+import '../services/analytics/analytics_navigation.dart';
+import '../services/analytics/analytics_screens.dart';
 import 'my_info_screen.dart';
 import 'curriculum_review_screen.dart';
 import 'today_sentences_screen.dart';
@@ -201,10 +204,10 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: const Icon(Icons.person_outline),
               tooltip: l10n.home_my_info_tooltip,
               onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const MyInfoScreen(),
-                  ),
+                pushAnalyticsScreen(
+                  context,
+                  screenName: AnalyticsScreens.myInfo,
+                  builder: (_) => const MyInfoScreen(),
                 );
               },
             ),
@@ -245,13 +248,12 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: Icons.grid_on_outlined,
               compactRow: true,
               onTap: () {
-                Navigator.of(context)
-                    .push(
-                  MaterialPageRoute(
-                    builder: (_) => const BasicCharacterChartScreen(),
-                  ),
-                )
-                    .then((_) => _refreshTodayProgress());
+                logHomeCardTap('basic_characters');
+                pushAnalyticsScreen(
+                  context,
+                  screenName: AnalyticsScreens.basicCharacterChart,
+                  builder: (_) => const BasicCharacterChartScreen(),
+                ).then((_) => _refreshTodayProgress());
               },
             ),
             const SizedBox(height: 12),
@@ -271,16 +273,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: Icons.translate,
                   progressText: p == null ? null : '${p.wordDone} / ${p.wordGoal}',
                   onTap: () {
-                    Navigator.of(context)
-                        .push(
-                      MaterialPageRoute(
-                        builder: (_) => TodayWordsScreen(
-                          targetLanguage: _prefs.targetLanguage,
-                          level: _prefs.level,
-                        ),
+                    logHomeCardTap('today_words');
+                    pushAnalyticsScreen(
+                      context,
+                      screenName: AnalyticsScreens.todayWords,
+                      builder: (_) => TodayWordsScreen(
+                        targetLanguage: _prefs.targetLanguage,
+                        level: _prefs.level,
                       ),
-                    )
-                        .then((_) => _refreshTodayProgress());
+                    ).then((_) => _refreshTodayProgress());
                   },
                 ),
                 HomeFeatureCard(
@@ -291,16 +292,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       ? null
                       : '${p.sentenceDone} / ${p.sentenceGoal}',
                   onTap: () {
-                    Navigator.of(context)
-                        .push(
-                      MaterialPageRoute(
-                        builder: (_) => TodaySentencesScreen(
-                          targetLanguage: _prefs.targetLanguage,
-                          level: _prefs.level,
-                        ),
+                    logHomeCardTap('today_sentences');
+                    pushAnalyticsScreen(
+                      context,
+                      screenName: AnalyticsScreens.todaySentences,
+                      builder: (_) => TodaySentencesScreen(
+                        targetLanguage: _prefs.targetLanguage,
+                        level: _prefs.level,
                       ),
-                    )
-                        .then((_) => _refreshTodayProgress());
+                    ).then((_) => _refreshTodayProgress());
                   },
                 ),
                 HomeFeatureCard(
@@ -313,18 +313,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   enabled: canOpenWrapUp,
                   onTap: canOpenWrapUp
                       ? () {
-                          Navigator.of(context)
-                              .push(
-                            MaterialPageRoute(
-                              builder: (_) => TodayWrapUpScreen(
-                                targetLanguage: _prefs.targetLanguage,
-                                level: _prefs.level,
-                              ),
+                          logHomeCardTap('today_wrap_up');
+                          pushAnalyticsScreen(
+                            context,
+                            screenName: AnalyticsScreens.todayWrapUp,
+                            builder: (_) => TodayWrapUpScreen(
+                              targetLanguage: _prefs.targetLanguage,
+                              level: _prefs.level,
                             ),
-                          )
-                              .then((_) => _refreshTodayProgress());
+                          ).then((_) => _refreshTodayProgress());
                         }
-                      : () {},
+                      : () {
+                          logHomeCardTap('today_wrap_up', locked: true);
+                        },
                 ),
               ],
             ),
@@ -337,14 +338,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 icon: Icons.history_edu_outlined,
                 compactRow: true,
                 onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => CurriculumReviewScreen(
-                        targetLanguage: _prefs.targetLanguage,
-                        level: _prefs.level,
-                        currentLearningDay: _prefs.curriculum.learningDay,
-                        curriculumPhase: _prefs.curriculum.curriculumPhase,
-                      ),
+                  logHomeCardTap('curriculum_review');
+                  pushAnalyticsScreen(
+                    context,
+                    screenName: AnalyticsScreens.curriculumReview,
+                    builder: (_) => CurriculumReviewScreen(
+                      targetLanguage: _prefs.targetLanguage,
+                      level: _prefs.level,
+                      currentLearningDay: _prefs.curriculum.learningDay,
+                      curriculumPhase: _prefs.curriculum.curriculumPhase,
                     ),
                   );
                 },

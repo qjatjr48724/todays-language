@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 
+import '../services/analytics/analytics_action_log.dart';
+import '../services/analytics/analytics_screens.dart';
 import '../services/daily_progress_sync.dart';
 import '../services/learning_audio_service.dart';
 import '../l10n/app_localizations.dart';
@@ -74,6 +76,10 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
       !_wordCapReached &&
       !(_aiLoading || _aiError != null || _completedCurrent || _savingProgress);
 
+  String get _analyticsScreenName => _inReviewMode
+      ? AnalyticsScreens.reviewStudyWords
+      : AnalyticsScreens.todayWords;
+
   @override
   void initState() {
     super.initState();
@@ -109,12 +115,21 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
 
   void _startRelearn() {
     final l10n = AppLocalizations.of(context)!;
+    logLearningRelearnStart(screenName: _analyticsScreenName);
     setState(() => _relearnActive = true);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(l10n.words_relearn_snackbar),
       ),
     );
+  }
+
+  Future<void> _onNextSampleTap({bool forceRefreshToken = false}) async {
+    await logLearningNextSample(
+      screenName: _analyticsScreenName,
+      reviewMode: _inReviewMode,
+    );
+    await _fetchWordSample(forceRefreshToken: forceRefreshToken);
   }
 
   Future<void> _fetchWordSample({bool forceRefreshToken = false}) async {
@@ -205,6 +220,11 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.words_completed_snackbar)),
+      );
+      await logLearningMarkDone(
+        screenName: _analyticsScreenName,
+        targetLanguage: widget.targetLanguage,
+        level: widget.level,
       );
     } catch (e) {
       final l10n = AppLocalizations.of(context)!;
@@ -376,7 +396,7 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
               const SizedBox(height: 8),
             ],
             OutlinedButton.icon(
-              onPressed: _canUseNextButton ? _fetchWordSample : null,
+              onPressed: _canUseNextButton ? _onNextSampleTap : null,
               icon: const Icon(Icons.refresh),
               label: Text(l10n.words_next_button_label),
             ),

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 
 import '../auth_gate.dart';
 import '../config/feature_flags.dart';
+import '../services/analytics/analytics_navigation.dart';
+import '../services/analytics/analytics_screens.dart';
 import '../services/auth_session_service.dart';
 import '../config/firebase_functions_config.dart';
 import '../l10n/app_localizations.dart';
@@ -276,10 +278,10 @@ class MyInfoScreen extends StatelessWidget {
               icon: const Icon(Icons.settings_outlined),
               tooltip: l10n.settings_tooltip,
               onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => const SettingsScreen(),
-                  ),
+                pushAnalyticsScreen(
+                  context,
+                  screenName: AnalyticsScreens.settings,
+                  builder: (_) => const SettingsScreen(),
                 );
               },
             ),
@@ -302,10 +304,10 @@ class MyInfoScreen extends StatelessWidget {
             icon: const Icon(Icons.settings_outlined),
             tooltip: l10n.settings_tooltip,
             onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => const SettingsScreen(),
-                ),
+              pushAnalyticsScreen(
+                context,
+                screenName: AnalyticsScreens.settings,
+                builder: (_) => const SettingsScreen(),
               );
             },
           ),

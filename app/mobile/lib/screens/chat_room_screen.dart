@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../services/analytics/analytics_action_log.dart';
 import '../l10n/app_localizations.dart';
 import '../models/chat_message.dart';
 import '../services/chat_repository.dart';
@@ -75,6 +76,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
       );
       if (!mounted) return;
       _inputController.clear();
+      await logChatMessageSend();
     } catch (e) {
       if (!mounted) return;
       setState(() => _sendError = l10n.chat_send_failed(e.toString()));

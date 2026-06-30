@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 
+import '../services/analytics/analytics_action_log.dart';
+import '../services/analytics/analytics_screens.dart';
 import '../services/daily_progress_sync.dart';
 import '../services/learning_audio_service.dart';
 import '../l10n/app_localizations.dart';
@@ -71,6 +73,10 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
       !_sentenceCapReached &&
       !(_aiLoading || _aiError != null || _completedCurrent || _savingProgress);
 
+  String get _analyticsScreenName => _inReviewMode
+      ? AnalyticsScreens.reviewStudySentences
+      : AnalyticsScreens.todaySentences;
+
   @override
   void initState() {
     super.initState();
@@ -104,10 +110,19 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
 
   void _startRelearn() {
     final l10n = AppLocalizations.of(context)!;
+    logLearningRelearnStart(screenName: _analyticsScreenName);
     setState(() => _relearnActive = true);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(l10n.sentences_relearn_snackbar)),
     );
+  }
+
+  Future<void> _onNextSampleTap({bool forceRefreshToken = false}) async {
+    await logLearningNextSample(
+      screenName: _analyticsScreenName,
+      reviewMode: _inReviewMode,
+    );
+    await _fetchSentenceSample(forceRefreshToken: forceRefreshToken);
   }
 
   Future<void> _fetchSentenceSample({bool forceRefreshToken = false}) async {
@@ -203,6 +218,11 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.sentences_completed_snackbar)),
+      );
+      await logLearningMarkDone(
+        screenName: _analyticsScreenName,
+        targetLanguage: widget.targetLanguage,
+        level: widget.level,
       );
     } catch (e) {
       final l10n = AppLocalizations.of(context)!;
@@ -363,7 +383,7 @@ class _TodaySentencesScreenState extends State<TodaySentencesScreen> {
               const SizedBox(height: 8),
             ],
             OutlinedButton.icon(
-              onPressed: _canUseNextButton ? _fetchSentenceSample : null,
+              onPressed: _canUseNextButton ? _onNextSampleTap : null,
               icon: const Icon(Icons.refresh),
               label: Text(l10n.sentences_next_button_label),
             ),

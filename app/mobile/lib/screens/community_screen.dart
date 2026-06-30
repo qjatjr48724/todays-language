@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.dart';
+import '../services/analytics/analytics_action_log.dart';
+import '../services/analytics/analytics_navigation.dart';
+import '../services/analytics/analytics_screens.dart';
 import '../services/chat_repository.dart';
 import 'certification_hub_screen.dart';
 import 'chat_room_screen.dart';
@@ -40,12 +43,13 @@ class CommunityScreen extends StatelessWidget {
       );
       return;
     }
-    await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => ChatRoomScreen(
-          targetLanguage: targetLanguage,
-          repository: repo,
-        ),
+    logCommunityMenuTap('chat');
+    await pushAnalyticsScreen(
+      context,
+      screenName: AnalyticsScreens.chatRoom,
+      builder: (_) => ChatRoomScreen(
+        targetLanguage: targetLanguage,
+        repository: repo,
       ),
     );
   }
@@ -71,10 +75,11 @@ class CommunityScreen extends StatelessWidget {
               title: l10n.community_menu_certificates,
               subtitle: l10n.community_menu_certificates_subtitle,
               onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => const CertificationHubScreen(),
-                  ),
+                logCommunityMenuTap('certificates');
+                pushAnalyticsScreen(
+                  context,
+                  screenName: AnalyticsScreens.certificationHub,
+                  builder: (_) => const CertificationHubScreen(),
                 );
               },
             ),

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../services/analytics/analytics_action_log.dart';
+import '../services/analytics/analytics_navigation.dart';
+import '../services/analytics/analytics_screens.dart';
 import '../l10n/app_localizations.dart';
 import '../models/certification.dart';
 import '../services/certification_repository.dart';
@@ -134,12 +137,16 @@ class _CertificationListScreenState extends State<CertificationListScreen> {
                             ),
                             trailing: const Icon(Icons.chevron_right),
                             onTap: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute<void>(
-                                  builder: (_) => CertificationDetailScreen(
-                                    certificationId: cert.id,
-                                    repository: _repo,
-                                  ),
+                              logCertificationOpen(
+                                certId: cert.id,
+                                entryPoint: 'list',
+                              );
+                              pushAnalyticsScreen(
+                                context,
+                                screenName: AnalyticsScreens.certificationDetail,
+                                builder: (_) => CertificationDetailScreen(
+                                  certificationId: cert.id,
+                                  repository: _repo,
                                 ),
                               );
                             },

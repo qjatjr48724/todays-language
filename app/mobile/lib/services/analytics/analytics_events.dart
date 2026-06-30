@@ -1,0 +1,28 @@
+/// Analytics 커스텀 이벤트 이름.
+abstract final class AnalyticsEvents {
+  static const screenView = 'screen_view';
+  static const screenDwell = 'screen_dwell';
+  static const appSessionStart = 'app_session_start';
+  static const appBackground = 'app_background';
+  static const tabSelect = 'tab_select';
+  static const homeCardTap = 'home_card_tap';
+  static const learningMarkDone = 'learning_mark_done';
+  static const learningNextSample = 'learning_next_sample';
+  static const learningRelearnStart = 'learning_relearn_start';
+  static const wrapUpStart = 'wrap_up_start';
+  static const wrapUpComplete = 'wrap_up_complete';
+  static const reviewDaySelect = 'review_day_select';
+  static const reviewTabSelect = 'review_tab_select';
+  static const progressMonthChange = 'progress_month_change';
+  static const progressDayOpen = 'progress_day_open';
+  static const communityMenuTap = 'community_menu_tap';
+  static const chatMessageSend = 'chat_message_send';
+  static const certificationOpen = 'certification_open';
+  static const characterTabSelect = 'character_tab_select';
+  static const authAttempt = 'auth_attempt';
+  static const authResult = 'auth_result';
+  static const languageSetupComplete = 'language_setup_complete';
+  static const consentComplete = 'consent_complete';
+  static const settingsToggle = 'settings_toggle';
+  static const callableError = 'callable_error';
+}

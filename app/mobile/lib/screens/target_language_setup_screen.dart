@@ -7,6 +7,10 @@ import 'main_nav_screen.dart';
 import '../config/feature_flags.dart';
 import '../l10n/app_localizations.dart';
 import '../models/curriculum_state.dart';
+import '../services/analytics/analytics_action_log.dart';
+import '../services/analytics/analytics_navigation.dart';
+import '../services/analytics/analytics_screens.dart';
+import '../services/analytics/tracked_scaffold.dart';
 import '../services/user_profile_sync.dart';
 import '../ui/learning_level_selector.dart';
 
@@ -148,9 +152,12 @@ class _TargetLanguageSetupScreenState extends State<TargetLanguageSetupScreen> {
       });
 
       if (!mounted) return;
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const MainNavScreen()),
-        (route) => false,
+      await logLanguageSetupComplete(targetLanguage: targetChoice.alpha3);
+      pushAndRemoveUntilAnalyticsScreen(
+        context,
+        screenName: AnalyticsScreens.mainNav,
+        builder: (_) => const MainNavScreen(),
+        predicate: (route) => false,
       );
     } catch (e) {
       if (!mounted) return;
@@ -167,7 +174,9 @@ class _TargetLanguageSetupScreenState extends State<TargetLanguageSetupScreen> {
     final scheme = Theme.of(context).colorScheme;
     final canSave = !_saving && _targetChoice != null;
 
-    return Scaffold(
+    return trackedScaffold(
+      screenName: AnalyticsScreens.targetLanguageSetup,
+      scaffold: Scaffold(
       appBar: AppBar(
         title: Text(l10n.target_language_setup_appbar_title),
         automaticallyImplyLeading: false,
@@ -245,6 +254,7 @@ class _TargetLanguageSetupScreenState extends State<TargetLanguageSetupScreen> {
           ],
         ),
       ),
+    ),
     );
   }
 }

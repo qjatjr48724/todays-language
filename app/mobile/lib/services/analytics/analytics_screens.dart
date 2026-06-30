@@ -1,0 +1,33 @@
+/// Analytics 화면 식별자 — PII 없음, snake_case 고정.
+abstract final class AnalyticsScreens {
+  static const launch = 'launch';
+  static const login = 'login';
+  static const emailLogin = 'email_login';
+  static const emailRegister = 'email_register';
+  static const consentScrollAgree = 'consent_scroll_agree';
+  static const privacyPolicy = 'privacy_policy';
+  static const termsOfService = 'terms_of_service';
+  static const languageSetup = 'language_setup';
+  static const targetLanguageSetup = 'target_language_setup';
+  static const mainNav = 'main_nav';
+  static const myInfo = 'my_info';
+  static const home = 'home';
+  static const community = 'community';
+  static const progress = 'progress';
+  static const todayWords = 'today_words';
+  static const todaySentences = 'today_sentences';
+  static const todayWrapUp = 'today_wrap_up';
+  static const curriculumReview = 'curriculum_review';
+  static const curriculumReviewStudy = 'curriculum_review_study';
+  static const reviewStudyWords = 'review_study_words';
+  static const reviewStudySentences = 'review_study_sentences';
+  static const basicCharacterChart = 'basic_character_chart';
+  static const chatRoom = 'chat_room';
+  static const certificationHub = 'certification_hub';
+  static const certificationList = 'certification_list';
+  static const certificationDetail = 'certification_detail';
+  static const settings = 'settings';
+  static const notificationSettings = 'notification_settings';
+  static const notificationPermission = 'notification_permission';
+  static const adminTools = 'admin_tools';
+}

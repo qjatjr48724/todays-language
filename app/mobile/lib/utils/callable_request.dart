@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../services/analytics/analytics_action_log.dart';
+
 /// 학습 화면 Callable 호출 전체 타임아웃(오프라인 시 무한 로딩 방지).
 const Duration kCallableLoadTimeout = Duration(seconds: 30);
 
@@ -53,7 +55,12 @@ Future<Map<String, dynamic>> invokeCallableMap(
     }
   }
 
-  return run().timeout(timeout);
+  try {
+    return await run().timeout(timeout);
+  } catch (e, st) {
+    await logCallableFailure(e, st);
+    rethrow;
+  }
 }
 
 /// Callable 로드 실패 메시지용 상세 문자열(타임아웃·Functions 코드).

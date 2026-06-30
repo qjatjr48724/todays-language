@@ -3,6 +3,8 @@ import '../utils/callable_request.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../services/analytics/analytics_action_log.dart';
+import '../services/analytics/analytics_params.dart';
 import '../services/daily_progress_sync.dart';
 import '../services/wrap_up_quiz_builder.dart';
 import '../l10n/app_localizations.dart';
@@ -98,6 +100,7 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
         _questions.addAll(built);
         _loading = false;
       });
+      await logWrapUpStart();
     } catch (e) {
       if (!mounted) return;
       final l10n = AppLocalizations.of(context)!;
@@ -169,6 +172,12 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
         );
       }
       if (!mounted) return;
+      final bucket = progressBucketFromPercent(
+        _questions.isEmpty
+            ? 0
+            : ((_correctCount / _questions.length) * 100).round(),
+      );
+      await logWrapUpComplete(progressBucket: bucket);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.wrapup_completed_snackbar)),
       );
