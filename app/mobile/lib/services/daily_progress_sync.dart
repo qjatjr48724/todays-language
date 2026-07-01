@@ -585,21 +585,23 @@ bool canAdvanceLearningDayForUser(
 
 
 /// 트랜잭션 안에서 해당 언어 일일 완료 시 learningDayByLanguage +1 (중복 방지).
+///
+/// [userData]는 호출 전에 트랜잭션으로 읽어 둔 사용자 문서이며, 성공 시 일차 필드를 갱신합니다.
+/// (Firestore: 모든 read 후에 write — 트랜잭션 내 user 재조회 금지)
 Future<bool> tryAdvanceLearningDayInTransaction(
   Transaction tx, {
   required DocumentReference<Map<String, dynamic>> userRef,
   required DocumentReference<Map<String, dynamic>> progressRef,
   required Map<String, dynamic> progressData,
   required String targetLanguage,
+  required Map<String, dynamic> userData,
 }) async {
   final lang = normalizeDailyProgressLanguageCode(targetLanguage);
   if (!isLanguageDailyProgressComplete(progressData, lang)) return false;
   if (_isCurriculumDayAdvancedForLanguage(progressData, lang)) return false;
 
-  final userSnap = await tx.get(userRef);
-  final userData = userSnap.data() ?? <String, dynamic>{};
-
   if (!canAdvanceLearningDayForUser(userData, targetLanguage: lang)) {
+    _markCurriculumDayAdvancedInMemory(progressData, lang);
     tx.set(
       progressRef,
       {
@@ -620,6 +622,9 @@ Future<bool> tryAdvanceLearningDayInTransaction(
     ),
   )..[lang] = nextDay;
 
+  userData[CurriculumState.learningDayByLanguageField] = byLangDays;
+  _markCurriculumDayAdvancedInMemory(progressData, lang);
+
   tx.set(
     userRef,
     {
@@ -639,6 +644,19 @@ Future<bool> tryAdvanceLearningDayInTransaction(
 }
 
 
+void _markCurriculumDayAdvancedInMemory(
+  Map<String, dynamic> progressData,
+  String lang,
+) {
+  final raw = progressData[kCurriculumDayAdvancedByLanguageField];
+  final map = raw is Map
+      ? Map<String, dynamic>.from(raw)
+      : <String, dynamic>{};
+  map[lang] = true;
+  progressData[kCurriculumDayAdvancedByLanguageField] = map;
+}
+
+
 /// 특정 KST 날짜·언어 문서가 완료됐으면 해당 언어 learningDay +1을 시도합니다.
 ///
 /// 당일(`dateKst` == 오늘 KST) 문서는 여기서 +1하지 않습니다.
@@ -655,9 +673,15 @@ Future<bool> tryAdvanceLearningDayForDate(
 
   return FirebaseFirestore.instance.runTransaction((tx) async {
     final progressSnap = await tx.get(progressRef);
+    final userSnap = await tx.get(userRef);
     if (!progressSnap.exists) return false;
 
-    final data = progressSnap.data() ?? <String, dynamic>{};
+    final data = Map<String, dynamic>.from(
+      progressSnap.data() ?? <String, dynamic>{},
+    );
+    final userData = Map<String, dynamic>.from(
+      userSnap.data() ?? <String, dynamic>{},
+    );
     final byLanguage = parseByLanguageField(data[kByLanguageField]);
 
     if (byLanguage.isEmpty) {
@@ -668,6 +692,7 @@ Future<bool> tryAdvanceLearningDayForDate(
         progressRef: progressRef,
         progressData: data,
         targetLanguage: lang,
+        userData: userData,
       );
     }
 
@@ -679,6 +704,7 @@ Future<bool> tryAdvanceLearningDayForDate(
         progressRef: progressRef,
         progressData: data,
         targetLanguage: lang,
+        userData: userData,
       );
       if (progressed) advancedAny = true;
     }
@@ -827,7 +853,11 @@ Future<DailyProgressView> incrementTodayDailyProgress(
 
   return FirebaseFirestore.instance.runTransaction((tx) async {
     final snap = await tx.get(ref);
+    final userSnap = await tx.get(userRef);
     final data = snap.data() ?? <String, dynamic>{};
+    final userData = Map<String, dynamic>.from(
+      userSnap.data() ?? <String, dynamic>{},
+    );
 
     final wordGoal = _intFromDynamic(data['wordGoal'], kDailyWordGoalDefault);
     final sentenceGoal =
@@ -875,15 +905,16 @@ Future<DailyProgressView> incrementTodayDailyProgress(
       'updatedAt': FieldValue.serverTimestamp(),
     };
 
-    tx.set(ref, progressPayload, SetOptions(merge: true));
-
     await tryAdvanceLearningDayInTransaction(
       tx,
       userRef: userRef,
       progressRef: ref,
       progressData: progressPayload,
       targetLanguage: lang,
+      userData: userData,
     );
+
+    tx.set(ref, progressPayload, SetOptions(merge: true));
 
     return buildDailyProgressView(
       dateKst: dateKst,
