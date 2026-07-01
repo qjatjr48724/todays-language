@@ -2202,3 +2202,64 @@ unauthenticated: 로그인 상태 확인
 1. `firebase deploy --only functions:generateWord,functions:generateSentence`
 2. 복습 플로우 E2E 수동 테스트 (일차 선택·탭 전환·뒤로가기 후 현재 일차 복귀)
 3. (선택) 캘린더 `childAspectRatio` 추가 미세 조정
+
+---
+
+## [단계 44] Analytics·Crashlytics · 마무리 듣기 · 진도 트랜잭션 수정 (2026-06-17)
+
+### 1) 오늘 한 일
+
+**Firebase Analytics·Crashlytics (앱)**
+- `firebase_analytics` · `firebase_crashlytics` 도입, Android Crashlytics 플러그인
+- PII 화이트리스트 가드(`AnalyticsGuard`), KST 이용 시간대(`app_session_start` → `hour_kst` / `time_band`)
+- 1~3차 커스텀 이벤트(탭·홈 카드·학습·복습·인증·설정 등), `docs/ANALYTICS_COLLECTION_MAP.md`
+- 릴리스 전송 / 디버그는 `--dart-define=ANALYTICS_FORCE_ENABLE=true` + `adb setprop debug.firebase.analytics.app`
+- **버그 수정:** bool 파라미터(`review_mode` 등) → `'true'`/`'false'` 문자열 변환, `logEvent` 실패 시 앱 흐름 격리
+- DebugView 수동 검증 완료 (`app_session_start`, `home_card_tap`, `learning_mark_done`, `tab_select` / `screen_dwell`)
+
+**오늘의 마무리 — 문제 카드 듣기**
+- `getWrapUpDeck` 응답에 `answerAudioPath` 추가(단어 `wordAudioPath` / 문장 `sentenceAudioPath`)
+- 마무리 **문제 카드에만** 스피커 버튼(보기 4개에는 미표시), `LearningAudioIconButton` 재사용
+
+**마무리 완료 진도 반영 버그 수정**
+- 일일 목표 달성 시 `learningDay` +1 트랜잭션에서 **쓰기 후 `users` 재조회** → Firestore 규칙 위반
+- 트랜잭션 시작 시 `daily_progress`·`users` 선조회 후 쓰기만 수행
+
+### 2) 합의·결정
+
+- Analytics 수집 맵은 Firestore가 아닌 **Firebase Analytics DebugView**에서 확인
+- 마무리 듣기는 **정답(학습 언어) 발음**만 문제 영역에서 재생
+- 오디오 없는 레거시 세트는 버튼 비활성(단어/문장 화면과 동일)
+
+### 3) 완료 기준 체크
+
+- [x] `flutter test` (`analytics_guard_test`, `wrap_up_quiz_builder_test`, `daily_progress_sync_test`)
+- [x] `npm run build` (Functions)
+- [x] Analytics DebugView E2E (디버그 기기 등록 + `ANALYTICS_FORCE_ENABLE`)
+- [ ] `firebase deploy --only functions:getWrapUpDeck` (마무리 듣기 경로 반영)
+- [ ] 마무리 완료 → 진도 13/13 반영 수동 재검증
+- [ ] iOS Crashlytics dSYM 설정(배포 시)
+
+### 4) 추가/변경 파일(주요)
+
+| 영역 | 파일 |
+|------|------|
+| Analytics 코어 | `lib/services/analytics/*`, `main.dart`, Android `build.gradle.kts` |
+| Analytics 문서·테스트 | `docs/ANALYTICS_COLLECTION_MAP.md`, `test/analytics_guard_test.dart` |
+| 마무리 듣기 | `functions/src/wrap_up/callables.ts`, `today_wrap_up_screen.dart`, `wrap_up_quiz_builder.dart` |
+| 진도 트랜잭션 | `daily_progress_sync.dart` |
+
+### 5) Git 커밋
+
+| 해시 | 메시지 |
+|------|--------|
+| `93cd447` | feat(mobile): Firebase Analytics·Crashlytics 도입 및 PII-safe 이벤트 계측 |
+| `6c32df3` | fix(mobile): Analytics bool 파라미터 문자열 변환 및 전송 실패 격리 |
+| (본 커밋) | feat/fix: 마무리 문제 듣기·진도 트랜잭션 수정 및 [단계 44] 진행 기록 |
+
+### 6) 다음 액션
+
+1. `firebase deploy --only functions:getWrapUpDeck`
+2. 마무리 완료(13/13) 후 홈 진도·스낵바 정상 확인
+3. (보류) 문장 세트 `vocabularyHints` 일반형·`meaningKo` 검증 프롬프트 보강
+4. (선택) 약관·개인정보에 Analytics/Crashlytics 고지 문구 반영
