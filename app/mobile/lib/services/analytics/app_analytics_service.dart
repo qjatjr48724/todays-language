@@ -76,11 +76,19 @@ class AppAnalyticsService {
     final eventName = AnalyticsGuard.safeLabel(name, maxLen: 40);
     if (eventName == null) return;
     final sanitized = AnalyticsGuard.sanitizeParams(params);
-    if (sanitized.isEmpty) {
-      await _analytics.logEvent(name: eventName);
-      return;
+    try {
+      if (sanitized.isEmpty) {
+        await _analytics.logEvent(name: eventName);
+        return;
+      }
+      await _analytics.logEvent(name: eventName, parameters: sanitized);
+    } catch (e, st) {
+      assert(() {
+        debugPrint('[AppAnalyticsService] logEvent failed: $eventName $e');
+        debugPrint('$st');
+        return true;
+      }());
     }
-    await _analytics.logEvent(name: eventName, parameters: sanitized);
   }
 
   Future<void> onScreenDisposed(String screenName, DateTime enteredAt) async {

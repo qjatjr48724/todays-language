@@ -15,7 +15,7 @@ void main() {
       expect(out[AnalyticsParamKeys.screenName], 'home');
       expect(out[AnalyticsParamKeys.hourKst], 14);
       expect(out[AnalyticsParamKeys.timeBand], 'afternoon');
-      expect(out[AnalyticsParamKeys.locked], true);
+      expect(out[AnalyticsParamKeys.locked], 'true');
     });
 
     test('화이트리스트 외 키는 제거한다', () {
@@ -37,6 +37,16 @@ void main() {
 
       expect(out.isEmpty, isTrue);
       expect(AnalyticsGuard.safeLabel('user@secret.com'), isNull);
+    });
+
+    test('bool 파라미터는 Firebase용 문자열로 변환한다', () {
+      final out = AnalyticsGuard.sanitizeParams({
+        AnalyticsParamKeys.reviewMode: false,
+        AnalyticsParamKeys.success: true,
+      });
+
+      expect(out[AnalyticsParamKeys.reviewMode], 'false');
+      expect(out[AnalyticsParamKeys.success], 'true');
     });
 
     test('진도 구간 라벨은 허용한다', () {

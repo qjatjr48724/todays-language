@@ -43,7 +43,9 @@ class AnalyticsGuard {
   }
 
   static Object? _sanitizeValue(Object value) {
-    if (value is bool || value is int) return value;
+    // Firebase Analytics 파라미터는 String·num만 허용.
+    if (value is bool) return value ? 'true' : 'false';
+    if (value is int) return value;
     if (value is double) return value.round();
     if (value is String) {
       final trimmed = value.trim();
