@@ -17,14 +17,23 @@ type WrapUpDeckItem = {
   kind: "word" | "sentence";
   meaningKo: string;
   answer: string;
+  answerAudioPath?: string;
 };
 
 type WordSetLike = {
-  words: { word: string; meaningKo: string }[];
+  words: {
+    word: string;
+    meaningKo: string;
+    wordAudioPath?: string;
+  }[];
 };
 
 type SentenceSetLike = {
-  sentences: { sentence: string; meaningKo: string }[];
+  sentences: {
+    sentence: string;
+    meaningKo: string;
+    sentenceAudioPath?: string;
+  }[];
 };
 
 function normalizeTargetLanguage(code: string): { external: string; internal: string } {
@@ -120,11 +129,17 @@ export const getWrapUpDeck = onCall(
         kind: "word" as const,
         meaningKo: w.meaningKo,
         answer: w.word,
+        ...(w.wordAudioPath?.trim()
+          ? { answerAudioPath: w.wordAudioPath.trim() }
+          : {}),
       })),
       ...pickS.map((s) => ({
         kind: "sentence" as const,
         meaningKo: s.meaningKo,
         answer: s.sentence,
+        ...(s.sentenceAudioPath?.trim()
+          ? { answerAudioPath: s.sentenceAudioPath.trim() }
+          : {}),
       })),
     ];
     return { items: shuffle(items) };

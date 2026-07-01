@@ -6,11 +6,13 @@ class WrapUpDeckEntry {
     required this.kind,
     required this.meaningKo,
     required this.answer,
+    this.answerAudioPath,
   });
 
   final String kind;
   final String meaningKo;
   final String answer;
+  final String? answerAudioPath;
 }
 
 /// 4지선다 1문항(앱에서 생성).
@@ -22,6 +24,7 @@ class WrapUpQuizQuestion {
     required this.correctAnswer,
     required this.choices,
     required this.correctIndex,
+    this.answerAudioPath,
   });
 
   final String kind;
@@ -30,6 +33,7 @@ class WrapUpQuizQuestion {
   final String correctAnswer;
   final List<String> choices;
   final int correctIndex;
+  final String? answerAudioPath;
 }
 
 /// 덱 항목으로 4지선다 문항 목록을 만든다. 보기는 덱 내 다른 정답에서 추출한다.
@@ -73,6 +77,7 @@ List<WrapUpQuizQuestion> buildWrapUpQuizQuestions({
         correctAnswer: item.answer,
         choices: choices,
         correctIndex: correctIndex,
+        answerAudioPath: item.answerAudioPath,
       ),
     );
   }

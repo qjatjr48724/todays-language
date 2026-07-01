@@ -18,6 +18,39 @@ void main() {
       expect(q, isEmpty);
     });
 
+    test('answerAudioPath is preserved on quiz question', () {
+      const items = [
+        WrapUpDeckEntry(
+          kind: 'word',
+          meaningKo: '가다',
+          answer: 'いく',
+          answerAudioPath: 'learning_audio/JPN/word1.mp3',
+        ),
+        WrapUpDeckEntry(kind: 'word', meaningKo: '학교', answer: 'がっこう'),
+        WrapUpDeckEntry(kind: 'word', meaningKo: '오다', answer: 'くる'),
+        WrapUpDeckEntry(
+          kind: 'sentence',
+          meaningKo: '학교에 가요',
+          answer: 'がっこうにいく。',
+          answerAudioPath: 'learning_audio/JPN/sent1.mp3',
+        ),
+      ];
+
+      final q = buildWrapUpQuizQuestions(
+        items: items,
+        wordKindLabel: '단어',
+        sentenceKindLabel: '문장',
+        random: _fixedRandom(),
+      );
+
+      final withAudio = q.where((e) => e.answerAudioPath != null).toList();
+      expect(withAudio, isNotEmpty);
+      for (final question in withAudio) {
+        expect(question.choices[question.correctIndex], question.correctAnswer);
+        expect(question.answerAudioPath, isNotEmpty);
+      }
+    });
+
     test('each question has 4 choices with one correct answer', () {
       final items = [
         const WrapUpDeckEntry(kind: 'word', meaningKo: '가다', answer: 'いく'),

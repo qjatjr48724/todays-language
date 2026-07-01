@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 import '../services/analytics/analytics_action_log.dart';
 import '../services/analytics/analytics_params.dart';
 import '../services/daily_progress_sync.dart';
+import '../services/learning_audio_service.dart';
 import '../services/wrap_up_quiz_builder.dart';
 import '../l10n/app_localizations.dart';
+import '../ui/learning_audio_icon_button.dart';
 
 class TodayWrapUpScreen extends StatefulWidget {
   const TodayWrapUpScreen({
@@ -34,6 +36,13 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
   bool _answered = false;
   int _correctCount = 0;
   bool _sessionComplete = false;
+  final _learningAudio = LearningAudioService();
+
+  @override
+  void dispose() {
+    _learningAudio.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -45,6 +54,7 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
 
   Future<void> _loadWrapUp({bool forceRefreshToken = false}) async {
     if (!mounted) return;
+    await _learningAudio.stop();
     setState(() {
       _loading = true;
       _error = null;
@@ -122,7 +132,16 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
       final answer = m['answer']?.toString().trim() ?? '';
       if (meaning.isEmpty || answer.isEmpty) continue;
       if (kind == 'word' || kind == 'sentence') {
-        loaded.add(WrapUpDeckEntry(kind: kind, meaningKo: meaning, answer: answer));
+        final audioPath = m['answerAudioPath']?.toString().trim();
+        loaded.add(
+          WrapUpDeckEntry(
+            kind: kind,
+            meaningKo: meaning,
+            answer: answer,
+            answerAudioPath:
+                (audioPath != null && audioPath.isNotEmpty) ? audioPath : null,
+          ),
+        );
       }
     }
     return loaded;
@@ -141,6 +160,7 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
 
   void _goNext() {
     if (!_answered) return;
+    _learningAudio.stop();
     if (_currentIndex + 1 >= _questions.length) {
       setState(() => _sessionComplete = true);
       return;
@@ -224,6 +244,9 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
                         onNext: _goNext,
                         pickWord: l10n.wrapup_pick_word,
                         pickSentence: l10n.wrapup_pick_sentence,
+                        audioService: _learningAudio,
+                        playWordTooltip: l10n.learning_audio_play_word,
+                        playSentenceTooltip: l10n.learning_audio_play_sentence,
                       ),
       ),
     );
@@ -265,6 +288,9 @@ class _QuizBody extends StatelessWidget {
     required this.onNext,
     required this.pickWord,
     required this.pickSentence,
+    required this.audioService,
+    required this.playWordTooltip,
+    required this.playSentenceTooltip,
   });
 
   final WrapUpQuizQuestion question;
@@ -276,6 +302,9 @@ class _QuizBody extends StatelessWidget {
   final VoidCallback onNext;
   final String pickWord;
   final String pickSentence;
+  final LearningAudioService audioService;
+  final String playWordTooltip;
+  final String playSentenceTooltip;
 
   @override
   Widget build(BuildContext context) {
@@ -284,6 +313,8 @@ class _QuizBody extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final instruction =
         question.kind == 'word' ? pickWord : pickSentence;
+    final audioTooltip =
+        question.kind == 'word' ? playWordTooltip : playSentenceTooltip;
     final isCorrect = answered && selectedIndex == question.correctIndex;
 
     return Column(
@@ -321,11 +352,25 @@ class _QuizBody extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  instruction,
-                  style: textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        instruction,
+                        style: textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    LearningAudioIconButton(
+                      storagePath: question.answerAudioPath,
+                      tooltip: audioTooltip,
+                      audioService: audioService,
+                      onError: (e) =>
+                          showLearningAudioErrorSnackBar(context, e),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 12),
                 Text(
