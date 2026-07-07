@@ -2313,7 +2313,7 @@ unauthenticated: 로그인 상태 확인
 
 | 해시 | 메시지 |
 |------|--------|
-| (본 커밋) | `0acbbad` — feat: 커리큘럼 주제명 Firestore 저장 및 앱 로컬라이즈 UI 표시 |
+| (본 커밋) | `b1ebc70` — feat: 커리큘럼 주제명 Firestore 저장 및 앱 로컬라이즈 UI 표시 |
 
 ### 6) 다음 액션
 
