@@ -235,6 +235,14 @@
       }
     }
   },
+  "curriculum_topic_label": "Topic: {topic}",
+  "@curriculum_topic_label": {
+    "placeholders": {
+      "topic": {
+        "type": "String"
+      }
+    }
+  },
   "home_no_data": "No data available.",
   "home_progress_counts": "Words {wordDone}/{wordGoal} · Sentences {sentenceDone}/{sentenceGoal} · Wrap-up {quizDone}/{quizGoal}",
   "home_reset_debug_button_label": "Reset Progress (Debug)",

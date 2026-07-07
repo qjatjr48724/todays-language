@@ -15,7 +15,10 @@ import {
   buildWordUserPromptJson,
   type CurriculumPromptContext,
 } from "./prompts";
-import { curriculumPromptContextForDay } from "./curriculum/prompt_bridge";
+import {
+  curriculumPromptContextForDay,
+  curriculumTopicLabelsKoForDay,
+} from "./curriculum/prompt_bridge";
 import {
   CURRICULUM_CORE_V1_ID,
   getCurriculumDaySpec,
@@ -142,6 +145,7 @@ type CurriculumWordSet = {
   curriculumPhase: number;
   learningDay: number;
   topicIds: string[];
+  topicLabelsKo: string[];
   words: StoredWordItem[];
   updatedAtMs: number;
 };
@@ -153,6 +157,7 @@ type CurriculumSentenceSet = {
   curriculumPhase: number;
   learningDay: number;
   topicIds: string[];
+  topicLabelsKo: string[];
   sentences: StoredSentenceItem[];
   updatedAtMs: number;
 };
@@ -1168,9 +1173,20 @@ async function materializeGlobalCurriculumWordSetIfAbsent(
       Array.isArray(data.words) &&
       data.words.length > 0
     ) {
-      if (data.words.some((w) => wordItemNeedsAudio(w))) {
-        const words = await enrichWordItemsWithAudio(data.words, canonicalLang);
-        await ref.set({ words, updatedAtMs: Date.now() }, { merge: true });
+      const topicLabelsKo = curriculumTopicLabelsKoForDay(learningDay);
+      const needsTopicLabels =
+        topicLabelsKo.length > 0 &&
+        (!Array.isArray(data.topicLabelsKo) || data.topicLabelsKo.length === 0);
+      const needsAudio = data.words.some((w) => wordItemNeedsAudio(w));
+      if (needsTopicLabels || needsAudio) {
+        const patch: Record<string, unknown> = { updatedAtMs: Date.now() };
+        if (needsTopicLabels) {
+          patch.topicLabelsKo = topicLabelsKo;
+        }
+        if (needsAudio) {
+          patch.words = await enrichWordItemsWithAudio(data.words, canonicalLang);
+        }
+        await ref.set(patch, { merge: true });
       }
       return ref;
     }
@@ -1178,6 +1194,7 @@ async function materializeGlobalCurriculumWordSetIfAbsent(
 
   const curriculum = curriculumPromptContextForDay(learningDay, phase);
   const spec = getCurriculumDaySpec(learningDay);
+  const topicLabelsKo = curriculumTopicLabelsKoForDay(learningDay);
   const blockedWords = await loadPriorCurriculumWordDedupKeys(
     canonicalLang,
     level,
@@ -1195,6 +1212,7 @@ async function materializeGlobalCurriculumWordSetIfAbsent(
     curriculumPhase: phase,
     learningDay,
     topicIds: [...(spec?.topicIds ?? [])],
+    topicLabelsKo,
     words,
     updatedAtMs: Date.now(),
   };
@@ -1231,12 +1249,23 @@ async function materializeGlobalCurriculumSentenceSetIfAbsent(
       Array.isArray(data.sentences) &&
       data.sentences.length > 0
     ) {
-      if (data.sentences.some((s) => sentenceItemNeedsAudio(s))) {
-        const sentences = await enrichSentenceItemsWithAudio(
-          data.sentences,
-          canonicalLang
-        );
-        await ref.set({ sentences, updatedAtMs: Date.now() }, { merge: true });
+      const topicLabelsKo = curriculumTopicLabelsKoForDay(learningDay);
+      const needsTopicLabels =
+        topicLabelsKo.length > 0 &&
+        (!Array.isArray(data.topicLabelsKo) || data.topicLabelsKo.length === 0);
+      const needsAudio = data.sentences.some((s) => sentenceItemNeedsAudio(s));
+      if (needsTopicLabels || needsAudio) {
+        const patch: Record<string, unknown> = { updatedAtMs: Date.now() };
+        if (needsTopicLabels) {
+          patch.topicLabelsKo = topicLabelsKo;
+        }
+        if (needsAudio) {
+          patch.sentences = await enrichSentenceItemsWithAudio(
+            data.sentences,
+            canonicalLang
+          );
+        }
+        await ref.set(patch, { merge: true });
       }
       return ref;
     }
@@ -1244,6 +1273,7 @@ async function materializeGlobalCurriculumSentenceSetIfAbsent(
 
   const curriculum = curriculumPromptContextForDay(learningDay, phase);
   const spec = getCurriculumDaySpec(learningDay);
+  const topicLabelsKo = curriculumTopicLabelsKoForDay(learningDay);
 
   await materializeGlobalCurriculumWordSetIfAbsent(
     canonicalLang,
@@ -1287,6 +1317,7 @@ async function materializeGlobalCurriculumSentenceSetIfAbsent(
     curriculumPhase: phase,
     learningDay,
     topicIds: [...(spec?.topicIds ?? [])],
+    topicLabelsKo,
     sentences,
     updatedAtMs: Date.now(),
   };

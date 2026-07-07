@@ -29,6 +29,16 @@ class CurriculumState {
 
   static const Set<String> learningLevels = {'beginner', 'intermediate', 'advanced'};
 
+  /// 초·중 커리큘럼 세트(일차별 topic) 사용 여부.
+  static bool usesCurriculumLearningSets({
+    required String level,
+    required String learningMode,
+  }) {
+    if (learningMode != 'curriculum') return false;
+    final lv = normalizeLearningLevel(level);
+    return lv == 'beginner' || lv == 'intermediate';
+  }
+
   final String curriculumId;
   final int curriculumPhase;
   final int learningDay;

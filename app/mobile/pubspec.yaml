@@ -80,6 +80,7 @@ flutter:
 
   assets:
     - assets/certifications/certifications.json
+    - assets/curriculum/curriculum_topic_labels.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

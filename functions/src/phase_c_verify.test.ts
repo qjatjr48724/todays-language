@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { curriculumPromptContextForDay } from "./curriculum/prompt_bridge";
+import {
+  curriculumPromptContextForDay,
+  curriculumTopicLabelsKoForDay,
+} from "./curriculum/prompt_bridge";
 import { getCurriculumDaySpec } from "./curriculum/core_v1_rotation";
 import { curriculumSetDocId } from "./learning_sets/curriculum_set_keys";
 import { isCurriculumSetLevel } from "./learning_sets/user_learning_profile";
@@ -33,6 +36,12 @@ describe("phase_c_verify", () => {
     const spec = getCurriculumDaySpec(1);
     assert.ok(spec);
     assert.deepEqual(ctx!.topicIds, [...spec!.topicIds]);
+    assert.deepEqual(ctx!.topicLabelsKo, [...spec!.topicLabelsKo]);
+  });
+
+  it("curriculum topic labels for Firestore payload", () => {
+    assert.deepEqual(curriculumTopicLabelsKoForDay(49), ["동아리·행사"]);
+    assert.deepEqual(curriculumTopicLabelsKoForDay(50), ["진로·상담"]);
   });
 
   it("word batch prompts embed curriculum scope when provided", () => {

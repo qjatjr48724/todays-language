@@ -541,6 +541,11 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String curriculum_topic_label(String topic) {
+    return '주제: $topic';
+  }
+
+  @override
   String get home_no_data => '데이터가 없습니다.';
 
   @override

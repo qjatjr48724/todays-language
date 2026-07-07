@@ -23,6 +23,8 @@ import 'today_words_screen.dart';
 import 'today_wrap_up_screen.dart';
 import 'basic_character_chart_screen.dart';
 import '../l10n/app_localizations.dart';
+import '../services/curriculum_topic_label_repository.dart';
+import '../ui/curriculum_topic_label_text.dart';
 import '../utils/kst_date.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -40,6 +42,8 @@ class _HomeScreenState extends State<HomeScreen> {
   UserPrefs _prefs = UserPrefs.fallback();
   bool _loadingProgress = true;
   StreamSubscription? _profileSub;
+  String? _curriculumTopicLabel;
+  final _curriculumTopicLabels = CurriculumTopicLabelRepository();
 
   @override
   void initState() {
@@ -67,6 +71,9 @@ class _HomeScreenState extends State<HomeScreen> {
         _todayProgress = progress;
         _profileError = null;
         _loadingProgress = false;
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _refreshCurriculumTopicLabel();
       });
 
       // 유저 프로필(targetLanguage/level)이 변경되면 홈에서 즉시 반영
@@ -100,6 +107,9 @@ class _HomeScreenState extends State<HomeScreen> {
               nextTargetLanguage,
             ),
           );
+        });
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) _refreshCurriculumTopicLabel();
         });
         if (languageChanged) {
           _refreshTodayProgress();
@@ -153,6 +163,30 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (_) {
       // 홈 새로고침 실패는 UI 흐름을 막지 않음
     }
+  }
+
+
+  /// 커리큘럼 모드일 때 현재 일차 주제명을 UI 로컬에 맞게 로드합니다.
+  Future<void> _refreshCurriculumTopicLabel() async {
+    if (!mounted) return;
+    final languageCode = Localizations.localeOf(context).languageCode;
+    final shouldShow = CurriculumState.usesCurriculumLearningSets(
+      level: _prefs.level,
+      learningMode: _prefs.curriculum.learningMode,
+    );
+    if (!shouldShow) {
+      if (_curriculumTopicLabel != null) {
+        setState(() => _curriculumTopicLabel = null);
+      }
+      return;
+    }
+
+    final label = await _curriculumTopicLabels.labelForLearningDay(
+      _prefs.displayLearningDay,
+      languageCode,
+    );
+    if (!mounted) return;
+    setState(() => _curriculumTopicLabel = label);
   }
 
   int _computedProgressPercent(DailyProgressView p) {
@@ -365,7 +399,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           color: scheme.onSurfaceVariant,
                         ),
                   ),
-                  if (_prefs.curriculum.learningMode == 'curriculum')
+                  if (_prefs.curriculum.learningMode == 'curriculum') ...[
                     Text(
                       l10n.home_curriculum_day_label(
                         _prefs.displayLearningDay,
@@ -376,6 +410,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             fontWeight: FontWeight.w600,
                           ),
                     ),
+                    CurriculumTopicLabelText(
+                      label: _curriculumTopicLabel,
+                      compact: true,
+                    ),
+                  ],
                 ],
               ),
               child: _loadingProgress

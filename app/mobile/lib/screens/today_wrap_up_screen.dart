@@ -5,10 +5,14 @@ import 'package:flutter/material.dart';
 
 import '../services/analytics/analytics_action_log.dart';
 import '../services/analytics/analytics_params.dart';
+import '../services/curriculum_topic_label_repository.dart';
 import '../services/daily_progress_sync.dart';
 import '../services/learning_audio_service.dart';
+import '../services/user_prefs.dart';
+import '../models/curriculum_state.dart';
 import '../services/wrap_up_quiz_builder.dart';
 import '../l10n/app_localizations.dart';
+import '../ui/curriculum_topic_label_text.dart';
 import '../ui/learning_audio_icon_button.dart';
 
 class TodayWrapUpScreen extends StatefulWidget {
@@ -38,6 +42,9 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
   bool _sessionComplete = false;
   final _learningAudio = LearningAudioService();
 
+  String? _curriculumTopicLabel;
+  final _curriculumTopicLabels = CurriculumTopicLabelRepository();
+
   @override
   void dispose() {
     _learningAudio.dispose();
@@ -48,8 +55,35 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _loadWrapUp();
+      if (mounted) {
+        _loadCurriculumTopicLabel();
+        _loadWrapUp();
+      }
     });
+  }
+
+
+  /// 커리큘럼 일차 주제명을 UI 로컬에 맞게 로드합니다.
+  Future<void> _loadCurriculumTopicLabel() async {
+    if (!mounted) return;
+    final languageCode = Localizations.localeOf(context).languageCode;
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final prefs = await fetchUserPrefs(user);
+    if (!CurriculumState.usesCurriculumLearningSets(
+      level: prefs.level,
+      learningMode: prefs.curriculum.learningMode,
+    )) {
+      return;
+    }
+
+    final label = await _curriculumTopicLabels.labelForLearningDay(
+      prefs.displayLearningDay,
+      languageCode,
+    );
+    if (!mounted) return;
+    setState(() => _curriculumTopicLabel = label);
   }
 
   Future<void> _loadWrapUp({bool forceRefreshToken = false}) async {
@@ -219,35 +253,43 @@ class _TodayWrapUpScreenState extends State<TodayWrapUpScreen> {
       appBar: AppBar(title: Text(l10n.wrapup_appbar_title)),
       body: Padding(
         padding: const EdgeInsets.all(24),
-        child: _loading
-            ? const Center(child: CircularProgressIndicator())
-            : (_error != null)
-                ? _ErrorBody(
-                    error: _error!,
-                    onRetry: () => _loadWrapUp(forceRefreshToken: true),
-                  )
-                : _sessionComplete
-                    ? _CompleteBody(
-                        correct: _correctCount,
-                        total: _questions.length,
-                        submitting: _submitting,
-                        onFinish: _finishWrapUp,
-                        onReload: () => _loadWrapUp(forceRefreshToken: true),
-                      )
-                    : _QuizBody(
-                        question: _questions[_currentIndex],
-                        current: _currentIndex + 1,
-                        total: _questions.length,
-                        selectedIndex: _selectedChoiceIndex,
-                        answered: _answered,
-                        onChoiceTap: _onChoiceTap,
-                        onNext: _goNext,
-                        pickWord: l10n.wrapup_pick_word,
-                        pickSentence: l10n.wrapup_pick_sentence,
-                        audioService: _learningAudio,
-                        playWordTooltip: l10n.learning_audio_play_word,
-                        playSentenceTooltip: l10n.learning_audio_play_sentence,
-                      ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CurriculumTopicLabelText(label: _curriculumTopicLabel),
+            Expanded(
+              child: _loading
+                  ? const Center(child: CircularProgressIndicator())
+                  : (_error != null)
+                      ? _ErrorBody(
+                          error: _error!,
+                          onRetry: () => _loadWrapUp(forceRefreshToken: true),
+                        )
+                      : _sessionComplete
+                          ? _CompleteBody(
+                              correct: _correctCount,
+                              total: _questions.length,
+                              submitting: _submitting,
+                              onFinish: _finishWrapUp,
+                              onReload: () => _loadWrapUp(forceRefreshToken: true),
+                            )
+                          : _QuizBody(
+                              question: _questions[_currentIndex],
+                              current: _currentIndex + 1,
+                              total: _questions.length,
+                              selectedIndex: _selectedChoiceIndex,
+                              answered: _answered,
+                              onChoiceTap: _onChoiceTap,
+                              onNext: _goNext,
+                              pickWord: l10n.wrapup_pick_word,
+                              pickSentence: l10n.wrapup_pick_sentence,
+                              audioService: _learningAudio,
+                              playWordTooltip: l10n.learning_audio_play_word,
+                              playSentenceTooltip: l10n.learning_audio_play_sentence,
+                            ),
+            ),
+          ],
+        ),
       ),
     );
   }

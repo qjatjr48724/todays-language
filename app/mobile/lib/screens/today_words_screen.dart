@@ -6,9 +6,13 @@ import 'package:flutter/foundation.dart';
 
 import '../services/analytics/analytics_action_log.dart';
 import '../services/analytics/analytics_screens.dart';
+import '../services/curriculum_topic_label_repository.dart';
 import '../services/daily_progress_sync.dart';
 import '../services/learning_audio_service.dart';
+import '../services/user_prefs.dart';
+import '../models/curriculum_state.dart';
 import '../l10n/app_localizations.dart';
+import '../ui/curriculum_topic_label_text.dart';
 import '../ui/learning_audio_icon_button.dart';
 
 class TodayWordsScreen extends StatefulWidget {
@@ -57,6 +61,9 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
   /// 오늘 단어 목표 달성 후 「다음 단어」를 다시 쓰려면 true.
   bool _relearnActive = false;
 
+  String? _curriculumTopicLabel;
+  final _curriculumTopicLabels = CurriculumTopicLabelRepository();
+
   bool get _inReviewMode => widget.curriculumReviewMode;
 
   bool get _wordCapReached =>
@@ -85,6 +92,40 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
     super.initState();
     _loadTodayProgress();
     _fetchWordSample();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _loadCurriculumTopicLabel();
+    });
+  }
+
+
+  /// 커리큘럼·복습 일차의 주제명을 UI 로컬에 맞게 로드합니다.
+  Future<void> _loadCurriculumTopicLabel() async {
+    if (!mounted) return;
+    final languageCode = Localizations.localeOf(context).languageCode;
+
+    int? learningDay;
+    if (_inReviewMode) {
+      learningDay = widget.reviewLearningDay;
+    } else {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+      final prefs = await fetchUserPrefs(user);
+      if (!CurriculumState.usesCurriculumLearningSets(
+        level: prefs.level,
+        learningMode: prefs.curriculum.learningMode,
+      )) {
+        return;
+      }
+      learningDay = prefs.displayLearningDay;
+    }
+
+    if (learningDay == null) return;
+    final label = await _curriculumTopicLabels.labelForLearningDay(
+      learningDay,
+      languageCode,
+    );
+    if (!mounted) return;
+    setState(() => _curriculumTopicLabel = label);
   }
 
   @override
@@ -249,6 +290,7 @@ class _TodayWordsScreenState extends State<TodayWordsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          CurriculumTopicLabelText(label: _curriculumTopicLabel),
           if (_inReviewMode &&
               widget.reviewLearningDay != null &&
               !widget.embedded) ...[

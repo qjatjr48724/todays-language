@@ -2262,4 +2262,62 @@ unauthenticated: 로그인 상태 확인
 1. `firebase deploy --only functions:getWrapUpDeck`
 2. 마무리 완료(13/13) 후 홈 진도·스낵바 정상 확인
 3. (보류) 문장 세트 `vocabularyHints` 일반형·`meaningKo` 검증 프롬프트 보강
+
+---
+
+## [단계 45] 커리큘럼 주제명 Firestore·앱 로컬라이즈 UI (2026-06-17)
+
+### 1) 오늘 한 일
+
+**Functions — 커리큘럼 세트 DB 주제명**
+- `curriculum_word_sets` / `curriculum_sentence_sets`에 `topicLabelsKo` 필드 저장
+- 신규 materialize 시 `core_v1_rotation` 정본에서 주제명 함께 기록
+- 기존 문서는 materialize 시 `topicLabelsKo` 누락이면 merge 백필
+- `docs/FIRESTORE_MIN_SCHEMA.md` 필드 표 보강
+
+**앱 — 주제명 전용 카탈로그·화면 표시**
+- `assets/curriculum/curriculum_topic_labels.json` — 50개 `topicId` × ko/en/ja
+- `CurriculumTopicLabelRepository` — `learningDay` → topicId → 로컬 주제명
+- `CurriculumTopicLabelText` — 「주제: {topic}」 i18n + 얇은 테두리 박스
+- 표시 위치: 홈 진도(`n/50일차` 아래), 오늘의 단어·문장·마무리 상단
+- 복습 모드는 해당 복습 일차 주제명 표시
+- `CurriculumState.usesCurriculumLearningSets` — 초·중 커리큘럼 모드에서만 노출
+
+### 2) 합의·결정
+
+- **UI 주제명 정본:** 앱 JSON (`curriculum_topic_labels.json`) — Firestore `topicLabelsKo`는 서버·디버그용
+- 표기 형식: ko `주제: …` / en `Topic: …` / ja `テーマ: …` (ARB `curriculum_topic_label`)
+- 요청 범위 밖 API(다중 topicId 연결 등)는 추가하지 않음
+
+### 3) 완료 기준 체크
+
+- [x] `flutter test` (`curriculum_topic_label_repository_test`, `curriculum_state_test`)
+- [x] `flutter gen-l10n` · `flutter analyze` (변경 파일)
+- [x] `npm run test` (Functions — `phase_c_verify` 포함)
+- [ ] `firebase deploy --only functions` (topicLabelsKo 저장·백필 반영 시)
+- [ ] 앱 수동 확인: 디바이스 로컬 ko/en/ja 전환 시 주제명·「주제:」 접두사 변경
+
+### 4) 추가/변경 파일(주요)
+
+| 영역 | 파일 |
+|------|------|
+| Functions | `index.ts`, `curriculum/prompt_bridge.ts`, `phase_c_verify.test.ts` |
+| 스키마 | `docs/FIRESTORE_MIN_SCHEMA.md` |
+| 앱 카탈로그 | `assets/curriculum/curriculum_topic_labels.json` |
+| 앱 서비스·UI | `curriculum_topic_label_repository.dart`, `curriculum_topic_label_text.dart` |
+| 앱 화면 | `home_screen.dart`, `today_words_screen.dart`, `today_sentences_screen.dart`, `today_wrap_up_screen.dart` |
+| i18n | `app_ko.arb`, `app_en.arb`, `app_ja.arb` (`curriculum_topic_label`) |
+| 테스트 | `curriculum_topic_label_repository_test.dart`, `curriculum_state_test.dart` |
+
+### 5) Git 커밋
+
+| 해시 | 메시지 |
+|------|--------|
+| (본 커밋) | `0acbbad` — feat: 커리큘럼 주제명 Firestore 저장 및 앱 로컬라이즈 UI 표시 |
+
+### 6) 다음 액션
+
+1. Functions 배포 후 기존 세트 materialize로 `topicLabelsKo` 백필 확인
+2. 홈·학습 화면에서 일차별 주제 박스 표시 수동 확인 (로컬 언어 3종)
+3. (선택) en/ja 주제명 번역 톤 검수
 4. (선택) 약관·개인정보에 Analytics/Crashlytics 고지 문구 반영

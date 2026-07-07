@@ -69,6 +69,30 @@ void main() {
       expect(CurriculumState.normalizeLearningLevel('Intermediate'), 'intermediate');
       expect(CurriculumState.normalizeLearningLevel('invalid'), 'beginner');
     });
+
+    test('usesCurriculumLearningSets', () {
+      expect(
+        CurriculumState.usesCurriculumLearningSets(
+          level: 'beginner',
+          learningMode: 'curriculum',
+        ),
+        isTrue,
+      );
+      expect(
+        CurriculumState.usesCurriculumLearningSets(
+          level: 'advanced',
+          learningMode: 'curriculum',
+        ),
+        isFalse,
+      );
+      expect(
+        CurriculumState.usesCurriculumLearningSets(
+          level: 'beginner',
+          learningMode: 'free_study',
+        ),
+        isFalse,
+      );
+    });
   });
 
 

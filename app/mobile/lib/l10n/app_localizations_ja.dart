@@ -539,6 +539,11 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String curriculum_topic_label(String topic) {
+    return 'テーマ: $topic';
+  }
+
+  @override
   String get home_no_data => 'データがありません。';
 
   @override

@@ -560,6 +560,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String curriculum_topic_label(String topic) {
+    return 'Topic: $topic';
+  }
+
+  @override
   String get home_no_data => 'No data available.';
 
   @override

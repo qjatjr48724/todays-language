@@ -1,0 +1,252 @@
+{
+  "DL-01": {
+    "ko": "인삿말 - 만날 때 / 헤어질 때 / 처음 만날 때 / 오랜만에 만날 때 / 오랫동안 헤어질 때",
+    "en": "Greetings (meeting, parting, reunions)",
+    "ja": "あいさつ（出会い・別れ・再会）"
+  },
+  "DL-02": {
+    "ko": "인삿말 - 외출·귀가",
+    "en": "Going out & coming home",
+    "ja": "あいさつ（外出・帰宅）"
+  },
+  "DL-03": {
+    "ko": "인삿말 - 감사·사과",
+    "en": "Thanks & apologies",
+    "ja": "あいさつ（感謝・謝罪）"
+  },
+  "DL-04": {
+    "ko": "인삿말 - 식사·끼니",
+    "en": "Meals",
+    "ja": "あいさつ（食事）"
+  },
+  "DL-05": {
+    "ko": "숫자표현 - 개수·수량",
+    "en": "Counting & quantities",
+    "ja": "数え方・数量"
+  },
+  "DL-06": {
+    "ko": "감정 표현",
+    "en": "Expressing emotions",
+    "ja": "感情表現"
+  },
+  "DL-07": {
+    "ko": "인칭대명사",
+    "en": "Personal pronouns",
+    "ja": "人称代名詞"
+  },
+  "DL-08": {
+    "ko": "명사의 긍정/의문/부정표현",
+    "en": "Noun affirmatives, questions & negatives",
+    "ja": "名詞の肯定・疑問・否定"
+  },
+  "DL-09": {
+    "ko": "부탁·요청",
+    "en": "Requests & favors",
+    "ja": "お願い・依頼"
+  },
+  "DL-10": {
+    "ko": "출발점과 도달점을 나타내는 표현",
+    "en": "Origin & destination",
+    "ja": "出発点と到着点"
+  },
+  "DL-11": {
+    "ko": "시간",
+    "en": "Time",
+    "ja": "時間"
+  },
+  "DL-12": {
+    "ko": "요일·날짜",
+    "en": "Days & dates",
+    "ja": "曜日・日付"
+  },
+  "DL-13": {
+    "ko": "가족·호칭",
+    "en": "Family & titles",
+    "ja": "家族・呼称"
+  },
+  "DL-14": {
+    "ko": "날씨·기온",
+    "en": "Weather & temperature",
+    "ja": "天気・気温"
+  },
+  "DL-15": {
+    "ko": "몸 상태·증상",
+    "en": "Body & symptoms",
+    "ja": "体の状態・症状"
+  },
+  "DL-16": {
+    "ko": "화폐·가격",
+    "en": "Money & prices",
+    "ja": "通貨・値段"
+  },
+  "DL-17": {
+    "ko": "축하·위로",
+    "en": "Congratulations & comfort",
+    "ja": "祝福・慰め"
+  },
+  "DL-18": {
+    "ko": "욕구·희망",
+    "en": "Wants & hopes",
+    "ja": "欲求・希望"
+  },
+  "DL-19": {
+    "ko": "이유·원인·근거",
+    "en": "Reasons & causes",
+    "ja": "理由・原因"
+  },
+  "DL-20": {
+    "ko": "경험·일화",
+    "en": "Experiences & stories",
+    "ja": "経験・エピソード"
+  },
+  "TM-01": {
+    "ko": "이동·방향",
+    "en": "Movement & directions",
+    "ja": "移動・方向"
+  },
+  "TM-11": {
+    "ko": "버스·택시·렌터",
+    "en": "Bus, taxi & rental car",
+    "ja": "バス・タクシー・レンタカー"
+  },
+  "TM-03": {
+    "ko": "지하철·전철",
+    "en": "Subway & metro",
+    "ja": "地下鉄・電車"
+  },
+  "TM-05": {
+    "ko": "기차·고속철",
+    "en": "Trains & high-speed rail",
+    "ja": "鉄道・新幹線"
+  },
+  "TM-06": {
+    "ko": "표·요금",
+    "en": "Tickets & fares",
+    "ja": "切符・運賃"
+  },
+  "TM-07": {
+    "ko": "역·정류장",
+    "en": "Stations & stops",
+    "ja": "駅・停留所"
+  },
+  "TM-08": {
+    "ko": "지연·변경",
+    "en": "Delays & changes",
+    "ja": "遅延・変更"
+  },
+  "TM-09": {
+    "ko": "안전·규칙",
+    "en": "Safety & rules",
+    "ja": "安全・ルール"
+  },
+  "TM-10": {
+    "ko": "자전거·도보",
+    "en": "Walking & cycling",
+    "ja": "自転車・徒歩"
+  },
+  "TR-01": {
+    "ko": "여행 준비",
+    "en": "Trip preparation",
+    "ja": "旅行の準備"
+  },
+  "TR-02": {
+    "ko": "예약·티켓",
+    "en": "Bookings & tickets",
+    "ja": "予約・チケット"
+  },
+  "TR-03": {
+    "ko": "공항·출입국",
+    "en": "Airport & immigration",
+    "ja": "空港・入出国"
+  },
+  "TR-04": {
+    "ko": "숙소",
+    "en": "Accommodation",
+    "ja": "宿泊"
+  },
+  "TR-05": {
+    "ko": "식당·주문 (여행)",
+    "en": "Dining while traveling",
+    "ja": "レストラン・注文（旅行）"
+  },
+  "TR-06": {
+    "ko": "관광·명소",
+    "en": "Sightseeing",
+    "ja": "観光・名所"
+  },
+  "TR-07": {
+    "ko": "쇼핑·기념품",
+    "en": "Shopping & souvenirs",
+    "ja": "ショッピング・お土産"
+  },
+  "TR-08": {
+    "ko": "길찾기·위치",
+    "en": "Directions & location",
+    "ja": "道案内・場所"
+  },
+  "TR-09": {
+    "ko": "대중교통 (여행지)",
+    "en": "Local transit abroad",
+    "ja": "現地の公共交通"
+  },
+  "TR-11": {
+    "ko": "문제·응급",
+    "en": "Problems & emergencies",
+    "ja": "トラブル・緊急"
+  },
+  "TR-12": {
+    "ko": "현지 문화·매너",
+    "en": "Local culture & manners",
+    "ja": "現地の文化・マナー"
+  },
+  "SC-01": {
+    "ko": "학교·교실",
+    "en": "School & classroom",
+    "ja": "学校・教室"
+  },
+  "SC-02": {
+    "ko": "수업·과목",
+    "en": "Classes & subjects",
+    "ja": "授業・科目"
+  },
+  "SC-03": {
+    "ko": "선생님·존댓말",
+    "en": "Teachers & polite speech",
+    "ja": "先生・敬語"
+  },
+  "SC-04": {
+    "ko": "친구·또래",
+    "en": "Friends & peers",
+    "ja": "友達・同級生"
+  },
+  "SC-05": {
+    "ko": "시간표·일과",
+    "en": "Schedule & routine",
+    "ja": "時間割・日課"
+  },
+  "SC-06": {
+    "ko": "숙제·공부",
+    "en": "Homework & studying",
+    "ja": "宿題・勉強"
+  },
+  "SC-07": {
+    "ko": "시험·성적",
+    "en": "Tests & grades",
+    "ja": "試験・成績"
+  },
+  "SC-08": {
+    "ko": "학교 시설",
+    "en": "School facilities",
+    "ja": "学校の施設"
+  },
+  "SC-09": {
+    "ko": "동아리·행사",
+    "en": "Clubs & events",
+    "ja": "部活・行事"
+  },
+  "SC-10": {
+    "ko": "진로·상담",
+    "en": "Career & counseling",
+    "ja": "進路・相談"
+  }
+}

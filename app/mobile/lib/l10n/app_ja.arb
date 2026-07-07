@@ -235,6 +235,14 @@
       }
     }
   },
+  "curriculum_topic_label": "テーマ: {topic}",
+  "@curriculum_topic_label": {
+    "placeholders": {
+      "topic": {
+        "type": "String"
+      }
+    }
+  },
   "home_no_data": "データがありません。",
   "home_progress_counts": "単語 {wordDone}/{wordGoal} · 文 {sentenceDone}/{sentenceGoal} · まとめ {quizDone}/{quizGoal}",
   "home_reset_debug_button_label": "進捗のリセット（デバッグ）",

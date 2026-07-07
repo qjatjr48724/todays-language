@@ -234,6 +234,14 @@
       }
     }
   },
+  "curriculum_topic_label": "주제: {topic}",
+  "@curriculum_topic_label": {
+    "placeholders": {
+      "topic": {
+        "type": "String"
+      }
+    }
+  },
   "home_no_data": "데이터가 없습니다.",
   "home_progress_counts": "단어 {wordDone}/{wordGoal} · 문장 {sentenceDone}/{sentenceGoal} · 마무리 {quizDone}/{quizGoal}",
   "home_reset_debug_button_label": "진행률 초기화(디버그)",

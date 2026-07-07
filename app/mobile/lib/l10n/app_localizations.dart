@@ -1066,6 +1066,12 @@ abstract class AppLocalizations {
   /// **'{day}/{total}일차'**
   String home_curriculum_day_label(int day, int total);
 
+  /// No description provided for @curriculum_topic_label.
+  ///
+  /// In ko, this message translates to:
+  /// **'주제: {topic}'**
+  String curriculum_topic_label(String topic);
+
   /// No description provided for @home_no_data.
   ///
   /// In ko, this message translates to:

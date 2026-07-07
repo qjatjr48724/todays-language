@@ -111,6 +111,20 @@ Functions 정본 키: `curriculumSetDocId`.
 
 `docId` 예: `JPN_beginner_1_7` → `targetLanguage` × `level` × `phase` × `learningDay`
 
+공통 필드(단어·문장 세트):
+
+| 필드 | 설명 |
+|------|------|
+| `curriculumId` | `core_v1` |
+| `targetLanguage` | alpha-3 (예: `JPN`) |
+| `level` | `beginner` \| `intermediate` |
+| `curriculumPhase` | `1` \| `2` |
+| `learningDay` | `1..50` |
+| `topicIds` | 일차 주제 코드 (예: `["SC-10"]`) |
+| `topicLabelsKo` | 한글 주제명 (예: `["진로·상담"]`) — `core_v1_rotation` 정본 |
+| `words` / `sentences` | 학습 항목 배열 |
+| `updatedAtMs` | 마지막 갱신 시각(ms) |
+
 레거시(운영 중):
 
 - `daily_word_sets/{yyyy-MM-dd}_{lang}_{level}`
