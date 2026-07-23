@@ -2321,3 +2321,66 @@ unauthenticated: 로그인 상태 확인
 2. 홈·학습 화면에서 일차별 주제 박스 표시 수동 확인 (로컬 언어 3종)
 3. (선택) en/ja 주제명 번역 톤 검수
 4. (선택) 약관·개인정보에 Analytics/Crashlytics 고지 문구 반영
+
+---
+
+## [단계 46] iOS 실기기 Profile·앱 브랜딩·홈 카드 높이 (2026-07-23)
+
+### 1) 오늘 한 일
+
+**iOS 실기기 케이블 없이 테스트 (개발 설치)**
+- Personal Team으로 iPhone에 **Profile/Release** 설치 → 홈 아이콘 단독 실행 가능
+- Debug 빌드는 iOS 14+에서 아이콘 단독 실행 시 즉시 종료(JIT 제한) — 앱 버그 아님
+- 재설치 시 개발자 앱 「신뢰」 필요, Personal Team 약 7일 만료 후 재설치
+
+**이미 커밋된 선행 작업 (동일 세션)**
+- iOS Keychain/사이닝·entitlements (`4abc7eb`)
+- 인증 오류 i18n 우선 (`96b9261`)
+- 홈 AppBar 패딩 (`0015c0e`)
+- 진행률 주제 overflow 말줄임 (`26de1e7`)
+
+**앱 브랜딩**
+- 홈 화면 이름: `Mobile` → **오늘의 언어** (iOS Info.plist, Android label)
+- 아이콘: `docs/design/ko_512.png` → `flutter_launcher_icons`로 iOS/Android 생성
+- Profile 재빌드·실기기 재설치로 반영
+
+**홈 UI**
+- 오늘의 단어/문장/마무리 그리드 카드 높이 축소 (`childAspectRatio` 0.9→1.3, 패딩·부제 축소)
+- 카드 내 진행 문구(`0 / 15` 등 `progressText`)는 유지
+
+### 2) 합의·결정
+
+- 케이블 없이 들고 다니며 테스트: **Profile 또는 Release** 설치 (Debug 불가)
+- 아이콘/이름 변경은 소스만 바꿔서는 안 되고 **재빌드·재설치** 필요
+- 「진행률까지 보이게」 요청의 진행률 = 카드의 `0/15` 문구 (하단 「오늘의 진행률」 섹션 아님)
+
+### 3) 완료 기준 체크
+
+- [x] `flutter_launcher_icons` 적용 · Profile 빌드 · iPhone 재설치
+- [x] 기기에서 앱 이름 `오늘의 언어` 확인
+- [x] `flutter analyze` (홈 카드 변경 파일)
+- [ ] (수동) 홈 카드 높이·`0/15` 표시 체감 확인
+- [ ] (선택) 유료 Apple Developer + TestFlight로 7일 재설치 부담 제거
+
+### 4) 추가/변경 파일(주요)
+
+| 영역 | 파일 |
+|------|------|
+| 디자인 | `docs/design/ko_512.png`, `docs/design/en_512.png` |
+| 브랜딩 | `Info.plist`, `AndroidManifest.xml`, `AppIcon.appiconset/*`, `mipmap-*/ic_launcher.png` |
+| 도구 | `pubspec.yaml` (`flutter_launcher_icons`), `assets/app_icon.png` |
+| 홈 UI | `home_screen.dart`, `home_feature_card.dart` |
+
+### 5) Git 커밋
+
+| 해시 | 메시지 |
+|------|--------|
+| `85dc996` | ui(mobile): 앱 표시 이름·아이콘을 오늘의 언어 브랜딩으로 교체 |
+| `d3b3516` | ui(mobile): 홈 단어·문장·마무리 카드 높이 축소 |
+| (본 커밋) | docs: [단계 46] iOS Profile·브랜딩·홈 카드 진행 기록 |
+
+### 6) 다음 액션
+
+1. 실기기에서 홈 카드 높이·아이콘 최종 확인
+2. (선택) 카드 비율 미세 조정
+3. (선택) Apple Developer 가입 후 TestFlight 베타
