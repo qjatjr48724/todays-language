@@ -49,7 +49,7 @@ class HomeFeatureCard extends StatelessWidget {
           child: Padding(
             padding: compactRow
                 ? const EdgeInsets.symmetric(horizontal: 14, vertical: 14)
-                : const EdgeInsets.all(12),
+                : const EdgeInsets.all(8),
             child: compactRow ? _buildCompactRow(context, scheme, t, iconBg, iconFg) : _buildGridTile(context, scheme, t, iconBg, iconFg),
           ),
         ),
@@ -91,7 +91,7 @@ class HomeFeatureCard extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 4),
         Text(
           title,
           style: t.titleSmall,
@@ -102,11 +102,11 @@ class HomeFeatureCard extends StatelessWidget {
         Text(
           subtitle,
           style: t.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-          maxLines: 2,
+          maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
         if (progressText != null) ...[
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           Text(
             progressText!,
             style: t.labelSmall?.copyWith(color: scheme.onSurfaceVariant),

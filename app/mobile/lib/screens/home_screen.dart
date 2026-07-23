@@ -299,8 +299,8 @@ class _HomeScreenState extends State<HomeScreen> {
               physics: const NeverScrollableScrollPhysics(),
               mainAxisSpacing: 10,
               crossAxisSpacing: 10,
-              // 카드 안 Column(아이콘행+제목+부제+진행)이 세로로 넉넉히 들어가도록 셀을 약간 높임
-              childAspectRatio: 0.9,
+              // 카드 높이 축소 — progressText(0/15)는 유지한 채 부제·패딩으로 공간 확보
+              childAspectRatio: 1.3,
               children: [
                 HomeFeatureCard(
                   title: l10n.home_today_words_title,
