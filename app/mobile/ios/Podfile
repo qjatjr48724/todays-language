@@ -46,8 +46,11 @@ post_install do |installer|
       ]
       config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'PERMISSION_NOTIFICATIONS=1'
 
-      config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
-      config.build_settings['CODE_SIGNING_REQUIRED'] = 'NO'
+      # Pod 타겟에만 코드 사이닝 비활성화 (Runner 타겟 제외 — Keychain 접근을 위해 사이닝 필요)
+      unless target.name == 'Runner'
+        config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+        config.build_settings['CODE_SIGNING_REQUIRED'] = 'NO'
+      end
     end
   end
 end
