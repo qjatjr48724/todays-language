@@ -43,7 +43,10 @@ class SectionCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                trailing ?? const SizedBox.shrink(),
+                // trailing이 길어도 Row overflow가 나지 않도록 남은 공간으로 제한
+                trailing != null
+                    ? Flexible(child: trailing!)
+                    : const SizedBox.shrink(),
               ],
             ),
             const SizedBox(height: 12),

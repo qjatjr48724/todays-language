@@ -47,6 +47,9 @@ class CurriculumTopicLabelText extends StatelessWidget {
         l10n.curriculum_topic_label(topic),
         style: style,
         textAlign: compact ? TextAlign.end : TextAlign.start,
+        // 홈 compact: 한 줄 + 말줄임. 그 외는 여러 줄 줄바꿈 허용.
+        maxLines: compact ? 1 : null,
+        overflow: compact ? TextOverflow.ellipsis : TextOverflow.clip,
       ),
     );
 
