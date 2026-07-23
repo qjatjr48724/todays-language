@@ -234,6 +234,6 @@ String _messageForAuthException(FirebaseAuthException e, BuildContext context) {
     case 'weak-password':
       return l10n.email_register_error_weak_password;
     default:
-      return e.message ?? l10n.email_register_error_failed(e.code);
+      return l10n.email_register_error_failed(e.code);
   }
 }

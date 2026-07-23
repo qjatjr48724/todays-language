@@ -165,6 +165,6 @@ String _messageForAuthException(FirebaseAuthException e, BuildContext context) {
     case 'too-many-requests':
       return l10n.email_login_error_too_many_requests;
     default:
-      return e.message ?? l10n.email_login_error_failed(e.code);
+      return l10n.email_login_error_failed(e.code);
   }
 }

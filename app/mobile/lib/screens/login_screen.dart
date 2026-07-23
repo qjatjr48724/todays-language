@@ -167,6 +167,6 @@ String _messageForAuthException(FirebaseAuthException e, BuildContext context) {
     case 'too-many-requests':
       return l10n.login_error_too_many_requests;
     default:
-      return e.message ?? l10n.login_error_unknown(e.code);
+      return l10n.login_error_unknown(e.code);
   }
 }
