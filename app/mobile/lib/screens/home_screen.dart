@@ -214,11 +214,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        titleSpacing: 20,
         title: Text(homeAppBarTitle(context)),
         actions: [
           if (user?.email != null)
             Padding(
-              padding: const EdgeInsets.only(right: 4),
+              padding: const EdgeInsets.only(right: 16),
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 160),
