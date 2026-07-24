@@ -1616,7 +1616,7 @@ abstract class AppLocalizations {
   /// No description provided for @words_loading_sample.
   ///
   /// In ko, this message translates to:
-  /// **'샘플을 불러오는 중…'**
+  /// **'문제를 불러오고 있습니다.'**
   String get words_loading_sample;
 
   /// No description provided for @words_sample_reload.
@@ -1748,7 +1748,7 @@ abstract class AppLocalizations {
   /// No description provided for @sentences_loading_sample.
   ///
   /// In ko, this message translates to:
-  /// **'샘플을 불러오는 중…'**
+  /// **'문제를 불러오고 있습니다.'**
   String get sentences_loading_sample;
 
   /// No description provided for @sentences_sample_reload.

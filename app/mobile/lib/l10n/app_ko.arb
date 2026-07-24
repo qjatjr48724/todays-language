@@ -363,7 +363,7 @@
   "progress_calendar_load_failed": "캘린더 데이터를 불러오지 못했습니다: {error}",
 
   "words_appbar_title": "오늘의 단어",
-  "words_loading_sample": "샘플을 불러오는 중…",
+  "words_loading_sample": "문제를 불러오고 있습니다.",
   "words_sample_reload": "샘플 다시 불러오기",
 
   "words_relearn_snackbar": "연습 모드입니다. 「다음 단어」로 복습할 수 있어요. (오늘 진도는 이미 목표에 도달했습니다.)",
@@ -397,7 +397,7 @@
   },
 
   "sentences_appbar_title": "오늘의 문장",
-  "sentences_loading_sample": "샘플을 불러오는 중…",
+  "sentences_loading_sample": "문제를 불러오고 있습니다.",
   "sentences_sample_reload": "샘플 다시 불러오기",
 
   "sentences_relearn_snackbar": "연습 모드입니다. 「다음 문장」으로 복습할 수 있어요. (오늘 진도는 이미 목표에 도달했습니다.)",

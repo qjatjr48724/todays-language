@@ -49,7 +49,7 @@ class HomeFeatureCard extends StatelessWidget {
           child: Padding(
             padding: compactRow
                 ? const EdgeInsets.symmetric(horizontal: 14, vertical: 14)
-                : const EdgeInsets.all(8),
+                : const EdgeInsets.all(10),
             child: compactRow ? _buildCompactRow(context, scheme, t, iconBg, iconFg) : _buildGridTile(context, scheme, t, iconBg, iconFg),
           ),
         ),

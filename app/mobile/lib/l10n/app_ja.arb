@@ -364,7 +364,7 @@
   "progress_calendar_load_failed": "カレンダーデータを読み込めませんでした: {error}",
 
   "words_appbar_title": "今日の単語",
-  "words_loading_sample": "サンプルを読み込み中…",
+  "words_loading_sample": "問題を読み込んでいます。",
   "words_sample_reload": "サンプルを再読み込み",
 
   "words_relearn_snackbar": "練習モードです。「次の単語」で復習できます。（今日の進捗はすでに目標に到達しています。）",
@@ -398,7 +398,7 @@
   },
 
   "sentences_appbar_title": "今日の文",
-  "sentences_loading_sample": "サンプルを読み込み中…",
+  "sentences_loading_sample": "問題を読み込んでいます。",
   "sentences_sample_reload": "サンプルを再読み込み",
 
   "sentences_relearn_snackbar": "練習モードです。「次の文」で復習できます。（今日の進捗はすでに目標に到達しています。）",

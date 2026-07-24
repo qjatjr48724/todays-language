@@ -880,7 +880,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get words_appbar_title => 'Today\'s Words';
 
   @override
-  String get words_loading_sample => 'Loading sample…';
+  String get words_loading_sample => 'Loading your questions.';
 
   @override
   String get words_sample_reload => 'Reload sample';
@@ -960,7 +960,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sentences_appbar_title => 'Today\'s Sentences';
 
   @override
-  String get sentences_loading_sample => 'Loading sample…';
+  String get sentences_loading_sample => 'Loading your questions.';
 
   @override
   String get sentences_sample_reload => 'Reload sample';

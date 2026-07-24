@@ -854,7 +854,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get words_appbar_title => '오늘의 단어';
 
   @override
-  String get words_loading_sample => '샘플을 불러오는 중…';
+  String get words_loading_sample => '문제를 불러오고 있습니다.';
 
   @override
   String get words_sample_reload => '샘플 다시 불러오기';
@@ -933,7 +933,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get sentences_appbar_title => '오늘의 문장';
 
   @override
-  String get sentences_loading_sample => '샘플을 불러오는 중…';
+  String get sentences_loading_sample => '문제를 불러오고 있습니다.';
 
   @override
   String get sentences_sample_reload => '샘플 다시 불러오기';

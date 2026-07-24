@@ -852,7 +852,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get words_appbar_title => '今日の単語';
 
   @override
-  String get words_loading_sample => 'サンプルを読み込み中…';
+  String get words_loading_sample => '問題を読み込んでいます。';
 
   @override
   String get words_sample_reload => 'サンプルを再読み込み';
@@ -931,7 +931,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get sentences_appbar_title => '今日の文';
 
   @override
-  String get sentences_loading_sample => 'サンプルを読み込み中…';
+  String get sentences_loading_sample => '問題を読み込んでいます。';
 
   @override
   String get sentences_sample_reload => 'サンプルを再読み込み';
