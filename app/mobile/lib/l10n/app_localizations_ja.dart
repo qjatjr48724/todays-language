@@ -1100,6 +1100,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get email_login_password_label => 'パスワード';
 
   @override
+  String get email_login_remember_email => 'メールアドレスを保存';
+
+  @override
   String get email_login_button => 'ログイン';
 
   @override

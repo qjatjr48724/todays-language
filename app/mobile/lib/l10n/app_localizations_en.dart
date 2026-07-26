@@ -1135,6 +1135,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get email_login_password_label => 'Password';
 
   @override
+  String get email_login_remember_email => 'Remember email';
+
+  @override
   String get email_login_button => 'Log in';
 
   @override

@@ -479,6 +479,7 @@
   "email_login_appbar_title": "이메일 로그인",
   "email_login_email_label": "이메일",
   "email_login_password_label": "비밀번호",
+  "email_login_remember_email": "아이디 저장",
   "email_login_button": "로그인",
   "email_login_to_register_prefix": "아이디가 없나요? ",
   "email_login_to_register_button": "회원가입",

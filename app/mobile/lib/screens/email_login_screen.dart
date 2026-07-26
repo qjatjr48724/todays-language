@@ -7,6 +7,7 @@ import '../services/analytics/analytics_action_log.dart';
 import '../services/analytics/analytics_navigation.dart';
 import '../services/analytics/analytics_screens.dart';
 import '../services/auth_session_service.dart';
+import '../services/saved_login_email.dart';
 
 class EmailLoginScreen extends StatefulWidget {
   const EmailLoginScreen({super.key});
@@ -20,7 +21,25 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _loading = false;
+  bool _rememberEmail = false;
   String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _restoreSavedEmail();
+  }
+
+
+  /// 저장된 이메일이 있으면 입력란·체크박스를 채운다.
+  Future<void> _restoreSavedEmail() async {
+    final saved = await SavedLoginEmail.load();
+    if (!mounted || saved == null) return;
+    setState(() {
+      _rememberEmail = saved.remember;
+      _emailController.text = saved.email;
+    });
+  }
 
   @override
   void dispose() {
@@ -46,13 +65,20 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
       if (user != null) {
         await AuthSessionService().claimSession(user);
       }
+      await SavedLoginEmail.persistAfterLogin(
+        remember: _rememberEmail,
+        email: _emailController.text,
+      );
       if (!mounted) return;
       await logAuthResult(authMethod: 'email', success: true);
+      if (!mounted) return;
       Navigator.of(context).pop();
     } on FirebaseAuthException catch (e) {
       await logAuthResult(authMethod: 'email', success: false);
+      if (!mounted) return;
       setState(() => _errorMessage = _messageForAuthException(e, context));
     } catch (_) {
+      if (!mounted) return;
       setState(() => _errorMessage = l10n.email_login_error_unknown);
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -107,11 +133,22 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                     return null;
                   },
                 ),
+                const SizedBox(height: 4),
+                CheckboxListTile(
+                  value: _rememberEmail,
+                  onChanged: _loading
+                      ? null
+                      : (v) => setState(() => _rememberEmail = v ?? false),
+                  controlAffinity: ListTileControlAffinity.leading,
+                  contentPadding: EdgeInsets.zero,
+                  dense: true,
+                  title: Text(l10n.email_login_remember_email),
+                ),
                 if (_errorMessage != null) ...[
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
                   Text(_errorMessage!, style: TextStyle(color: scheme.error)),
                 ],
-                const SizedBox(height: 20),
+                const SizedBox(height: 12),
                 FilledButton(
                   onPressed: _loading ? null : _signIn,
                   child: _loading

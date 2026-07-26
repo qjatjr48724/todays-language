@@ -481,6 +481,7 @@
   "email_login_appbar_title": "Email Login",
   "email_login_email_label": "Email",
   "email_login_password_label": "Password",
+  "email_login_remember_email": "Remember email",
   "email_login_button": "Log in",
   "email_login_to_register_prefix": "Don't have an account? ",
   "email_login_to_register_button": "Sign up",

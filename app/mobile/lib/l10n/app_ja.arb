@@ -481,6 +481,7 @@
   "email_login_appbar_title": "メールログイン",
   "email_login_email_label": "メール",
   "email_login_password_label": "パスワード",
+  "email_login_remember_email": "メールアドレスを保存",
   "email_login_button": "ログイン",
   "email_login_to_register_prefix": "アカウントをお持ちではありませんか？ ",
   "email_login_to_register_button": "新規登録",

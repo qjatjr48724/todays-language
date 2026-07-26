@@ -2033,6 +2033,12 @@ abstract class AppLocalizations {
   /// **'비밀번호'**
   String get email_login_password_label;
 
+  /// No description provided for @email_login_remember_email.
+  ///
+  /// In ko, this message translates to:
+  /// **'아이디 저장'**
+  String get email_login_remember_email;
+
   /// No description provided for @email_login_button.
   ///
   /// In ko, this message translates to:

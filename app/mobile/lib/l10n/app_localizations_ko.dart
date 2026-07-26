@@ -1102,6 +1102,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get email_login_password_label => '비밀번호';
 
   @override
+  String get email_login_remember_email => '아이디 저장';
+
+  @override
   String get email_login_button => '로그인';
 
   @override
