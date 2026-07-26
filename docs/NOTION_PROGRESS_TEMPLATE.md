@@ -2384,3 +2384,55 @@ unauthenticated: 로그인 상태 확인
 1. 실기기에서 홈 카드 높이·아이콘 최종 확인
 2. (선택) 카드 비율 미세 조정
 3. (선택) Apple Developer 가입 후 TestFlight 베타
+
+---
+
+## [단계 47] 이메일 로그인 아이디 저장 · 커리큘럼 JSON 추출 (2026-07-26)
+
+### 1) 오늘 한 일
+
+**이메일 로그인 「아이디 저장」**
+- 비밀번호 입력란 하단에 체크박스 추가
+- 체크 후 로그인 성공 시 SharedPreferences에 이메일만 저장(비밀번호 미저장)
+- 체크 해제 후 로그인 성공 시 저장값 삭제
+- 세션 만료·중복 로그인 등으로 로그인 화면 복귀 시 이메일 자동 입력
+
+**이미 커밋된 관련 작업**
+- 홈 카드 패딩·로딩 문구 (`6d800ce`)
+- 커리큘럼 TEMP export/import 도구 `docs/export_cur` (`70b22ef`)
+- 로컬에서 `JPN_beginner_1_1`~`1_50` JSON 일괄 export (gitignore, 커밋 제외)
+
+**참고**
+- Profile 빌드에서는 `kDebugMode` 테스트 로그인 버튼이 보이지 않음(의도된 동작). 이메일 로그인 사용.
+
+### 2) 합의·결정
+
+- 아이디만 SharedPreferences 저장, 비밀번호는 저장하지 않음
+- TEMP 커리큘럼 도구·추출 JSON은 `docs/export_cur`에 모으고 작업 후 폴더 삭제 예정
+
+### 3) 완료 기준 체크
+
+- [x] `SavedLoginEmail` 단위 테스트 통과
+- [x] `flutter analyze` (변경 파일)
+- [ ] (수동) Profile 재설치 후 아이디 저장 UX 확인
+
+### 4) 추가/변경 파일(주요)
+
+| 영역 | 파일 |
+|------|------|
+| 저장 | `lib/services/saved_login_email.dart` |
+| UI | `lib/screens/email_login_screen.dart` |
+| i18n | `app_ko/en/ja.arb` + gen-l10n |
+| 테스트 | `test/saved_login_email_test.dart` |
+
+### 5) Git 커밋
+
+| 해시 | 메시지 |
+|------|--------|
+| (본 커밋) | feat(mobile): 이메일 로그인 아이디 저장 + [단계 47] 진행 기록 |
+
+### 6) 다음 액션
+
+1. Profile 재빌드로 아이디 저장 UX 확인
+2. (선택) 편집한 커리큘럼 JSON import + 음성 백필
+3. (선택) 작업 종료 후 `docs/export_cur` 정리·삭제
