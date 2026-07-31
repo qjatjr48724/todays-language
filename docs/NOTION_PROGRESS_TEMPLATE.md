@@ -2436,3 +2436,65 @@ unauthenticated: 로그인 상태 확인
 1. Profile 재빌드로 아이디 저장 UX 확인
 2. (선택) 편집한 커리큘럼 JSON import + 음성 백필
 3. (선택) 작업 종료 후 `docs/export_cur` 정리·삭제
+
+---
+
+## [단계 48] JPN 초급 커리큘럼 meaningKo·히라가나·음성 Firebase 반영 (2026-08-01)
+
+### 1) 오늘 한 일
+
+**meaningKo 검수·수정 (JPN_beginner_1_1~50, 로컬 JSON)**
+- 단어: 경어 뜻풀이 → 평어체 (`축하하다`, `있다`, `걷다` 등). 고정 인삿말은 경어 유지
+- 문장·예문: 경어 유지 + 높임 반영 (`선생님이 계십니다` 등)
+- 질문 어미 자연화 (`~인가요?`, `~나요?`, `~세요?`)
+- 어색 문장 수정 (예: `나가요?` → `외출하세요?`)
+
+**예문/문장 표기**
+- 한자 → 히라가나 변환 (외래어 카타카나 `バス`/`ケーキ` 등은 유지)
+- 변환 오류 2건 수동 보정 (`くじ`, `にゅうじょう`)
+
+**음성·Firebase**
+- 예문·문장 음성 경로 재검증 후 TTS 신규 771 / Storage 재사용 588
+- `todays-language-dev` Firestore에 `JPN_beginner_1_1`~`50` import 완료 (단어·문장 세트)
+- 앱 코드 변경 없음 → **재빌드 불필요**, 화면 재진입으로 확인
+
+**TEMP 스크립트 (`docs/export_cur`, JSON은 gitignore)**
+- `fix_meaning_ko.mjs`
+- `convert_example_to_hiragana.mjs`
+- `refresh_curriculum_audio.mjs`
+- `package.json`에 TTS·kuroshiro 의존성 추가
+
+### 2) 합의·결정
+
+- UI/학습 데이터 정본은 Firestore 글로벌 커리큘럼 세트
+- 추출 JSON·일회성 변환 스크립트는 TEMP (`docs/export_cur`)
+- Windows에서는 iOS 빌드 불가 → Mac에서 Profile/실기기 확인
+
+### 3) 완료 기준 체크
+
+- [x] meaningKo 평어·높임·질문·어색 문장 반영 (로컬 JSON)
+- [x] 예문/문장 히라가나화 (잔여 한자 0)
+- [x] 음성 최신화 + Firestore import 50/50
+- [ ] (수동) 앱에서 1·3·8·10일차 등 샘플 확인 (뜻·예문·듣기)
+- [ ] (선택) Mac에서 iOS Profile 재설치·실기기 확인
+- [ ] (선택) `docs/export_cur` TEMP 폴더 정리
+
+### 4) 추가/변경 파일(주요)
+
+| 영역 | 파일 |
+|------|------|
+| TEMP 스크립트 | `fix_meaning_ko.mjs`, `convert_example_to_hiragana.mjs`, `refresh_curriculum_audio.mjs` |
+| 의존성 | `docs/export_cur/package.json`, `package-lock.json` |
+| 데이터(미커밋) | `JPN_beginner_1_*.json` (gitignore) → Firebase 반영됨 |
+
+### 5) Git 커밋
+
+| 해시 | 메시지 |
+|------|--------|
+| (본 커밋) | docs/chore: JPN 커리큘럼 교정 TEMP 스크립트 및 [단계 48] 진행 기록 |
+
+### 6) 다음 액션
+
+1. 앱에서 수정 일차 뜻·예문·음성 수동 확인 (빌드 불필요)
+2. Mac에서 iOS 실기기/Profile 확인 (필요 시)
+3. 작업 종료 후 `docs/export_cur` TEMP 스크립트·JSON 정리 여부 결정

@@ -8,6 +8,9 @@
     "import": "node curriculum_set_cli.mjs import"
   },
   "dependencies": {
-    "firebase-admin": "^13.0.2"
+    "@google-cloud/text-to-speech": "^6.4.1",
+    "firebase-admin": "^13.0.2",
+    "kuroshiro": "^1.2.0",
+    "kuroshiro-analyzer-kuromoji": "^1.1.0"
   }
 }
