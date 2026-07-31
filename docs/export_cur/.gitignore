@@ -1,5 +1,0 @@
-# 이 디렉터리의 *.json / node_modules 는 로컬 작업용 (TEMP)
-*.json
-!package.json
-!package-lock.json
-node_modules/
