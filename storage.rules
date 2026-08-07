@@ -7,5 +7,11 @@ service firebase.storage {
       allow read: if request.auth != null;
       allow write: if false;
     }
+
+    // 랜덤 단어 이미지 — Functions(Admin)만 쓰기, 로그인 사용자 읽기
+    match /random_words/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
   }
 }

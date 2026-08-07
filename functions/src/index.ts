@@ -3,6 +3,7 @@ export { scheduledSyncCountryFlags } from "./metadata/schedules";
 export { getWrapUpDeck } from "./wrap_up/callables";
 export { cleanupLegacyFirestoreDocs } from "./maintenance/cleanup";
 export { setAdminCurriculumPreviewDay } from "./admin/curriculum_admin_callables";
+export { generateRandomWordImages } from "./random_words/callables";
 
 import {
   buildDailySentenceBatchSystemPrompt,
