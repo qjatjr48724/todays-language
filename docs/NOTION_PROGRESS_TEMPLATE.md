@@ -2600,7 +2600,9 @@ unauthenticated: 로그인 상태 확인
 
 | 해시 | 메시지 |
 |------|--------|
-| (본 커밋) | feat/docs: 랜덤 단어·이미지 Functions·[단계 50] |
+| `1f3a784` | feat(mobile): 랜덤 단어 화면·풀·주제 필터·홈 배치 추가 |
+| `d392c2f` | feat(functions): 랜덤 단어 이미지 OpenAI 생성 및 Storage 규칙 |
+| `ea83e5f` | docs: [단계 49·50] TEMP 정리 및 랜덤 단어 작업 진행 기록 |
 
 ### 6) 다음 액션
 
