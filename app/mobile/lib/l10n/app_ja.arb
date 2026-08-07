@@ -217,6 +217,16 @@
 
   "home_today_words_title": "今日の単語",
   "home_today_words_subtitle": "毎日15個",
+  "home_random_words_title": "ランダム単語",
+  "home_random_words_subtitle": "単語・意味・画像で自由に練習",
+  "random_words_appbar_title": "ランダム単語",
+  "random_words_topic_filter_label": "トピック",
+  "random_words_topic_random": "ランダム（全体）",
+  "random_words_next": "次の単語",
+  "random_words_image_placeholder": "画像は近日追加予定です",
+  "random_words_audio_unavailable": "この単語の音声はまだありません",
+  "random_words_empty": "練習する単語がありません。",
+  "random_words_load_failed": "単語プールを読み込めませんでした。",
   "home_today_sentences_title": "今日の文",
   "home_today_sentences_subtitle": "毎日5個",
   "home_today_wrap_up_title": "今日のまとめ",
@@ -595,6 +605,20 @@
   "admin_tools_fill_daily_progress_snackbar": "本日の学習量を満たしました。次の日は深夜（KST）以降に反映されます。",
   "admin_tools_section_learning_set": "学習セット",
   "admin_tools_ensure_learning_set": "ensureLearningSetForToday（現在のプロフィール）",
+
+  "admin_tools_section_random_word_images": "ランダム単語画像",
+  "admin_tools_generate_dl01_images": "DL-01画像生成（5件バッチ）",
+  "admin_tools_generate_dl01_images_title": "DL-01ランダム単語画像生成",
+  "admin_tools_generate_dl01_images_message": "OpenAIでDL-01画像を最大5件Storageに上げます。既にあるものはスキップします。残りはもう一度押してください。",
+  "admin_tools_generate_dl01_images_snackbar": "処理 {total} · 生成 {generated} · 再利用 {reused} · 失敗 {failed}",
+  "@admin_tools_generate_dl01_images_snackbar": {
+    "placeholders": {
+      "total": { "type": "int" },
+      "generated": { "type": "int" },
+      "reused": { "type": "int" },
+      "failed": { "type": "int" }
+    }
+  },
 
   "admin_tools_section_curriculum_day": "カリキュラム日次（管理者）",
   "admin_tools_curriculum_day_hint": "日次（1–50）",

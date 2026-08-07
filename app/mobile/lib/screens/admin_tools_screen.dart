@@ -582,6 +582,54 @@ class _AdminToolsScreenState extends State<AdminToolsScreen> {
               ],
             ),
 
+            const SizedBox(height: 16),
+            _Section(
+              title: l10n.admin_tools_section_random_word_images,
+              children: [
+                FilledButton.tonal(
+                  onPressed: () async {
+                    final ok = await _confirm(
+                      l10n.admin_tools_generate_dl01_images_title,
+                      l10n.admin_tools_generate_dl01_images_message,
+                    );
+                    if (!ok) return;
+                    await _run(
+                      () async {
+                        await user.getIdToken(true);
+                        final callable = callableGenerateRandomWordImages();
+                        final result =
+                            await callable.call<Map<String, dynamic>>({
+                          'dev': true,
+                          'topicId': 'DL-01',
+                          'limit': 5,
+                          'missingOnly': true,
+                        });
+                        if (!mounted) return;
+                        final data = result.data;
+                        final innerL10n = AppLocalizations.of(context)!;
+                        final failedList =
+                            (data['failed'] as List<dynamic>?) ?? const [];
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              innerL10n.admin_tools_generate_dl01_images_snackbar(
+                                (data['total'] as num?)?.toInt() ?? 0,
+                                (data['generated'] as num?)?.toInt() ?? 0,
+                                (data['reused'] as num?)?.toInt() ?? 0,
+                                failedList.length,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                      showSuccessSnackbar: false,
+                    );
+                  },
+                  child: Text(l10n.admin_tools_generate_dl01_images),
+                ),
+              ],
+            ),
+
             if (_busy) ...[
               const SizedBox(height: 16),
               const LinearProgressIndicator(),

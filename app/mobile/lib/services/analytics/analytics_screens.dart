@@ -22,6 +22,7 @@ abstract final class AnalyticsScreens {
   static const reviewStudyWords = 'review_study_words';
   static const reviewStudySentences = 'review_study_sentences';
   static const basicCharacterChart = 'basic_character_chart';
+  static const randomWords = 'random_words';
   static const chatRoom = 'chat_room';
   static const certificationHub = 'certification_hub';
   static const certificationList = 'certification_list';

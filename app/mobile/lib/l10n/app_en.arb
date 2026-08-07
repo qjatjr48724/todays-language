@@ -217,6 +217,16 @@
 
   "home_today_words_title": "Today's Words",
   "home_today_words_subtitle": "15 per day",
+  "home_random_words_title": "Random Words",
+  "home_random_words_subtitle": "Practice with word, meaning, and image",
+  "random_words_appbar_title": "Random Words",
+  "random_words_topic_filter_label": "Topic",
+  "random_words_topic_random": "Random (all)",
+  "random_words_next": "Next word",
+  "random_words_image_placeholder": "Image coming soon",
+  "random_words_audio_unavailable": "Audio is not ready for this word yet",
+  "random_words_empty": "No words to practice.",
+  "random_words_load_failed": "Couldn't load the word pool.",
   "home_today_sentences_title": "Today's Sentences",
   "home_today_sentences_subtitle": "5 per day",
   "home_today_wrap_up_title": "Today's Wrap-up",
@@ -595,6 +605,20 @@
   "admin_tools_fill_daily_progress_snackbar": "Today's goals are filled. The next curriculum day applies after KST midnight.",
   "admin_tools_section_learning_set": "Learning set",
   "admin_tools_ensure_learning_set": "ensureLearningSetForToday (current profile)",
+
+  "admin_tools_section_random_word_images": "Random word images",
+  "admin_tools_generate_dl01_images": "Generate DL-01 images (batch of 5)",
+  "admin_tools_generate_dl01_images_title": "Generate DL-01 random word images",
+  "admin_tools_generate_dl01_images_message": "Uploads up to 5 DL-01 images to Storage via OpenAI. Skips existing files. Press again for remaining items.",
+  "admin_tools_generate_dl01_images_snackbar": "Done {total} · created {generated} · reused {reused} · failed {failed}",
+  "@admin_tools_generate_dl01_images_snackbar": {
+    "placeholders": {
+      "total": { "type": "int" },
+      "generated": { "type": "int" },
+      "reused": { "type": "int" },
+      "failed": { "type": "int" }
+    }
+  },
 
   "admin_tools_section_curriculum_day": "Curriculum day (admin)",
   "admin_tools_curriculum_day_hint": "Day (1–50)",

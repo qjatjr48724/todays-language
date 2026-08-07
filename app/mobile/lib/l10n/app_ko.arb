@@ -216,6 +216,16 @@
 
   "home_today_words_title": "오늘의 단어",
   "home_today_words_subtitle": "매일 15개",
+  "home_random_words_title": "랜덤 단어",
+  "home_random_words_subtitle": "단어·뜻·이미지로 자유롭게 연습",
+  "random_words_appbar_title": "랜덤 단어",
+  "random_words_topic_filter_label": "주제",
+  "random_words_topic_random": "랜덤 (전체)",
+  "random_words_next": "다음 단어",
+  "random_words_image_placeholder": "이미지는 곧 추가될 예정이에요",
+  "random_words_audio_unavailable": "이 단어의 음성이 아직 없어요",
+  "random_words_empty": "연습할 단어가 없습니다.",
+  "random_words_load_failed": "단어 풀을 불러오지 못했어요.",
   "home_today_sentences_title": "오늘의 문장",
   "home_today_sentences_subtitle": "매일 5개",
   "home_today_wrap_up_title": "오늘의 마무리",
@@ -593,6 +603,20 @@
   "admin_tools_fill_daily_progress_snackbar": "오늘 학습량을 채웠습니다. 다음 일차는 자정(KST) 이후 반영됩니다.",
   "admin_tools_section_learning_set": "학습 세트",
   "admin_tools_ensure_learning_set": "ensureLearningSetForToday(현재 프로필)",
+
+  "admin_tools_section_random_word_images": "랜덤 단어 이미지",
+  "admin_tools_generate_dl01_images": "DL-01 이미지 생성 (배치 5개)",
+  "admin_tools_generate_dl01_images_title": "DL-01 랜덤 단어 이미지 생성",
+  "admin_tools_generate_dl01_images_message": "OpenAI로 DL-01 이미지 최대 5개를 Storage에 올립니다. 이미 있으면 건너뜁니다. 남은 항목은 버튼을 다시 누르세요.",
+  "admin_tools_generate_dl01_images_snackbar": "처리 {total} · 생성 {generated} · 재사용 {reused} · 실패 {failed}",
+  "@admin_tools_generate_dl01_images_snackbar": {
+    "placeholders": {
+      "total": { "type": "int" },
+      "generated": { "type": "int" },
+      "reused": { "type": "int" },
+      "failed": { "type": "int" }
+    }
+  },
 
   "admin_tools_section_curriculum_day": "커리큘럼 일차 (관리자)",
   "admin_tools_curriculum_day_hint": "일차 (1–50)",

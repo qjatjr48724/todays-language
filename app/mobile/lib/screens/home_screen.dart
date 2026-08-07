@@ -19,6 +19,7 @@ import '../services/analytics/analytics_screens.dart';
 import 'my_info_screen.dart';
 import 'curriculum_review_screen.dart';
 import 'today_sentences_screen.dart';
+import 'random_words_screen.dart';
 import 'today_words_screen.dart';
 import 'today_wrap_up_screen.dart';
 import 'basic_character_chart_screen.dart';
@@ -277,19 +278,44 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
             const SizedBox(height: 12),
 
-            HomeFeatureCard(
-              title: l10n.home_basic_characters_button,
-              subtitle: l10n.home_basic_characters_subtitle,
-              icon: Icons.grid_on_outlined,
-              compactRow: true,
-              onTap: () {
-                logHomeCardTap('basic_characters');
-                pushAnalyticsScreen(
-                  context,
-                  screenName: AnalyticsScreens.basicCharacterChart,
-                  builder: (_) => const BasicCharacterChartScreen(),
-                ).then((_) => _refreshTodayProgress());
-              },
+            // 기초문자표 · 랜덤 단어 — 같은 행
+            GridView.count(
+              crossAxisCount: 2,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
+              childAspectRatio: 1.3,
+              children: [
+                HomeFeatureCard(
+                  title: l10n.home_basic_characters_button,
+                  subtitle: l10n.home_basic_characters_subtitle,
+                  icon: Icons.grid_on_outlined,
+                  onTap: () {
+                    logHomeCardTap('basic_characters');
+                    pushAnalyticsScreen(
+                      context,
+                      screenName: AnalyticsScreens.basicCharacterChart,
+                      builder: (_) => const BasicCharacterChartScreen(),
+                    ).then((_) => _refreshTodayProgress());
+                  },
+                ),
+                HomeFeatureCard(
+                  title: l10n.home_random_words_title,
+                  subtitle: l10n.home_random_words_subtitle,
+                  icon: Icons.casino_outlined,
+                  onTap: () {
+                    logHomeCardTap('random_words');
+                    pushAnalyticsScreen(
+                      context,
+                      screenName: AnalyticsScreens.randomWords,
+                      builder: (_) => RandomWordsScreen(
+                        targetLanguage: _prefs.targetLanguage,
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
             const SizedBox(height: 12),
 

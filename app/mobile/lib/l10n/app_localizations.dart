@@ -1018,6 +1018,66 @@ abstract class AppLocalizations {
   /// **'매일 15개'**
   String get home_today_words_subtitle;
 
+  /// No description provided for @home_random_words_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'랜덤 단어'**
+  String get home_random_words_title;
+
+  /// No description provided for @home_random_words_subtitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'단어·뜻·이미지로 자유롭게 연습'**
+  String get home_random_words_subtitle;
+
+  /// No description provided for @random_words_appbar_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'랜덤 단어'**
+  String get random_words_appbar_title;
+
+  /// No description provided for @random_words_topic_filter_label.
+  ///
+  /// In ko, this message translates to:
+  /// **'주제'**
+  String get random_words_topic_filter_label;
+
+  /// No description provided for @random_words_topic_random.
+  ///
+  /// In ko, this message translates to:
+  /// **'랜덤 (전체)'**
+  String get random_words_topic_random;
+
+  /// No description provided for @random_words_next.
+  ///
+  /// In ko, this message translates to:
+  /// **'다음 단어'**
+  String get random_words_next;
+
+  /// No description provided for @random_words_image_placeholder.
+  ///
+  /// In ko, this message translates to:
+  /// **'이미지는 곧 추가될 예정이에요'**
+  String get random_words_image_placeholder;
+
+  /// No description provided for @random_words_audio_unavailable.
+  ///
+  /// In ko, this message translates to:
+  /// **'이 단어의 음성이 아직 없어요'**
+  String get random_words_audio_unavailable;
+
+  /// No description provided for @random_words_empty.
+  ///
+  /// In ko, this message translates to:
+  /// **'연습할 단어가 없습니다.'**
+  String get random_words_empty;
+
+  /// No description provided for @random_words_load_failed.
+  ///
+  /// In ko, this message translates to:
+  /// **'단어 풀을 불러오지 못했어요.'**
+  String get random_words_load_failed;
+
   /// No description provided for @home_today_sentences_title.
   ///
   /// In ko, this message translates to:
@@ -2560,6 +2620,41 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'ensureLearningSetForToday(현재 프로필)'**
   String get admin_tools_ensure_learning_set;
+
+  /// No description provided for @admin_tools_section_random_word_images.
+  ///
+  /// In ko, this message translates to:
+  /// **'랜덤 단어 이미지'**
+  String get admin_tools_section_random_word_images;
+
+  /// No description provided for @admin_tools_generate_dl01_images.
+  ///
+  /// In ko, this message translates to:
+  /// **'DL-01 이미지 생성 (배치 5개)'**
+  String get admin_tools_generate_dl01_images;
+
+  /// No description provided for @admin_tools_generate_dl01_images_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'DL-01 랜덤 단어 이미지 생성'**
+  String get admin_tools_generate_dl01_images_title;
+
+  /// No description provided for @admin_tools_generate_dl01_images_message.
+  ///
+  /// In ko, this message translates to:
+  /// **'OpenAI로 DL-01 이미지 최대 5개를 Storage에 올립니다. 이미 있으면 건너뜁니다. 남은 항목은 버튼을 다시 누르세요.'**
+  String get admin_tools_generate_dl01_images_message;
+
+  /// No description provided for @admin_tools_generate_dl01_images_snackbar.
+  ///
+  /// In ko, this message translates to:
+  /// **'처리 {total} · 생성 {generated} · 재사용 {reused} · 실패 {failed}'**
+  String admin_tools_generate_dl01_images_snackbar(
+    int total,
+    int generated,
+    int reused,
+    int failed,
+  );
 
   /// No description provided for @admin_tools_section_curriculum_day.
   ///

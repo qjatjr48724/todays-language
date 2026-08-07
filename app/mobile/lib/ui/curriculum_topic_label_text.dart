@@ -8,12 +8,16 @@ class CurriculumTopicLabelText extends StatelessWidget {
     super.key,
     required this.label,
     this.compact = false,
+    this.ellipsis = false,
   });
 
   final String? label;
 
   /// 홈 진도 영역 등 작은 텍스트 스타일.
   final bool compact;
+
+  /// 한 줄 말줄임(…). 가로 폭을 채운 뒤 넘치면 자른다.
+  final bool ellipsis;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +38,10 @@ class CurriculumTopicLabelText extends StatelessWidget {
               fontWeight: FontWeight.w600,
             );
 
+    final useEllipsis = compact || ellipsis;
+
     final box = Container(
+      width: useEllipsis ? double.infinity : null,
       padding: EdgeInsets.symmetric(
         horizontal: compact ? 8 : 12,
         vertical: compact ? 4 : 8,
@@ -47,14 +54,16 @@ class CurriculumTopicLabelText extends StatelessWidget {
         l10n.curriculum_topic_label(topic),
         style: style,
         textAlign: compact ? TextAlign.end : TextAlign.start,
-        // 홈 compact: 한 줄 + 말줄임. 그 외는 여러 줄 줄바꿈 허용.
-        maxLines: compact ? 1 : null,
-        overflow: compact ? TextOverflow.ellipsis : TextOverflow.clip,
+        maxLines: useEllipsis ? 1 : null,
+        overflow: useEllipsis ? TextOverflow.ellipsis : TextOverflow.clip,
       ),
     );
 
     return Padding(
-      padding: EdgeInsets.only(top: compact ? 4 : 0, bottom: compact ? 0 : 16),
+      padding: EdgeInsets.only(
+        top: compact ? 4 : 0,
+        bottom: compact ? 0 : 8,
+      ),
       child: compact
           ? Align(alignment: Alignment.centerRight, child: box)
           : box,

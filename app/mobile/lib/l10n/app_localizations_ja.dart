@@ -511,6 +511,36 @@ class AppLocalizationsJa extends AppLocalizations {
   String get home_today_words_subtitle => '毎日15個';
 
   @override
+  String get home_random_words_title => 'ランダム単語';
+
+  @override
+  String get home_random_words_subtitle => '単語・意味・画像で自由に練習';
+
+  @override
+  String get random_words_appbar_title => 'ランダム単語';
+
+  @override
+  String get random_words_topic_filter_label => 'トピック';
+
+  @override
+  String get random_words_topic_random => 'ランダム（全体）';
+
+  @override
+  String get random_words_next => '次の単語';
+
+  @override
+  String get random_words_image_placeholder => '画像は近日追加予定です';
+
+  @override
+  String get random_words_audio_unavailable => 'この単語の音声はまだありません';
+
+  @override
+  String get random_words_empty => '練習する単語がありません。';
+
+  @override
+  String get random_words_load_failed => '単語プールを読み込めませんでした。';
+
+  @override
   String get home_today_sentences_title => '今日の文';
 
   @override
@@ -1386,6 +1416,29 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get admin_tools_ensure_learning_set =>
       'ensureLearningSetForToday（現在のプロフィール）';
+
+  @override
+  String get admin_tools_section_random_word_images => 'ランダム単語画像';
+
+  @override
+  String get admin_tools_generate_dl01_images => 'DL-01画像生成（5件バッチ）';
+
+  @override
+  String get admin_tools_generate_dl01_images_title => 'DL-01ランダム単語画像生成';
+
+  @override
+  String get admin_tools_generate_dl01_images_message =>
+      'OpenAIでDL-01画像を最大5件Storageに上げます。既にあるものはスキップします。残りはもう一度押してください。';
+
+  @override
+  String admin_tools_generate_dl01_images_snackbar(
+    int total,
+    int generated,
+    int reused,
+    int failed,
+  ) {
+    return '処理 $total · 生成 $generated · 再利用 $reused · 失敗 $failed';
+  }
 
   @override
   String get admin_tools_section_curriculum_day => 'カリキュラム日次（管理者）';

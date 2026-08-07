@@ -530,6 +530,38 @@ class AppLocalizationsEn extends AppLocalizations {
   String get home_today_words_subtitle => '15 per day';
 
   @override
+  String get home_random_words_title => 'Random Words';
+
+  @override
+  String get home_random_words_subtitle =>
+      'Practice with word, meaning, and image';
+
+  @override
+  String get random_words_appbar_title => 'Random Words';
+
+  @override
+  String get random_words_topic_filter_label => 'Topic';
+
+  @override
+  String get random_words_topic_random => 'Random (all)';
+
+  @override
+  String get random_words_next => 'Next word';
+
+  @override
+  String get random_words_image_placeholder => 'Image coming soon';
+
+  @override
+  String get random_words_audio_unavailable =>
+      'Audio is not ready for this word yet';
+
+  @override
+  String get random_words_empty => 'No words to practice.';
+
+  @override
+  String get random_words_load_failed => 'Couldn\'t load the word pool.';
+
+  @override
   String get home_today_sentences_title => 'Today\'s Sentences';
 
   @override
@@ -1445,6 +1477,31 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get admin_tools_ensure_learning_set =>
       'ensureLearningSetForToday (current profile)';
+
+  @override
+  String get admin_tools_section_random_word_images => 'Random word images';
+
+  @override
+  String get admin_tools_generate_dl01_images =>
+      'Generate DL-01 images (batch of 5)';
+
+  @override
+  String get admin_tools_generate_dl01_images_title =>
+      'Generate DL-01 random word images';
+
+  @override
+  String get admin_tools_generate_dl01_images_message =>
+      'Uploads up to 5 DL-01 images to Storage via OpenAI. Skips existing files. Press again for remaining items.';
+
+  @override
+  String admin_tools_generate_dl01_images_snackbar(
+    int total,
+    int generated,
+    int reused,
+    int failed,
+  ) {
+    return 'Done $total · created $generated · reused $reused · failed $failed';
+  }
 
   @override
   String get admin_tools_section_curriculum_day => 'Curriculum day (admin)';

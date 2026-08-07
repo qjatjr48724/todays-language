@@ -513,6 +513,36 @@ class AppLocalizationsKo extends AppLocalizations {
   String get home_today_words_subtitle => '매일 15개';
 
   @override
+  String get home_random_words_title => '랜덤 단어';
+
+  @override
+  String get home_random_words_subtitle => '단어·뜻·이미지로 자유롭게 연습';
+
+  @override
+  String get random_words_appbar_title => '랜덤 단어';
+
+  @override
+  String get random_words_topic_filter_label => '주제';
+
+  @override
+  String get random_words_topic_random => '랜덤 (전체)';
+
+  @override
+  String get random_words_next => '다음 단어';
+
+  @override
+  String get random_words_image_placeholder => '이미지는 곧 추가될 예정이에요';
+
+  @override
+  String get random_words_audio_unavailable => '이 단어의 음성이 아직 없어요';
+
+  @override
+  String get random_words_empty => '연습할 단어가 없습니다.';
+
+  @override
+  String get random_words_load_failed => '단어 풀을 불러오지 못했어요.';
+
+  @override
   String get home_today_sentences_title => '오늘의 문장';
 
   @override
@@ -1388,6 +1418,29 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get admin_tools_ensure_learning_set =>
       'ensureLearningSetForToday(현재 프로필)';
+
+  @override
+  String get admin_tools_section_random_word_images => '랜덤 단어 이미지';
+
+  @override
+  String get admin_tools_generate_dl01_images => 'DL-01 이미지 생성 (배치 5개)';
+
+  @override
+  String get admin_tools_generate_dl01_images_title => 'DL-01 랜덤 단어 이미지 생성';
+
+  @override
+  String get admin_tools_generate_dl01_images_message =>
+      'OpenAI로 DL-01 이미지 최대 5개를 Storage에 올립니다. 이미 있으면 건너뜁니다. 남은 항목은 버튼을 다시 누르세요.';
+
+  @override
+  String admin_tools_generate_dl01_images_snackbar(
+    int total,
+    int generated,
+    int reused,
+    int failed,
+  ) {
+    return '처리 $total · 생성 $generated · 재사용 $reused · 실패 $failed';
+  }
 
   @override
   String get admin_tools_section_curriculum_day => '커리큘럼 일차 (관리자)';

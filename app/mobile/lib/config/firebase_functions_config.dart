@@ -33,3 +33,11 @@ HttpsCallable callableSeedCountryCatalog() =>
 
 HttpsCallable callableSyncCountryFlags() =>
     appFirebaseFunctions().httpsCallable('syncCountryFlags');
+
+HttpsCallable callableGenerateRandomWordImages() =>
+    appFirebaseFunctions().httpsCallable(
+      'generateRandomWordImages',
+      options: HttpsCallableOptions(
+        timeout: const Duration(minutes: 9),
+      ),
+    );

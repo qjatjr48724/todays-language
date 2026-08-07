@@ -248,5 +248,10 @@
     "ko": "진로·상담",
     "en": "Career & counseling",
     "ja": "進路・相談"
+  },
+  "JOB-01": {
+    "ko": "직업/직장",
+    "en": "Jobs & workplace",
+    "ja": "職業・職場"
   }
 }
