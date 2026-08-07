@@ -2477,7 +2477,7 @@ unauthenticated: 로그인 상태 확인
 - [x] 음성 최신화 + Firestore import 50/50
 - [ ] (수동) 앱에서 1·3·8·10일차 등 샘플 확인 (뜻·예문·듣기)
 - [ ] (선택) Mac에서 iOS Profile 재설치·실기기 확인
-- [ ] (선택) `docs/export_cur` TEMP 폴더 정리
+- [x] (선택) `docs/export_cur` TEMP 정리 → [단계 49]에서 내부 파일 삭제 완료
 
 ### 4) 추가/변경 파일(주요)
 
@@ -2491,10 +2491,119 @@ unauthenticated: 로그인 상태 확인
 
 | 해시 | 메시지 |
 |------|--------|
-| (본 커밋) | docs/chore: JPN 커리큘럼 교정 TEMP 스크립트 및 [단계 48] 진행 기록 |
+| `1749184` | docs/chore: JPN 커리큘럼 교정 TEMP 스크립트 및 [단계 48] 진행 기록 |
 
 ### 6) 다음 액션
 
 1. 앱에서 수정 일차 뜻·예문·음성 수동 확인 (빌드 불필요)
 2. Mac에서 iOS 실기기/Profile 확인 (필요 시)
-3. 작업 종료 후 `docs/export_cur` TEMP 스크립트·JSON 정리 여부 결정
+3. ~~TEMP 정리~~ → [단계 49] 완료
+
+---
+
+## [단계 49] 커리큘럼 TEMP 정리 · 세션 마무리 (2026-08-03)
+
+### 1) 오늘 한 일
+
+**[단계 48] 후속 — TEMP 도구 정리**
+- `docs/export_cur` **폴더는 유지**, 내부 파일만 전부 삭제
+  - 추적 파일 8개 삭제: README, `.gitignore`, `curriculum_set_cli.mjs`, `fix_meaning_ko.mjs`, `convert_example_to_hiragana.mjs`, `refresh_curriculum_audio.mjs`, `package.json`, `package-lock.json`
+  - 로컬만 있던 `JPN_beginner_1_1`~`50` JSON · `node_modules` 도 삭제
+- 학습 데이터 정본은 이미 `todays-language-dev` Firestore에 반영됨 → 앱/데이터 영향 없음
+
+**이번 구간(단계 48~49) 작업 요약**
+1. JPN 초급 1~50 `meaningKo` 검수 (단어 평어 / 문장·예문 경어·높임 / 질문 자연화)
+2. 예문·문장 한자 → 히라가나 (외래어 카타카나 유지)
+3. 예문·문장 TTS 재생성·경로 갱신 후 Firestore import 50/50
+4. TEMP export/import·교정 스크립트 커밋 후, 작업 종료로 내부 파일 삭제
+
+### 2) 합의·결정
+
+- `docs/export_cur` 빈 폴더는 남겨 둠 (재작업 시 다시 도구를 둘 자리)
+- Windows에서는 iOS 빌드 불가 → Profile/실기기는 Mac에서
+
+### 3) 완료 기준 체크
+
+- [x] `docs/export_cur` 내부 TEMP 파일 삭제 (폴더 유지)
+- [x] 정리 커밋 (`329fc5c`)
+- [ ] (수동) 앱에서 뜻·예문·음성 샘플 확인
+- [ ] (선택) Mac iOS Profile/실기기 확인
+
+### 4) 추가/변경 파일(주요)
+
+| 영역 | 내용 |
+|------|------|
+| 삭제 | `docs/export_cur/*` (폴더만 남김) |
+
+### 5) Git 커밋
+
+| 해시 | 메시지 |
+|------|--------|
+| `1749184` | docs/chore: JPN 커리큘럼 교정 TEMP 스크립트 및 [단계 48] 진행 기록 |
+| `329fc5c` | chore: 커리큘럼 TEMP export_cur 내부 파일 정리 |
+| (본 기록) | docs: [단계 49] TEMP 정리·세션 마무리 진행 기록 |
+
+### 6) 다음 액션
+
+1. 앱에서 1·3·8·10일차 등 뜻·예문·듣기 수동 확인 (재빌드 불필요, 화면 재진입)
+2. (선택) Mac에서 iOS Profile 빌드·실기기 확인
+3. (선택) 원격 push (`origin/main` 대비 local ahead)
+
+---
+
+## [단계 50] 랜덤 단어 POC · 이미지 Storage · 이음동의 정리 (2026-08-07~08)
+
+### 1) 오늘 한 일
+
+**랜덤 단어 앱**
+- 홈에 랜덤 단어 진입 + 기초문자표와 **같은 행** 배치
+- `random_word_pool.json` 기반 화면: 이미지(로컬/Storage)·표기·히라가나·뜻·주제
+- 주제 필터: 기본 **랜덤(전체)** / 선택 시 해당 `topicId`만 추첨, 드롭다운 최대 5행 스크롤
+- 주제 라벨을 이미지 **아래**로 이동 + 한 줄 말줄임(`…`)
+- 단어·뜻 폰트 축소(약 75%), 히라가나만 소폭 확대(0.95)
+
+**단어 풀·이음동의 정리**
+- 노션 정리·번역 반영 후 풀 구축 → 이음동의·경어·외래어 중복 정리
+- **1028 → 960** (`version: 2`)
+- 큰 개념 통합 예: 형제/자매/삼촌/이모, `자기, 자신` / `부탁, 제발` / `너, 당신` 병합 표기
+
+**이미지 파이프라인 (Functions + Storage)**
+- callable `generateRandomWordImages` (asia-northeast3, 관리자 UID, OpenAI `gpt-image-1`)
+- Storage `random_words/images/{id}.png`, `storage.rules` 로그인 읽기
+- DL-01 장면형 프롬프트·카탈로그, 관리자 도구 배치 생성 버튼
+- DL-01 1차 생성 완료 / 시간대·작별 장면 **재생성은 OpenAI 크레딧 부족으로 대기**
+
+### 2) 합의·결정
+
+- 이미지·음성은 로컬이 아니라 **Firebase Storage** (음성과 동일 패턴)
+- 이음동의: 명확 중복 삭제 → 큰 개념 1개 → 외래어 동의는 표준어만 / 다중 뜻은 병합 표기
+- 동음이의(형/오빠 등)는 형용사(elder 등)로 나중에 확장
+
+### 3) 완료 기준 체크
+
+- [x] 랜덤 단어 화면·주제 필터·홈 배치·UI 폴리시
+- [x] 풀 960개 정리 + 에셋 로드 테스트
+- [x] Functions 이미지 callable·storage rules 배포(dev)
+- [x] DL-01 이미지 1차 Storage 업로드
+- [ ] OpenAI 크레딧 충전 후 아침/저녁·작별 장면 25장 force 재생성
+- [ ] (선택) 타 주제 이미지 일괄 생성
+
+### 4) 추가/변경 파일(주요)
+
+| 영역 | 내용 |
+|------|------|
+| 앱 | `random_words_screen`, repository/model, pool JSON, i18n, home, admin tools |
+| Functions | `functions/src/random_words/*`, `storage.rules` |
+| 기타 | `curriculum_topic_labels.json`(JOB-01), 진행 문서 |
+
+### 5) Git 커밋
+
+| 해시 | 메시지 |
+|------|--------|
+| (본 커밋) | feat/docs: 랜덤 단어·이미지 Functions·[단계 50] |
+
+### 6) 다음 액션
+
+1. OpenAI 크레딧 충전 → DL-01 시간대/작별 이미지 재생성
+2. 앱에서 랜덤 단어·주제 필터·Storage 이미지 수동 확인(완전 재시작)
+3. (선택) 다른 주제 이미지 생성 확장
