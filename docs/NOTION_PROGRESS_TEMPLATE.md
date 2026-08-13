@@ -2609,3 +2609,67 @@ unauthenticated: 로그인 상태 확인
 1. OpenAI 크레딧 충전 → DL-01 시간대/작별 이미지 재생성
 2. 앱에서 랜덤 단어·주제 필터·Storage 이미지 수동 확인(완전 재시작)
 3. (선택) 다른 주제 이미지 생성 확장
+
+---
+
+## [단계 51] 학습 리마인드 온보딩·설정 재설정·언어 초기화 재시동 (2026-08-11~13)
+
+### 1) 오늘 한 일
+
+**학습 리마인드 온보딩 (1차)**
+- 언어 설정 완료 직후 `LearningReminderSetupScreen`으로 진입
+- 매일 알림 시각: **08:00~20:50**, **10분 단위** (기본 선택 08:00)
+- 「이 시간에 알림 받기」 / 「지금은 안 할래요」 (AppBar 건너뛰기 제거, 하단 버튼 배치)
+- 시·분 드롭다운: **최대 5개 표시 + 스크롤**
+- `flutter_local_notifications` 로컬 알림 예약 (기기 로컬 타임존, 실패 시 Asia/Seoul)
+- AuthGate: `languageSetupDone` 후 `LearningReminderPreferences.isSetupDone()` 미완료 시 온보딩
+
+**알림 설정에서 시간 재설정**
+- 내정보 → 알림 설정: 앱 알림 ON일 때 「학습 알림 시간」 시·분 + 저장
+- 저장 시 prefs + `LearningReminderScheduler.syncFromPreferences()` 재예약
+
+**관리자 언어 선택 초기화**
+- Firestore `languageSetupDone: false` + 언어 필드 삭제 후 **`AppRestart.restart()`**
+- 리마인드 prefs 리셋 + 스케줄 취소 (완료 SnackBar 생략)
+
+**검증**
+- 실기기 Profile 빌드·설치 후 **알림 수신 확인됨**
+- 단위 테스트: `learning_reminder_time` / `learning_reminder_preferences`
+
+### 2) 합의·결정
+
+- 학습 리마인드는 **서버 FCM 푸시가 아니라 로컬 알림** (잠금 화면/알림 센터에 표시)
+- 인앱 SnackBar/다이얼로그가 아님
+- 알림 센터(종 아이콘·7일 inbox·일반/이벤트 탭)는 **미구현** — 다음 단계에서 UI·저장 방식 확정 후 진행
+- 알림 목록을 “로컬 저장” = **사용자 기기에만** 저장 (앱 삭제·기기 변경 시 소실)
+
+### 3) 완료 기준 체크
+
+- [x] 언어 설정 후 리마인드 온보딩·건너뛰기/확정
+- [x] 로컬 알림 스케줄·실기기 수신 확인
+- [x] 알림 설정에서 시간 재설정
+- [x] 언어 선택 초기화 시 재시동 → 언어 선택 플로우
+- [ ] 홈 종 아이콘 + 85% 알림 확인 팝업 (일반/이벤트, 7일 보관)
+- [ ] (선택) FCM 이벤트/광고성 푸시
+
+### 4) 추가/변경 파일(주요)
+
+| 영역 | 내용 |
+|------|------|
+| 신규 | `learning_reminder_setup_screen`, `learning_reminder_preferences`, `learning_reminder_scheduler`, `learning_reminder_time`, 단위 테스트 |
+| 연동 | `auth_gate`, `target_language_setup_screen`, `main`, `admin_tools_screen`, `notification_settings_screen` |
+| 의존성 | `timezone`, `flutter_timezone` + AndroidManifest boot receiver 등 |
+| i18n | 리마인드·알림 설정 시간 관련 키 (ko/en/ja) |
+
+### 5) Git 커밋
+
+| 해시 | 메시지 |
+|------|--------|
+| (본 세션) | feat(mobile): 학습 리마인드 온보딩·로컬 알림·설정 재설정 |
+| (본 세션) | docs: [단계 51] 학습 리마인드 진행 기록 |
+
+### 6) 다음 액션
+
+1. 홈 이메일 → 내정보 이동 + 종 아이콘 알림 확인 팝업(85%, 일반/이벤트, 7일) 설계·구현
+2. 일반=학습/기타, 이벤트=서버 광고 — 로컬 inbox vs Firestore/FCM 범위 확정
+3. (선택) 알림 ON 시 리마인드 자동 재등록·iOS 권한 체크 보강
