@@ -1270,6 +1270,69 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settings_notification_open_settings_button => 'システム設定を開く';
 
   @override
+  String get settings_reminder_time_section_title => '学習リマインダーの時間';
+
+  @override
+  String get settings_reminder_time_section_description =>
+      '毎日の学習リマインダーを受け取る時間を設定します。';
+
+  @override
+  String get settings_reminder_time_not_set => 'リマインダーの時間が設定されていません。';
+
+  @override
+  String get settings_reminder_time_save_button => '保存';
+
+  @override
+  String get settings_reminder_time_saved_snackbar => 'リマインダーの時間を保存しました。';
+
+  @override
+  String get learning_reminder_setup_appbar_title => '学習リマインダー';
+
+  @override
+  String get learning_reminder_setup_heading => '毎日いつお知らせしますか？';
+
+  @override
+  String get learning_reminder_setup_description =>
+      '選んだ時間に学習リマインダーを送ります。曜日は毎日です。';
+
+  @override
+  String get learning_reminder_time_label => '通知時間';
+
+  @override
+  String get learning_reminder_hour_label => '時';
+
+  @override
+  String get learning_reminder_minute_label => '分';
+
+  @override
+  String get learning_reminder_time_hint => '8:00〜20:50の間で、10分単位で選べます。';
+
+  @override
+  String get learning_reminder_decline => '今はしない';
+
+  @override
+  String get learning_reminder_confirm => 'この時間に通知を受け取る';
+
+  @override
+  String get learning_reminder_permission_title => '通知の許可が必要です';
+
+  @override
+  String get learning_reminder_permission_message =>
+      '学習リマインダーを受け取るには、端末の通知を許可してください。';
+
+  @override
+  String get learning_reminder_permission_later => 'あとで';
+
+  @override
+  String get learning_reminder_permission_allow => '許可する';
+
+  @override
+  String get learning_reminder_notification_title => '今日の言語';
+
+  @override
+  String get learning_reminder_notification_body => '今日も短く学習してみませんか？';
+
+  @override
   String get settings_admin_tile => '管理者ツール';
 
   @override

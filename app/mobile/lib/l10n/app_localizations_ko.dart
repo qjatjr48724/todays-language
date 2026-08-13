@@ -1272,6 +1272,70 @@ class AppLocalizationsKo extends AppLocalizations {
   String get settings_notification_open_settings_button => '시스템 설정 열기';
 
   @override
+  String get settings_reminder_time_section_title => '학습 알림 시간';
+
+  @override
+  String get settings_reminder_time_section_description =>
+      '매일 학습 리마인드를 받을 시간을 설정합니다.';
+
+  @override
+  String get settings_reminder_time_not_set => '알림 시간이 설정되어 있지 않습니다.';
+
+  @override
+  String get settings_reminder_time_save_button => '저장';
+
+  @override
+  String get settings_reminder_time_saved_snackbar => '알림 시간이 저장되었습니다.';
+
+  @override
+  String get learning_reminder_setup_appbar_title => '학습 알림';
+
+  @override
+  String get learning_reminder_setup_heading => '매일 언제 알려드릴까요?';
+
+  @override
+  String get learning_reminder_setup_description =>
+      '선택한 시간에 학습 리마인드를 보내 드려요. 요일은 매일입니다.';
+
+  @override
+  String get learning_reminder_time_label => '알림 시간';
+
+  @override
+  String get learning_reminder_hour_label => '시';
+
+  @override
+  String get learning_reminder_minute_label => '분';
+
+  @override
+  String get learning_reminder_time_hint =>
+      '오전 8:00부터 오후 8:50까지, 10분 단위로 선택할 수 있어요.';
+
+  @override
+  String get learning_reminder_decline => '지금은 안 할래요';
+
+  @override
+  String get learning_reminder_confirm => '이 시간에 알림 받기';
+
+  @override
+  String get learning_reminder_permission_title => '알림 권한이 필요해요';
+
+  @override
+  String get learning_reminder_permission_message =>
+      '학습 리마인드를 받으려면 기기 알림을 허용해 주세요.';
+
+  @override
+  String get learning_reminder_permission_later => '나중에';
+
+  @override
+  String get learning_reminder_permission_allow => '허용하기';
+
+  @override
+  String get learning_reminder_notification_title => '오늘의 언어';
+
+  @override
+  String get learning_reminder_notification_body => '오늘도 짧게 학습해 볼까요?';
+
+  @override
   String get settings_admin_tile => '관리자 도구';
 
   @override

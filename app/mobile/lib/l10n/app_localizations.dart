@@ -2357,6 +2357,126 @@ abstract class AppLocalizations {
   /// **'시스템 설정 열기'**
   String get settings_notification_open_settings_button;
 
+  /// No description provided for @settings_reminder_time_section_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'학습 알림 시간'**
+  String get settings_reminder_time_section_title;
+
+  /// No description provided for @settings_reminder_time_section_description.
+  ///
+  /// In ko, this message translates to:
+  /// **'매일 학습 리마인드를 받을 시간을 설정합니다.'**
+  String get settings_reminder_time_section_description;
+
+  /// No description provided for @settings_reminder_time_not_set.
+  ///
+  /// In ko, this message translates to:
+  /// **'알림 시간이 설정되어 있지 않습니다.'**
+  String get settings_reminder_time_not_set;
+
+  /// No description provided for @settings_reminder_time_save_button.
+  ///
+  /// In ko, this message translates to:
+  /// **'저장'**
+  String get settings_reminder_time_save_button;
+
+  /// No description provided for @settings_reminder_time_saved_snackbar.
+  ///
+  /// In ko, this message translates to:
+  /// **'알림 시간이 저장되었습니다.'**
+  String get settings_reminder_time_saved_snackbar;
+
+  /// No description provided for @learning_reminder_setup_appbar_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'학습 알림'**
+  String get learning_reminder_setup_appbar_title;
+
+  /// No description provided for @learning_reminder_setup_heading.
+  ///
+  /// In ko, this message translates to:
+  /// **'매일 언제 알려드릴까요?'**
+  String get learning_reminder_setup_heading;
+
+  /// No description provided for @learning_reminder_setup_description.
+  ///
+  /// In ko, this message translates to:
+  /// **'선택한 시간에 학습 리마인드를 보내 드려요. 요일은 매일입니다.'**
+  String get learning_reminder_setup_description;
+
+  /// No description provided for @learning_reminder_time_label.
+  ///
+  /// In ko, this message translates to:
+  /// **'알림 시간'**
+  String get learning_reminder_time_label;
+
+  /// No description provided for @learning_reminder_hour_label.
+  ///
+  /// In ko, this message translates to:
+  /// **'시'**
+  String get learning_reminder_hour_label;
+
+  /// No description provided for @learning_reminder_minute_label.
+  ///
+  /// In ko, this message translates to:
+  /// **'분'**
+  String get learning_reminder_minute_label;
+
+  /// No description provided for @learning_reminder_time_hint.
+  ///
+  /// In ko, this message translates to:
+  /// **'오전 8:00부터 오후 8:50까지, 10분 단위로 선택할 수 있어요.'**
+  String get learning_reminder_time_hint;
+
+  /// No description provided for @learning_reminder_decline.
+  ///
+  /// In ko, this message translates to:
+  /// **'지금은 안 할래요'**
+  String get learning_reminder_decline;
+
+  /// No description provided for @learning_reminder_confirm.
+  ///
+  /// In ko, this message translates to:
+  /// **'이 시간에 알림 받기'**
+  String get learning_reminder_confirm;
+
+  /// No description provided for @learning_reminder_permission_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'알림 권한이 필요해요'**
+  String get learning_reminder_permission_title;
+
+  /// No description provided for @learning_reminder_permission_message.
+  ///
+  /// In ko, this message translates to:
+  /// **'학습 리마인드를 받으려면 기기 알림을 허용해 주세요.'**
+  String get learning_reminder_permission_message;
+
+  /// No description provided for @learning_reminder_permission_later.
+  ///
+  /// In ko, this message translates to:
+  /// **'나중에'**
+  String get learning_reminder_permission_later;
+
+  /// No description provided for @learning_reminder_permission_allow.
+  ///
+  /// In ko, this message translates to:
+  /// **'허용하기'**
+  String get learning_reminder_permission_allow;
+
+  /// No description provided for @learning_reminder_notification_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'오늘의 언어'**
+  String get learning_reminder_notification_title;
+
+  /// No description provided for @learning_reminder_notification_body.
+  ///
+  /// In ko, this message translates to:
+  /// **'오늘도 짧게 학습해 볼까요?'**
+  String get learning_reminder_notification_body;
+
   /// No description provided for @settings_admin_tile.
   ///
   /// In ko, this message translates to:

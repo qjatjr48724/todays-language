@@ -1321,6 +1321,72 @@ class AppLocalizationsEn extends AppLocalizations {
       'Open system settings';
 
   @override
+  String get settings_reminder_time_section_title => 'Study reminder time';
+
+  @override
+  String get settings_reminder_time_section_description =>
+      'Set the time to receive your daily study reminder.';
+
+  @override
+  String get settings_reminder_time_not_set => 'No reminder time set.';
+
+  @override
+  String get settings_reminder_time_save_button => 'Save';
+
+  @override
+  String get settings_reminder_time_saved_snackbar => 'Reminder time saved.';
+
+  @override
+  String get learning_reminder_setup_appbar_title => 'Study reminder';
+
+  @override
+  String get learning_reminder_setup_heading => 'When should we remind you?';
+
+  @override
+  String get learning_reminder_setup_description =>
+      'We\'ll send a daily study reminder at the time you choose.';
+
+  @override
+  String get learning_reminder_time_label => 'Reminder time';
+
+  @override
+  String get learning_reminder_hour_label => 'Hour';
+
+  @override
+  String get learning_reminder_minute_label => 'Minute';
+
+  @override
+  String get learning_reminder_time_hint =>
+      'Choose from 08:00 to 20:50 in 10-minute steps.';
+
+  @override
+  String get learning_reminder_decline => 'Not now';
+
+  @override
+  String get learning_reminder_confirm => 'Remind me at this time';
+
+  @override
+  String get learning_reminder_permission_title =>
+      'Notification permission needed';
+
+  @override
+  String get learning_reminder_permission_message =>
+      'Please allow notifications to receive study reminders.';
+
+  @override
+  String get learning_reminder_permission_later => 'Later';
+
+  @override
+  String get learning_reminder_permission_allow => 'Allow';
+
+  @override
+  String get learning_reminder_notification_title => 'Today\'s Language';
+
+  @override
+  String get learning_reminder_notification_body =>
+      'Ready for a short study session today?';
+
+  @override
   String get settings_admin_tile => 'Admin tools';
 
   @override

@@ -3,7 +3,7 @@ import '../config/firebase_functions_config.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import 'main_nav_screen.dart';
+import 'learning_reminder_setup_screen.dart';
 import '../config/feature_flags.dart';
 import '../l10n/app_localizations.dart';
 import '../models/curriculum_state.dart';
@@ -153,10 +153,11 @@ class _TargetLanguageSetupScreenState extends State<TargetLanguageSetupScreen> {
 
       if (!mounted) return;
       await logLanguageSetupComplete(targetLanguage: targetChoice.alpha3);
+      if (!mounted) return;
       pushAndRemoveUntilAnalyticsScreen(
         context,
-        screenName: AnalyticsScreens.mainNav,
-        builder: (_) => const MainNavScreen(),
+        screenName: AnalyticsScreens.learningReminderSetup,
+        builder: (_) => const LearningReminderSetupScreen(),
         predicate: (route) => false,
       );
     } catch (e) {

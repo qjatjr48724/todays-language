@@ -7,6 +7,7 @@ import 'firebase_options.dart';
 import 'screens/launch_screen.dart';
 import 'services/analytics/analytics_lifecycle_binding.dart';
 import 'services/analytics/app_crashlytics_service.dart';
+import 'services/learning_reminder_scheduler.dart';
 import 'ui/app_theme.dart';
 import 'l10n/app_localizations.dart';
 import 'utils/app_restart.dart';
@@ -17,6 +18,7 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await AppCrashlyticsService.instance.initialize();
+  await LearningReminderScheduler.initialize();
   AnalyticsLifecycleBinding.instance.install();
   runApp(const AppRoot());
 }

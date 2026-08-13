@@ -30,5 +30,6 @@ abstract final class AnalyticsScreens {
   static const settings = 'settings';
   static const notificationSettings = 'notification_settings';
   static const notificationPermission = 'notification_permission';
+  static const learningReminderSetup = 'learning_reminder_setup';
   static const adminTools = 'admin_tools';
 }

@@ -9,6 +9,9 @@ import 'target_language_setup_screen.dart';
 import '../l10n/app_localizations.dart';
 import '../models/curriculum_state.dart';
 import '../services/daily_progress_sync.dart';
+import '../services/learning_reminder_preferences.dart';
+import '../services/learning_reminder_scheduler.dart';
+import '../utils/app_restart.dart';
 
 class AdminToolsScreen extends StatefulWidget {
   const AdminToolsScreen({super.key});
@@ -203,17 +206,24 @@ class _AdminToolsScreenState extends State<AdminToolsScreen> {
                     if (!ok) {
                       return;
                     }
-                    await _run(() async {
-                      await docRef.set(
-                        {
-                          'languageSetupDone': false,
-                          'nativeLanguage': FieldValue.delete(),
-                          'targetLanguage': FieldValue.delete(),
-                          'targetLanguageVariant': FieldValue.delete(),
-                        },
-                        SetOptions(merge: true),
-                      );
-                    });
+                    await _run(
+                      () async {
+                        await docRef.set(
+                          {
+                            'languageSetupDone': false,
+                            'nativeLanguage': FieldValue.delete(),
+                            'targetLanguage': FieldValue.delete(),
+                            'targetLanguageVariant': FieldValue.delete(),
+                          },
+                          SetOptions(merge: true),
+                        );
+                        await LearningReminderPreferences.resetForLanguageFlow();
+                        await LearningReminderScheduler.cancel();
+                        if (!mounted) return;
+                        AppRestart.restart();
+                      },
+                      showSuccessSnackbar: false,
+                    );
                   },
                   child: Text(l10n.admin_tools_reset_language_flow_button),
                 ),

@@ -4,6 +4,9 @@ import 'package:permission_handler/permission_handler.dart';
 import '../services/analytics/analytics_action_log.dart';
 import '../l10n/app_localizations.dart';
 import '../services/app_notification_preferences.dart';
+import '../services/learning_reminder_preferences.dart';
+import '../services/learning_reminder_scheduler.dart';
+import '../utils/learning_reminder_time.dart';
 
 
 /// 앱 알림 on/off 토글. 시스템 권한과 별도로 즉시 반영됩니다.
@@ -18,10 +21,20 @@ class NotificationSettingsScreen extends StatefulWidget {
 
 class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
     with WidgetsBindingObserver {
+    static const _dropdownVisibleItems = 5;
+    static const _dropdownMenuMaxHeight =
+        _dropdownVisibleItems * kMinInteractiveDimension;
+
     bool _loading = true;
     bool _busy = false;
     bool _appEnabled = false;
     bool _systemGranted = false;
+
+    // 리마인드 시간 설정
+    bool _reminderEnabled = false;
+    int _hour = LearningReminderTime.defaultHour;
+    int _minute = LearningReminderTime.defaultMinute;
+    bool _reminderBusy = false;
 
 
     @override
@@ -52,12 +65,43 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
         final appEnabled = await AppNotificationPreferences.isEnabled();
         final systemGranted =
             await AppNotificationPreferences.isSystemPermissionGranted();
+        final reminderEnabled = await LearningReminderPreferences.isEnabled();
+        final time = await LearningReminderPreferences.loadTime();
         if (!mounted) return;
         setState(() {
             _appEnabled = appEnabled;
             _systemGranted = systemGranted;
+            _reminderEnabled = reminderEnabled;
+            _hour = time.hour;
+            _minute = time.minute;
             _loading = false;
         });
+    }
+
+
+    Future<void> _saveReminderTime() async {
+        if (_reminderBusy) return;
+        final l10n = AppLocalizations.of(context)!;
+        setState(() => _reminderBusy = true);
+        try {
+            await LearningReminderPreferences.markEnabled(
+                hour: _hour,
+                minute: _minute,
+            );
+            await LearningReminderScheduler.syncFromPreferences(
+                title: l10n.learning_reminder_notification_title,
+                body: l10n.learning_reminder_notification_body,
+            );
+            if (!mounted) return;
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                    content: Text(l10n.settings_reminder_time_saved_snackbar),
+                ),
+            );
+            setState(() => _reminderEnabled = true);
+        } finally {
+            if (mounted) setState(() => _reminderBusy = false);
+        }
     }
 
 
@@ -197,22 +241,109 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                                             : null,
                                     ),
                             ),
-                            if (_busy) ...[
-                                const SizedBox(height: 16),
-                                const Center(
-                                    child: SizedBox(
-                                        width: 24,
-                                        height: 24,
-                                        child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                        ),
-                                    ),
-                                ),
-                            ],
-                        ],
+            if (_busy) ...[
+                const SizedBox(height: 16),
+                const Center(
+                    child: SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2),
                     ),
                 ),
-            ),
-        );
-    }
+            ],
+
+            // 리마인드 시간 설정 섹션 — 앱 알림이 ON일 때만 노출
+            if (!_loading && _appEnabled) ...[
+                const SizedBox(height: 28),
+                Text(
+                    l10n.settings_reminder_time_section_title,
+                    style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 6),
+                Text(
+                    l10n.settings_reminder_time_section_description,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                    ),
+                ),
+                const SizedBox(height: 16),
+                if (!_reminderEnabled)
+                    Text(
+                        l10n.settings_reminder_time_not_set,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: scheme.onSurfaceVariant,
+                        ),
+                    ),
+                const SizedBox(height: 12),
+                Row(
+                    children: [
+                        Expanded(
+                            child: DropdownButtonFormField<int>(
+                                key: ValueKey('settings-hour-$_hour'),
+                                initialValue: _hour,
+                                menuMaxHeight: _dropdownMenuMaxHeight,
+                                decoration: InputDecoration(
+                                    labelText: l10n.learning_reminder_hour_label,
+                                    border: const OutlineInputBorder(),
+                                ),
+                                items: [
+                                    for (final h in LearningReminderTime.hourOptions())
+                                        DropdownMenuItem(
+                                            value: h,
+                                            child: Text(h.toString().padLeft(2, '0')),
+                                        ),
+                                ],
+                                onChanged: _reminderBusy
+                                    ? null
+                                    : (v) {
+                                        if (v == null) return;
+                                        setState(() => _hour = v);
+                                    },
+                            ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                            child: DropdownButtonFormField<int>(
+                                key: ValueKey('settings-minute-$_minute'),
+                                initialValue: _minute,
+                                menuMaxHeight: _dropdownMenuMaxHeight,
+                                decoration: InputDecoration(
+                                    labelText: l10n.learning_reminder_minute_label,
+                                    border: const OutlineInputBorder(),
+                                ),
+                                items: [
+                                    for (final m in LearningReminderTime.minuteOptions())
+                                        DropdownMenuItem(
+                                            value: m,
+                                            child: Text(m.toString().padLeft(2, '0')),
+                                        ),
+                                ],
+                                onChanged: _reminderBusy
+                                    ? null
+                                    : (v) {
+                                        if (v == null) return;
+                                        setState(() => _minute = v);
+                                    },
+                            ),
+                        ),
+                        const SizedBox(width: 12),
+                        FilledButton(
+                            onPressed: _reminderBusy ? null : _saveReminderTime,
+                            child: _reminderBusy
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                  )
+                                : Text(l10n.settings_reminder_time_save_button),
+                        ),
+                    ],
+                ),
+            ],
+        ],
+        ),
+        ),
+        ),
+    );
+  }
 }

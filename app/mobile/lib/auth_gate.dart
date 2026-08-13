@@ -6,7 +6,9 @@ import 'l10n/app_localizations.dart';
 import 'screens/login_screen.dart';
 import 'screens/main_nav_screen.dart';
 import 'screens/language_setup_screen.dart';
+import 'screens/learning_reminder_setup_screen.dart';
 import 'screens/target_language_setup_screen.dart';
+import 'services/learning_reminder_preferences.dart';
 
 /// 로그인 여부는 [authStateChanges] 스트림, 프로필(언어 설정)은 uid당 [get] 1회로 분기합니다.
 class AuthGate extends StatefulWidget {
@@ -70,7 +72,21 @@ class _AuthGateState extends State<AuthGate> {
           if (targetLanguage.isEmpty) {
             return const TargetLanguageSetupScreen();
           }
-          return const MainNavScreen();
+          // 언어 설정 후 학습 리마인드 온보딩(미완료 시 1회)
+          return FutureBuilder<bool>(
+            future: LearningReminderPreferences.isSetupDone(),
+            builder: (context, reminderSnap) {
+              if (reminderSnap.connectionState == ConnectionState.waiting) {
+                return const Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                );
+              }
+              if (reminderSnap.data == true) {
+                return const MainNavScreen();
+              }
+              return const LearningReminderSetupScreen();
+            },
+          );
         }
 
         if (nativeLanguage.isNotEmpty) {
