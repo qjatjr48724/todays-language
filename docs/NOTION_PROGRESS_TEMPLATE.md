@@ -2673,3 +2673,69 @@ unauthenticated: 로그인 상태 확인
 1. 홈 이메일 → 내정보 이동 + 종 아이콘 알림 확인 팝업(85%, 일반/이벤트, 7일) 설계·구현
 2. 일반=학습/기타, 이벤트=서버 광고 — 로컬 inbox vs Firestore/FCM 범위 확정
 3. (선택) 알림 ON 시 리마인드 자동 재등록·iOS 권한 체크 보강
+
+---
+
+## [단계 52] 영문 처리방침·이용약관·Play 출시 전 체크리스트 (2026-08-17~18)
+
+### 1) 오늘 한 일
+
+**nisrulz 영문 초안**
+- 위저드 입력 확정: Today's Language, Android+iOS, GDPR, 개인 개발자, 시행일 2026-08-31
+- `docs/legal/`에 Privacy Policy + Terms Markdown/HTML 저장
+- 워크플로 문서 `docs/PRIVACY_POLICY_WORKFLOW_DRAFT.md` 작성·nisrulz 완료 체크 반영
+
+**영문 문서 앱 동작 대조 (3단계)**
+- EU 법정대리인: Privacy optional 빈칸과 달리 Terms DSA에 “지정됨”이 들어가 있어 **미지정**으로 수정
+- 로그인 필수, 마케팅 메일 없음, Firebase(Auth/Firestore/Functions/Analytics/Crashlytics/Storage)·OpenAI 처리위탁 명시
+- OpenAI는 Cloud Functions에서만, 이메일·비밀번호 미전송
+- UGC를 언어 채팅방 기준으로 구체화 (앱 내 신고/차단 없음 → 이메일 신고)
+- DSA 과장 문구(투명성 보고 등) 축소
+- 운영자 표기명 `seok` → **seok77**
+- md→html 동기화 스크립트 `docs/legal/sync_html_from_md.py`
+
+**Google Play 배포 계약**
+- Developer Distribution Agreement 기준으로 출시 전 할 일 정리
+- `docs/legal/play_prelaunch_checklist.md` 추가, `docs/legal/README.md`에 링크
+
+### 2) 합의·결정
+
+- 마케팅 메일은 **필수가 아님**. 안 보내면 방침에 “보내지 않음”이 맞음
+- 계정 삭제: 현재는 이메일 요청만. 앱 내 탈퇴는 미구현(방침에 명시)
+- 한국어 처리방침(kimlawtech)·HTTPS 호스팅·앱 `lib/data/legal/` 반영은 미완
+- 다음 기능: 앱 문의하기 + React 관리자 웹(답변) + 앱에서 문의/답변 확인 + 답변 알림. 관리자 웹은 이후 운영 기능 확장용
+
+### 3) 완료 기준 체크
+
+- [x] nisrulz 영문 Privacy/Terms 생성·저장
+- [x] 영문 문서 ↔ 앱 동작 불일치 보정 (EU 대리인, 로그인, Firebase/OpenAI, UGC/DSA)
+- [x] 개발자명 seok77 반영
+- [x] Play 출시 전 체크리스트 md
+- [ ] 체크리스트 항목 실제 확인
+- [ ] kimlawtech 한국어 · HTTPS URL · 앱 내 전문 · Data safety
+- [ ] 앱 내 계정 탈퇴
+- [ ] 문의하기 + 관리자 웹 + 답변 알림
+
+### 4) 추가/변경 파일(주요)
+
+| 영역 | 내용 |
+|------|------|
+| 영문 방침 | `docs/legal/privacy-en.md/html`, `terms-en.md/html` |
+| 워크플로 | `docs/PRIVACY_POLICY_WORKFLOW_DRAFT.md` |
+| 체크리스트 | `docs/legal/play_prelaunch_checklist.md`, `docs/legal/README.md` |
+| 도구 | `docs/legal/sync_html_from_md.py` |
+| 한국어 | `privacy-ko.*`, `terms-ko.*` 골격만 (본문 미작성) |
+
+### 5) Git 커밋
+
+| 해시 | 메시지 |
+|------|--------|
+| `ceabc29` | docs: 영문 처리방침·이용약관 초안 및 작성 워크플로 추가 |
+| `9b4dedc` | docs: Play 출시 전 체크리스트 추가 |
+
+### 6) 다음 액션
+
+1. `docs/legal/play_prelaunch_checklist.md` 항목 확인
+2. 앱 문의하기 양식·저장(Firestore) + React 관리자 웹에서 조회·답변
+3. 앱에서 본인 문의/답변 확인 + 답변 시 알림 (FCM 등)
+4. (이후) 관리자 웹을 공지·원격 설정 등 운영 콘솔로 확장
