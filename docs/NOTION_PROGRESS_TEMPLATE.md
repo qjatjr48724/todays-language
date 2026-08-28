@@ -2740,3 +2740,72 @@ unauthenticated: 로그인 상태 확인
 2. 앱 문의하기 양식·저장(Firestore) + React 관리자 웹에서 조회·답변
 3. 앱에서 본인 문의/답변 확인 + 답변 시 알림 (FCM 등)
 4. (이후) 관리자 웹을 공지·원격 설정 등 운영 콘솔로 확장
+
+---
+
+## [단계 53] 한국어 처리방침·이용약관·HTML·등록 정책 정리 (2026-08-28)
+
+### 1) 오늘 한 일
+
+**kimlawtech `/privacy-kr` 한국어 법률 문서**
+- `docs/PRIVACY_POLICY_WORKFLOW_DRAFT.md` §2 인터뷰 답변 기준으로 한국어 전문 작성
+- `docs/legal/privacy-ko.md` — PIPA §30 11항목, 위탁(Firebase/OpenAI), 국외 이전, AI 자동화, 전송요구권, CPO 등
+- `docs/legal/terms-ko.md` — 무료 학습 앱·UGC(채팅)·AI 면책·인천지방법원 준거
+- Next.js·동의 모달·쿠키 배너는 **미생성** (md/html 텍스트만)
+
+**HTML 호스팅용 생성**
+- `docs/legal/sync_html_from_md.py` — 한국어 md(`# Today's Language …`) → HTML 변환 추가, 영문 템플릿 CSS 보정
+- `docs/legal/privacy-ko.html`, `terms-ko.html` 생성 (웹 가공 전 원본)
+- `docs/legal/README.md` — 동기화 명령 안내 갱신
+
+**영·한 대조 및 등록 준비 논의**
+- `privacy-en`/`terms-en` ↔ `privacy-ko`/`terms-ko` 불일치 항목 정리 (보유기간, 연령 14 vs 16, 마케팅, 준거법, UGC 라이선스, 삭제 경로 등)
+- 스토어 등록 최소 세트: 한·영 사실 통일 → 계정 삭제 → HTTPS URL → 앱 전문 → Data safety/App Privacy
+- **정책 확정(구두):** 로그·통계 12개월, 연령 16세, 마케팅 현재 미발송(추후 opt-in 가능), 영문 준거법 대한민국+인천지방법원(비전속)
+
+**앱 탈퇴 기능 설계 (미구현)**
+- 내정보 → 탈퇴 안내(5초 후 버튼 활성) → **이메일: 비밀번호 재입력** / **소셜: 해당 로그인 재인증**
+- Firestore `users/{uid}`·`daily_progress` + `chat_rooms/*/messages`(규칙상 클라이언트 삭제 불가) → **Callable 일괄 삭제** 방향
+- 문서·방침은 아직 「이메일 삭제 요청」 상태 — 탈퇴 구현 후 갱신 예정
+
+### 2) 합의·결정
+
+- 한국어 HTML은 레포에 보관만; **웹 노출용은 별도 가공** 예정
+- §5(한·영 사실 통일)만으로는 Play/Apple 등록 부족 — URL·선언·삭제 운영 필요
+- 회원·학습 데이터 보유(탈퇴 시 즉시 vs 이용 종료+12개월)는 **아직 미확정** — 영·한 문서 수정 전 확정 필요
+- 계정 삭제: **앱 내 탈퇴(B)** 로 진행하기로 방향 합의, 구현은 다음 작업
+
+### 3) 완료 기준 체크
+
+- [x] kimlawtech 한국어 처리방침·이용약관 md
+- [x] 한국어 HTML + sync 스크립트
+- [x] 영·한 불일치 분석·등록 작업 순서 정리
+- [x] 탈퇴 UX·재인증 방식 설계
+- [ ] 한·영 md 사실 통일(보유·연령·마케팅·관할·삭제 문구)
+- [ ] HTTPS URL 호스팅
+- [ ] `lib/data/legal/` 전문 반영
+- [ ] Play Data safety / Apple App Privacy
+- [ ] 앱 내 회원 탈퇴 + Functions `deleteAccount`
+
+### 4) 추가/변경 파일(주요)
+
+| 영역 | 내용 |
+|------|------|
+| 한국어 방침·약관 | `docs/legal/privacy-ko.md/html`, `terms-ko.md/html` |
+| HTML 도구 | `docs/legal/sync_html_from_md.py` |
+| 안내 | `docs/legal/README.md` |
+| gitignore | `.cursor/skills/korean-privacy-terms/` (clone 제외) |
+
+### 5) Git 커밋
+
+| 해시 | 메시지 |
+|------|--------|
+| `48e7610` | docs: 한국어 처리방침·이용약관 초안 및 HTML 동기화 |
+| (본 커밋) | docs: [단계 53] 한국어 법률 문서·등록 준비 진행 기록 |
+
+### 6) 다음 액션
+
+1. **앱 탈퇴:** 내정보 버튼 → 안내(5초) → 비밀번호/소셜 재인증 → Callable 삭제
+2. 한·영 방침·약관 사실 통일(확정 정책 반영) + `sync_html_from_md.py`
+3. HTTPS URL · `lib/data/legal/` · Play/Apple 선언
+4. (미확정) 회원 데이터 보유 기간 — 탈퇴 즉시 삭제 vs 이용 종료+12개월 확정
