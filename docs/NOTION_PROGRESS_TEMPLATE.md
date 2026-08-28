@@ -2802,6 +2802,7 @@ unauthenticated: 로그인 상태 확인
 |------|--------|
 | `48e7610` | docs: 한국어 처리방침·이용약관 초안 및 HTML 동기화 |
 | `bf58a97` | docs: [단계 53] 한국어 법률 문서·등록 준비 진행 기록 |
+| `a745bdf` | docs: [단계 53] 커밋 해시 반영 |
 
 ### 6) 다음 액션
 
@@ -2809,3 +2810,77 @@ unauthenticated: 로그인 상태 확인
 2. 한·영 방침·약관 사실 통일(확정 정책 반영) + `sync_html_from_md.py`
 3. HTTPS URL · `lib/data/legal/` · Play/Apple 선언
 4. (미확정) 회원 데이터 보유 기간 — 탈퇴 즉시 삭제 vs 이용 종료+12개월 확정
+
+---
+
+## [단계 54] 앱 내 회원 탈퇴·처리방침 계정 삭제 문구 (2026-08-28)
+
+### 1) 오늘 한 일
+
+**앱 — 회원 탈퇴 (내정보)**
+- `MyInfoScreen` → **회원 탈퇴** 진입
+- `AccountDeletionScreen`: 삭제 항목 안내 → **5초 대기** → 「탈퇴 계속하기」 → 본인 확인 → 「탈퇴하기」
+- 재인증: **이메일** 비밀번호 재입력 / **Google·Apple** `reauthenticateWithProvider` (로그인 방식별 분기, 현재 앱은 이메일 로그인만 활성)
+- `AccountDeletionService` → `deleteAccount` Callable 호출 후 로컬 세션 정리·`AuthGate` 복귀
+- i18n ko/en/ja ARB + `flutter gen-l10n`
+- 테스트: `account_deletion_confirm_delay_test`, `account_reauth_helper_test`
+
+**Functions — `deleteAccount` (asia-northeast3)**
+- 인증 필수 Callable
+- 삭제: `users/{uid}` + `daily_progress/*`, `chat_rooms/{KOR,USA,JPN}/messages` 중 본인 `uid`, Firebase Auth 계정
+- `functions/src/account/delete_user_data.ts`, `delete_account_callable.ts`
+- `npm run build` + `npm test` 통과 (35 tests)
+
+**처리방침 문구 (탈퇴·보유·연령)**
+- `privacy-ko.md`: 내정보 → 회원 탈퇴 경로, 만 **16세**, 마케팅 현재 미발송(추후 opt-in)
+- `privacy-en.md`: in-app deletion 단계 안내, 자동 수집 **12개월**, 탈퇴 시 제공 데이터 삭제, 마케팅 문구 정리
+- `sync_html_from_md.py` → `privacy-ko.html`, `privacy-en.html` 재생성
+
+**미완·보류**
+- `terms-ko.md` / `terms-en.md` 탈퇴·연령 문구는 **아직 이메일-only·14세(한)** 잔존 — 처리방침만 반영
+- Functions **배포** 미실행 (`firebase deploy --only functions:deleteAccount`)
+- Mac 실기기 **수동 확인**은 사용자 측에서 진행 예정
+
+### 2) 합의·결정
+
+- 탈퇴 본인 확인: **비밀번호(이메일) / 소셜 재로그인** (「탈퇴하기」 문구 입력은 사용 안 함)
+- 5초 대기 + 재인증으로 오탭 방지
+- 채팅 메시지는 Firestore 규칙상 클라이언트 삭제 불가 → **서버 Callable**에서 삭제
+- 정책(이전 합의): 로그 12개월, 연령 16세, 마케팅 미발송(추후 opt-in) — 처리방침에 부분 반영
+
+### 3) 완료 기준 체크
+
+- [x] 앱 내 회원 탈퇴 UI·재인증·i18n
+- [x] Functions `deleteAccount` + 단위 테스트
+- [x] 처리방침(ko/en) 앱 내 탈퇴·12개월·16세 반영 + HTML
+- [x] `flutter analyze` (신규 오류 없음), 탈퇴 관련 flutter test
+- [ ] Functions Firebase 배포
+- [ ] Mac 실기기 탈퇴 E2E 확인
+- [ ] 이용약관(ko/en) 탈퇴·연령 문구 통일
+- [ ] 한·영 방침 나머지(준거법·UGC 등) 통일
+- [ ] HTTPS URL · `lib/data/legal/` · Play/Apple 선언
+
+### 4) 추가/변경 파일(주요)
+
+| 영역 | 내용 |
+|------|------|
+| 앱 UI | `account_deletion_screen.dart`, `my_info_screen.dart` |
+| 앱 서비스 | `account_deletion_service.dart`, `account_reauth_helper.dart`, `account_deletion_confirm_delay.dart` |
+| i18n | `app_ko/en/ja.arb`, `app_localizations*.dart` |
+| Functions | `functions/src/account/*`, `index.ts`, `package.json` |
+| 방침 | `privacy-ko.md/html`, `privacy-en.md/html` |
+| 테스트 | `account_deletion_confirm_delay_test.dart`, `account_reauth_helper_test.dart`, `delete_user_data.test.ts` |
+
+### 5) Git 커밋
+
+| 해시 | 메시지 |
+|------|--------|
+| `3e729e9` | feat: 앱 내 회원 탈퇴 및 처리방침 계정 삭제 문구 반영 |
+| (본 커밋) | docs: [단계 54] 회원 탈퇴·처리방침 진행 기록 |
+
+### 6) 다음 액션
+
+1. **Mac 수동 확인:** 내정보 → 회원 탈퇴 → 5초 → 비밀번호 → 탈퇴 (Functions 배포 후)
+2. `firebase deploy --only functions:deleteAccount`
+3. `terms-ko.md` / `terms-en.md` 탈퇴·만 16세 문구 통일
+4. HTTPS URL · `lib/data/legal/` · Play Data safety / App Privacy
