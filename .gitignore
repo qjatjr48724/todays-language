@@ -123,6 +123,9 @@ functions/lib/
 # Editor/IDE
 .vscode/
 
+# kimlawtech clone (nested .git). Cursor는 `.cursor/skills/privacy-kr` 사용
+.cursor/skills/korean-privacy-terms/
+
 # Symbols
 app.*.symbols
 

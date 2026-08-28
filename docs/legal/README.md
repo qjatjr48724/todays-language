@@ -19,4 +19,4 @@
 작업 가이드: [`docs/PRIVACY_POLICY_WORKFLOW_DRAFT.md`](../PRIVACY_POLICY_WORKFLOW_DRAFT.md)  
 Play 출시 전: [`play_prelaunch_checklist.md`](play_prelaunch_checklist.md)
 
-md 수정 후 HTML 동기화: `python docs/legal/sync_html_from_md.py`
+md 수정 후 HTML 동기화(영문·한국어): `python docs/legal/sync_html_from_md.py`
