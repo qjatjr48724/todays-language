@@ -660,6 +660,81 @@ class AppLocalizationsKo extends AppLocalizations {
   String get my_info_logout_loading => '로그아웃 중…';
 
   @override
+  String get account_deletion_entry_button => '회원 탈퇴';
+
+  @override
+  String get account_deletion_screen_title => '회원 탈퇴';
+
+  @override
+  String get account_deletion_warning_title => '정말 탈퇴하시겠어요?';
+
+  @override
+  String get account_deletion_warning_body =>
+      '탈퇴하면 아래 정보가 삭제되며 복구할 수 없습니다. 진행 전 내용을 확인해 주세요.';
+
+  @override
+  String get account_deletion_items_header => '삭제되는 정보';
+
+  @override
+  String get account_deletion_item_profile => '프로필·언어·난이도 설정';
+
+  @override
+  String get account_deletion_item_progress => '학습 진도 및 기록';
+
+  @override
+  String get account_deletion_item_chat => '채팅방에 게시한 메시지';
+
+  @override
+  String get account_deletion_item_account => '로그인 계정';
+
+  @override
+  String account_deletion_wait_seconds(int seconds) {
+    return '탈퇴하기 전 $seconds초 후에 계속할 수 있습니다.';
+  }
+
+  @override
+  String get account_deletion_continue_button => '탈퇴 계속하기';
+
+  @override
+  String get account_deletion_verify_header => '본인 확인';
+
+  @override
+  String get account_deletion_password_label => '비밀번호';
+
+  @override
+  String get account_deletion_reauth_google_hint =>
+      '아래 버튼을 누르면 Google 계정으로 다시 로그인하여 본인을 확인합니다.';
+
+  @override
+  String get account_deletion_reauth_apple_hint =>
+      '아래 버튼을 누르면 Apple 계정으로 다시 로그인하여 본인을 확인합니다.';
+
+  @override
+  String get account_deletion_confirm_button => '탈퇴하기';
+
+  @override
+  String get account_deletion_processing => '탈퇴 처리 중…';
+
+  @override
+  String get account_deletion_failed => '탈퇴에 실패했습니다. 잠시 후 다시 시도해 주세요.';
+
+  @override
+  String get account_deletion_wrong_password => '비밀번호가 올바르지 않습니다.';
+
+  @override
+  String get account_deletion_too_many_requests =>
+      '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.';
+
+  @override
+  String get account_deletion_password_required => '비밀번호를 입력해 주세요.';
+
+  @override
+  String get account_deletion_email_missing => '계정 이메일을 확인할 수 없습니다.';
+
+  @override
+  String get account_deletion_reauth_failed => '본인 확인에 실패했습니다. 다시 시도해 주세요.';
+
+  @override
   String get my_info_review_not_ready_snackbar => '리뷰 작성 연결은 다음 단계에서 구현합니다.';
 
   @override

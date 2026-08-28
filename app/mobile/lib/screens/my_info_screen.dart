@@ -10,6 +10,7 @@ import '../services/auth_session_service.dart';
 import '../config/firebase_functions_config.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/flag_thumb.dart';
+import 'account_deletion_screen.dart';
 import 'settings_screen.dart';
 
 class MyInfoScreen extends StatelessWidget {
@@ -185,6 +186,23 @@ class MyInfoScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () {
+                        pushAnalyticsScreen(
+                          context,
+                          screenName: AnalyticsScreens.accountDeletion,
+                          builder: (_) => const AccountDeletionScreen(),
+                        );
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor: scheme.error,
+                      ),
+                      child: Text(l10n.account_deletion_entry_button),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [

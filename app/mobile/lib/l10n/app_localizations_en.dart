@@ -682,6 +682,87 @@ class AppLocalizationsEn extends AppLocalizations {
   String get my_info_logout_loading => 'Logging out…';
 
   @override
+  String get account_deletion_entry_button => 'Delete account';
+
+  @override
+  String get account_deletion_screen_title => 'Delete account';
+
+  @override
+  String get account_deletion_warning_title =>
+      'Are you sure you want to delete your account?';
+
+  @override
+  String get account_deletion_warning_body =>
+      'The information below will be permanently deleted and cannot be recovered. Please review before continuing.';
+
+  @override
+  String get account_deletion_items_header => 'Data to be deleted';
+
+  @override
+  String get account_deletion_item_profile =>
+      'Profile, language, and difficulty settings';
+
+  @override
+  String get account_deletion_item_progress => 'Learning progress and records';
+
+  @override
+  String get account_deletion_item_chat => 'Messages you posted in chat rooms';
+
+  @override
+  String get account_deletion_item_account => 'Your login account';
+
+  @override
+  String account_deletion_wait_seconds(int seconds) {
+    return 'You can continue in $seconds seconds.';
+  }
+
+  @override
+  String get account_deletion_continue_button => 'Continue to delete';
+
+  @override
+  String get account_deletion_verify_header => 'Verify your identity';
+
+  @override
+  String get account_deletion_password_label => 'Password';
+
+  @override
+  String get account_deletion_reauth_google_hint =>
+      'Tap the button below to sign in with Google again to verify your identity.';
+
+  @override
+  String get account_deletion_reauth_apple_hint =>
+      'Tap the button below to sign in with Apple again to verify your identity.';
+
+  @override
+  String get account_deletion_confirm_button => 'Delete my account';
+
+  @override
+  String get account_deletion_processing => 'Deleting account…';
+
+  @override
+  String get account_deletion_failed =>
+      'Account deletion failed. Please try again later.';
+
+  @override
+  String get account_deletion_wrong_password => 'Incorrect password.';
+
+  @override
+  String get account_deletion_too_many_requests =>
+      'Too many attempts. Please try again later.';
+
+  @override
+  String get account_deletion_password_required =>
+      'Please enter your password.';
+
+  @override
+  String get account_deletion_email_missing =>
+      'Unable to verify your account email.';
+
+  @override
+  String get account_deletion_reauth_failed =>
+      'Identity verification failed. Please try again.';
+
+  @override
   String get my_info_review_not_ready_snackbar =>
       'Review submission integration will be added in the next step.';
 

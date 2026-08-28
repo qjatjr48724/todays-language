@@ -41,3 +41,6 @@ HttpsCallable callableGenerateRandomWordImages() =>
         timeout: const Duration(minutes: 9),
       ),
     );
+
+HttpsCallable callableDeleteAccount() =>
+    appFirebaseFunctions().httpsCallable('deleteAccount');

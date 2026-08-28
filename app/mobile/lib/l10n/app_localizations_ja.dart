@@ -658,6 +658,81 @@ class AppLocalizationsJa extends AppLocalizations {
   String get my_info_logout_loading => 'ログアウト中…';
 
   @override
+  String get account_deletion_entry_button => '退会';
+
+  @override
+  String get account_deletion_screen_title => '退会';
+
+  @override
+  String get account_deletion_warning_title => '本当に退会しますか？';
+
+  @override
+  String get account_deletion_warning_body =>
+      '退会すると以下の情報が削除され、復元できません。続行前に内容をご確認ください。';
+
+  @override
+  String get account_deletion_items_header => '削除される情報';
+
+  @override
+  String get account_deletion_item_profile => 'プロフィール・言語・難易度設定';
+
+  @override
+  String get account_deletion_item_progress => '学習進度と記録';
+
+  @override
+  String get account_deletion_item_chat => 'チャットルームに投稿したメッセージ';
+
+  @override
+  String get account_deletion_item_account => 'ログインアカウント';
+
+  @override
+  String account_deletion_wait_seconds(int seconds) {
+    return 'あと$seconds秒後に続行できます。';
+  }
+
+  @override
+  String get account_deletion_continue_button => '退会を続ける';
+
+  @override
+  String get account_deletion_verify_header => '本人確認';
+
+  @override
+  String get account_deletion_password_label => 'パスワード';
+
+  @override
+  String get account_deletion_reauth_google_hint =>
+      '下のボタンを押すと、Googleで再ログインして本人確認を行います。';
+
+  @override
+  String get account_deletion_reauth_apple_hint =>
+      '下のボタンを押すと、Appleで再ログインして本人確認を行います。';
+
+  @override
+  String get account_deletion_confirm_button => '退会する';
+
+  @override
+  String get account_deletion_processing => '退会処理中…';
+
+  @override
+  String get account_deletion_failed => '退会に失敗しました。しばらくしてから再度お試しください。';
+
+  @override
+  String get account_deletion_wrong_password => 'パスワードが正しくありません。';
+
+  @override
+  String get account_deletion_too_many_requests =>
+      'リクエストが多すぎます。しばらくしてから再度お試しください。';
+
+  @override
+  String get account_deletion_password_required => 'パスワードを入力してください。';
+
+  @override
+  String get account_deletion_email_missing => 'アカウントのメールを確認できません。';
+
+  @override
+  String get account_deletion_reauth_failed => '本人確認に失敗しました。再度お試しください。';
+
+  @override
   String get my_info_review_not_ready_snackbar => 'レビュー投稿の連携は次のステップで追加されます。';
 
   @override

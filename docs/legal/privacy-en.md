@@ -27,7 +27,7 @@ For data protection inquiries and to exercise your GDPR rights, please contact t
 
 The Application and related services acquire the information you supply when you download, access, or register for the service. **An account is required to use the Application.** You must register with an email address and password to access learning features, save progress, and use community chat.
 
-The Service Provider may use the information you provide to send **service-related notices** (for example, important updates about the Application or changes to this policy). The Service Provider does **not** send promotional or marketing communications unless you separately opt in where such a feature is offered.
+The Service Provider may use the information you provide to send **service-related notices** (for example, important updates about the Application or changes to this policy). The Service Provider **does not currently send** promotional or marketing communications; if such a feature is offered in the future, it will be sent only with your separate opt-in consent.
 
 **Legal basis for processing your personal data**
 
@@ -107,18 +107,27 @@ To request deletion of your personal data, withdraw consent, or exercise any of 
 
 The Service Provider retains personal data based on its necessity for the stated purposes:
 
-*   User Provided Data: Retained for the duration of your use of the Application plus 12 months thereafter, unless longer retention is required by law
-*   Automatically Collected Data: Retained for up to 24 months from collection, unless longer retention is required for legal compliance or security purposes
+*   User Provided Data (account profile, learning progress, chat messages): Deleted when you delete your account through the in-app deletion flow, except where retention is required by law
+*   Automatically Collected Data (diagnostics, analytics): Retained for up to **12 months** from collection, unless longer retention is required for legal compliance or security purposes
 *   Aggregated and Anonymized Data: Retained indefinitely as it no longer identifies you
 *   Data required for legal compliance: Retained as long as required by applicable law
 
-You have the right to request deletion of your personal data at any time, except where retention is required by law. If you'd like the Service Provider to delete User Provided Data that you have provided via the Application, please contact them at qjatjr1285@naver.com and they will respond within the time required by applicable law. Please note that some User Provided Data may be required in order for the Application to function properly.
+You have the right to request deletion of your personal data at any time, except where retention is required by law.
 
 **Data Deletion**
 
-You can request deletion of your personal data or account by contacting the Service Provider at qjatjr1285@naver.com from the email address associated with your account. The Service Provider will process your request within the timeframes required by applicable law. **In-app account deletion is not yet available**; email request is the current method.
+You can delete your account and associated personal data **in the Application**:
 
-Upon verification of your identity, the Service Provider will delete your personal data from its systems, except where retention is required for legal compliance or legitimate business purposes.
+1. Open **My Info** in the Application
+2. Tap **Delete account**
+3. Review the deletion notice, then verify your identity (email accounts: re-enter your password; Google or Apple accounts: sign in again with the same provider)
+4. Confirm deletion
+
+Upon successful verification, the Service Provider deletes your Firebase Authentication account, Firestore profile and learning data, and chat messages you posted, except where retention is required by law.
+
+If you cannot use in-app deletion, you may also request account deletion by contacting the Service Provider at **qjatjr1285@naver.com** from the email address associated with your account. The Service Provider will process your request within the timeframes required by applicable law.
+
+Upon verification of your identity, the Service Provider will delete your personal data from its systems, except where retention is required for legal compliance.
 
 **How does the Application address children's privacy?**
 

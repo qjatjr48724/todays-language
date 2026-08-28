@@ -11,6 +11,7 @@ abstract final class AnalyticsScreens {
   static const targetLanguageSetup = 'target_language_setup';
   static const mainNav = 'main_nav';
   static const myInfo = 'my_info';
+  static const accountDeletion = 'account_deletion';
   static const home = 'home';
   static const community = 'community';
   static const progress = 'progress';

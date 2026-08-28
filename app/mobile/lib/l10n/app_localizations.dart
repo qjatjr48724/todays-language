@@ -1277,6 +1277,144 @@ abstract class AppLocalizations {
   /// **'로그아웃 중…'**
   String get my_info_logout_loading;
 
+  /// No description provided for @account_deletion_entry_button.
+  ///
+  /// In ko, this message translates to:
+  /// **'회원 탈퇴'**
+  String get account_deletion_entry_button;
+
+  /// No description provided for @account_deletion_screen_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'회원 탈퇴'**
+  String get account_deletion_screen_title;
+
+  /// No description provided for @account_deletion_warning_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'정말 탈퇴하시겠어요?'**
+  String get account_deletion_warning_title;
+
+  /// No description provided for @account_deletion_warning_body.
+  ///
+  /// In ko, this message translates to:
+  /// **'탈퇴하면 아래 정보가 삭제되며 복구할 수 없습니다. 진행 전 내용을 확인해 주세요.'**
+  String get account_deletion_warning_body;
+
+  /// No description provided for @account_deletion_items_header.
+  ///
+  /// In ko, this message translates to:
+  /// **'삭제되는 정보'**
+  String get account_deletion_items_header;
+
+  /// No description provided for @account_deletion_item_profile.
+  ///
+  /// In ko, this message translates to:
+  /// **'프로필·언어·난이도 설정'**
+  String get account_deletion_item_profile;
+
+  /// No description provided for @account_deletion_item_progress.
+  ///
+  /// In ko, this message translates to:
+  /// **'학습 진도 및 기록'**
+  String get account_deletion_item_progress;
+
+  /// No description provided for @account_deletion_item_chat.
+  ///
+  /// In ko, this message translates to:
+  /// **'채팅방에 게시한 메시지'**
+  String get account_deletion_item_chat;
+
+  /// No description provided for @account_deletion_item_account.
+  ///
+  /// In ko, this message translates to:
+  /// **'로그인 계정'**
+  String get account_deletion_item_account;
+
+  /// No description provided for @account_deletion_wait_seconds.
+  ///
+  /// In ko, this message translates to:
+  /// **'탈퇴하기 전 {seconds}초 후에 계속할 수 있습니다.'**
+  String account_deletion_wait_seconds(int seconds);
+
+  /// No description provided for @account_deletion_continue_button.
+  ///
+  /// In ko, this message translates to:
+  /// **'탈퇴 계속하기'**
+  String get account_deletion_continue_button;
+
+  /// No description provided for @account_deletion_verify_header.
+  ///
+  /// In ko, this message translates to:
+  /// **'본인 확인'**
+  String get account_deletion_verify_header;
+
+  /// No description provided for @account_deletion_password_label.
+  ///
+  /// In ko, this message translates to:
+  /// **'비밀번호'**
+  String get account_deletion_password_label;
+
+  /// No description provided for @account_deletion_reauth_google_hint.
+  ///
+  /// In ko, this message translates to:
+  /// **'아래 버튼을 누르면 Google 계정으로 다시 로그인하여 본인을 확인합니다.'**
+  String get account_deletion_reauth_google_hint;
+
+  /// No description provided for @account_deletion_reauth_apple_hint.
+  ///
+  /// In ko, this message translates to:
+  /// **'아래 버튼을 누르면 Apple 계정으로 다시 로그인하여 본인을 확인합니다.'**
+  String get account_deletion_reauth_apple_hint;
+
+  /// No description provided for @account_deletion_confirm_button.
+  ///
+  /// In ko, this message translates to:
+  /// **'탈퇴하기'**
+  String get account_deletion_confirm_button;
+
+  /// No description provided for @account_deletion_processing.
+  ///
+  /// In ko, this message translates to:
+  /// **'탈퇴 처리 중…'**
+  String get account_deletion_processing;
+
+  /// No description provided for @account_deletion_failed.
+  ///
+  /// In ko, this message translates to:
+  /// **'탈퇴에 실패했습니다. 잠시 후 다시 시도해 주세요.'**
+  String get account_deletion_failed;
+
+  /// No description provided for @account_deletion_wrong_password.
+  ///
+  /// In ko, this message translates to:
+  /// **'비밀번호가 올바르지 않습니다.'**
+  String get account_deletion_wrong_password;
+
+  /// No description provided for @account_deletion_too_many_requests.
+  ///
+  /// In ko, this message translates to:
+  /// **'요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.'**
+  String get account_deletion_too_many_requests;
+
+  /// No description provided for @account_deletion_password_required.
+  ///
+  /// In ko, this message translates to:
+  /// **'비밀번호를 입력해 주세요.'**
+  String get account_deletion_password_required;
+
+  /// No description provided for @account_deletion_email_missing.
+  ///
+  /// In ko, this message translates to:
+  /// **'계정 이메일을 확인할 수 없습니다.'**
+  String get account_deletion_email_missing;
+
+  /// No description provided for @account_deletion_reauth_failed.
+  ///
+  /// In ko, this message translates to:
+  /// **'본인 확인에 실패했습니다. 다시 시도해 주세요.'**
+  String get account_deletion_reauth_failed;
+
   /// No description provided for @my_info_review_not_ready_snackbar.
   ///
   /// In ko, this message translates to:
