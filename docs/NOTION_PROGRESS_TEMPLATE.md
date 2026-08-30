@@ -2884,3 +2884,51 @@ unauthenticated: 로그인 상태 확인
 2. `firebase deploy --only functions:deleteAccount`
 3. `terms-ko.md` / `terms-en.md` 탈퇴·만 16세 문구 통일
 4. HTTPS URL · `lib/data/legal/` · Play Data safety / App Privacy
+
+---
+
+## [단계 55] deleteAccount 배포·탈퇴 E2E 검증 (2026-08-30)
+
+### 1) 오늘 한 일
+
+**Functions 배포**
+- `firebase deploy --only functions:deleteAccount` — 최초 시도에서 discovery 10초 타임아웃 발생, 재시도 후 정상 배포
+- 원인: 배포 시 `index.ts` 전역 로드 discovery 지연(간헐적). `deleteAccount` 코드 자체 오류 아님
+- 배포 확인: `firebase functions:list` — v2 callable, `asia-northeast3`, nodejs24, **ACTIVE**
+- URL: `https://asia-northeast3-todays-language-dev.cloudfunctions.net/deleteAccount`
+
+**탈퇴 E2E (실기기)**
+- 별도 테스트 계정으로 **내정보 → 회원 탈퇴 → 5초 대기 → 재인증 → 탈퇴**까지 정상 완료
+- Callable 호출·Auth/Firestore 삭제·로그인 화면 복귀 확인
+
+### 2) 합의·결정
+
+- discovery 타임아웃 재발 시 `$env:FUNCTIONS_DISCOVERY_TIMEOUT=30` 후 재배포
+- 탈퇴 기능은 **dev 배포 + E2E** 기준으로 사용 가능 상태
+
+### 3) 완료 기준 체크
+
+- [x] Functions `deleteAccount` Firebase 배포 (todays-language-dev)
+- [x] 실기기 탈퇴 E2E (테스트 계정)
+- [ ] `terms-ko.md` / `terms-en.md` 탈퇴·만 16세 문구 통일
+- [ ] 한·영 방침 나머지(준거법·UGC 등) 통일
+- [ ] HTTPS URL · `lib/data/legal/` · Play/Apple 선언
+
+### 4) 추가/변경 파일(주요)
+
+| 영역 | 내용 |
+|------|------|
+| 배포 | `deleteAccount` (asia-northeast3, GEN_2) |
+| 검증 | `firebase functions:list`, functions 로그, 실기기 E2E |
+
+### 5) Git 커밋
+
+| 해시 | 메시지 |
+|------|--------|
+| (본 커밋) | docs: [단계 55] deleteAccount 배포·탈퇴 E2E 검증 기록 |
+
+### 6) 다음 액션
+
+1. `terms-ko.md` / `terms-en.md` 탈퇴·만 16세 문구 통일
+2. 한·영 방침 나머지(준거법·UGC 등) 통일
+3. HTTPS URL · `lib/data/legal/` · Play Data safety / App Privacy
