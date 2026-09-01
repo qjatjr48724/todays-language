@@ -1446,6 +1446,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get email_register_error_weak_password => '비밀번호가 너무 짧습니다.';
 
   @override
+  String get email_register_error_recreation_blocked =>
+      '탈퇴 후 7일 이내에는 같은 계정으로 재가입할 수 없습니다.';
+
+  @override
   String email_register_error_failed(Object code) {
     return '회원가입에 실패했습니다. ($code)';
   }
@@ -1494,6 +1498,13 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get admin_tools_section_country_cache => '국가/국기 캐시';
+
+  @override
+  String get admin_tools_section_account_ttl => '계정·TTL';
+
+  @override
+  String get admin_tools_seed_recreation_block_placeholder =>
+      '재가입 block TTL placeholder 생성';
 
   @override
   String get admin_tools_seed_catalog => 'seedCountryCatalog 실행';

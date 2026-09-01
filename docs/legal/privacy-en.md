@@ -108,6 +108,7 @@ To request deletion of your personal data, withdraw consent, or exercise any of 
 The Service Provider retains personal data based on its necessity for the stated purposes:
 
 *   User Provided Data (account profile, learning progress, chat messages): Deleted when you delete your account through the in-app deletion flow, except where retention is required by law
+*   Email hash for re-registration prevention: To prevent immediate re-registration with the same email after deletion, a SHA-256 hash of the normalized email (not the raw email) is stored for **7 days** after deletion and deleted when the period expires
 *   Automatically Collected Data (diagnostics, analytics): Retained for up to **12 months** from collection, unless longer retention is required for legal compliance or security purposes
 *   Aggregated and Anonymized Data: Retained indefinitely as it no longer identifies you
 *   Data required for legal compliance: Retained as long as required by applicable law

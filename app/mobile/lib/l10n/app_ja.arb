@@ -610,6 +610,7 @@
   "email_register_error_invalid_email": "メール形式が正しくありません。",
   "email_register_error_email_in_use": "このメールはすでに使用されています。",
   "email_register_error_weak_password": "パスワードが弱すぎます。",
+  "email_register_error_recreation_blocked": "退会から7日以内は同じアカウントで再登録できません。",
   "email_register_error_failed": "登録に失敗しました。({code})",
 
   "admin_tools_title": "管理者ツール",
@@ -630,6 +631,8 @@
   "admin_tools_reset_language_flow_message": "languageSetupDone を false に戻し、native/target/variant を削除します。",
 
   "admin_tools_section_country_cache": "国/旗キャッシュ",
+  "admin_tools_section_account_ttl": "アカウント・TTL",
+  "admin_tools_seed_recreation_block_placeholder": "再登録 block TTL placeholder 作成",
   "admin_tools_seed_catalog": "seedCountryCatalog を実行",
   "admin_tools_sync_flags_force": "syncCountryFlags(force:true) を実行",
   "admin_tools_refresh_cache_status": "キャッシュ状態を更新",

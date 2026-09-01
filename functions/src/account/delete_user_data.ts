@@ -1,6 +1,7 @@
 import * as admin from "firebase-admin";
 import type { Query } from "firebase-admin/firestore";
 
+import { recordAccountRecreationBlock } from "./account_recreation_block";
 import { db } from "../shared/firebase";
 
 /** Firestore rules `isSupportedChatRoom`와 동일 */
@@ -67,8 +68,16 @@ export type DeleteUserAccountResult = {
 
 /** Firestore 사용자 데이터 삭제 후 Firebase Auth 계정을 삭제합니다. */
 export async function deleteUserAccount(uid: string): Promise<DeleteUserAccountResult> {
+  const userRecord = await admin.auth().getUser(uid);
+  const email = userRecord.email?.trim();
+
   const chatMessagesDeleted = await deleteUserChatMessages(uid);
   const dailyProgressDeleted = await deleteUserFirestoreProfile(uid);
+
+  if (email) {
+    await recordAccountRecreationBlock(email);
+  }
+
   await admin.auth().deleteUser(uid);
 
   return { chatMessagesDeleted, dailyProgressDeleted };

@@ -610,6 +610,7 @@
   "email_register_error_invalid_email": "The email address format is invalid.",
   "email_register_error_email_in_use": "This email is already in use.",
   "email_register_error_weak_password": "The password is too weak.",
+  "email_register_error_recreation_blocked": "You cannot sign up again with the same account within 7 days after deletion.",
   "email_register_error_failed": "Sign up failed. ({code})",
 
   "admin_tools_title": "Admin Tools",
@@ -630,6 +631,8 @@
   "admin_tools_reset_language_flow_message": "Set languageSetupDone to false and delete native/target/variant.",
 
   "admin_tools_section_country_cache": "Country/flag cache",
+  "admin_tools_section_account_ttl": "Account · TTL",
+  "admin_tools_seed_recreation_block_placeholder": "Create re-registration block TTL placeholder",
   "admin_tools_seed_catalog": "Run seedCountryCatalog",
   "admin_tools_sync_flags_force": "Run syncCountryFlags(force:true)",
   "admin_tools_refresh_cache_status": "Refresh cache status",

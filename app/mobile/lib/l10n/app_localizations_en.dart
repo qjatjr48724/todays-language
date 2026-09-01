@@ -1506,6 +1506,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get email_register_error_weak_password => 'The password is too weak.';
 
   @override
+  String get email_register_error_recreation_blocked =>
+      'You cannot sign up again with the same account within 7 days after deletion.';
+
+  @override
   String email_register_error_failed(Object code) {
     return 'Sign up failed. ($code)';
   }
@@ -1555,6 +1559,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get admin_tools_section_country_cache => 'Country/flag cache';
+
+  @override
+  String get admin_tools_section_account_ttl => 'Account · TTL';
+
+  @override
+  String get admin_tools_seed_recreation_block_placeholder =>
+      'Create re-registration block TTL placeholder';
 
   @override
   String get admin_tools_seed_catalog => 'Run seedCountryCatalog';

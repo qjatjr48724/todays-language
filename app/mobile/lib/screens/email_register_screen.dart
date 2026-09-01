@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../utils/account_recreation_block_auth_error.dart';
 import '../data/legal/privacy_policy_content.dart';
 import '../data/legal/terms_of_service_content.dart';
 import '../l10n/app_localizations.dart';
@@ -226,6 +227,9 @@ class _EmailRegisterScreenState extends State<EmailRegisterScreen> {
 
 String _messageForAuthException(FirebaseAuthException e, BuildContext context) {
   final l10n = AppLocalizations.of(context)!;
+  if (isAccountRecreationBlockedAuthError(e)) {
+    return l10n.email_register_error_recreation_blocked;
+  }
   switch (e.code) {
     case 'invalid-email':
       return l10n.email_register_error_invalid_email;

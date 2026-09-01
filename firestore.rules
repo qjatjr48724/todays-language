@@ -31,6 +31,11 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // 탈퇴 후 재가입 금지(이메일 해시) — Functions 전용
+    match /account_recreation_blocks/{docId} {
+      allow read, write: if false;
+    }
+
     function userTargetLanguage() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.targetLanguage;
     }

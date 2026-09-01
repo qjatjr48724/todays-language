@@ -10,6 +10,7 @@ import '../services/analytics/analytics_action_log.dart';
 import '../services/analytics/analytics_navigation.dart';
 import '../services/analytics/analytics_screens.dart';
 import '../services/analytics/tracked_scaffold.dart';
+import '../utils/account_recreation_block_auth_error.dart';
 import '../services/auth_session_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -69,10 +70,19 @@ class _LoginScreenState extends State<LoginScreen> {
       await logAuthResult(authMethod: 'debug_test', success: true);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: _testEmail,
-          password: _testPassword,
-        );
+        try {
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+            email: _testEmail,
+            password: _testPassword,
+          );
+        } on FirebaseAuthException catch (createError) {
+          if (!mounted) return;
+          await logAuthResult(authMethod: 'debug_test', success: false);
+          setState(
+            () => _errorMessage = _messageForAuthException(createError, context),
+          );
+          return;
+        }
         await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: _testEmail,
           password: _testPassword,
@@ -157,6 +167,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
 String _messageForAuthException(FirebaseAuthException e, BuildContext context) {
   final l10n = AppLocalizations.of(context)!;
+  if (isAccountRecreationBlockedAuthError(e)) {
+    return l10n.email_register_error_recreation_blocked;
+  }
   switch (e.code) {
     case 'invalid-email':
       return l10n.login_error_invalid_email;

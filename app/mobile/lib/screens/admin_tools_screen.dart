@@ -232,6 +232,21 @@ class _AdminToolsScreenState extends State<AdminToolsScreen> {
 
             const SizedBox(height: 16),
             _Section(
+              title: l10n.admin_tools_section_account_ttl,
+              children: [
+                FilledButton.tonal(
+                  onPressed: () => _run(() async {
+                    await user.getIdToken(true);
+                    final callable = callableSeedAccountRecreationBlocksPlaceholder();
+                    await callable.call<Map<String, dynamic>>({});
+                  }),
+                  child: Text(l10n.admin_tools_seed_recreation_block_placeholder),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 16),
+            _Section(
               title: l10n.admin_tools_section_country_cache,
               children: [
                 FilledButton.tonal(

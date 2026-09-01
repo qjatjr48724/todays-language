@@ -1443,6 +1443,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get email_register_error_weak_password => 'パスワードが弱すぎます。';
 
   @override
+  String get email_register_error_recreation_blocked =>
+      '退会から7日以内は同じアカウントで再登録できません。';
+
+  @override
   String email_register_error_failed(Object code) {
     return '登録に失敗しました。($code)';
   }
@@ -1491,6 +1495,13 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get admin_tools_section_country_cache => '国/旗キャッシュ';
+
+  @override
+  String get admin_tools_section_account_ttl => 'アカウント・TTL';
+
+  @override
+  String get admin_tools_seed_recreation_block_placeholder =>
+      '再登録 block TTL placeholder 作成';
 
   @override
   String get admin_tools_seed_catalog => 'seedCountryCatalog を実行';

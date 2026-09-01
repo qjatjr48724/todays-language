@@ -608,6 +608,7 @@
   "email_register_error_invalid_email": "이메일 형식이 올바르지 않습니다.",
   "email_register_error_email_in_use": "이미 사용 중인 이메일입니다.",
   "email_register_error_weak_password": "비밀번호가 너무 짧습니다.",
+  "email_register_error_recreation_blocked": "탈퇴 후 7일 이내에는 같은 계정으로 재가입할 수 없습니다.",
   "email_register_error_failed": "회원가입에 실패했습니다. ({code})",
 
   "admin_tools_title": "관리자 도구",
@@ -628,6 +629,8 @@
   "admin_tools_reset_language_flow_message": "languageSetupDone을 false로 되돌리고, native/target/variant를 삭제합니다.",
 
   "admin_tools_section_country_cache": "국가/국기 캐시",
+  "admin_tools_section_account_ttl": "계정·TTL",
+  "admin_tools_seed_recreation_block_placeholder": "재가입 block TTL placeholder 생성",
   "admin_tools_seed_catalog": "seedCountryCatalog 실행",
   "admin_tools_sync_flags_force": "syncCountryFlags(force:true) 실행",
   "admin_tools_refresh_cache_status": "캐시 상태 새로고침",

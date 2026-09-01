@@ -5,6 +5,8 @@ export { cleanupLegacyFirestoreDocs } from "./maintenance/cleanup";
 export { setAdminCurriculumPreviewDay } from "./admin/curriculum_admin_callables";
 export { generateRandomWordImages } from "./random_words/callables";
 export { deleteAccount } from "./account/delete_account_callable";
+export { blockRecentAccountRecreation } from "./account/before_user_created_block";
+export { seedAccountRecreationBlocksPlaceholder } from "./account/seed_recreation_blocks_placeholder_callable";
 
 import {
   buildDailySentenceBatchSystemPrompt,

@@ -44,3 +44,6 @@ HttpsCallable callableGenerateRandomWordImages() =>
 
 HttpsCallable callableDeleteAccount() =>
     appFirebaseFunctions().httpsCallable('deleteAccount');
+
+HttpsCallable callableSeedAccountRecreationBlocksPlaceholder() =>
+    appFirebaseFunctions().httpsCallable('seedAccountRecreationBlocksPlaceholder');
