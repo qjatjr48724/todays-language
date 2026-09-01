@@ -8,9 +8,9 @@
 | `privacy-en.html` | English | nisrulz | **스토어 URL 호스팅용** (GitHub Pages 등) |
 | `terms-en.md` | English | nisrulz | Markdown 보관 |
 | `terms-en.html` | English | nisrulz | 호스팅용 (필요 시) |
-| `privacy-ko.md` | Korean | kimlawtech | 앱 내 전문 → `privacy_policy_content.dart` |
+| `privacy-ko.md` | Korean | kimlawtech | 앱 내 전문 → `privacy_policy_content.dart` (`python sync_dart_from_md.py`) |
 | `privacy-ko.html` | Korean | kimlawtech | 한국어 공개 URL (선택) |
-| `terms-ko.md` | Korean | kimlawtech | 앱 내 전문 → `terms_of_service_content.dart` |
+| `terms-ko.md` | Korean | kimlawtech | 앱 내 전문 → `terms_of_service_content.dart` (`python sync_dart_from_md.py`) |
 | `terms-ko.html` | Korean | kimlawtech | 호스팅용 (선택) |
 | `play_prelaunch_checklist.md` | Korean | Play DDA | Google Play 출시 전 체크리스트 |
 

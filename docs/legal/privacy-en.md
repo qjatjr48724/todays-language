@@ -1,8 +1,9 @@
 # Privacy Policy — Today's Language (English)
 
 > **Source:** [nisrulz/app-privacy-policy-generator](https://app-privacy-policy-generator.nisrulz.com/)  
-> **Effective date:** 2026-08-31  
-> **Status:** Reviewed — aligned with app behavior (2026-08-17)
+> **Effective date:** 2026-09-01  
+> **Last updated:** 2026-09-01  
+> **Status:** Reviewed — aligned with app behavior (account deletion, password reset, re-registration block)
 
 ---
 
@@ -28,6 +29,18 @@ For data protection inquiries and to exercise your GDPR rights, please contact t
 The Application and related services acquire the information you supply when you download, access, or register for the service. **An account is required to use the Application.** You must register with an email address and password to access learning features, save progress, and use community chat.
 
 The Service Provider may use the information you provide to send **service-related notices** (for example, important updates about the Application or changes to this policy). The Service Provider **does not currently send** promotional or marketing communications; if such a feature is offered in the future, it will be sent only with your separate opt-in consent.
+
+**Account features (email sign-up only)**
+
+The Application currently supports **email and password** registration and login only. Social sign-in (Google, Apple, etc.) is not offered at this time.
+
+**Password reset**
+
+If you forget your password, you can use **Forgot password?** on the email login screen. The Service Provider uses Firebase Authentication to send a password reset link to the email address you enter. You set a new password through the link (often in your device browser). For security, the Application may show the same success message even if the email is not registered. The Application **does not currently require separate email address verification (verify email)** after sign-up.
+
+**Re-registration after account deletion**
+
+If you delete your account, you **cannot register again with the same email address for 7 days** after deletion. This restriction is shown on the sign-up screen. To enforce it, a SHA-256 hash of your normalized email (not the raw email) is stored for 7 days as described in the retention section below.
 
 **Legal basis for processing your personal data**
 
@@ -107,7 +120,7 @@ To request deletion of your personal data, withdraw consent, or exercise any of 
 
 The Service Provider retains personal data based on its necessity for the stated purposes:
 
-*   User Provided Data (account profile, learning progress, chat messages): Deleted when you delete your account through the in-app deletion flow, except where retention is required by law
+*   User Provided Data (account profile, learning progress, learning cursors for quiz/word/sentence consumption, chat messages): Deleted when you delete your account through the in-app deletion flow, except where retention is required by law
 *   Email hash for re-registration prevention: To prevent immediate re-registration with the same email after deletion, a SHA-256 hash of the normalized email (not the raw email) is stored for **7 days** after deletion and deleted when the period expires
 *   Automatically Collected Data (diagnostics, analytics): Retained for up to **12 months** from collection, unless longer retention is required for legal compliance or security purposes
 *   Aggregated and Anonymized Data: Retained indefinitely as it no longer identifies you
@@ -121,10 +134,19 @@ You can delete your account and associated personal data **in the Application**:
 
 1. Open **My Info** in the Application
 2. Tap **Delete account**
-3. Review the deletion notice, then verify your identity (email accounts: re-enter your password; Google or Apple accounts: sign in again with the same provider)
-4. Confirm deletion
+3. Review the deletion notice and wait **5 seconds** before continuing
+4. Verify your identity (email accounts: re-enter your password)
+5. Confirm deletion
 
-Upon successful verification, the Service Provider deletes your Firebase Authentication account, Firestore profile and learning data, and chat messages you posted, except where retention is required by law.
+Upon successful verification, the Service Provider deletes:
+
+*   Your Firebase Authentication account
+*   Your Firestore user profile and subcollections, including `daily_progress`, `daily_quiz_cursor`, `daily_word_cursor`, and `daily_sentence_cursor`
+*   Chat messages you posted in language chat rooms
+
+except where retention is required by law.
+
+For **7 days** after deletion, a SHA-256 hash of your normalized email (not the raw email) is retained to prevent immediate re-registration with the same email, then deleted when the period expires.
 
 If you cannot use in-app deletion, you may also request account deletion by contacting the Service Provider at **qjatjr1285@naver.com** from the email address associated with your account. The Service Provider will process your request within the timeframes required by applicable law.
 
@@ -150,7 +172,12 @@ The Service Provider may update this Privacy Policy from time to time. The Servi
 
 Previous versions of this Privacy Policy will be maintained and made available upon request by contacting the Service Provider at qjatjr1285@naver.com.
 
-This privacy policy is effective as of 2026-08-31
+This privacy policy is effective as of 2026-09-01
+
+**Revision history**
+
+*   2026-09-01 — Account deletion, password reset, 7-day re-registration block
+*   2026-08-31 — Initial version
 
 **What are your GDPR data protection rights?**
 

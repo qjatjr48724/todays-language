@@ -1,8 +1,9 @@
 # Terms & Conditions — Today's Language (English)
 
 > **Source:** [nisrulz/app-privacy-policy-generator](https://app-privacy-policy-generator.nisrulz.com/)  
-> **Effective date:** 2026-08-31  
-> **Status:** Reviewed — aligned with app behavior (2026-08-17)
+> **Effective date:** 2026-09-01  
+> **Last updated:** 2026-09-01  
+> **Status:** Reviewed — aligned with app behavior (account deletion, password reset, re-registration block)
 
 ---
 
@@ -14,6 +15,30 @@
 These terms and conditions apply to the Today's Language app for mobile devices, together with any related services operated by seok77 (collectively, the "Application"). seok77 is hereby referred to as the "Service Provider".
 
 By downloading or using the Application, you agree to these Terms and Conditions. You should read them carefully before using the Application.
+
+**Account registration and eligibility**
+
+*   An account is required. You must register with an email address and password. Social sign-in (Google, Apple, etc.) is **not currently offered**.
+*   You must be at least **16 years of age** to use the Application.
+*   If you delete your account, you **cannot register again with the same email address for 7 days** after deletion. This is stated on the sign-up screen.
+
+**Password reset**
+
+If you forget your password, use **Forgot password?** on the email login screen. Firebase Authentication sends a reset link to the email you enter. You set a new password through the link (often in your browser). For security, the Application may show the same success message even if the email is not registered. **Email address verification (verify email) after sign-up is not currently required.**
+
+**Account deletion (withdrawal)**
+
+You may delete your account at any time in the Application:
+
+1. Open **My Info**
+2. Tap **Delete account**
+3. Review the deletion notice and wait **5 seconds** before continuing
+4. Re-enter your password to verify your identity
+5. Confirm deletion
+
+Upon deletion, your Firebase Authentication account, Firestore profile, daily progress, learning cursors (`daily_quiz_cursor`, `daily_word_cursor`, `daily_sentence_cursor`), and chat messages you posted are deleted, except where retention is required by law. Personal data is handled as described in the Privacy Policy.
+
+If you cannot use in-app deletion, contact the Service Provider at **qjatjr1285@naver.com** from the email address associated with your account.
 
 **License to use the Application**
 
@@ -144,7 +169,12 @@ The Service Provider may periodically update their Terms and Conditions. Therefo
 
 Previous versions of these Terms and Conditions will be maintained and made available upon request by contacting the Service Provider at qjatjr1285@naver.com.
 
-These terms and conditions are effective as of 2026-08-31
+These terms and conditions are effective as of 2026-09-01
+
+**Revision history**
+
+*   2026-09-01 — In-app account deletion, password reset, 7-day re-registration restriction
+*   2026-08-31 — Initial version
 
 **Contact Us**
 
