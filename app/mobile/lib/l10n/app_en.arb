@@ -524,6 +524,17 @@
   "email_login_button": "Log in",
   "email_login_to_register_prefix": "Don't have an account? ",
   "email_login_to_register_button": "Sign up",
+  "email_login_forgot_password_button": "Forgot password?",
+
+  "password_reset_appbar_title": "Reset Password",
+  "password_reset_description": "We'll send a password reset link to your registered email.",
+  "password_reset_button": "Send reset email",
+  "password_reset_success": "We sent a reset link to your email. Please check your inbox.",
+  "password_reset_back_to_login": "Back to login",
+  "password_reset_error_unknown": "An unknown error occurred.",
+  "password_reset_error_invalid_email": "The email address format is invalid.",
+  "password_reset_error_too_many_requests": "Too many attempts. Please try again later.",
+  "password_reset_error_failed": "Failed to send reset email. ({code})",
 
   "email_login_validate_email_required": "Please enter your email.",
   "email_login_validate_email_format": "Invalid email format.",

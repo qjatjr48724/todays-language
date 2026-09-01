@@ -1217,6 +1217,40 @@ class AppLocalizationsJa extends AppLocalizations {
   String get email_login_to_register_button => '新規登録';
 
   @override
+  String get email_login_forgot_password_button => 'パスワードをお忘れですか';
+
+  @override
+  String get password_reset_appbar_title => 'パスワード再設定';
+
+  @override
+  String get password_reset_description => '登録したメールアドレスにパスワード再設定リンクをお送りします。';
+
+  @override
+  String get password_reset_button => '再設定メールを送信';
+
+  @override
+  String get password_reset_success =>
+      '入力したメールアドレスに再設定リンクを送信しました。受信トレイをご確認ください。';
+
+  @override
+  String get password_reset_back_to_login => 'ログインに戻る';
+
+  @override
+  String get password_reset_error_unknown => '不明なエラーが発生しました。';
+
+  @override
+  String get password_reset_error_invalid_email => 'メール形式が正しくありません。';
+
+  @override
+  String get password_reset_error_too_many_requests =>
+      '試行回数が多すぎます。しばらくしてから再試行してください。';
+
+  @override
+  String password_reset_error_failed(Object code) {
+    return '再設定メールの送信に失敗しました。($code)';
+  }
+
+  @override
   String get email_login_validate_email_required => 'メールアドレスを入力してください。';
 
   @override

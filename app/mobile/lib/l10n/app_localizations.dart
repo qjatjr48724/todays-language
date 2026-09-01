@@ -2255,6 +2255,66 @@ abstract class AppLocalizations {
   /// **'회원가입'**
   String get email_login_to_register_button;
 
+  /// No description provided for @email_login_forgot_password_button.
+  ///
+  /// In ko, this message translates to:
+  /// **'비밀번호 찾기'**
+  String get email_login_forgot_password_button;
+
+  /// No description provided for @password_reset_appbar_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'비밀번호 찾기'**
+  String get password_reset_appbar_title;
+
+  /// No description provided for @password_reset_description.
+  ///
+  /// In ko, this message translates to:
+  /// **'가입하신 이메일로 비밀번호 재설정 링크를 보내 드립니다.'**
+  String get password_reset_description;
+
+  /// No description provided for @password_reset_button.
+  ///
+  /// In ko, this message translates to:
+  /// **'재설정 메일 보내기'**
+  String get password_reset_button;
+
+  /// No description provided for @password_reset_success.
+  ///
+  /// In ko, this message translates to:
+  /// **'입력하신 이메일로 재설정 링크를 보냈습니다. 메일함을 확인해 주세요.'**
+  String get password_reset_success;
+
+  /// No description provided for @password_reset_back_to_login.
+  ///
+  /// In ko, this message translates to:
+  /// **'로그인으로 돌아가기'**
+  String get password_reset_back_to_login;
+
+  /// No description provided for @password_reset_error_unknown.
+  ///
+  /// In ko, this message translates to:
+  /// **'알 수 없는 오류가 발생했습니다.'**
+  String get password_reset_error_unknown;
+
+  /// No description provided for @password_reset_error_invalid_email.
+  ///
+  /// In ko, this message translates to:
+  /// **'이메일 형식이 올바르지 않습니다.'**
+  String get password_reset_error_invalid_email;
+
+  /// No description provided for @password_reset_error_too_many_requests.
+  ///
+  /// In ko, this message translates to:
+  /// **'시도가 너무 많습니다. 잠시 후 다시 시도해 주세요.'**
+  String get password_reset_error_too_many_requests;
+
+  /// No description provided for @password_reset_error_failed.
+  ///
+  /// In ko, this message translates to:
+  /// **'재설정 메일 발송에 실패했습니다. ({code})'**
+  String password_reset_error_failed(Object code);
+
   /// No description provided for @email_login_validate_email_required.
   ///
   /// In ko, this message translates to:

@@ -1260,6 +1260,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String get email_login_to_register_button => 'Sign up';
 
   @override
+  String get email_login_forgot_password_button => 'Forgot password?';
+
+  @override
+  String get password_reset_appbar_title => 'Reset Password';
+
+  @override
+  String get password_reset_description =>
+      'We\'ll send a password reset link to your registered email.';
+
+  @override
+  String get password_reset_button => 'Send reset email';
+
+  @override
+  String get password_reset_success =>
+      'We sent a reset link to your email. Please check your inbox.';
+
+  @override
+  String get password_reset_back_to_login => 'Back to login';
+
+  @override
+  String get password_reset_error_unknown => 'An unknown error occurred.';
+
+  @override
+  String get password_reset_error_invalid_email =>
+      'The email address format is invalid.';
+
+  @override
+  String get password_reset_error_too_many_requests =>
+      'Too many attempts. Please try again later.';
+
+  @override
+  String password_reset_error_failed(Object code) {
+    return 'Failed to send reset email. ($code)';
+  }
+
+  @override
   String get email_login_validate_email_required => 'Please enter your email.';
 
   @override

@@ -4,6 +4,7 @@ abstract final class AnalyticsScreens {
   static const login = 'login';
   static const emailLogin = 'email_login';
   static const emailRegister = 'email_register';
+  static const passwordReset = 'password_reset';
   static const consentScrollAgree = 'consent_scroll_agree';
   static const privacyPolicy = 'privacy_policy';
   static const termsOfService = 'terms_of_service';

@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'email_register_screen.dart';
+import 'password_reset_screen.dart';
 import '../l10n/app_localizations.dart';
 import '../services/analytics/analytics_action_log.dart';
 import '../services/analytics/analytics_navigation.dart';
@@ -176,6 +177,15 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                               );
                             },
                       child: Text(l10n.email_login_to_register_button),
+                    ),
+                    TextButton(
+                      onPressed: _loading
+                          ? null
+                          : () => openPasswordResetScreen(
+                                context,
+                                initialEmail: _emailController.text.trim(),
+                              ),
+                      child: Text(l10n.email_login_forgot_password_button),
                     ),
                   ],
                 ),

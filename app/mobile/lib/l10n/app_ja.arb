@@ -524,6 +524,17 @@
   "email_login_button": "ログイン",
   "email_login_to_register_prefix": "アカウントをお持ちではありませんか？ ",
   "email_login_to_register_button": "新規登録",
+  "email_login_forgot_password_button": "パスワードをお忘れですか",
+
+  "password_reset_appbar_title": "パスワード再設定",
+  "password_reset_description": "登録したメールアドレスにパスワード再設定リンクをお送りします。",
+  "password_reset_button": "再設定メールを送信",
+  "password_reset_success": "入力したメールアドレスに再設定リンクを送信しました。受信トレイをご確認ください。",
+  "password_reset_back_to_login": "ログインに戻る",
+  "password_reset_error_unknown": "不明なエラーが発生しました。",
+  "password_reset_error_invalid_email": "メール形式が正しくありません。",
+  "password_reset_error_too_many_requests": "試行回数が多すぎます。しばらくしてから再試行してください。",
+  "password_reset_error_failed": "再設定メールの送信に失敗しました。({code})",
 
   "email_login_validate_email_required": "メールアドレスを入力してください。",
   "email_login_validate_email_format": "メール形式が正しくありません。",
