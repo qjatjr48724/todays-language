@@ -1,5 +1,4 @@
-import { beforeUserCreated } from "firebase-functions/v2/identity";
-import { HttpsError } from "firebase-functions/v2/https";
+import { beforeUserCreated, HttpsError } from "firebase-functions/v2/identity";
 
 import {
   ACCOUNT_RECREATION_BLOCKED_MESSAGE,

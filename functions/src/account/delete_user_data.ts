@@ -7,6 +7,14 @@ import { db } from "../shared/firebase";
 /** Firestore rules `isSupportedChatRoom`와 동일 */
 export const CHAT_ROOM_IDS = ["KOR", "USA", "JPN"] as const;
 
+/** 탈퇴 시 `users/{uid}` 아래에서 삭제할 하위 컬렉션 (부모 문서 삭제 전 전부 제거) */
+export const USER_FIRESTORE_SUBCOLLECTIONS = [
+  "daily_progress",
+  "daily_quiz_cursor",
+  "daily_word_cursor",
+  "daily_sentence_cursor",
+] as const;
+
 const BATCH_DELETE_LIMIT = 400;
 
 
@@ -49,20 +57,24 @@ export async function deleteUserChatMessages(uid: string): Promise<number> {
 }
 
 
-/** `users/{uid}` 및 `daily_progress` 하위 컬렉션을 삭제합니다. */
+/** `users/{uid}` 및 모든 사용자 하위 컬렉션을 삭제합니다. */
 export async function deleteUserFirestoreProfile(uid: string): Promise<number> {
   const userRef = db.collection("users").doc(uid);
-  const dailyProgressDeleted = await deleteQueryBatch(
-    userRef.collection("daily_progress"),
-  );
+  let totalDeleted = 0;
+
+  for (const sub of USER_FIRESTORE_SUBCOLLECTIONS) {
+    const count = await deleteQueryBatch(userRef.collection(sub));
+    totalDeleted += count;
+  }
+
   await userRef.delete();
-  return dailyProgressDeleted;
+  return totalDeleted;
 }
 
 
 export type DeleteUserAccountResult = {
   chatMessagesDeleted: number;
-  dailyProgressDeleted: number;
+  userSubcollectionDocsDeleted: number;
 };
 
 
@@ -72,7 +84,7 @@ export async function deleteUserAccount(uid: string): Promise<DeleteUserAccountR
   const email = userRecord.email?.trim();
 
   const chatMessagesDeleted = await deleteUserChatMessages(uid);
-  const dailyProgressDeleted = await deleteUserFirestoreProfile(uid);
+  const userSubcollectionDocsDeleted = await deleteUserFirestoreProfile(uid);
 
   if (email) {
     await recordAccountRecreationBlock(email);
@@ -80,5 +92,5 @@ export async function deleteUserAccount(uid: string): Promise<DeleteUserAccountR
 
   await admin.auth().deleteUser(uid);
 
-  return { chatMessagesDeleted, dailyProgressDeleted };
+  return { chatMessagesDeleted, userSubcollectionDocsDeleted };
 }
