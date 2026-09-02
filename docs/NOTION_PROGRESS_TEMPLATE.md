@@ -3003,3 +3003,84 @@ unauthenticated: 로그인 상태 확인
 3. Firebase Console → Authentication → Templates → **Password reset** 본문 한국어 정리(선택)
 4. 휴대폰(SMS) 인증 — 본인 확인·탈퇴용으로 설계 시점에 `가입용 vs 탈퇴용` 구분
 5. `terms-ko.md` / `terms-en.md` · Play/Apple 선언 (백로그)
+
+---
+
+## [단계 57] 고객 문의 v1(웹·Functions·앱) · 설정 화면 UI (2026-09-02)
+
+### 1) 오늘 한 일
+
+**고객 문의 백엔드 (Functions + Firestore)**
+- `support_inquiries/{id}` + `messages` 하위 컬렉션 스키마
+- Callable: `submitSupportInquiry`(유저), `listSupportInquiriesAdmin` / `getSupportInquiryAdmin` / `replySupportInquiryAdmin`(관리자)
+- Firestore rules: 본인 `uid` 문의·메시지 read만, write는 Callable 우선
+- `firestore.indexes.json` — `uid` + `createdAtMs` 복합 인덱스
+- 탈퇴 시 `deleteUserSupportInquiries()` 연동 (`delete_user_data.ts`)
+- 테스트: `support_inquiry.test.ts` 포함 `npm run test` 48건 통과
+
+**React 웹 포털 (`web/portal`) + Firebase Hosting**
+- 대표 `/`, 유저 문의 `/support/*`, 관리자 `/admin/*` (히든 URL + 관리자 uid)
+- Firebase Auth(앱과 동일 계정)로 웹 문의 접수
+- `firebase.json` hosting + predeploy 빌드
+- 법적 문서 정적 페이지: `/legal/privacy-ko.html`, `/legal/terms-ko.html`
+- dev URL: `https://todays-language-dev.web.app`
+
+**Flutter 앱 — 문의 내역**
+- 설정 → **문의하기**(웹 포털) / **문의 내역**(Firestore 조회)
+- `SupportInquiriesScreen` · `SupportInquiryDetailScreen` · `SupportInquiryRepository`
+- i18n ko/en/ja, Analytics `support_inquiries` / `support_inquiry_detail`
+
+**설정 화면 UI**
+- 카드(`ListTile`) → 전체 너비 `FilledButton` 통일
+- 부제(subtitle) 제거, 주제목만 · `12.8px`(기존 16px의 80%) · `textAlign: center`
+- 순서: 문의하기 → 문의 내역 (문의하기가 위)
+
+**문서**
+- `docs/legal/play_prelaunch_checklist.md` — 2026-09-02 기준 갱신(탈퇴·약관·문의·Hosting URL)
+
+**사용자 검증**
+- 웹 페이지 · 문의 등록 · 앱 문의 내역 확인 — 정상 동작 확인(사용자)
+
+### 2) 합의·결정
+
+- 문의 **등록은 웹**, **내역·답변 조회는 앱** (v1)
+- 관리자 답변은 웹 `/admin` (기존 `ADMIN_TOOLS_UID` 재사용)
+- FCM 답변 알림은 **2단계**(이번 범위 밖)
+- 웹·앱 Auth 세션 분리 → 웹 문의 시 브라우저 재로그인 가능
+
+### 3) 완료 기준 체크
+
+- [x] Functions Callables + rules + tests
+- [x] React portal 빌드 (`npm run build`)
+- [x] Flutter 문의 내역·설정 링크·i18n
+- [x] `flutter analyze`
+- [x] 웹 문의 등록 · 앱 내역 E2E (사용자)
+- [x] 설정 화면 버튼 UI
+- [ ] Firebase `hosting,functions,firestore` 배포(미배포 시 로컬/이전 배포 환경에 의존)
+- [ ] FCM 답변 알림
+- [ ] Play Console HTTPS URL · Data safety 입력
+
+### 4) 추가/변경 파일(주요)
+
+| 영역 | 파일 |
+|------|------|
+| Functions | `support/support_inquiry*.ts`, `delete_user_data.ts`, `index.ts` |
+| Firestore | `firestore.rules`, `firestore.indexes.json` |
+| Web | `web/portal/**`, `firebase.json` |
+| Flutter | `support_inquiries_screen.dart`, `support_inquiry_detail_screen.dart`, `support_inquiry_repository.dart`, `support_portal_config.dart`, `settings_screen.dart`, `app_*.arb` |
+| 문서 | `play_prelaunch_checklist.md`, `web/portal/README.md` |
+
+### 5) Git 커밋
+
+| 해시 | 메시지 |
+|------|--------|
+| 25d2e13 | feat: 고객 문의 웹 포털·Functions·앱 내역 조회 추가 |
+| 1493270 | ui: 설정 화면 메뉴를 버튼 스타일로 통일 |
+
+### 6) 다음 액션
+
+1. `main` push (`25d2e13`, `1493270`)
+2. `firebase deploy --only hosting,functions,firestore` (미배포 환경이면)
+3. Play Console — 처리방침 HTTPS URL · Data safety 선언
+4. FCM 답변 알림 (2단계)
+5. 관리자 웹 확장 — 공지·원격 설정 등 운영 콘솔
