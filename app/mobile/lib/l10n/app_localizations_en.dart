@@ -1438,6 +1438,69 @@ class AppLocalizationsEn extends AppLocalizations {
       'Open system settings';
 
   @override
+  String get settings_support_inquiries_tile => 'Support history';
+
+  @override
+  String get settings_support_inquiries_subtitle =>
+      'View your inquiries and replies';
+
+  @override
+  String get settings_support_new_tile => 'Contact support';
+
+  @override
+  String get settings_support_new_subtitle =>
+      'Submit a new inquiry on the web (same app account)';
+
+  @override
+  String get support_inquiries_screen_title => 'Support history';
+
+  @override
+  String get support_inquiries_new_button => 'Inquiry on web';
+
+  @override
+  String get support_inquiries_empty => 'No inquiries yet.';
+
+  @override
+  String get support_inquiries_web_hint =>
+      'Create new inquiries on the web. Sign in with the same account as the app.';
+
+  @override
+  String get support_inquiries_load_failed => 'Could not load inquiries.';
+
+  @override
+  String get support_inquiry_detail_title => 'Inquiry detail';
+
+  @override
+  String get support_inquiry_category_bug => 'Bug';
+
+  @override
+  String get support_inquiry_category_account => 'Account';
+
+  @override
+  String get support_inquiry_category_suggestion => 'Suggestion';
+
+  @override
+  String get support_inquiry_category_other => 'Other';
+
+  @override
+  String get support_inquiry_status_open => 'Open';
+
+  @override
+  String get support_inquiry_status_answered => 'Answered';
+
+  @override
+  String get support_inquiry_status_closed => 'Closed';
+
+  @override
+  String get support_inquiry_message_admin => 'Support';
+
+  @override
+  String get support_inquiry_message_user => 'You';
+
+  @override
+  String get support_portal_open_failed => 'Could not open the web page.';
+
+  @override
   String get settings_reminder_time_section_title => 'Study reminder time';
 
   @override

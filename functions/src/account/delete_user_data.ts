@@ -2,6 +2,7 @@ import * as admin from "firebase-admin";
 import type { Query } from "firebase-admin/firestore";
 
 import { recordAccountRecreationBlock } from "./account_recreation_block";
+import { deleteUserSupportInquiries } from "../support/support_inquiry_service";
 import { db } from "../shared/firebase";
 
 /** Firestore rules `isSupportedChatRoom`와 동일 */
@@ -75,6 +76,7 @@ export async function deleteUserFirestoreProfile(uid: string): Promise<number> {
 export type DeleteUserAccountResult = {
   chatMessagesDeleted: number;
   userSubcollectionDocsDeleted: number;
+  supportInquiriesDeleted: number;
 };
 
 
@@ -85,6 +87,7 @@ export async function deleteUserAccount(uid: string): Promise<DeleteUserAccountR
 
   const chatMessagesDeleted = await deleteUserChatMessages(uid);
   const userSubcollectionDocsDeleted = await deleteUserFirestoreProfile(uid);
+  const supportInquiriesDeleted = await deleteUserSupportInquiries(uid);
 
   if (email) {
     await recordAccountRecreationBlock(email);
@@ -92,5 +95,5 @@ export async function deleteUserAccount(uid: string): Promise<DeleteUserAccountR
 
   await admin.auth().deleteUser(uid);
 
-  return { chatMessagesDeleted, userSubcollectionDocsDeleted };
+  return { chatMessagesDeleted, userSubcollectionDocsDeleted, supportInquiriesDeleted };
 }

@@ -36,6 +36,20 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // 고객 문의 — 본인 읽기만, 작성·답변은 Functions Callable
+    match /support_inquiries/{inquiryId} {
+      allow read: if isSignedIn()
+        && resource.data.uid == request.auth.uid;
+      allow create, update, delete: if false;
+
+      match /messages/{messageId} {
+        allow read: if isSignedIn()
+          && get(/databases/$(database)/documents/support_inquiries/$(inquiryId)).data.uid
+            == request.auth.uid;
+        allow write: if false;
+      }
+    }
+
     function userTargetLanguage() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.targetLanguage;
     }

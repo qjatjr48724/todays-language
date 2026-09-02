@@ -1380,6 +1380,67 @@ class AppLocalizationsKo extends AppLocalizations {
   String get settings_notification_open_settings_button => '시스템 설정 열기';
 
   @override
+  String get settings_support_inquiries_tile => '문의 내역';
+
+  @override
+  String get settings_support_inquiries_subtitle => '접수한 문의와 답변 확인';
+
+  @override
+  String get settings_support_new_tile => '문의하기';
+
+  @override
+  String get settings_support_new_subtitle => '웹에서 새 문의 접수 (앱 계정 로그인)';
+
+  @override
+  String get support_inquiries_screen_title => '문의 내역';
+
+  @override
+  String get support_inquiries_new_button => '웹에서 문의';
+
+  @override
+  String get support_inquiries_empty => '접수한 문의가 없습니다.';
+
+  @override
+  String get support_inquiries_web_hint =>
+      '새 문의는 웹에서 작성해 주세요. 브라우저에서 앱과 동일한 계정으로 로그인해야 합니다.';
+
+  @override
+  String get support_inquiries_load_failed => '문의를 불러오지 못했습니다.';
+
+  @override
+  String get support_inquiry_detail_title => '문의 상세';
+
+  @override
+  String get support_inquiry_category_bug => '버그/오류';
+
+  @override
+  String get support_inquiry_category_account => '계정';
+
+  @override
+  String get support_inquiry_category_suggestion => '기능 제안';
+
+  @override
+  String get support_inquiry_category_other => '기타';
+
+  @override
+  String get support_inquiry_status_open => '접수';
+
+  @override
+  String get support_inquiry_status_answered => '답변 완료';
+
+  @override
+  String get support_inquiry_status_closed => '종료';
+
+  @override
+  String get support_inquiry_message_admin => '운영자';
+
+  @override
+  String get support_inquiry_message_user => '나';
+
+  @override
+  String get support_portal_open_failed => '웹 페이지를 열지 못했습니다.';
+
+  @override
   String get settings_reminder_time_section_title => '학습 알림 시간';
 
   @override

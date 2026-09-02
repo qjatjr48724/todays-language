@@ -2555,6 +2555,126 @@ abstract class AppLocalizations {
   /// **'시스템 설정 열기'**
   String get settings_notification_open_settings_button;
 
+  /// No description provided for @settings_support_inquiries_tile.
+  ///
+  /// In ko, this message translates to:
+  /// **'문의 내역'**
+  String get settings_support_inquiries_tile;
+
+  /// No description provided for @settings_support_inquiries_subtitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'접수한 문의와 답변 확인'**
+  String get settings_support_inquiries_subtitle;
+
+  /// No description provided for @settings_support_new_tile.
+  ///
+  /// In ko, this message translates to:
+  /// **'문의하기'**
+  String get settings_support_new_tile;
+
+  /// No description provided for @settings_support_new_subtitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'웹에서 새 문의 접수 (앱 계정 로그인)'**
+  String get settings_support_new_subtitle;
+
+  /// No description provided for @support_inquiries_screen_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'문의 내역'**
+  String get support_inquiries_screen_title;
+
+  /// No description provided for @support_inquiries_new_button.
+  ///
+  /// In ko, this message translates to:
+  /// **'웹에서 문의'**
+  String get support_inquiries_new_button;
+
+  /// No description provided for @support_inquiries_empty.
+  ///
+  /// In ko, this message translates to:
+  /// **'접수한 문의가 없습니다.'**
+  String get support_inquiries_empty;
+
+  /// No description provided for @support_inquiries_web_hint.
+  ///
+  /// In ko, this message translates to:
+  /// **'새 문의는 웹에서 작성해 주세요. 브라우저에서 앱과 동일한 계정으로 로그인해야 합니다.'**
+  String get support_inquiries_web_hint;
+
+  /// No description provided for @support_inquiries_load_failed.
+  ///
+  /// In ko, this message translates to:
+  /// **'문의를 불러오지 못했습니다.'**
+  String get support_inquiries_load_failed;
+
+  /// No description provided for @support_inquiry_detail_title.
+  ///
+  /// In ko, this message translates to:
+  /// **'문의 상세'**
+  String get support_inquiry_detail_title;
+
+  /// No description provided for @support_inquiry_category_bug.
+  ///
+  /// In ko, this message translates to:
+  /// **'버그/오류'**
+  String get support_inquiry_category_bug;
+
+  /// No description provided for @support_inquiry_category_account.
+  ///
+  /// In ko, this message translates to:
+  /// **'계정'**
+  String get support_inquiry_category_account;
+
+  /// No description provided for @support_inquiry_category_suggestion.
+  ///
+  /// In ko, this message translates to:
+  /// **'기능 제안'**
+  String get support_inquiry_category_suggestion;
+
+  /// No description provided for @support_inquiry_category_other.
+  ///
+  /// In ko, this message translates to:
+  /// **'기타'**
+  String get support_inquiry_category_other;
+
+  /// No description provided for @support_inquiry_status_open.
+  ///
+  /// In ko, this message translates to:
+  /// **'접수'**
+  String get support_inquiry_status_open;
+
+  /// No description provided for @support_inquiry_status_answered.
+  ///
+  /// In ko, this message translates to:
+  /// **'답변 완료'**
+  String get support_inquiry_status_answered;
+
+  /// No description provided for @support_inquiry_status_closed.
+  ///
+  /// In ko, this message translates to:
+  /// **'종료'**
+  String get support_inquiry_status_closed;
+
+  /// No description provided for @support_inquiry_message_admin.
+  ///
+  /// In ko, this message translates to:
+  /// **'운영자'**
+  String get support_inquiry_message_admin;
+
+  /// No description provided for @support_inquiry_message_user.
+  ///
+  /// In ko, this message translates to:
+  /// **'나'**
+  String get support_inquiry_message_user;
+
+  /// No description provided for @support_portal_open_failed.
+  ///
+  /// In ko, this message translates to:
+  /// **'웹 페이지를 열지 못했습니다.'**
+  String get support_portal_open_failed;
+
   /// No description provided for @settings_reminder_time_section_title.
   ///
   /// In ko, this message translates to:

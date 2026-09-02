@@ -34,4 +34,6 @@ abstract final class AnalyticsScreens {
   static const notificationPermission = 'notification_permission';
   static const learningReminderSetup = 'learning_reminder_setup';
   static const adminTools = 'admin_tools';
+  static const supportInquiries = 'support_inquiries';
+  static const supportInquiryDetail = 'support_inquiry_detail';
 }

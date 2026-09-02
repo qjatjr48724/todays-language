@@ -120,6 +120,11 @@ coverage/
 functions/node_modules/
 functions/lib/
 
+# Web portal
+web/portal/node_modules/
+web/portal/dist/
+web/portal/.env
+
 # Editor/IDE
 .vscode/
 

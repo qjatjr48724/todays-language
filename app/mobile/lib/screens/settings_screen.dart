@@ -1,13 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../config/support_portal_config.dart';
+import '../l10n/app_localizations.dart';
 import '../services/analytics/analytics_navigation.dart';
 import '../services/analytics/analytics_screens.dart';
-import '../l10n/app_localizations.dart';
 import '../services/target_language_picker.dart';
 import 'admin_tools_screen.dart';
 import 'notification_settings_screen.dart';
 import 'privacy_policy_screen.dart';
+import 'support_inquiries_screen.dart';
 import 'terms_of_service_screen.dart';
 
 
@@ -69,6 +72,44 @@ class SettingsScreen extends StatelessWidget {
                                     builder: (_) =>
                                         const NotificationSettingsScreen(),
                                 );
+                            },
+                        ),
+                        const SizedBox(height: 12),
+                        _settingsTile(
+                            context: context,
+                            icon: Icons.support_agent_outlined,
+                            title: l10n.settings_support_inquiries_tile,
+                            subtitle: l10n.settings_support_inquiries_subtitle,
+                            onTap: () {
+                                pushAnalyticsScreen(
+                                    context,
+                                    screenName: AnalyticsScreens.supportInquiries,
+                                    builder: (_) =>
+                                        const SupportInquiriesScreen(),
+                                );
+                            },
+                        ),
+                        const SizedBox(height: 12),
+                        _settingsTile(
+                            context: context,
+                            icon: Icons.mail_outline,
+                            title: l10n.settings_support_new_tile,
+                            subtitle: l10n.settings_support_new_subtitle,
+                            onTap: () async {
+                                final uri = Uri.parse(supportPortalLoginUrl());
+                                final launched = await launchUrl(
+                                    uri,
+                                    mode: LaunchMode.externalApplication,
+                                );
+                                if (!launched && context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                            content: Text(
+                                                l10n.support_portal_open_failed,
+                                            ),
+                                        ),
+                                    );
+                                }
                             },
                         ),
                         const SizedBox(height: 12),

@@ -9,16 +9,18 @@
 
 ---
 
-## 진행 현황 (2026-08-18 기준)
+## 진행 현황 (2026-09-02 기준)
 
 | 구분 | 상태 |
 |------|------|
-| 영문 처리방침·이용약관 초안 | 완료 (`privacy-en.*`, `terms-en.*`) |
-| 공개 HTTPS 처리방침 URL | 미완 |
-| Play Data safety 선언 | 미완 |
-| 앱 내 약관 전문 반영 | 미완 (placeholder) |
-| 앱 내 계정 탈퇴 | 미완 (방침: 이메일 삭제 요청) |
-| 한국어 처리방침·약관 | 미완 |
+| 영문 처리방침·이용약관 | 완료 (`privacy-en.*`, `terms-en.*`, 시행일 2026-09-01) |
+| 한국어 처리방침·이용약관 | 완료 (`privacy-ko.*`, `terms-ko.*`) |
+| 앱 내 약관 전문 반영 | 완료 (`*_content.dart`, version `2026-09-01`) |
+| 앱 내 계정 탈퇴 | 완료 (`deleteAccount` Callable, cursor·7일 재가입 차단) |
+| 비밀번호 찾기 | 완료 (앱 내 이메일 재설정) |
+| 공개 HTTPS 처리방침 URL | **Hosting 배포 후** `https://todays-language-dev.web.app/legal/privacy-ko.html` |
+| 고객 문의 (웹 접수 + 앱 조회) | 구현 완료 (Functions + `web/portal`, 배포 필요) |
+| Play Data safety 선언 | 미완 (콘솔 수동 입력) |
 
 ---
 
@@ -50,7 +52,7 @@
 - [ ] 앱이 요청하는 **권한**을 콘솔에 정확히 공개
 - [ ] 위치·카메라·마이크·연락처: **미사용**이면 선언도 없음
 - [ ] 스토어 상세 페이지에 **유효한 연락처** 표시
-- [ ] 사용자 문의에 응답할 수 있는 창구 유지 (이메일)
+- [ ] 사용자 문의에 응답할 수 있는 창구 유지 — **웹 문의** (`/support/login`) + 이메일 `qjatjr1285@naver.com`
 
 유료/인앱을 넣을 때만:
 
@@ -63,7 +65,7 @@
 
 계약 4.8: 처리방침 공개, 목적 내 이용, 안전한 보관, 필요 기간만 보유.
 
-- [ ] 처리방침 **공개 HTTPS URL** (로그인 불필요, PDF 아님)
+- [ ] 처리방침 **공개 HTTPS URL** (로그인 불필요, PDF 아님) — Hosting: `/legal/privacy-ko.html`, `/legal/privacy-en.html`
 - [ ] Play Console App content에 해당 URL 등록
 - [ ] Data safety 선언이 아래와 **실제 수집과 일치**
 
@@ -87,10 +89,9 @@
 
 ## 5. 계정 삭제 (Play 정책에서 자주 지적)
 
-- [ ] 삭제 방법이 처리방침에 적혀 있음 — 현재: **qjatjr1285@naver.com**
-- [ ] 이메일 삭제 요청을 **실제로 처리**할 수 있음
-- [ ] (권장·검수 대비) 앱 내 **회원 탈퇴** 구현  
-  현재: 로그아웃만 있음. 방침에 in-app 미제공을 적어 둠.
+- [x] 삭제 방법이 처리방침에 적혀 있음 — 앱 내 **회원 탈퇴** + 이메일 문의
+- [x] 앱 내 **회원 탈퇴** 구현 (`deleteAccount`, Firestore·Auth 삭제, 7일 재가입 차단)
+- [ ] 탈퇴 시 `support_inquiries` 포함 전체 삭제 — Functions에 연동됨, 배포 후 E2E 확인
 
 ---
 
@@ -106,11 +107,12 @@
 
 ## 7. 앱 반영 (스토어 URL과 맞출 것)
 
-- [ ] `privacy-ko.md` / `terms-ko.md` 작성 (kimlawtech)
-- [ ] `app/mobile/lib/data/legal/privacy_policy_content.dart` 전문 교체
-- [ ] `app/mobile/lib/data/legal/terms_of_service_content.dart` 전문 교체
-- [ ] `PrivacyPolicyContent.version` = 방침 시행일 (**2026-08-31**)
-- [ ] 회원가입·설정 화면에서 약관·처리방침이 열림
+- [x] `privacy-ko.md` / `terms-ko.md` 작성·갱신
+- [x] `app/mobile/lib/data/legal/privacy_policy_content.dart` 전문 교체
+- [x] `app/mobile/lib/data/legal/terms_of_service_content.dart` 전문 교체
+- [x] `PrivacyPolicyContent.version` = 방침 시행일 (**2026-09-01**)
+- [x] 회원가입·설정 화면에서 약관·처리방침이 열림
+- [ ] Firebase Hosting 배포 후 Play Console에 HTTPS URL 등록
 
 ---
 

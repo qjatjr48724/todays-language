@@ -7,6 +7,12 @@ export { generateRandomWordImages } from "./random_words/callables";
 export { deleteAccount } from "./account/delete_account_callable";
 export { blockRecentAccountRecreation } from "./account/before_user_created_block";
 export { seedAccountRecreationBlocksPlaceholder } from "./account/seed_recreation_blocks_placeholder_callable";
+export {
+  submitSupportInquiry,
+  listSupportInquiriesAdmin,
+  getSupportInquiryAdmin,
+  replySupportInquiryAdmin,
+} from "./support/support_inquiry_callables";
 
 import {
   buildDailySentenceBatchSystemPrompt,

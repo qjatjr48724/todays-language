@@ -1379,6 +1379,67 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settings_notification_open_settings_button => 'システム設定を開く';
 
   @override
+  String get settings_support_inquiries_tile => 'お問い合わせ履歴';
+
+  @override
+  String get settings_support_inquiries_subtitle => '送信したお問い合わせと返信を確認';
+
+  @override
+  String get settings_support_new_tile => 'お問い合わせ';
+
+  @override
+  String get settings_support_new_subtitle => 'Webで新規お問い合わせ（アプリと同じアカウント）';
+
+  @override
+  String get support_inquiries_screen_title => 'お問い合わせ履歴';
+
+  @override
+  String get support_inquiries_new_button => 'Webで問い合わせ';
+
+  @override
+  String get support_inquiries_empty => 'お問い合わせはありません。';
+
+  @override
+  String get support_inquiries_web_hint =>
+      '新規お問い合わせはWebから送信してください。アプリと同じアカウントでログインが必要です。';
+
+  @override
+  String get support_inquiries_load_failed => 'お問い合わせを読み込めませんでした。';
+
+  @override
+  String get support_inquiry_detail_title => 'お問い合わせ詳細';
+
+  @override
+  String get support_inquiry_category_bug => '不具合';
+
+  @override
+  String get support_inquiry_category_account => 'アカウント';
+
+  @override
+  String get support_inquiry_category_suggestion => '機能提案';
+
+  @override
+  String get support_inquiry_category_other => 'その他';
+
+  @override
+  String get support_inquiry_status_open => '受付';
+
+  @override
+  String get support_inquiry_status_answered => '回答済み';
+
+  @override
+  String get support_inquiry_status_closed => '終了';
+
+  @override
+  String get support_inquiry_message_admin => '運営';
+
+  @override
+  String get support_inquiry_message_user => '自分';
+
+  @override
+  String get support_portal_open_failed => 'Webページを開けませんでした。';
+
+  @override
   String get settings_reminder_time_section_title => '学習リマインダーの時間';
 
   @override
