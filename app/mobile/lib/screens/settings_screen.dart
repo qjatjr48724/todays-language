@@ -20,21 +20,47 @@ class SettingsScreen extends StatelessWidget {
 
     static const _testAdminUid = AdminToolsScreen.testAdminUid;
 
+    static const _titleFontSize = 12.8;
 
-    Widget _settingsTile({
+
+    Widget _settingsButton({
         required BuildContext context,
         required IconData icon,
         required String title,
-        String? subtitle,
-        required VoidCallback onTap,
+        required VoidCallback onPressed,
     }) {
-        return Card(
-            child: ListTile(
-                leading: Icon(icon),
-                title: Text(title),
-                subtitle: subtitle == null ? null : Text(subtitle),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: onTap,
+        final theme = Theme.of(context);
+        return SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+                onPressed: onPressed,
+                style: FilledButton.styleFrom(
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
+                    ),
+                ),
+                child: Row(
+                    children: [
+                        Icon(icon, size: 22),
+                        Expanded(
+                            child: Text(
+                                title,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                    fontSize: _titleFontSize,
+                                ),
+                            ),
+                        ),
+                        Icon(
+                            Icons.chevron_right,
+                            size: 22,
+                            color: theme.colorScheme.onPrimary
+                                .withValues(alpha: 0.85),
+                        ),
+                    ],
+                ),
             ),
         );
     }
@@ -52,20 +78,18 @@ class SettingsScreen extends StatelessWidget {
                 child: ListView(
                     padding: const EdgeInsets.all(16),
                     children: [
-                        _settingsTile(
+                        _settingsButton(
                             context: context,
                             icon: Icons.language,
                             title: l10n.settings_language_change_tile,
-                            subtitle: l10n.settings_language_change_subtitle,
-                            onTap: () => openTargetLanguagePicker(context),
+                            onPressed: () => openTargetLanguagePicker(context),
                         ),
                         const SizedBox(height: 12),
-                        _settingsTile(
+                        _settingsButton(
                             context: context,
                             icon: Icons.notifications_outlined,
                             title: l10n.settings_notification_tile,
-                            subtitle: l10n.settings_notification_subtitle,
-                            onTap: () {
+                            onPressed: () {
                                 pushAnalyticsScreen(
                                     context,
                                     screenName: AnalyticsScreens.notificationSettings,
@@ -75,27 +99,11 @@ class SettingsScreen extends StatelessWidget {
                             },
                         ),
                         const SizedBox(height: 12),
-                        _settingsTile(
-                            context: context,
-                            icon: Icons.support_agent_outlined,
-                            title: l10n.settings_support_inquiries_tile,
-                            subtitle: l10n.settings_support_inquiries_subtitle,
-                            onTap: () {
-                                pushAnalyticsScreen(
-                                    context,
-                                    screenName: AnalyticsScreens.supportInquiries,
-                                    builder: (_) =>
-                                        const SupportInquiriesScreen(),
-                                );
-                            },
-                        ),
-                        const SizedBox(height: 12),
-                        _settingsTile(
+                        _settingsButton(
                             context: context,
                             icon: Icons.mail_outline,
                             title: l10n.settings_support_new_tile,
-                            subtitle: l10n.settings_support_new_subtitle,
-                            onTap: () async {
+                            onPressed: () async {
                                 final uri = Uri.parse(supportPortalLoginUrl());
                                 final launched = await launchUrl(
                                     uri,
@@ -113,11 +121,25 @@ class SettingsScreen extends StatelessWidget {
                             },
                         ),
                         const SizedBox(height: 12),
-                        _settingsTile(
+                        _settingsButton(
+                            context: context,
+                            icon: Icons.support_agent_outlined,
+                            title: l10n.settings_support_inquiries_tile,
+                            onPressed: () {
+                                pushAnalyticsScreen(
+                                    context,
+                                    screenName: AnalyticsScreens.supportInquiries,
+                                    builder: (_) =>
+                                        const SupportInquiriesScreen(),
+                                );
+                            },
+                        ),
+                        const SizedBox(height: 12),
+                        _settingsButton(
                             context: context,
                             icon: Icons.privacy_tip_outlined,
                             title: l10n.privacy_policy_screen_title,
-                            onTap: () {
+                            onPressed: () {
                                 PrivacyPolicyScreen.open(
                                     context,
                                     readOnly: true,
@@ -125,11 +147,11 @@ class SettingsScreen extends StatelessWidget {
                             },
                         ),
                         const SizedBox(height: 12),
-                        _settingsTile(
+                        _settingsButton(
                             context: context,
                             icon: Icons.description_outlined,
                             title: l10n.terms_of_service_screen_title,
-                            onTap: () {
+                            onPressed: () {
                                 TermsOfServiceScreen.open(
                                     context,
                                     readOnly: true,
@@ -138,12 +160,11 @@ class SettingsScreen extends StatelessWidget {
                         ),
                         if (isAdmin) ...[
                             const SizedBox(height: 12),
-                            _settingsTile(
+                            _settingsButton(
                                 context: context,
                                 icon: Icons.admin_panel_settings_outlined,
                                 title: l10n.settings_admin_tile,
-                                subtitle: l10n.settings_admin_subtitle,
-                                onTap: () {
+                                onPressed: () {
                                     pushAnalyticsScreen(
                                         context,
                                         screenName: AnalyticsScreens.adminTools,
