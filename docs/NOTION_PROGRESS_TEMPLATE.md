@@ -3084,3 +3084,65 @@ unauthenticated: 로그인 상태 확인
 3. Play Console — 처리방침 HTTPS URL · Data safety 선언
 4. FCM 답변 알림 (2단계)
 5. 관리자 웹 확장 — 공지·원격 설정 등 운영 콘솔
+
+---
+
+## [단계 58] Git·Firebase 확인 · 법적 HTML 포털 스타일 · Play Console 안내 (2026-09-09~18)
+
+### 1) 오늘 한 일
+
+**Git / Firebase 상태 확인 (2026-09-09)**
+- `main` push 완료 (`25d2e13`~`e95b1d0` → origin)
+- Hosting live: `https://todays-language-dev.web.app` (문의 Functions·`support_inquiries` 인덱스 이미 배포됨)
+- 처리방침 URL 접속 확인: `/legal/privacy-ko.html`
+
+**법적 HTML — 포털 메인과 동일 스타일**
+- `sync_html_from_md.py` 템플릿: 헤더(로고·문의하기) / `.card` 본문 / 홈 버튼 / 푸터(처리방침·약관)
+- 한·영 `privacy`·`terms` HTML 재생성 → `web/portal/public/legal/` 동기화
+- Hosting 재배포
+
+**법적 HTML — 본문 폰트 축소**
+- 본문 `0.875rem`, h1 `1.35rem`, h2 `1rem`, 표 `0.8rem`
+- Hosting 재배포
+
+**Play Console 안내**
+- Play Console = Google Play 앱 스토어 관리 사이트 (코드 작업이 아님)
+- 다음: 처리방침 HTTPS URL 등록 + Data safety 선언
+
+### 2) 합의·결정
+
+- 법적 HTML CSS는 포털 메인(`index.css`) 토큰·클래스와 맞춤
+- Play Console 입력은 개발자가 콘솔에서 직접 수행
+
+### 3) 완료 기준 체크
+
+- [x] 미푸시 커밋 push
+- [x] Firebase Hosting·Functions·문의 인덱스 확인
+- [x] 법적 HTML 포털 스타일 + 홈 링크
+- [x] 본문 폰트 축소 + Hosting 배포
+- [ ] Play Console — 처리방침 URL 등록
+- [ ] Play Console — Data safety 선언
+- [ ] FCM 답변 알림
+- [ ] 관리자 웹 확장
+
+### 4) 추가/변경 파일(주요)
+
+| 영역 | 파일 |
+|------|------|
+| 생성 스크립트 | `docs/legal/sync_html_from_md.py` |
+| 법적 HTML | `docs/legal/privacy-*.html`, `terms-*.html` |
+| Hosting | `web/portal/public/legal/*` |
+
+### 5) Git 커밋
+
+| 해시 | 메시지 |
+|------|--------|
+| dbf648b | ui: 처리방침·이용약관 HTML을 포털 메인과 같은 스타일로 맞춤 |
+| 069c622 | ui: 처리방침·이용약관 HTML 본문 폰트 축소 |
+
+### 6) 다음 액션
+
+1. Play Console — `https://todays-language-dev.web.app/legal/privacy-ko.html` 등록
+2. Play Console — Data safety 선언 (이메일·uid·진도·채팅·Analytics·Crashlytics 등)
+3. FCM 답변 알림 (문의 2단계)
+4. 관리자 웹 확장 — 공지·원격 설정
